@@ -105,7 +105,7 @@ const Banner = () => {
                 <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-cat'); }}>
                   Dành cho mèo
                 </li>
-              </ul>
+                </ul>
             )}
           </li>
           <li className="mx-4 my-3 md:my-0">

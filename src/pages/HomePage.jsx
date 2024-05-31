@@ -1,16 +1,18 @@
 
-import Banner from '../components/homePage/Banner'
-import Footer from '../components/homePage/Footer'
-import Welcome from '../components/homePage/Welcome'
+import Banner from '../components/homePage/Banner';
+import Footer from '../components/homePage/Footer';
+import Welcome from '../components/homePage/Welcome';
 
 const HomePage = () => {
   return (
-    <div>
-        <Banner/>
-        <Welcome/>
-        <Footer/>
+    <div className='min-h-screen flex flex-col'>
+        <Banner />
+        <div className='flex-grow'>
+          <Welcome />
+        </div>
+        <Footer />
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

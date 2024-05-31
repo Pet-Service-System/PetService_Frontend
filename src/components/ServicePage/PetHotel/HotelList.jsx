@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getForDogProducts } from '../../../apis/ApiProduct';
 
-const HotelList = () => {
+const ProductList = () => {
   const [productData, setProductData] = useState([]);
 
   useEffect(() => {
@@ -50,4 +50,4 @@ const HotelList = () => {
   );
 };
 
-export default HotelList;
+export default ProductList;

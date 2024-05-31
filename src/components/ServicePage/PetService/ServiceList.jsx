@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getForCatProducts } from '../../../apis/ApiProduct';
 
-const ServiceList = () => {
+const ProductList = () => {
   const [productData, setProductData] = useState([]);
 
   useEffect(() => {
@@ -50,4 +50,4 @@ const ServiceList = () => {
   );
 };
 
-export default ServiceList;
+export default ProductList;

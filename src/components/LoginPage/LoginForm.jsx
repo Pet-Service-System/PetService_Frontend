@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios'; // Import axios for making HTTP requests
 
 const LoginForm = () => {
@@ -136,7 +136,6 @@ const SignUp = ({ setIsSignUp }) => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       console.log('Form submitted', formData);
-      // You can add your signup logic here
     } else {
       setErrors(validationErrors);
     }
