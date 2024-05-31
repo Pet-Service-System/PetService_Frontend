@@ -1,8 +1,5 @@
 import{ useEffect, useState } from 'react'
-
 import UserProfile from '../components/UserProfilePage/UserProfile'
-import Banner from '../components/UserProfilePage/Banner'
-import Footer from '../components/homePage/Footer'
 import { getUserInformation } from '../apis/ApiUserProfile'
 
 const UserProfilePage = () => {
@@ -15,9 +12,7 @@ const UserProfilePage = () => {
   },[])
   return (userData &&
     <div>
-        <Banner/>
         <UserProfile userData = {userData}/>
-        <Footer/>
     </div>
   )
 }

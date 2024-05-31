@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { FaRegUserCircle } from "react-icons/fa";
 import 'tailwindcss/tailwind.css';
 
-const Banner = () => {
+const StaffBanner = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
@@ -47,13 +48,13 @@ const Banner = () => {
     setIsStoreDropdownOpen(false);
   };
 
-  const handleLoginClick = () => {
-    closeMenu();
-    navigate('/login');
+  const clickTitle = () => {
+    navigate('/staff  ');
   };
 
-  const clickTitle = () => {
-    navigate('/');
+  const handleUserIconClick = () => {
+    closeMenu();
+    navigate('/user-profile-staff');
   };
 
   return (
@@ -73,10 +74,10 @@ const Banner = () => {
         </div>
         <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
           <li className="mx-4 my-3 md:my-0">
-            <a href="/" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
+            <NavLink to="/staff-schedule" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LỊCH</NavLink>
           </li>
           <li className="mx-4 my-3 md:my-0">
-            <a href="/about" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
+            <NavLink to="/accounts" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">QUẢN LÝ TÀI KHOẢN</NavLink>
           </li>
           <li className="relative mx-4 my-3 md:my-0">
             <button onClick={toggleServiceDropdown} className="text-xl hover:text-cyan-500 duration-500">
@@ -84,11 +85,11 @@ const Banner = () => {
             </button>
             {isServiceDropdownOpen && (
               <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-service'); }}>
-                  Dịch vụ thú cưng
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                  <NavLink to={'/for-vet'} onClick={closeMenu}>Dịch vụ thú cưng</NavLink>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-hotel'); }}>
-                  Khách sạn thú cưng
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                  <NavLink to={'/for-pet'} onClick={closeMenu}>Khách sạn thú cưng</NavLink>
                 </li>
               </ul>
             )}
@@ -99,22 +100,24 @@ const Banner = () => {
             </button>
             {isStoreDropdownOpen && (
               <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-dog'); }}>
-                  Dành cho chó
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" >
+                  <NavLink to={'/for-dog'} onClick={closeMenu}>Dành cho chó</NavLink>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-cat'); }}>
-                  Dành cho mèo
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                  <NavLink to={'/for-cat'} onClick={closeMenu}>Dành cho mèo</NavLink>
                 </li>
-                </ul>
+              </ul>
             )}
           </li>
           <li className="mx-4 my-3 md:my-0">
-            <a href="/contact" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
+            <NavLink to="/booking-list" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">BOOKING</NavLink>
           </li>
           <li className="mx-4 my-3 md:my-0">
-            <button onClick={handleLoginClick} className="bg-cyan-400 text-white duration-500 px-6 py-2 hover:bg-cyan-500 rounded">
-              ĐĂNG NHẬP
-            </button>
+            {isSmallScreen ? (
+              <button onClick={handleUserIconClick} className="text-xl hover:text-cyan-500 duration-500">TÀI KHOẢN</button>
+            ) : (
+              <FaRegUserCircle className="userIcon w-10 h-10 hover:text-cyan-500 duration-500" onClick={handleUserIconClick} />
+            )}
           </li>
         </ul>
       </div>
@@ -122,4 +125,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default StaffBanner;

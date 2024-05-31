@@ -1,6 +1,4 @@
 
-import Banner from '../components/UserProfilePage/Banner'
-import Footer from '../components/homePage/Footer'
 import TransactionDetail from '../components/TransactionDetailPage/TransactionDetail'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -16,9 +14,7 @@ const TransactionDetailPage = () => {
   },[])
   return (transactionData &&
     <div>
-        <Banner/>
         <TransactionDetail transactionData={transactionData}/>
-        <Footer/>
     </div>
   )
 }

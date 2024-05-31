@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaRegUserCircle } from "react-icons/fa";
+import { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
+import { FaRegUserCircle } from "react-icons/fa";
+import { IoCartOutline } from "react-icons/io5";
 
-const Banner = () => {
+const UserProfileBanner = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
@@ -21,7 +22,7 @@ const Banner = () => {
 
   const toggleStoreDropdown = () => {
     setIsStoreDropdownOpen(!isStoreDropdownOpen);
-    setIsServiceDropdownOpen(false); 
+    setIsServiceDropdownOpen(false);
   };
 
   useEffect(() => {
@@ -29,8 +30,6 @@ const Banner = () => {
       setIsSmallScreen(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
         setIsOpen(false);
-        setIsServiceDropdownOpen(false);
-        setIsStoreDropdownOpen(false);
       }
     };
 
@@ -44,17 +43,16 @@ const Banner = () => {
 
   const closeMenu = () => {
     setIsOpen(false);
-    setIsServiceDropdownOpen(false);
-    setIsStoreDropdownOpen(false);
-  };
-
-  const clickTitle = () => {
-    navigate('/staff  ');
   };
 
   const handleUserIconClick = () => {
     closeMenu();
-    navigate('/user-profile-staff');
+    navigate('/user-profile');
+  };
+
+  const handleCartIconClick = () => {
+    closeMenu();
+    navigate('/cart');
   };
 
   return (
@@ -63,7 +61,7 @@ const Banner = () => {
         <div className="flex items-center justify-between w-full md:w-auto">
           <div className="flex items-center">
             <img className="h-20 w-20" src="/src/assets/image/iconPet.png" alt="Pet Service Logo" />
-            <span className="text-4xl ml-2 px-7 cursor-pointer" onClick={clickTitle}>Pet Service</span>
+            <span className="text-4xl ml-2 px-7 cursor-pointer">Pet Service</span>
           </div>
           <button
             className="text-3xl md:hidden focus:outline-none"
@@ -74,10 +72,10 @@ const Banner = () => {
         </div>
         <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
           <li className="mx-4 my-3 md:my-0">
-            <a href="/staff-schedule" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LỊCH</a>
+            <NavLink to="/" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</NavLink>
           </li>
           <li className="mx-4 my-3 md:my-0">
-            <a href="/accounts" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">QUẢN LÝ TÀI KHOẢN</a>
+            <NavLink to="/about" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</NavLink>
           </li>
           <li className="relative mx-4 my-3 md:my-0">
             <button onClick={toggleServiceDropdown} className="text-xl hover:text-cyan-500 duration-500">
@@ -85,11 +83,11 @@ const Banner = () => {
             </button>
             {isServiceDropdownOpen && (
               <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-service'); }}>
-                  Dịch vụ thú cưng
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                  <NavLink to={'/pet-service'} onClick={closeMenu}>Dịch vụ thú cưng</NavLink>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-hotel'); }}>
-                  Khách sạn thú cưng
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                  <NavLink to={'/pet-hotel'} onClick={closeMenu}>Khách sạn thú cưng</NavLink>
                 </li>
               </ul>
             )}
@@ -100,17 +98,24 @@ const Banner = () => {
             </button>
             {isStoreDropdownOpen && (
               <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-dog'); }}>
-                  Dành cho chó
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">
+                  <NavLink to={'/for-dog'} onClick={closeMenu}>Dành cho chó</NavLink>
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-cat'); }}>
-                  Dành cho mèo
+                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" >
+                  <NavLink to={'/for-cat'} onClick={closeMenu}>Dành cho mèo</NavLink>
                 </li>
               </ul>
             )}
           </li>
           <li className="mx-4 my-3 md:my-0">
-            <a href="/booking-list" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">BOOKING</a>
+            <NavLink to={'/contact'} onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</NavLink>
+          </li>
+          <li className="mx-4 my-3 md:my-0">
+            {isSmallScreen ? (
+              <button onClick={handleCartIconClick} className="text-xl hover:text-cyan-500 duration-500">GIỎ HÀNG</button>
+            ) : (
+              <IoCartOutline className="userIcon w-10 h-10 hover:text-cyan-500 duration-500" onClick={handleCartIconClick} />
+            )}
           </li>
           <li className="mx-4 my-3 md:my-0">
             {isSmallScreen ? (
@@ -125,4 +130,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default UserProfileBanner;

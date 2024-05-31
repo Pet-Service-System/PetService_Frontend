@@ -6,9 +6,7 @@ import Footer from '../components/homePage/Footer'
 const LoginPage = () => {
   return (
     <div>
-        <Banner/>
         <LoginForm/>
-        <Footer/>
     </div>
   )
 }

@@ -1,82 +1,68 @@
-import useShopping from '../../hook/useShopping';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-    const { shoppingCart, handelUpdateQuantity, handleRemoveItem } = useShopping();
+  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState([
+    { id: 1, name: 'Product 1', price: 100, quantity: 2 },
+    { id: 2, name: 'Product 2', price: 200, quantity: 1 },
+    { id: 3, name: 'Product 3', price: 150, quantity: 3 },
+  ]);
 
-    // Calculate the total amount of the cart
-    const totalAmount = shoppingCart.reduce((total, item) => {
-        return total + item.price * item.quantity;
-    }, 0);
+  const handleCheckout = () => {
+    navigate('/payment');
+  };
 
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="lg:text-5xl text-3xl font-bold mb-8 text-center">Shopping Cart</h1>
-            <div className="bg-white shadow-lg rounded-lg p-6">
-                {shoppingCart && shoppingCart.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full table-auto">
-                            <thead>
-                                <tr className="bg-gray-200">
-                                    <th className="px-4 py-2 text-left">#</th>
-                                    <th className="px-4 py-2 text-left">Sản phẩm</th>
-                                    <th className="px-4 py-2 text-left">Giá</th>
-                                    <th className="px-4 py-2 text-left">Số lượng</th>
-                                    <th className="px-4 py-2 text-left">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {shoppingCart.map((item, index) => (
-                                    <tr key={item.id} className="border-t">
-                                        <td className="px-4 py-2">{index + 1}</td>
-                                        <td className="px-4 py-2 flex items-center">
-                                            <div
-                                                className="w-20 h-20 bg-cover bg-center rounded mr-4"
-                                                style={{ backgroundImage: `url(${item.image})` }}
-                                            ></div>
-                                            <span className="text-xl font-semibold">{item.name}</span>
-                                        </td>
-                                        <td className="px-4 py-2">${item.price}</td>
-                                        <td className="px-4 py-2">
-                                            <input
-                                                value={item.quantity}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value);
-                                                    if (value >= 1) {
-                                                        handelUpdateQuantity(item.id, value);
-                                                    }
-                                                }}
-                                                className="w-24 p-2 border border-gray-300 rounded-md text-center"
-                                                min="1"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <button
-                                                onClick={() => handleRemoveItem(item.id)}
-                                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                            >
-                                                Xóa
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <p className="text-5xl text-center text-gray-500">Giỏ của bạn đang trống.</p>
-                )}
-            </div>
-            {shoppingCart && shoppingCart.length > 0 && (
-                <div className="mt-8 flex justify-end items-center">
-                    <span className="text-2xl text-green-600 font-bold mr-4">Tổng tiền: ${totalAmount.toFixed(2)}</span>
-                    <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
-                        Thanh toán
-                    </button>
-                </div>
-            )}
-        </div>
-    );
+  const handleCancel = () => {
+    navigate('/');
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  return (
+    <div className="container mx-auto p-4 py-40 md:px-80">
+      <h2 className="text-5xl text-red-500 text-center font-semibold mb-4">Giỏ hàng</h2>
+      <table className="w-full border-collapse border border-gray-300 mb-4">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">Tên sản phẩm</th>
+            <th className="border px-4 py-2">Giá</th>
+            <th className="border px-4 py-2">Số lượng</th>
+            <th className="border px-4 py-2">Tổng cộng</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cartItems.map((item) => (
+            <tr key={item.id}>
+              <td className="border px-4 py-2">{item.name}</td>
+              <td className="border px-4 py-2">${item.price}</td>
+              <td className="border px-4 py-2">{item.quantity}</td>
+              <td className="border px-4 py-2">${item.price * item.quantity}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="text-right mb-4">
+        <h3 className="text-2xl text-green-700 font-semibold">Tổng cộng: ${calculateTotal()}</h3>
+      </div>
+      <div className="text-right">
+        <button
+          className="bg-orange-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+          onClick={handleCheckout}
+        >
+          Thanh toán
+        </button>
+        <button
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleCancel}
+        >
+          Hủy
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Cart;

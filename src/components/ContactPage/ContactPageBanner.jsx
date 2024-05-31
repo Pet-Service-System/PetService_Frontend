@@ -1,5 +1,6 @@
+import { NavLink } from "react-router-dom"
 
-const Banner = () => {
+const ContactPageBanner = () => {
     return (
       <div>
           <div className="w3ls-banner about-w3lsbanner">
@@ -12,7 +13,7 @@ const Banner = () => {
                           </div>
                           <div className="agileits_w3layouts_sign_in">
                               <ul>
-                              <li><a href="../Login" className="play-icon">ĐĂNG NHẬP</a></li>
+                              <li><NavLink to="../Login" className="play-icon">ĐĂNG NHẬP</NavLink></li>
                                   
                               </ul>
                           </div>
@@ -30,21 +31,21 @@ const Banner = () => {
                               </div>
                               <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                                   <ul className="nav navbar-nav cl-effect-16">
-                                      <li><a href="index.html">TRANG CHỦ</a></li>
-                                      <li><a href="about.html">GIỚI THIỆU</a></li> 
-                                      <li><a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">DỊCH VỤ <span className="caret"></span></a>
+                                      <li><NavLink to="/">TRANG CHỦ</NavLink></li>
+                                      <li><NavLink to="about">GIỚI THIỆU</NavLink></li> 
+                                      <li><NavLink to="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">DỊCH VỤ <span className="caret"></span></NavLink>
                                           <ul className="dropdown-menu">
-                                              <li><a href="icons.html">KHÁCH SẠN THÚ CƯNG</a></li>
-                                              <li><a href="codes.html">DỊCH VỤ THÚ CƯNG</a></li>
+                                              <li><NavLink to="pet-hotel">KHÁCH SẠN THÚ CƯNG</NavLink></li>
+                                              <li><NavLink to="pet-service">DỊCH VỤ THÚ CƯNG</NavLink></li>
                                           </ul>
                                       </li> 
-                                      <li><a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CỬA HÀNG <span className="caret"></span></a>
+                                      <li><NavLink to="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CỬA HÀNG <span className="caret"></span></NavLink>
                                           <ul className="dropdown-menu">
-                                              <li><a href="icons.html">DÀNH CHO CHÓ</a></li>
-                                              <li><a href="codes.html">DÀNH CHO MÈO</a></li>
+                                              <li><NavLink to="for-dog">DÀNH CHO CHÓ</NavLink></li>
+                                              <li><NavLink to="for-cat">DÀNH CHO MÈO</NavLink></li>
                                           </ul>
                                       </li> 
-                                      <li><a href="contact.html" className="active">LIÊN HỆ</a></li>
+                                      <li><NavLink to="contact" className="active">LIÊN HỆ</NavLink></li>
                                   </ul>  
                                   <div className="clearfix"> </div>	
                               </div>
@@ -58,4 +59,4 @@ const Banner = () => {
     )
   }
   
-  export default Banner
+  export default ContactPageBanner

@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import axios from 'axios'; // Import axios for making HTTP requests
+import React, { useState } from 'react';
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +9,6 @@ const LoginForm = () => {
   const [errors, setErrors] = useState({});
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [loginMessage, setLoginMessage] = useState(''); // To store login messages
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,73 +25,59 @@ const LoginForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
-      try {
-        const response = await axios.post('http://localhost:3001/login', {
-          username: formData.email,
-          password: formData.password,
-        });
-        setLoginMessage(response.data.message);
-        console.log('Login successful', response.data.user);
-      } catch (error) {
-        if (error.response) {
-          setLoginMessage(error.response.data.message);
-        } else {
-          setLoginMessage('An error occurred');
-        }
-      }
+      console.log('Form submitted', formData);
     } else {
       setErrors(validationErrors);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-12 bg-white rounded-lg py-40">
-      {isSignUp ? (
-        <SignUp setIsSignUp={setIsSignUp} />
-      ) : isForgotPassword ? (
-        <ForgotPassword setIsForgotPassword={setIsForgotPassword} />
-      ) : (
-        <div className="max-w-4xl p-12 bg-white rounded-lg shadow-lg">
-          <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">ĐĂNG NHẬP</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="email" className="block mb-1">Email:</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md"
-              />
-              {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
-            </div>
-            <div className="mb-4">
-              <label htmlFor="password" className="block mb-1">Mật khẩu:</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-md"
-              />
-              {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
-            </div>
-            <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Đăng nhập</button>
-          </form>
-          {loginMessage && <p className="text-center mt-4 text-red-500">{loginMessage}</p>}
-          <div className="mt-4 flex justify-between">
-            <button className="text-blue-500" onClick={() => setIsSignUp(true)}>Đăng kí</button>
-            <button className="text-blue-500" onClick={() => setIsForgotPassword(true)}>Quên mật khẩu</button>
+    <div className="flex justify-center items-center min-h-3/4 py-5 bg-gray-100">
+    {isSignUp ? (
+      <SignUp setIsSignUp={setIsSignUp} />
+    ) : isForgotPassword ? (
+      <ForgotPassword setIsForgotPassword={setIsForgotPassword} />
+    ) : (
+      <div className="max-w-3xl p-20 bg-white rounded-lg shadow-lg"> 
+        <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">ĐĂNG NHẬP</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block mb-1">Email:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-12 py-2 border rounded-md"
+            />
+            {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
           </div>
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-1">Mật khẩu:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-12 py-2 border rounded-md"
+            />
+            {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
+          </div>
+          <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Đăng nhập</button>
+        </form>
+        <div className="mt-4 flex justify-between">
+          <button className="text-blue-500" onClick={() => setIsSignUp(true)}>Đăng kí</button>
+          <button className="text-blue-500" onClick={() => setIsForgotPassword(true)}>Quên mật khẩu</button>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+  </div>
   );
 };
 
@@ -142,10 +126,10 @@ const SignUp = ({ setIsSignUp }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-12 bg-white rounded-lg shadow-md">
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">Đăng kí</h2>
       <form onSubmit={handleSubmit} className="signupForm">
-        <div className="mb-4">
+        <div className="mb-1">
           <div className="flex">
             <div className="w-1/2 pr-2">
               <label htmlFor="firstName" className="block mb-1">Tên:</label>
@@ -173,7 +157,7 @@ const SignUp = ({ setIsSignUp }) => {
             </div>
           </div>
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label htmlFor="email" className="block mb-1">Email:</label>
           <input
             type="email"
@@ -185,7 +169,7 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label htmlFor="password" className="block mb-1">Mật khẩu:</label>
           <input
             type="password"
@@ -197,7 +181,7 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label htmlFor="confirmPassword" className="block mb-1">Xác nhận mật khẩu:</label>
           <input
             type="password"
@@ -209,7 +193,7 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.confirmPassword && <p className="text-red-500 mt-1">{errors.confirmPassword}</p>}
         </div>
-        <div className="mb-4">
+        <div className="mb-1">
           <label htmlFor="phoneNumber" className="block mb-1">Số điện thoại:</label>
           <input
             type="text"
@@ -221,7 +205,7 @@ const SignUp = ({ setIsSignUp }) => {
           />
           {errors.phoneNumber && <p className="text-red-500 mt-1">{errors.phoneNumber}</p>}
         </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <label htmlFor="address" className="block mb-1">Địa chỉ:</label>
           <input
             type="text"
@@ -235,34 +219,31 @@ const SignUp = ({ setIsSignUp }) => {
         </div>
         <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Đăng kí</button>
       </form>
-      <button className="mt-4 text-blue-500" onClick={() => setIsSignUp(false)}>Quay lại đăng nhập</button>
+      <button className="text-blue-500 mt-4" onClick={() => setIsSignUp(false)}>Trở về đăng nhập</button>
     </div>
   );
 };
 
+
 const ForgotPassword = ({ setIsForgotPassword }) => {
   const [email, setEmail] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState('');
 
-  const validate = () => {
-    const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    return newErrors;
+  const handleChange = (e) => {
+    setEmail(e.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length === 0) {
-      console.log('Reset password for', email);
-      // You can add your reset password logic here
+    if (!email) {
+      setErrors('Email is required');
     } else {
-      setErrors(validationErrors);
+      console.log('Forgot password request submitted for', email);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-12 bg-white rounded-lg shadow-md">
+    <div className="max-w-4xl p-20 bg-white rounded-lg shadow-lg">
       <h2 className="text-4xl text-blue-500 font-semibold mb-6 text-center">Quên mật khẩu</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -270,16 +251,15 @@ const ForgotPassword = ({ setIsForgotPassword }) => {
           <input
             type="email"
             id="email"
-            name="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md"
+            onChange={handleChange}
+            className="w-full px-12 py-2 border rounded-md"
           />
-          {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
+          {errors && <p className="text-red-500 mt-1">{errors}</p>}
         </div>
-        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Gửi yêu cầu</button>
+        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md">Gửi</button>
       </form>
-      <button className="mt-4 text-blue-500" onClick={() => setIsForgotPassword(false)}>Quay lại đăng nhập</button>
+      <button className="text-blue-500 mt-4" onClick={() => setIsForgotPassword(false)}>Trở về đăng nhập</button>
     </div>
   );
 };
