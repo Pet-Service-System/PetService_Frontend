@@ -32,8 +32,8 @@ const LoginForm = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await axios.post('http://localhost:3001/login', {
-          username: formData.email,
+        const response = await axios.post('http://localhost:3001/api/auth/login', {
+          email: formData.email,
           password: formData.password,
         });
         setLoginMessage(response.data.message);
