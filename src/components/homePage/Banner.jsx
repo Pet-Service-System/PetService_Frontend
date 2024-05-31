@@ -134,7 +134,7 @@ const Banner = () => {
               </a>
 
               <a href={"for-cat"} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black md:mx-2">
-                Khách sạn thú cưng
+                Dành cho mèo
               </a>
 
             </div>
