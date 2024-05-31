@@ -74,7 +74,7 @@ const Banner = () => {
         </div>
         <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
           <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
-            <a onClick={() => { closeMenu(); navigate('/staff-schedule'); }} className="px-5 relative text-xl hover:text-cyan-500 duration-500">LỊCH</a>
+            <a onClick={() => { closeMenu(); navigate('/staff-schedule'); }} className="px-5 relative text-xl hover:text-cyan-500 duration-500">LỊCH LÀM VIỆC</a>
           </li>
           <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
             <a onClick={() => { closeMenu(); navigate('/accounts'); }} className="px-5 relative text-xl hover:text-cyan-500 duration-500">QUẢN LÝ TÀI KHOẢN</a>

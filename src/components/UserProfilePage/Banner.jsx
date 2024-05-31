@@ -17,7 +17,7 @@ const Banner = () => {
 
   const toggleServiceDropdown = () => {
     setIsServiceDropdownOpen(!isServiceDropdownOpen);
-    setIsStoreDropdownOpen(false); 
+    setIsStoreDropdownOpen(false);
   };
 
   const toggleStoreDropdown = () => {
@@ -71,44 +71,67 @@ const Banner = () => {
           </button>
         </div>
         <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
+          <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
+            <a onClick={() => { closeMenu(); navigate('/'); }} className="relative px-5 text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
           </li>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/about" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
+          <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
+            <a onClick={() => { closeMenu(); navigate('/about'); }} className="relative px-5 text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
           </li>
-          <li className="relative mx-4 my-3 md:my-0">
-            <button onClick={toggleServiceDropdown} className="text-xl hover:text-cyan-500 duration-500">
-              DỊCH VỤ
-            </button>
-            {isServiceDropdownOpen && (
-              <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-service'); }}>
-                  Dịch vụ thú cưng
-                </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-hotel'); }}>
-                  Khách sạn thú cưng
-                </li>
-              </ul>
-            )}
-          </li>
-          <li className="relative mx-4 my-3 md:my-0">
-            <button onClick={toggleStoreDropdown} className="text-xl hover:text-cyan-500 duration-500">
-              CỬA HÀNG
-            </button>
-            {isStoreDropdownOpen && (
-              <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-dog'); }}>
-                  Dành cho chó
-                </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-cat'); }}>
-                  Dành cho mèo
-                </li>
-              </ul>
-            )}
-          </li>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/contact" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
+          <div className="group relative cursor-pointer py-2">
+            <div className="flex items-center justify-between space-x-5 bg-white px-4">
+              <a className="menu-hover text-xl hover:text-cyan-500 duration-500" >
+                DỊCH VỤ
+              </a>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                  stroke="currentColor" className="h-6 w-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </span>
+            </div>
+
+            <div
+              className="invisible absolute z-50 flex w-full flex-col bg-gray-100 py-1 px-4 text-gray-800 shadow-xl group-hover:visible">
+
+              <a onClick={() => { closeMenu(); navigate('/pet-service'); }} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black md:mx-2">
+                Dịch vụ thú cưng
+              </a>
+
+              <a onClick={() => { closeMenu(); navigate('/pet-hotel'); }} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black md:mx-2">
+                Khách sạn thú cưng
+              </a>
+
+            </div>
+          </div>
+          <div className="group relative cursor-pointer py-2">
+
+            <div className="flex items-center justify-between space-x-5 bg-white px-4">
+              <a className="menu-hover text-xl hover:text-cyan-500 duration-500" >
+                CỬA HÀNG
+              </a>
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                  stroke="currentColor" className="h-6 w-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </span>
+            </div>
+
+            <div
+              className="invisible absolute z-50 flex w-full flex-col bg-gray-100 py-1 px-4 text-gray-800 shadow-xl group-hover:visible">
+
+              <a onClick={() => { closeMenu(); navigate('/for-dog'); }} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black md:mx-2">
+                Dành cho chó
+              </a>
+
+              <a onClick={() => { closeMenu(); navigate('/for-cat'); }} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black md:mx-2">
+                Dành cho mèo
+              </a>
+
+            </div>
+          </div>
+          <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
+            <a href="/contact" onClick={closeMenu} className="relative px-5 text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
           </li>
           <li className="mx-4 my-3 md:my-0">
             {isSmallScreen ? (
