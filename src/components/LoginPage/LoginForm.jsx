@@ -250,12 +250,23 @@ const ForgotPassword = ({ setIsForgotPassword }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
-      console.log('Reset password for', email);
-      // You can add your reset password logic here
+      try {
+        const response = await axios.post('http://localhost:3001/api/auth/request-reset-password', {
+          email,
+        });
+        setRequestMessage(response.data.message);
+        console.log('Password reset request successful', response.data);
+      } catch (error) {
+        if (error.response) {
+          setRequestMessage(error.response.data.message);
+        } else {
+          setRequestMessage('An error occurred');
+        }
+      }
     } else {
       setErrors(validationErrors);
     }
