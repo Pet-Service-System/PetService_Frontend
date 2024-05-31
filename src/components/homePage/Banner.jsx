@@ -78,12 +78,12 @@ const Banner = () => {
         <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
           <div className='text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500'>
             <li className="mx-4 my-3 md:my-0">
-              <a onClick={() => { closeMenu(); navigate('/'); }} className="relative bold text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
+              <a onClick={() => { closeMenu(); navigate('/'); }} className="px-5 relative bold text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
             </li>
           </div>
           <div className='text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500'>
             <li className="mx-4 my-3 md:my-0">
-              <a onClick={() => { closeMenu(); navigate('/about'); }} className="relative bold text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
+              <a onClick={() => { closeMenu(); navigate('/about'); }} className="px-5 relative bold text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
             </li>
           </div>
           <div className="group relative cursor-pointer py-2">
@@ -140,7 +140,7 @@ const Banner = () => {
             </div>
           </div>
           <div className='text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500'>
-            <li className="mx-4 my-3 md:my-0">
+            <li className="px-5 mx-4 my-3 md:my-0">
               <a onClick={() => { closeMenu(); navigate('/contact'); }} className="relative bold text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
             </li>
           </div>

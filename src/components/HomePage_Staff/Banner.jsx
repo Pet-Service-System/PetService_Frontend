@@ -74,10 +74,10 @@ const Banner = () => {
         </div>
         <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
           <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
-            <a onClick={() => { closeMenu(); navigate('/staff-schedule'); }} className="relative text-xl hover:text-cyan-500 duration-500">LỊCH</a>
+            <a onClick={() => { closeMenu(); navigate('/staff-schedule'); }} className="px-5 relative text-xl hover:text-cyan-500 duration-500">LỊCH</a>
           </li>
           <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
-            <a onClick={() => { closeMenu(); navigate('/accounts'); }} className="relative text-xl hover:text-cyan-500 duration-500">QUẢN LÝ TÀI KHOẢN</a>
+            <a onClick={() => { closeMenu(); navigate('/accounts'); }} className="px-5 relative text-xl hover:text-cyan-500 duration-500">QUẢN LÝ TÀI KHOẢN</a>
           </li>
           <div className="group relative cursor-pointer py-2">
             <div className="flex items-center justify-between space-x-5 bg-white px-4">
@@ -132,8 +132,8 @@ const Banner = () => {
 
             </div>
           </div>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/booking-list" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">BOOKING</a>
+          <li className="text-4xl cursor-pointer relative before:absolute before:bg-sky-200 before:bottom-0 before:left-0 before:h-full before:w-full before:origin-bottom before:scale-y-[0.35] hover:before:scale-y-100 before:transition-transform before:ease-in-out before:duration-500">
+            <a href="/booking-list" onClick={closeMenu} className="px-5 relative text-xl hover:text-cyan-500 duration-500">BOOKING</a>
           </li>
           <li className="mx-4 my-3 md:my-0">
             {isSmallScreen ? (
