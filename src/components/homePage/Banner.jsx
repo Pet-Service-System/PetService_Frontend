@@ -88,13 +88,13 @@ const Banner = () => {
           </div>
           <div className="group relative cursor-pointer py-2">
             <div className="flex items-center justify-between space-x-5 bg-white px-4">
-              <a className="menu-hover text-xl hover:text-cyan-500 duration-500" onClick="">
+              <a className="menu-hover text-xl hover:text-cyan-500 duration-500" >
                 DỊCH VỤ
               </a>
               <span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="h-6 w-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                  stroke="currentColor" className="h-6 w-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </span>
             </div>
@@ -115,13 +115,13 @@ const Banner = () => {
           <div className="group relative cursor-pointer py-2">
 
             <div className="flex items-center justify-between space-x-5 bg-white px-4">
-              <a className="menu-hover text-xl hover:text-cyan-500 duration-500" onClick="">
+              <a className="menu-hover text-xl hover:text-cyan-500 duration-500" >
                 CỬA HÀNG
               </a>
               <span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                  stroke="currentColor" class="h-6 w-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                  stroke="currentColor" className="h-6 w-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </span>
             </div>

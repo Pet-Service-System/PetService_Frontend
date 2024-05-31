@@ -31,6 +31,7 @@ import BookingFeedbackPage from './pages/BookingFeedbackPage'
 import UserProfilePage_Staff from './pages/UserProfilePage_Staff'
 import PetServiceDetailPage from './pages/PetServiceDetailPage'
 import HotelServiceDetailPage from './pages/HotelServiceDetailPage'
+import NotFound from './components/AboutPage/NotFound'
 
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
       <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/user-profile-staff' element={<UserProfilePage_Staff/>}/>
+      <Route path='*' element={<NotFound/>}/>
     </Routes>
     </>
   )
