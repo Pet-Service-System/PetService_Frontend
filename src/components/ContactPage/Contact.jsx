@@ -2,49 +2,83 @@ import React from 'react';
 import { FaHouseChimney } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
 import { FaPhoneAlt } from "react-icons/fa";
+import { Form, Input, Button, Row, Col, Typography } from 'antd';
 
+const { Title, Paragraph } = Typography;
 
 const Contact = () => {
   return (
-    <div className="bg-gray-100 py-12 px-40">
-      <div className="container mx-auto px-4">
-        <h3 className="text-6xl text-red-500 text-center font-semibold mb-8">Liên hệ</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="address-row flex items-center">
-            <FaHouseChimney className='icon w-20 h-20'/>
-            <div className="address-right">
-              <h5 className="font-semibold">Visit Us</h5>
-              <p>Pet Service Quận 7</p>
+    <div className="bg-gray-100 px-4 md:px-20 lg:px-40">
+      <div className="container mx-auto">
+        <Title level={2} className="text-red-500 text-center font-semibold mb-8 mt-10">Liên hệ</Title>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={8}>
+            <div className="address-row flex items-center">
+              <FaHouseChimney className='icon w-12 h-12 md:w-20 md:h-20' />
+              <div className="address-right ml-4">
+                <Title level={5} className="font-semibold">Visit Us</Title>
+                <Paragraph>Pet Service Quận 7</Paragraph>
+              </div>
             </div>
-          </div>
-          <div className="address-row flex items-center">
-            <IoMdMail className='icon w-20 h-20'/>
-            <div className="address-right">
-              <h5 className="font-semibold">Mail Us</h5>
-              <p><a href="mailto:info@example.com"> petservicemanagement@gmail.com</a></p>
+          </Col>
+          <Col xs={24} md={8}>
+            <div className="address-row flex items-center">
+              <IoMdMail className='icon w-12 h-12 md:w-20 md:h-20' />
+              <div className="address-right ml-4">
+                <Title level={5} className="font-semibold">Mail Us</Title>
+                <Paragraph>
+                  <a href="mailto:petservicemanagement@gmail.com">petservicemanagement@gmail.com</a>
+                </Paragraph>
+              </div>
             </div>
-          </div>
-          <div className="address-row flex items-center">
-            <FaPhoneAlt className='icon w-20 h-20'/>
-            <div className="address-right">
-              <h5 className="font-semibold">Call Us</h5>
-              <p>(+00) 123 234</p>
+          </Col>
+          <Col xs={24} md={8}>
+            <div className="address-row flex items-center">
+              <FaPhoneAlt className='icon w-12 h-12 md:w-20 md:h-20' />
+              <div className="address-right ml-4">
+                <Title level={5} className="font-semibold">Call Us</Title>
+                <Paragraph>(+00) 123 234</Paragraph>
+              </div>
             </div>
-          </div>
-        </div>
-        <form className="mt-8" action="#" method="post">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="contact-left">
-              <input className="block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 mb-3" type="text" name="Name" placeholder="Your Name" required=""/>
-              <input className="block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 mb-3" type="email" name="Email" placeholder="Email" required=""/>
-              <input className="block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 mb-3" type="text" name="Mobile Number" placeholder="Mobile Number" required=""/>
-            </div>
-            <div className="contact-right">
-              <textarea className="block w-full border-gray-300 rounded-md shadow-sm py-2 px-3 mb-3" name="Message" placeholder="Message" required=""></textarea>
-              <input className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600" type="submit" value="Submit" />
-            </div>
-          </div>
-        </form>
+          </Col>
+        </Row>
+        <Form className="mt-8" layout="vertical">
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="Name"
+                rules={[{ required: true, message: 'Please enter your name' }]}
+              >
+                <Input placeholder="Your Name" />
+              </Form.Item>
+              <Form.Item
+                name="Email"
+                rules={[{ required: true, message: 'Please enter your email' }, { type: 'email', message: 'Please enter a valid email' }]}
+              >
+                <Input placeholder="Email" />
+              </Form.Item>
+              <Form.Item
+                name="Mobile Number"
+                rules={[{ required: true, message: 'Please enter your mobile number' }]}
+              >
+                <Input placeholder="Mobile Number" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="Message"
+                rules={[{ required: true, message: 'Please enter your message' }]}
+              >
+                <Input.TextArea placeholder="Message" rows={4} />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit" className="w-full">
+                  Submit
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
       </div>
     </div>
   );

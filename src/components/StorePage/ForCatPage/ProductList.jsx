@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getForCatProducts } from '../../../apis/ApiProduct';
+import { Card, Col, Row } from 'antd';
+
+const { Meta } = Card;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
@@ -20,31 +23,39 @@ const ProductList = () => {
   return (
     productData && (
       <div className="flex justify-center p-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <Row gutter={[16, 16]} justify="center">
           {productData.map((product) => (
-            <div
+            <Col
               key={product.id}
-              className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition transform hover:scale-105 duration-300"
-              onClick={() => handleProductClick(product.id)}
-              style={{ width: '250px' }} // Set a fixed width for the card
+              xs={24}
+              sm={12}
+              md={8}
+              lg={6}
             >
-              <div className="w-full overflow-hidden" style={{ height: '250px' }}> {/* Set a fixed height for the image container */}
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
+              <Card
+                hoverable
+                cover={
+                  <img
+                    alt={product.name}
+                    src={product.image}
+                    style={{ height: '250px', objectFit: 'cover' }}
+                  />
+                }
+                onClick={() => handleProductClick(product.id)}
+              >
+                <Meta
+                  title={product.name}
+                  description={
+                    <>
+                      <p>${product.price}</p>
+                      <p>{product.description}</p>
+                    </>
+                  }
                 />
-              </div>
-              <div className="p-4 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-                  <p className="text-gray-600 mt-2">${product.price}</p>
-                  <p className="text-gray-500 mt-2">{product.description}</p>
-                </div>
-              </div>
-            </div>
+              </Card>
+            </Col>
           ))}
-        </div>
+        </Row>
       </div>
     )
   );
