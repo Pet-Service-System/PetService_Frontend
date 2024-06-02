@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Button, Drawer, Badge } from 'antd';
-import { MenuOutlined, UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
+import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 
 const { Header } = Layout;
 
 const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [role, setRole] = useState('staff'); // 'guest', 'customer', 'admin', 'staff'
+  const [role, setRole] = useState(''); // 'guest', 'customer', 'admin', 'staff'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +18,10 @@ const Banner = () => {
         setIsDrawerVisible(false);
       }
     };
+
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole);
+    console.log('Role retrieved from localStorage:', storedRole);
 
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -30,6 +34,41 @@ const Banner = () => {
   const closeMenu = () => setIsDrawerVisible(false);
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };
   const clickTitle = () => navigate('/');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/')
+  };
+
+  const userMenu = (
+    <Menu>
+      <Menu.Item
+        key="profile"
+        icon={<UserOutlined />}
+        onClick={() => navigate('/user-profile')}
+      >
+        Thông tin người dùng
+      </Menu.Item>
+      <Menu.Item
+        key="pet-list"
+        icon={<UnorderedListOutlined />}
+        onClick={() => navigate('/pet-list')}
+      >
+        Danh sách thú cưng
+      </Menu.Item>
+      <Menu.Item
+        key="transaction-history"
+        icon={<HistoryOutlined />}
+        onClick={() => navigate('/transaction-history')}
+      >
+        Lịch sử giao dịch
+      </Menu.Item>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+        Đăng xuất
+      </Menu.Item>
+    </Menu>
+  );
 
   const renderMenuItems = (isVertical) => {
     let menuItems = [];
@@ -50,13 +89,13 @@ const Banner = () => {
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
         { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG HÀNGe' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'admin') {
       menuItems = [
-        { key: 'schedule', label: 'LỊCH', path: '/schedule' },
+        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
         { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
@@ -66,7 +105,7 @@ const Banner = () => {
       ];
     } else if (role === 'staff') {
       menuItems = [
-        { key: 'schedule', label: 'LỊCH', path: '/schedule' },
+        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
         { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
@@ -141,18 +180,24 @@ const Banner = () => {
                 {role === 'customer' && (
                   <>
                     <Badge count={5}>
-                      <Button shape="circle" icon={<ShoppingCartOutlined />} />
+                      <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
-                    <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    <Popover content={userMenu} trigger="click">
+                      <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    </Popover>
                   </>
                 )}
                 {role === 'admin' && (
                   <>
-                    <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    <Popover content={userMenu} trigger="click">
+                      <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    </Popover>
                   </>
                 )}
                 {role === 'staff' && (
-                  <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                  <Popover content={userMenu} trigger="click">
+                    <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                  </Popover>
                 )}
               </div>
             )}

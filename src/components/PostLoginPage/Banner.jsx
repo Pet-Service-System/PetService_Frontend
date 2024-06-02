@@ -1,37 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import 'tailwindcss/tailwind.css';
-import { FaRegUserCircle } from "react-icons/fa";
-import { IoCartOutline } from "react-icons/io5";
+import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
+import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
+
+const { Header } = Layout;
 
 const Banner = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [isServiceDropdownOpen, setIsServiceDropdownOpen] = useState(false);
-  const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
+  const [role, setRole] = useState(''); // 'guest', 'customer', 'admin', 'staff'
   const navigate = useNavigate();
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const toggleServiceDropdown = () => {
-    setIsServiceDropdownOpen(!isServiceDropdownOpen);
-    setIsStoreDropdownOpen(false); 
-  };
-
-  const toggleStoreDropdown = () => {
-    setIsStoreDropdownOpen(!isStoreDropdownOpen);
-    setIsServiceDropdownOpen(false);
-  };
 
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
-        setIsOpen(false);
+        setIsDrawerVisible(false);
       }
     };
+
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole);
+    console.log('Role retrieved from localStorage:', storedRole);
 
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -41,92 +31,180 @@ const Banner = () => {
     };
   }, []);
 
-  const closeMenu = () => {
-    setIsOpen(false);
+  const closeMenu = () => setIsDrawerVisible(false);
+  const handleLoginClick = () => { closeMenu(); navigate('/login'); };
+  const clickTitle = () => navigate('/');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/')
   };
 
-  const handleUserIconClick = () => {
-    closeMenu();
-    navigate('/user-profile');
-  };
+  const userMenu = (
+    <Menu>
+      <Menu.Item
+        key="profile"
+        icon={<UserOutlined />}
+        onClick={() => navigate('/user-profile')}
+      >
+        Thông tin người dùng
+      </Menu.Item>
+      <Menu.Item
+        key="pet-list"
+        icon={<UnorderedListOutlined />}
+        onClick={() => navigate('/pet-list')}
+      >
+        Danh sách thú cưng
+      </Menu.Item>
+      <Menu.Item
+        key="transaction-history"
+        icon={<HistoryOutlined />}
+        onClick={() => navigate('/transaction-history')}
+      >
+        Lịch sử giao dịch
+      </Menu.Item>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+        Đăng xuất
+      </Menu.Item>
+    </Menu>
+  );
 
-  const handleCartIconClick = () => {
-    closeMenu();
-    navigate('/cart');
+  const renderMenuItems = (isVertical) => {
+    let menuItems = [];
+
+    if (role === 'guest') {
+      menuItems = [
+        { key: 'home', label: 'TRANG CHỦ', path: '/' },
+        { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+      ];
+    } else if (role === 'customer') {
+      menuItems = [
+        { key: 'home', label: 'TRANG CHỦ', path: '/' },
+        { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+      ];
+    } else if (role === 'admin') {
+      menuItems = [
+        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
+        { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
+      ];
+    } else if (role === 'staff') {
+      menuItems = [
+        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
+      ];
+    }
+
+    const verticalMenu = menuItems.reduce((acc, item) => {
+      if (item.parent) {
+        const parent = acc.find((menu) => menu.key === item.parent);
+        if (parent) {
+          parent.children.push({ key: item.key, label: item.label, onClick: () => navigate(item.path) });
+        } else {
+          acc.push({ key: item.parent, label: item.parent.toUpperCase(), children: [{ key: item.key, label: item.label, onClick: () => navigate(item.path) }] });
+        }
+      } else {
+        acc.push({ key: item.key, label: item.label, onClick: () => navigate(item.path) });
+      }
+      return acc;
+    }, []);
+
+    return (
+      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-end bg-cyan-400'} disabledOverflow={true}>
+        {verticalMenu.map(item => (
+          item.children ? (
+            <Menu.SubMenu key={item.key} title={item.label}>
+              {item.children.map(child => (
+                <Menu.Item key={child.key} onClick={child.onClick}>{child.label}</Menu.Item>
+              ))}
+            </Menu.SubMenu>
+          ) : (
+            <Menu.Item key={item.key} onClick={item.onClick}>{item.label}</Menu.Item>
+          )
+        ))}
+        {role === 'guest' && isVertical && (
+          <Menu.Item key="login">
+            <Button type="primary" onClick={handleLoginClick}>ĐĂNG NHẬP</Button>
+          </Menu.Item>
+        )}
+        {role === 'customer' && isVertical && (
+          <>
+            <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
+            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
+          </>
+        )}
+      </Menu>
+    );
   };
 
   return (
-    <div className="jarallax bg-gray-200">
-      <div className="p-5 bg-white shadow md:flex md:items-center md:justify-between">
-        <div className="flex items-center justify-between w-full md:w-auto">
-          <div className="flex items-center">
-            <img className="h-20 w-20" src="/src/assets/image/iconPet.png" alt="Pet Service Logo" />
-            <span className="text-4xl ml-2 px-7 cursor-pointer">Pet Service</span>
-          </div>
-          <button
-            className="text-3xl md:hidden focus:outline-none"
-            onClick={toggleMenu}
-          >
-            ☰
-          </button>
+    <Layout>
+      <Header className="flex justify-between items-center bg-cyan-400 shadow-md px-4 py-2 md:px-8 md:py-4">
+        <div className="flex items-center">
+          <img className="h-20 w-20" src="/src/assets/image/iconPet.png" alt="Pet Service Logo" />
+          <span className="text-4xl ml-2 px-7 cursor-pointer text-white" onClick={clickTitle}>Pet Service</span>
         </div>
-        <ul className={`flex-col md:flex md:flex-row md:items-center w-full md:w-auto ${isOpen || !isSmallScreen ? 'flex' : 'hidden'}`}>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">TRANG CHỦ</a>
-          </li>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/about" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">GIỚI THIỆU</a>
-          </li>
-          <li className="relative mx-4 my-3 md:my-0">
-            <button onClick={toggleServiceDropdown} className="text-xl hover:text-cyan-500 duration-500">
-              DỊCH VỤ
-            </button>
-            {isServiceDropdownOpen && (
-              <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-service'); }}>
-                  Dịch vụ thú cưng
-                </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/pet-hotel'); }}>
-                  Khách sạn thú cưng
-                </li>
-              </ul>
-            )}
-          </li>
-          <li className="relative mx-4 my-3 md:my-0">
-            <button onClick={toggleStoreDropdown} className="text-xl hover:text-cyan-500 duration-500">
-              CỬA HÀNG
-            </button>
-            {isStoreDropdownOpen && (
-              <ul className="absolute bg-white shadow-lg rounded mt-2 w-60 z-10">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-dog'); }}>
-                  Dành cho chó
-                </li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer" onClick={() => { closeMenu(); navigate('/for-cat'); }}>
-                  Dành cho mèo
-                </li>
-              </ul>
-            )}
-          </li>
-          <li className="mx-4 my-3 md:my-0">
-            <a href="/contact" onClick={closeMenu} className="text-xl hover:text-cyan-500 duration-500">LIÊN HỆ</a>
-          </li>
-          <li className="mx-4 my-3 md:my-0">
-            {isSmallScreen ? (
-              <button onClick={handleCartIconClick} className="text-xl hover:text-cyan-500 duration-500">GIỎ HÀNG</button>
+        {isSmallScreen ? (
+          <>
+            <Button type="primary" icon={<MenuOutlined />} onClick={() => setIsDrawerVisible(true)} />
+            <Drawer title="Menu" placement="right" closable onClose={closeMenu} visible={isDrawerVisible}>
+              {renderMenuItems(true)}
+            </Drawer>
+          </>
+        ) : (
+          <div className="flex items-center">
+            {renderMenuItems(false)}
+            {role === 'guest' ? (
+              <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
             ) : (
-              <IoCartOutline className="userIcon w-10 h-10 hover:text-cyan-500 duration-500" onClick={handleCartIconClick} />
+              <div className="flex items-center ml-4">
+                {role === 'customer' && (
+                  <>
+                    <Badge count={5}>
+                      <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
+                    </Badge>
+                    <Popover content={userMenu} trigger="click">
+                      <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    </Popover>
+                  </>
+                )}
+                {role === 'admin' && (
+                  <>
+                    <Popover content={userMenu} trigger="click">
+                      <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    </Popover>
+                  </>
+                )}
+                {role === 'staff' && (
+                  <Popover content={userMenu} trigger="click">
+                    <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                  </Popover>
+                )}
+              </div>
             )}
-          </li>
-          <li className="mx-4 my-3 md:my-0">
-            {isSmallScreen ? (
-              <button onClick={handleUserIconClick} className="text-xl hover:text-cyan-500 duration-500">TÀI KHOẢN</button>
-            ) : (
-              <FaRegUserCircle className="userIcon w-10 h-10 hover:text-cyan-500 duration-500" onClick={handleUserIconClick} />
-            )}
-          </li>
-        </ul>
-      </div>
-    </div>
+          </div>
+        )}
+      </Header>
+    </Layout>
   );
 };
 
