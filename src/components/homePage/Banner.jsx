@@ -8,7 +8,7 @@ const { Header } = Layout;
 const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [role, setRole] = useState(''); // 'guest', 'customer', 'admin', 'staff'
+  const [role, setRole] = useState('customer'); // 'guest', 'customer', 'admin', 'staff'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -143,14 +143,25 @@ const Banner = () => {
           )
         ))}
         {role === 'guest' && isVertical && (
-          <Menu.Item key="login">
-            <Button type="primary" onClick={handleLoginClick}>ĐĂNG NHẬP</Button>
-          </Menu.Item>
+          <Menu.Item key="login">ĐĂNG NHẬP</Menu.Item>
         )}
         {role === 'customer' && isVertical && (
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
             <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
+            <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
+          </>
+        )}
+        {role === 'admin' && isVertical && (
+          <>
+            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
+            <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
+          </>
+        )}
+        {role === 'staff' && isVertical && (
+          <>
+            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
+            <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
           </>
         )}
       </Menu>
