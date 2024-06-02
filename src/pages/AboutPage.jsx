@@ -1,8 +1,8 @@
 import React from 'react'
 import Welcome from '../components/AboutPage/Welcome'
-import Footer from '../components/homePage/Footer'
+import Footer from '../components/HomePage/Footer'
 import { Stats } from '../components/AboutPage/Stats'
-import Banner from '../components/homePage/Banner'
+import Banner from '../components/HomePage/Banner'
 
 const About = () => {
   return (

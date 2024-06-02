@@ -1,7 +1,7 @@
 
 import BookingList from '../components/BookingListPage/BookingList'
 import Banner from '../components/HomePage_Staff/Banner'
-import Footer from '../components/homePage/Footer'
+import Footer from '../components/HomePage/Footer'
 
 const BookingListPage = () => {
   return (

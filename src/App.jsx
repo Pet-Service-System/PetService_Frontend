@@ -31,6 +31,8 @@ import BookingFeedbackPage from './pages/BookingFeedbackPage'
 import UserProfilePage_Staff from './pages/UserProfilePage_Staff'
 import PetServiceDetailPage from './pages/PetServiceDetailPage'
 import HotelServiceDetailPage from './pages/HotelServiceDetailPage'
+import RegisterPage from './pages/RegisterPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 
 
 function App() {
@@ -43,6 +45,8 @@ function App() {
       <Route path='/about' element={<AboutPage/>}/>
       <Route path='/contact' element={<ContactPage/>}/>
       <Route path='/login' element={<LoginPage/>}/>
+      <Route path='/register' element={<RegisterPage/>}/>
+      <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
       <Route path='/home' element={<PostLogin/>}/>
       <Route path='/for-dog' element={<ForDogPage/>}/>
       <Route path='/for-cat' element={<ForCatPage/>}/>

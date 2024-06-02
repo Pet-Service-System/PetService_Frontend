@@ -9,6 +9,7 @@ const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState('customer'); // 'guest', 'customer', 'admin', 'staff'
+  const [accountId, setAccountId] = useState(null); // Thêm state để lưu accountId
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,9 +21,12 @@ const Banner = () => {
     };
 
     const storedRole = localStorage.getItem('role');
+    const storedAccountId = localStorage.getItem('account_id'); // Lấy accountId từ localStorage
     setRole(storedRole || 'guest');
+    setAccountId(storedAccountId); // Cập nhật accountId vào state
     console.log('Role retrieved from localStorage:', storedRole);
-
+    console.log('Account ID retrieved from localStorage:', storedAccountId); // Hiển thị accountId trong console log
+    
     handleResize();
     window.addEventListener('resize', handleResize);
 

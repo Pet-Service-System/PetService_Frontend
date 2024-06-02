@@ -1,7 +1,7 @@
 import React from 'react'
 import ChangePasswordForm from '../components/ChangePasswordPage/ChangePasswordForm'
 import Banner from '../components/UserProfilePage/Banner'
-import Footer from '../components/homePage/Footer'
+import Footer from '../components/HomePage/Footer'
 
 const ChangePasswordPage = () => {
   return (

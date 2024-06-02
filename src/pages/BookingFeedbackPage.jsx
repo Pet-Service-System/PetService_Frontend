@@ -1,7 +1,7 @@
 
 import Feedback from '../components/BookingFeedbackPage/Feedback'
 import Banner from '../components/HomePage_Staff/Banner'
-import Footer from '../components/homePage/Footer'
+import Footer from '../components/HomePage/Footer'
 
 const BookingFeedbackPage = () => {
   return (

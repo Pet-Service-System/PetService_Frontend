@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import Banner from '../components/homePage/Banner'
-import Footer from '../components/homePage/Footer'
+import Banner from '../components/HomePage/Banner'
+import Footer from '../components/HomePage/Footer'
 import { useParams } from 'react-router-dom';
 import ServiceDetail from '../components/ServiceDetailPage/ServiceDetail';
 import { getHotelServiceDetail } from '../apis/ApiService';

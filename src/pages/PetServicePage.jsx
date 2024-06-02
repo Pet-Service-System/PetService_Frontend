@@ -1,8 +1,8 @@
 import React from 'react'
 
 import Title from '../components/ServicePage/PetService/Title'
-import Banner from '../components/homePage/Banner'
-import Footer from '../components/homePage/Footer'
+import Banner from '../components/HomePage/Banner'
+import Footer from '../components/HomePage/Footer'
 import ServiceList from '../components/ServicePage/PetService/ServiceList'
 
 

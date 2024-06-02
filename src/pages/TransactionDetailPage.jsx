@@ -1,6 +1,6 @@
 
 import Banner from '../components/UserProfilePage/Banner'
-import Footer from '../components/homePage/Footer'
+import Footer from '../components/HomePage/Footer'
 import TransactionDetail from '../components/TransactionDetailPage/TransactionDetail'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'

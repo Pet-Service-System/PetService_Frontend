@@ -1,6 +1,6 @@
 import AccountList from "../components/ManageAccountPage/AccountList"
 import Banner from "../components/HomePage_Staff/Banner"
-import Footer from "../components/homePage/Footer"
+import Footer from "../components/HomePage/Footer"
 
 const ManageAccountPage = () => {
   return (
