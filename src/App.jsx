@@ -62,7 +62,7 @@ function App() {
       <Route path='/staff' element={<StaffHomePage/>}/>
       <Route path='/staff-schedule' element={<StaffSchedulePage/>}/>
       <Route path='/accounts' element={<ManageAccountPage/>}/>
-      <Route path='/booking-list' element={<BookingListPage/>}/>
+      <Route path='/manage-bookings' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
       <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/user-profile-staff' element={<UserProfilePage_Staff/>}/>

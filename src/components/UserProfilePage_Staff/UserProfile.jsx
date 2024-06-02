@@ -1,165 +1,170 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Typography, Button, Form, Input, Row, Col, message } from 'antd';
-import {
-  UserOutlined,
-  UnorderedListOutlined,
-  HistoryOutlined,
-  LogoutOutlined,
-} from '@ant-design/icons';
+import { Layout, Menu, Button, Drawer, Badge } from 'antd';
+import { MenuOutlined, UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 
-const { Title } = Typography;
-const { Sider, Content } = Layout;
+const { Header } = Layout;
 
-const UserProfile = () => {
-  const [user, setUser] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phoneNumber: '123-456-7890',
-    address: '123 Main St, Anytown, USA',
-  });
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
-  const [errors, setErrors] = useState({});
+const Banner = () => {
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [role, setRole] = useState('staff'); // 'guest', 'customer', 'admin', 'staff'
   const navigate = useNavigate();
 
-  const handleUpdateInfo = () => {
-    setIsEditMode(true);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setIsDrawerVisible(false);
+      }
+    };
 
-  const handleChangePassword = () => {
-    navigate('/change-password');
-  };
+    // const storedRole = localStorage.getItem('role');
+    // setRole(storedRole);
+    // console.log('Role retrieved from localStorage:', storedRole);
 
-  const handleCancel = () => {
-    setIsEditMode(false);
-    setFormData({ ...user });
-    setErrors({});
-  };
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
-  const handleSave = () => {
-    let newErrors = {};
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'Tên không được để trống';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Họ không được để trống';
-    if (!formData.email.trim()) newErrors.email = 'Email không được để trống';
-    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = 'Số điện thoại không được để trống';
-    if (!formData.address.trim()) newErrors.address = 'Địa chỉ không được để trống';
+  const closeMenu = () => setIsDrawerVisible(false);
+  const handleLoginClick = () => { closeMenu(); navigate('/login'); };
+  const clickTitle = () => navigate('/');
 
-    if (Object.keys(newErrors).length === 0) {
-      setUser(formData);
-      setIsEditMode(false);
-      setErrors({});
-      message.success('Thông tin đã được cập nhật');
-    } else {
-      setErrors(newErrors);
+  const renderMenuItems = (isVertical) => {
+    let menuItems = [];
+
+    if (role === 'guest') {
+      menuItems = [
+        { key: 'home', label: 'TRANG CHỦ', path: '/' },
+        { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+      ];
+    } else if (role === 'customer') {
+      menuItems = [
+        { key: 'home', label: 'TRANG CHỦ', path: '/' },
+        { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+      ];
+    } else if (role === 'admin') {
+      menuItems = [
+        { key: 'schedule', label: 'LỊCH', path: '/schedule' },
+        { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
+      ];
+    } else if (role === 'staff') {
+      menuItems = [
+        { key: 'schedule', label: 'LỊCH', path: '/schedule' },
+        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
+        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
+      ];
     }
-  };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const verticalMenu = menuItems.reduce((acc, item) => {
+      if (item.parent) {
+        const parent = acc.find((menu) => menu.key === item.parent);
+        if (parent) {
+          parent.children.push({ key: item.key, label: item.label, onClick: () => navigate(item.path) });
+        } else {
+          acc.push({ key: item.parent, label: item.parent.toUpperCase(), children: [{ key: item.key, label: item.label, onClick: () => navigate(item.path) }] });
+        }
+      } else {
+        acc.push({ key: item.key, label: item.label, onClick: () => navigate(item.path) });
+      }
+      return acc;
+    }, []);
+
+    return (
+      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-end bg-cyan-400'} disabledOverflow={true}>
+        {verticalMenu.map(item => (
+          item.children ? (
+            <Menu.SubMenu key={item.key} title={item.label}>
+              {item.children.map(child => (
+                <Menu.Item key={child.key} onClick={child.onClick}>{child.label}</Menu.Item>
+              ))}
+            </Menu.SubMenu>
+          ) : (
+            <Menu.Item key={item.key} onClick={item.onClick}>{item.label}</Menu.Item>
+          )
+        ))}
+        {role === 'guest' && isVertical && (
+          <Menu.Item key="login">
+            <Button type="primary" onClick={handleLoginClick}>ĐĂNG NHẬP</Button>
+          </Menu.Item>
+        )}
+        {role === 'customer' && isVertical && (
+          <>
+            <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
+            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
+          </>
+        )}
+      </Menu>
+    );
   };
 
   return (
-    <Layout style={{ minHeight: '80vh' }}>
-      <Sider width={220}>
-        <div className="logo" />
-        <Menu theme="dark" mode="inline">
-          <Menu.Item
-            key="profile"
-            icon={<UserOutlined />}
-            onClick={() => navigate('/user-profile')}
-          >
-            Thông tin người dùng
-          </Menu.Item>
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => navigate('/')}>
-            Đăng xuất
-          </Menu.Item>
-        </Menu>
-      </Sider>
-      <Layout>
-        <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <Title level={2} className="text-center">
-              Thông tin người dùng
-            </Title>
-            {isEditMode ? (
-              <Form layout="vertical">
-                <Form.Item label="Tên" validateStatus={errors.firstName ? 'error' : ''} help={errors.firstName}>
-                  <Input
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Họ" validateStatus={errors.lastName ? 'error' : ''} help={errors.lastName}>
-                  <Input
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Email" validateStatus={errors.email ? 'error' : ''} help={errors.email}>
-                  <Input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Số điện thoại" validateStatus={errors.phoneNumber ? 'error' : ''} help={errors.phoneNumber}>
-                  <Input
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Địa chỉ" validateStatus={errors.address ? 'error' : ''} help={errors.address}>
-                  <Input
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" onClick={handleSave} className="mr-2">Lưu thay đổi</Button>
-                  <Button onClick={handleCancel}>Hủy</Button>
-                </Form.Item>
-              </Form>
+    <Layout>
+      <Header className="flex justify-between items-center bg-cyan-400 shadow-md px-4 py-2 md:px-8 md:py-4">
+        <div className="flex items-center">
+          <img className="h-20 w-20" src="/src/assets/image/iconPet.png" alt="Pet Service Logo" />
+          <span className="text-4xl ml-2 px-7 cursor-pointer text-white" onClick={clickTitle}>Pet Service</span>
+        </div>
+        {isSmallScreen ? (
+          <>
+            <Button type="primary" icon={<MenuOutlined />} onClick={() => setIsDrawerVisible(true)} />
+            <Drawer title="Menu" placement="right" closable onClose={closeMenu} visible={isDrawerVisible}>
+              {renderMenuItems(true)}
+            </Drawer>
+          </>
+        ) : (
+          <div className="flex items-center">
+            {renderMenuItems(false)}
+            {role === 'guest' ? (
+              <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
             ) : (
-              <>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Title level={5}>Tên</Title>
-                    <p className="bg-gray-200 p-2 rounded-md">{user.firstName}</p>
-                  </Col>
-                  <Col span={12}>
-                    <Title level={5}>Họ</Title>
-                    <p className="bg-gray-200 p-2 rounded-md">{user.lastName}</p>
-                  </Col>
-                </Row>
-                <Title level={5}>Email</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.email}</p>
-                <Title level={5}>Số điện thoại</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.phoneNumber}</p>
-                <Title level={5}>Địa chỉ</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.address}</p>
-                <div className="flex justify-between mt-6">
-                  <Button type="primary" onClick={handleUpdateInfo} className="mr-2">Cập nhật thông tin</Button>
-                  <Button type="default" onClick={handleChangePassword}>Đổi mật khẩu</Button>
-                </div>
-              </>
+              <div className="flex items-center ml-4">
+                {role === 'customer' && (
+                  <>
+                    <Badge count={5}>
+                      <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
+                    </Badge>
+                    <Button shape="circle" icon={<UserOutlined />} onClick={() => navigate('/user-profile')} className="ml-4" />
+                  </>
+                )}
+                {role === 'admin' && (
+                  <>
+                    <Button shape="circle" icon={<UserOutlined />} onClick={() => navigate('/user-profile')} className="ml-4" />
+                  </>
+                )}
+                {role === 'staff' && (
+                  <Button shape="circle" icon={<UserOutlined />} onClick={() => navigate('/user-profile')} className="ml-4" />
+                )}
+              </div>
             )}
           </div>
-        </Content>
-      </Layout>
+        )}
+      </Header>
     </Layout>
   );
 };
 
-export default UserProfile;
+export default Banner;

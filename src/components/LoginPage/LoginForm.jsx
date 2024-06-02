@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Typography, Modal, Row, Col } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
@@ -13,6 +13,7 @@ const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loginMessage, setLoginMessage] = useState('');
+  const [role, setRole] = useState('customer');
   const [successModalVisible, setSuccessModalVisible] = useState(false); // State để kiểm soát việc hiển thị Modal
   const navigate = useNavigate()
 
@@ -23,6 +24,16 @@ const LoginForm = () => {
     return newErrors;
   };
 
+  useEffect(() => {
+    // Check if the user is logged in and set the role
+    const token = localStorage.getItem('token');
+    if (token) {
+      const userRole = localStorage.getItem('role'); // Assume the role is also stored in localStorage
+      setRole(userRole);
+    }
+  }, []);
+
+
   const handleSubmit = async () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
@@ -31,11 +42,16 @@ const LoginForm = () => {
           email: email,
           password: password,
         });
+        const { token, user } = response.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', user.role);
+        console.log('Role saved to localStorage:', localStorage.getItem('role'));
         console.log('Login successful', response.data.user);
+        setRole(localStorage.getItem('role'));
         setSuccessModalVisible(true); // Hiển thị Modal khi đăng nhập thành công
         setTimeout(() => {
           setSuccessModalVisible(false);
-          navigate('/home'); // Chuyển hướng đến trang home
+          navigate('/'); // Chuyển hướng đến trang home
         }, 2000);
       } catch (error) {
         if (error.response) {
