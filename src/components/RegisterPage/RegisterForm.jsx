@@ -1,6 +1,6 @@
-import { Button, Form, Input, Typography, Row, Col } from 'antd';
+import { Button, Form, Input, Typography, Row, Col, message } from 'antd'; // Import message từ antd
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
@@ -13,15 +13,9 @@ const RegisterForm = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [errors, setErrors] = useState({});
-  const [registrationMessage, setRegistrationMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Đăng ký
+  const [disableRegister, setDisableRegister] = useState(false); // State để điều khiển việc vô hiệu hóa nút Đăng ký
   const navigate = useNavigate();
-
-  // Function to generate accountID
-  const generateAccountID = () => {
-    // Here you can generate the accountID based on your requirements
-    // For example, you can use timestamp combined with a random string
-    return `A${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
-  };
 
   const validate = () => {
     const newErrors = {};
@@ -34,13 +28,25 @@ const RegisterForm = () => {
     return newErrors;
   };
 
+  useEffect(() => {
+    let timer;
+    if (disableRegister) {
+      timer = setTimeout(() => {
+        setDisableRegister(false);
+      }, 1000); 
+    }
+  
+    return () => clearTimeout(timer);
+  }, [disableRegister]);
+
   const handleSubmit = async () => {
+    if (disableRegister) return; // Nếu đang trong quá trình vô hiệu hóa, không thực hiện gì
+  
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const accountID = generateAccountID(); // Generate accountID
+        setIsLoading(true); // Vô hiệu hóa nút Đăng ký
         const response = await axios.post('http://localhost:3001/register', {
-          accountID: accountID,
           fullname: fullname,
           password: password,
           email: email,
@@ -49,14 +55,22 @@ const RegisterForm = () => {
           status: 'active', // Assuming default status is 'active'
           role: 'customer', // Assuming default role is 'customer'
         });
-        setRegistrationMessage('Registration successful');
+  
+        // Hiển thị thông báo thành công và chuyển trang sau 2 giây
+        message.success('Registration successful', 2).then(() => {
+          navigate('/login');
+        });
+        setDisableRegister(true);
         console.log('Registration successful', response.data);
       } catch (error) {
         if (error.response) {
-          setRegistrationMessage(error.response.data.message);
+          message.error(error.response.data.message);
         } else {
-          setRegistrationMessage('An error occurred');
+          message.error('An error occurred');
         }
+        setDisableRegister(true); // Bắt đầu quá trình vô hiệu hóa nút Đăng ký
+      } finally {
+        setIsLoading(false); // Enable lại nút Đăng ký
       }
     } else {
       setErrors(validationErrors);
@@ -143,10 +157,11 @@ const RegisterForm = () => {
               />
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit" className="w-full">Đăng kí</Button>
+            <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableRegister}>
+              {disableRegister ? 'Đang đăng ký...' : 'Đăng ký'}
+            </Button> {/* Sử dụng disableLogin để vô hiệu hóa nút */}
             </Form.Item>
           </Form>
-          {registrationMessage && <p className="text-center mt-4">{registrationMessage}</p>}
           <div className="text-center mt-4">
             <Button type="link" onClick={() => navigate('/login')}>Quay lại đăng nhập</Button>
           </div>

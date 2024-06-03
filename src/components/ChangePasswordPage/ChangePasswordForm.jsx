@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Typography, message, Modal } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
@@ -11,6 +12,7 @@ const ChangePasswordForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   const accountId = localStorage.getItem('account_id'); // Lấy account_id từ localStorage
 
@@ -23,7 +25,7 @@ const ChangePasswordForm = () => {
   };
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem('token'); // Lấy token từ localStorage hoặc nơi lưu trữ token
+    const token = localStorage.getItem('token'); // Get token from localStorage
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
@@ -33,14 +35,16 @@ const ChangePasswordForm = () => {
           newPassword: newPassword,
         }, {
           headers: {
-            Authorization: `Bearer ${token}` // Truyền token vào header Authorization
+            Authorization: `Bearer ${token}` // Pass token in Authorization header
           }
         });
         console.log('Password changed successfully', response.data);
-        setSuccessModalVisible(true);
+        message.success('Password changed successfully');
+        setTimeout(() => {
+          navigate('/user-profile');
+        }, 2000);
       } catch (error) {
         if (error.response) {
-          console.log('hi')
           message.error(error.response.data.message);
         } else {
           message.error('An error occurred');
@@ -48,9 +52,14 @@ const ChangePasswordForm = () => {
       }
     } else {
       setErrors(validationErrors);
-    }   
+    }
   };
 
+  const handleCancel = () => {
+    // Xử lý hành động khi bấm nút "Cancel" ở đây
+    // Ví dụ: chuyển hướng về trang trước đó
+    navigate(-1);
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-12 bg-white rounded-lg py-20">
@@ -96,9 +105,14 @@ const ChangePasswordForm = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="mr-2">
-              Đổi mật khẩu
-            </Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button type="primary" htmlType="submit" className="mr-2">
+                Đổi mật khẩu
+              </Button>
+              <Button type="default" onClick={handleCancel}>
+                Hủy bỏ
+              </Button>
+            </div>
           </Form.Item>
         </Form>
       </div>
