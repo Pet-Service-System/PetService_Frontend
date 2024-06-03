@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Form, Input, Typography, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,6 +8,7 @@ const { Title } = Typography;
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Gửi yêu cầu
   const navigate = useNavigate();
   
   const validate = () => {
@@ -20,15 +21,21 @@ const ForgotPasswordForm = () => {
   const handleSubmit = async () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
-        console.log(email)
+        setIsLoading(true); // Vô hiệu hóa nút Gửi yêu cầu
         const response = await axios.post('http://localhost:3001/forgot-password', {
             email: email,
         });
         console.log('Data from server:', response.data);
-        message.success('Password reset request sent successfully');
+        message.success('Yêu cầu đặt lại mật khẩu thành công. Vui lòng kiểm tra mail của bạn.', 2.5).then(()=>{
+          message.info('Bạn sẽ được chuyển hướng đến trang đăng nhập.', 1.5).then(() => {
+            navigate('/login');
+          });
+        })
       } catch (error) {
         console.error('Error during password reset:', error);
         message.error(error.response.data.message);
+      } finally {
+        setIsLoading(false); // Enable lại nút Gửi yêu cầu
       }
     } else {
       setErrors(validationErrors);
@@ -55,7 +62,9 @@ const ForgotPasswordForm = () => {
               />
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit" className="w-full">Gửi yêu cầu</Button>
+              <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Đang gửi...' : 'Gửi yêu cầu'}
+              </Button>
             </Form.Item>
           </Form>
           <div className="text-center mt-4">

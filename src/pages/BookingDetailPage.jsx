@@ -1,5 +1,5 @@
 
-import Banner from '../components/HomePage_Staff/Banner'
+import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
 import BookingDetail from '../components/BookingDetailPage/BookingDetail'
 import { useParams } from 'react-router-dom';

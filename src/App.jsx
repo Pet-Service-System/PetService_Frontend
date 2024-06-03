@@ -14,7 +14,6 @@ import LoginPage from './pages/LoginPage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import { Route, Routes } from 'react-router-dom'
-import PostLogin from './pages/PostLogin'
 import ForCatProductDetailPage from './pages/ForCatProductDetailPage'
 import ForDogProductDetailPage from './pages/ForDogProductDetailPage'
 import PetListPage from './pages/PetListPage'
@@ -22,19 +21,16 @@ import TransactionHistoryPage from './pages/TransactionHistoryPage'
 import TransactionDetailPage from './pages/TransactionDetailPage'
 import CartPage from './pages/CartPage'
 import PaymentPage from './pages/PaymentPage'
-import StaffHomePage from './pages/HomePage_Staff'
-import StaffSchedulePage from './pages/SchedulePage_Admin'
 import ManageAccountPage from './pages/ManageAccountPage'
 import BookingListPage from './pages/BookingListPage'
 import BookingDetailPage from './pages/BookingDetailPage'
 import BookingFeedbackPage from './pages/BookingFeedbackPage'
-import UserProfilePage_Staff from './pages/UserProfilePage_Staff'
 import PetServiceDetailPage from './pages/PetServiceDetailPage'
 import HotelServiceDetailPage from './pages/HotelServiceDetailPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import OTPPage from './pages/OTPPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import SchedulePage from './pages/SchedulePage'
 
 
 function App() {
@@ -49,7 +45,6 @@ function App() {
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
-      <Route path='/home' element={<PostLogin/>}/>
       <Route path='/for-dog' element={<ForDogPage/>}/>
       <Route path='/for-cat' element={<ForCatPage/>}/>
       <Route path='/pet-service' element={<PetServicePage/>}/>
@@ -65,15 +60,12 @@ function App() {
       <Route path='/hotel-service-detail/:id' element={<HotelServiceDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/payment' element={<PaymentPage/>}/>
-      <Route path='/staff' element={<StaffHomePage/>}/>
-      <Route path='/staff-schedule' element={<StaffSchedulePage/>}/>
-      <Route path='/accounts' element={<ManageAccountPage/>}/>
+      <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
       <Route path='/manage-bookings' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
       <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
-      <Route path='/user-profile-staff' element={<UserProfilePage_Staff/>}/>
-      <Route path='/otp' element={<OTPPage/>}/>
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
+      <Route path='/staff-schedule' element={<SchedulePage/>}/>
     </Routes>
     </>
   )

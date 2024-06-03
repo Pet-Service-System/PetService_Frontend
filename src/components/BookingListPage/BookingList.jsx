@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
-import { getBooking } from '../../apis/ApiBooking.js';
+import { Table, Button, Typography } from 'antd';
+const { Title } = Typography;
 
 const BookingList = () => {
     const [bookings, setBookings] = useState([]);
     const [sortOrder, setSortOrder] = useState('desc');
+    const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
 
     useEffect(() => {
-        getBooking().then((data) => {
-            setBookings(data);
-        });
+        const sampleData = [
+            { id: 1, fullname: 'John Doe', date: '2023-06-01', amount: 150.00, status: 'Confirmed' },
+            { id: 2, fullname: 'Jane Smith', date: '2023-06-02', amount: 200.00, status: 'Pending' },
+            { id: 3, fullname: 'Alice Johnson', date: '2023-06-03', amount: 100.00, status: 'Cancelled' },
+            { id: 4, fullname: 'Bob Brown', date: '2023-06-04', amount: 250.00, status: 'Confirmed' },
+        ];
+        setBookings(sampleData);
     }, []);
 
     const handleSort = () => {
@@ -30,48 +36,70 @@ const BookingList = () => {
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
+    const columns = [
+        {
+            title: 'Mã đặt lịch',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
+            title: 'Họ tên',
+            dataIndex: 'fullname',
+            key: 'fullname',
+        },
+        {
+            title: 'Ngày đặt',
+            dataIndex: 'date',
+            key: 'date',
+            render: (text) => formatDate(text),
+        },
+        {
+            title: 'Tổng tiền',
+            dataIndex: 'amount',
+            key: 'amount',
+            render: (text) => `$${text.toFixed(2)}`,
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            key: 'status',
+        },
+        {
+            title: 'Chi tiết',
+            key: 'details',
+            render: (text, record) => (
+                <a href={`/booking-detail/${record.id}`} className="text-blue-500 hover:underline">Chi tiết</a>
+            ),
+        },
+    ];
+
+    if (role !== 'admin' && role !== 'sale staff') {
+        columns.push({
+            title: 'Đánh giá',
+            key: 'feedback',
+            render: (text, record) => (
+                <a href={`/booking-feedback/${record.id}`} className="text-blue-500 hover:underline">Xem đánh giá</a>
+            ),
+        });
+    }
+
     return (
-        bookings && (
-            <div className="p-44">
-                <h2 className="text-5xl text-center text-red-500 font-semibold mb-4">Danh sách đặt lịch của khách hàng</h2>
-                <div className="flex justify-end mb-4">
-                    <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={handleSort}
-                    >
-                        {sortOrder === 'asc' ? 'Sắp xếp: Ngày gần nhất' : 'Sắp xếp: Ngày xa nhất'}
-                    </button>
-                </div>
-                <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr>
-                            <th className="border px-4 py-2">Mã đặt lịch</th>
-                            <th className="border px-4 py-2">Ngày đặt</th>
-                            <th className="border px-4 py-2">Tổng tiền</th>
-                            <th className="border px-4 py-2">Trạng thái</th>
-                            <th className="border px-4 py-2">Chi tiết</th>
-                            <th className="border px-4 py-2">Đánh giá</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {bookings.map((booking) => (
-                            <tr key={booking.id}>
-                                <td className="border px-4 py-2">{booking.id}</td>
-                                <td className="border px-4 py-2">{formatDate(booking.date)}</td>
-                                <td className="border px-4 py-2">${booking.amount}</td>
-                                <td className="border px-4 py-2">{booking.status}</td>
-                                <td className="border px-4 py-2">
-                                    <a href={`/booking-detail/${booking.id}`} className="text-blue-500 hover:underline">Chi tiết</a>
-                                </td>
-                                <td className="border px-4 py-2">
-                                    <a href={`/booking-feedback/${booking.id}`} className="text-blue-500 hover:underline">Xem đánh giá</a>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+        <div className="p-10">
+            <Title className="text-center text-red-500 font-semibold mb-4" level={2}>
+                Danh sách đặt lịch của khách hàng
+            </Title>
+            <div className="flex justify-end mb-4">
+                <Button type="primary" onClick={handleSort}>
+                    {sortOrder === 'asc' ? 'Sắp xếp: Ngày gần nhất' : 'Sắp xếp: Ngày xa nhất'}
+                </Button>
             </div>
-        )
+            <Table
+                dataSource={bookings}
+                columns={columns}
+                rowKey="id"
+                bordered
+            />
+        </div>
     );
 };
 

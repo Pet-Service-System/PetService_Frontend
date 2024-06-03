@@ -45,11 +45,6 @@ const LoginForm = () => {
         const { token, user } = response.data;
         localStorage.setItem('token', token);
         localStorage.setItem('role', user.role);
-        localStorage.setItem('account_id', user.account_id);
-        // Lưu các thuộc tính của user vào localStorage
-        localStorage.setItem('fullname', user.fullname);
-        localStorage.setItem('email', user.email);
-        // Gửi user vào localStorage
         localStorage.setItem('user', JSON.stringify(user));
         console.log('Login successful', response.data.user);
   

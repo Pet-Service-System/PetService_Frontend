@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useShopping from '../../hook/useShopping';
 import { getForCatProductsDetail, getForDogProductsDetail } from '../../apis/ApiProduct';
-import { Link, useParams } from 'react-router-dom';
+import {useParams } from 'react-router-dom';
 
 const ProductDetail = ({ type }) => {
     const { id } = useParams();
@@ -68,7 +68,6 @@ const ProductDetail = ({ type }) => {
                         <button onClick={handleOrderNow} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2">Order Now</button>
                     </div>
                 </div>
-                <button className='bg-gray-200'><Link to='/cart'>ShoppingCart</Link></button>
             </div>
         )
     );

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
 import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
+import useShopping from '../../hook/useShopping';
 
 const { Header } = Layout;
 
@@ -9,12 +10,11 @@ const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
-  const [accountId, setAccountId] = useState(localStorage.getItem('account_id'));
-  const [fullName, setFullName] = useState(localStorage.getItem('fullname'));
-  const [email, setEmail] = useState(localStorage.getItem('email'));
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
+  const { shoppingCart } = useShopping();
+  const productCount = shoppingCart.length;
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -29,10 +29,6 @@ const Banner = () => {
     };
 
     console.log('Role:', role);
-    console.log('Account ID:', accountId);
-    console.log('Full Name:', fullName);
-    console.log('Email:', email);
-    console.log('User:', user);
 
     
     handleResize();
@@ -55,9 +51,6 @@ const Banner = () => {
     localStorage.removeItem('email'); 
     localStorage.removeItem('user'); 
     setRole('guest');
-    setAccountId(null);
-    setFullName(null); 
-    setEmail(null); 
     setUser(null); 
     navigate('/')
     window.location.reload();
@@ -72,25 +65,29 @@ const Banner = () => {
       >
         Thông tin người dùng
       </Menu.Item>
-      <Menu.Item
-        key="pet-list"
-        icon={<UnorderedListOutlined />}
-        onClick={() => navigate('/pet-list')}
-      >
-        Danh sách thú cưng
-      </Menu.Item>
-      <Menu.Item
-        key="transaction-history"
-        icon={<HistoryOutlined />}
-        onClick={() => navigate('/transaction-history')}
-      >
-        Lịch sử giao dịch
-      </Menu.Item>
+      {role === 'customer' && (
+        <Menu.Item
+          key="pet-list"
+          icon={<UnorderedListOutlined />}
+          onClick={() => navigate('/pet-list')}
+        >
+          Danh sách thú cưng
+        </Menu.Item>
+      )}
+      {role === 'customer' && (
+        <Menu.Item
+          key="transaction-history"
+          icon={<HistoryOutlined />}
+          onClick={() => navigate('/transaction-history')}
+        >
+          Lịch sử giao dịch
+        </Menu.Item>
+      )}
       <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
         Đăng xuất
       </Menu.Item>
     </Menu>
-  );
+  );  
 
   const renderMenuItems = (isVertical) => {
     let menuItems = [];
@@ -125,7 +122,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
         { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
       ];
-    } else if (role === 'staff') {
+    } else if (role === 'sale staff' || role === 'caretaker staff' || role === 'store manager') {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
@@ -134,7 +131,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
         { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
       ];
-    }
+    } 
 
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
@@ -179,7 +176,7 @@ const Banner = () => {
             <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
           </>
         )}
-        {role === 'staff' && isVertical && (
+        {(role === 'sale staff' || role === 'caretaker staff' || role === 'store manager') && isVertical && (
           <>
             <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
             <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
@@ -212,27 +209,20 @@ const Banner = () => {
               <div className="flex items-center ml-4">
                 {role === 'customer' && (
                   <>
-                    <Badge count={5}>
+                    <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
+                    
+                  </>
+                )}
+                {role !== 'guest' && (
+                  <>
                     <Popover content={userMenu} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
                       <Button shape="round" className="ml-4 py-2 px-4">
-                        <span className="text-black">{fullName}</span>
+                        <span className="text-black">{user.fullname}</span>
                       </Button>
                     </Popover>
                   </>
-                )}
-                {role === 'admin' && (
-                  <>
-                    <Popover content={userMenu} trigger="click">
-                      <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
-                    </Popover>
-                  </>
-                )}
-                {role === 'staff' && (
-                  <Popover content={userMenu} trigger="click">
-                    <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
-                  </Popover>
                 )}
               </div>
             )}
