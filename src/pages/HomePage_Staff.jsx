@@ -1,7 +1,7 @@
 
-import Footer from '../components/homePage/Footer'
+import Footer from '../components/HomePage/Footer'
 import Banner from '../components/HomePage_Staff/Banner'
-import Welcome from '../components/homePage/Welcome'
+import Welcome from '../components/HomePage/Welcome'
 
 const HomePage_Staff = () => {
   return (

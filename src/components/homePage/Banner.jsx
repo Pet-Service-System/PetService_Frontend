@@ -8,8 +8,17 @@ const { Header } = Layout;
 const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [role, setRole] = useState('customer'); // 'guest', 'customer', 'admin', 'staff'
+  const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
+  const [accountId, setAccountId] = useState(localStorage.getItem('account_id'));
+  const [fullName, setFullName] = useState(localStorage.getItem('fullname'));
+  const [email, setEmail] = useState(localStorage.getItem('email'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const navigate = useNavigate();
+  const [visible, setVisible] = useState(false);
+
+  const handleVisibleChange = (visible) => {
+    setVisible(visible);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -19,17 +28,20 @@ const Banner = () => {
       }
     };
 
-    const storedRole = localStorage.getItem('role');
-    setRole(storedRole || 'guest');
-    console.log('Role retrieved from localStorage:', storedRole);
+    console.log('Role:', role);
+    console.log('Account ID:', accountId);
+    console.log('Full Name:', fullName);
+    console.log('Email:', email);
+    console.log('User:', user);
 
+    
     handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [role]);
+  }, []);
 
   const closeMenu = () => setIsDrawerVisible(false);
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };
@@ -38,8 +50,17 @@ const Banner = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('account_id');
+    localStorage.removeItem('fullname');
+    localStorage.removeItem('email'); 
+    localStorage.removeItem('user'); 
     setRole('guest');
-    navigate('/');
+    setAccountId(null);
+    setFullName(null); 
+    setEmail(null); 
+    setUser(null); 
+    navigate('/')
+    window.location.reload();
   };
 
   const userMenu = (
@@ -194,8 +215,10 @@ const Banner = () => {
                     <Badge count={5}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
-                    <Popover content={userMenu} trigger="click">
-                      <Button shape="circle" icon={<UserOutlined />} className="ml-4" />
+                    <Popover content={userMenu} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
+                      <Button shape="round" className="ml-4 py-2 px-4">
+                        <span className="text-black">{fullName}</span>
+                      </Button>
                     </Popover>
                   </>
                 )}

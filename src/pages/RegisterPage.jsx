@@ -1,17 +1,16 @@
-import React from 'react'
 
-import Contact from '../components/ContactPage/Contact'
+import RegisterForm from '../components/RegisterPage/RegisterForm'
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
 
-const ContactPage = () => {
+const RegisterPage = () => {
   return (
     <div>
         <Banner/>
-        <Contact/>
+        <RegisterForm/>
         <Footer/>
     </div>
   )
 }
 
-export default ContactPage
+export default RegisterPage

@@ -1,6 +1,6 @@
 import Banner from "../components/PostLoginPage/Banner"
-import Footer from "../components/homePage/Footer"
-import Welcome from "../components/homePage/Welcome"
+import Footer from "../components/HomePage/Footer"
+import Welcome from "../components/HomePage/Welcome"
 
 
 const PostLogin = () => {
