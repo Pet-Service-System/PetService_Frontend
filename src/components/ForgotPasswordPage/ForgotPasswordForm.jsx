@@ -16,6 +16,7 @@ const ForgotPasswordForm = () => {
     return newErrors;
   };
   const validationErrors = validate();
+  
   const handleSubmit = async () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
@@ -25,9 +26,6 @@ const ForgotPasswordForm = () => {
         });
         console.log('Data from server:', response.data);
         message.success('Password reset request sent successfully');
-        setTimeout(() => {
-          navigate('/reset-password');
-        }, 2000);
       } catch (error) {
         console.error('Error during password reset:', error);
         message.error(error.response.data.message);

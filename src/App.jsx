@@ -73,7 +73,7 @@ function App() {
       <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/user-profile-staff' element={<UserProfilePage_Staff/>}/>
       <Route path='/otp' element={<OTPPage/>}/>
-      <Route path='/reset-password/:id/:token' element={<ResetPasswordPage/>}/>
+      <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
     </Routes>
     </>
   )
