@@ -1,6 +1,7 @@
-import { Button, Form, Input, Typography, Row, Col } from 'antd';
 import React, { useState } from 'react';
+import { Button, Form, Input, Typography, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const { Title } = Typography;
 
@@ -11,20 +12,31 @@ const ForgotPasswordForm = () => {
   
   const validate = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
+    if (!email) newErrors.email = 'Email là bắt buộc';
     return newErrors;
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
+  const validationErrors = validate();
+  const handleSubmit = async () => {
     if (Object.keys(validationErrors).length === 0) {
-      console.log('Reset password for', email);
+      try {
+        console.log(email)
+        const response = await axios.post('http://localhost:3001/forgot-password', {
+            email: email,
+        });
+        console.log('Data from server:', response.data);
+        message.success('Password reset request sent successfully');
+        setTimeout(() => {
+          navigate('/reset-password');
+        }, 2000);
+      } catch (error) {
+        console.error('Error during password reset:', error);
+        message.error(error.response.data.message);
+      }
     } else {
       setErrors(validationErrors);
     }
   };
-
+  
   return (
     <Row justify="center" style={{ minHeight: '59vh', alignItems: 'center' }}>
       <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10'>
@@ -34,7 +46,7 @@ const ForgotPasswordForm = () => {
             <Form.Item
               label="Email"
               name="email"
-              rules={[{ required: true, message: 'Email is required' }]}
+              rules={[{ required: true, message: 'Email là bắt buộc' }]}
               validateStatus={errors.email && 'error'}
               help={errors.email}
             >

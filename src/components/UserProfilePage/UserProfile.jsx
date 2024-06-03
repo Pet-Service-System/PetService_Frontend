@@ -65,6 +65,14 @@ const UserProfile = () => {
     });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('account_id')
+    navigate('/');
+  };
+
+
   return (
     <Layout style={{ minHeight: '80vh' }}>
       <Sider width={220}>
@@ -91,7 +99,7 @@ const UserProfile = () => {
           >
             Lịch sử giao dịch
           </Menu.Item>
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => navigate('/')}>
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Đăng xuất
           </Menu.Item>
         </Menu>

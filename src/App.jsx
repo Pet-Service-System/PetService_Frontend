@@ -33,6 +33,8 @@ import PetServiceDetailPage from './pages/PetServiceDetailPage'
 import HotelServiceDetailPage from './pages/HotelServiceDetailPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import OTPPage from './pages/OTPPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 
 function App() {
@@ -70,6 +72,8 @@ function App() {
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
       <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/user-profile-staff' element={<UserProfilePage_Staff/>}/>
+      <Route path='/otp' element={<OTPPage/>}/>
+      <Route path='/reset-password/:id/:token' element={<ResetPasswordPage/>}/>
     </Routes>
     </>
   )

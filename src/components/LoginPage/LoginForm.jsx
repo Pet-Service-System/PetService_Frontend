@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, Modal } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
@@ -10,9 +9,20 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [loginMessage, setLoginMessage] = useState('');
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Đăng nhập
+  const [disableLogin, setDisableLogin] = useState(false); // State để điều khiển việc vô hiệu hóa nút Đăng nhập
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let timer;
+    if (disableLogin) {
+      timer = setTimeout(() => {
+        setDisableLogin(false);
+      }, 1000); // Vô hiệu hóa trong 2 giây
+    }
+
+    return () => clearTimeout(timer);
+  }, [disableLogin]);
 
   const validate = () => {
     const newErrors = {};
@@ -22,9 +32,12 @@ const LoginForm = () => {
   };
 
   const handleSubmit = async () => {
+    if (disableLogin) return; // Nếu đang trong quá trình vô hiệu hóa, không thực hiện gì
+
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
+        setIsLoading(true); // Vô hiệu hóa nút Đăng nhập
         const response = await axios.post('http://localhost:3001/login', {
           email: email,
           password: password,
@@ -32,22 +45,28 @@ const LoginForm = () => {
         const { token, user } = response.data;
         localStorage.setItem('token', token);
         localStorage.setItem('role', user.role);
-        localStorage.setItem('account_id', user.account_id); // Lưu account_id vào localStorage
-        console.log('Role saved to localStorage:', localStorage.getItem('role'));
-        console.log('Account ID saved to localStorage:', localStorage.getItem('account_id'));
+        localStorage.setItem('account_id', user.account_id);
+        // Lưu các thuộc tính của user vào localStorage
+        localStorage.setItem('fullname', user.fullname);
+        localStorage.setItem('email', user.email);
+        // Gửi user vào localStorage
+        localStorage.setItem('user', JSON.stringify(user));
         console.log('Login successful', response.data.user);
-        setLoginMessage('');
-        setSuccessModalVisible(true);
-        setTimeout(() => {
-          setSuccessModalVisible(false);
+  
+        // Hiển thị thông báo thành công và chuyển trang sau 2 giây
+        message.success('Bạn đã đăng nhập thành công!', 1).then(() => {
           navigate('/');
-        }, 2000);
+        });
+        setDisableLogin(true); 
       } catch (error) {
         if (error.response) {
-          setLoginMessage(error.response.data.message);
+          message.error(error.response.data.message);
         } else {
-          setLoginMessage('An error occurred');
+          message.error('An error occurred');
         }
+        setDisableLogin(true); // Bắt đầu quá trình vô hiệu hóa nút Đăng nhập
+      } finally {
+        setIsLoading(false); // Enable lại nút Đăng nhập
       }
     } else {
       setErrors(validationErrors);
@@ -93,26 +112,16 @@ const LoginForm = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full">Đăng nhập</Button>
+            <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableLogin}>
+              {disableLogin  ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            </Button> {/* Sử dụng disableLogin để vô hiệu hóa nút */}
           </Form.Item>
         </Form>
-        {loginMessage && <p className="text-center mt-4 text-red-500">{loginMessage}</p>}
         <div className="mt-4 flex justify-between">
           <Button type="link" onClick={() => navigate('/register')}>Đăng kí</Button>
           <Button type="link" onClick={() => navigate('/forgot-password')}>Quên mật khẩu</Button>
         </div>
       </div>
-      <Modal
-        visible={successModalVisible}
-        onCancel={() => setSuccessModalVisible(false)}
-        footer={null}
-        centered
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <CheckCircleOutlined style={{ fontSize: '170px', color: '#52c41a' }} />
-          <p className="mt-4">Bạn đã đăng nhập thành công!</p>
-        </div>
-      </Modal>
     </div>
   );
 };
