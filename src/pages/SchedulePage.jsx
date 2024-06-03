@@ -1,6 +1,6 @@
 
-import Banner from '../components/HomePage_Staff/Banner'
-import Schedule from '../components/SchedulePage_Admin/Schedule'
+import Banner from '../components/HomePage/Banner'
+import Schedule from '../components/SchedulePage/Schedule'
 import Footer from '../components/HomePage/Footer'
 
 const SchedulePage_Admin = () => {

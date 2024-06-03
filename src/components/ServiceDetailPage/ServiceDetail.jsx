@@ -1,5 +1,6 @@
+import { Button, Typography } from 'antd';
 
-import PropTypes from 'prop-types';
+const { Title, Paragraph } = Typography;
 
 const ServiceDetail = ({ serviceData }) => {
 
@@ -16,29 +17,19 @@ const ServiceDetail = ({ serviceData }) => {
       {/* Right section for the product information */}
       <div className="w-1/2 p-5 ml-10">
         {/* Product name */}
-        <h1 className="text-6xl font-bold mb-4">{serviceData.name}</h1>
+        <Title level={1} className="mb-4">{serviceData.name}</Title>
 
         {/* Product price */}
-        <p className="text-2xl text-green-500 mb-4">{`Price: $${serviceData.price}`}</p>
+        <Title level={3} className="text-green-500 mb-4">{`Price: $${serviceData.price}`}</Title>
 
         {/* Product description */}
-        <p className="mb-6">{serviceData.description}</p>
+        <Paragraph className="mb-6">{serviceData.description}</Paragraph>
         
         {/* Booking button */}
-        <button onClick={handleBookingNow} className="bg-black hover:bg-gray-700 text-white px-4 py-2">Booking Now</button>
+        <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
       </div>
     </div>
   );
-};
-
-// PropTypes to enforce the type and structure of serviceData
-ServiceDetail.propTypes = {
-  serviceData: PropTypes.shape({
-    name: PropTypes.string.isRequired,       // Service name should be a string and is required
-    price: PropTypes.number.isRequired,      // Service price should be a number and is required
-    description: PropTypes.string.isRequired,// Service description should be a string and is required
-    image: PropTypes.string.isRequired,      // Service image URL should be a string and is required
-  }).isRequired,
 };
 
 export default ServiceDetail;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Typography, Button, Form, Input, Row, Col, message } from 'antd';
 import {
@@ -12,17 +12,18 @@ const { Title } = Typography;
 const { Sider, Content } = Layout;
 
 const UserProfile = () => {
-  const [user, setUser] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phoneNumber: '123-456-7890',
-    address: '123 Main St, Anytown, USA',
-  });
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
+  const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+  const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    setUser(storedUser);
+    setFormData({ ...storedUser });
+  }, []);
 
   const handleUpdateInfo = () => {
     setIsEditMode(true);
@@ -41,13 +42,14 @@ const UserProfile = () => {
   const handleSave = () => {
     let newErrors = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'Tên không được để trống';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Họ không được để trống';
-    if (!formData.email.trim()) newErrors.email = 'Email không được để trống';
-    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = 'Số điện thoại không được để trống';
-    if (!formData.address.trim()) newErrors.address = 'Địa chỉ không được để trống';
+    // Kiểm tra dữ liệu nhập vào và cập nhật state
+    if (!formData.fullname) newErrors.fullname = 'Họ và tên là bắt buộc';
+    if (!formData.phone) newErrors.phone = 'Số điện thoại là bắt buộc';
+    if (!formData.address) newErrors.address = 'Địa chỉ là bắt buộc';
 
     if (Object.keys(newErrors).length === 0) {
+      // Cập nhật thông tin người dùng và localStorage
+      localStorage.setItem('user', JSON.stringify(formData));
       setUser(formData);
       setIsEditMode(false);
       setErrors({});
@@ -68,10 +70,15 @@ const UserProfile = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    localStorage.removeItem('account_id')
+    localStorage.removeItem('account_id');
+    localStorage.removeItem('fullname');
+    localStorage.removeItem('email'); 
+    localStorage.removeItem('user'); 
+    setRole('guest');
+    setUser(null); 
     navigate('/');
+    window.location.reload();
   };
-
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
@@ -85,20 +92,24 @@ const UserProfile = () => {
           >
             Thông tin người dùng
           </Menu.Item>
-          <Menu.Item
-            key="pet-list"
-            icon={<UnorderedListOutlined />}
-            onClick={() => navigate('/pet-list')}
-          >
-            Danh sách thú cưng
-          </Menu.Item>
-          <Menu.Item
-            key="transaction-history"
-            icon={<HistoryOutlined />}
-            onClick={() => navigate('/transaction-history')}
-          >
-            Lịch sử giao dịch
-          </Menu.Item>
+          {role === 'customer' && (
+            <Menu.Item
+              key="pet-list"
+              icon={<UnorderedListOutlined />}
+              onClick={() => navigate('/pet-list')}
+            >
+              Danh sách thú cưng
+            </Menu.Item>
+          )}
+          {role === 'customer' && (
+            <Menu.Item
+              key="transaction-history"
+              icon={<HistoryOutlined />}
+              onClick={() => navigate('/transaction-history')}
+            >
+              Lịch sử giao dịch
+            </Menu.Item>
+          )}
           <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
             Đăng xuất
           </Menu.Item>
@@ -112,63 +123,47 @@ const UserProfile = () => {
             </Title>
             {isEditMode ? (
               <Form layout="vertical">
-                <Form.Item label="Tên" validateStatus={errors.firstName ? 'error' : ''} help={errors.firstName}>
+                <Form.Item label="Họ và tên" validateStatus={errors.fullname && "error"} help={errors.fullname}>
                   <Input
-                    name="firstName"
-                    value={formData.firstName}
+                    name="fullname"
+                    value={formData.fullname}
                     onChange={handleChange}
                   />
                 </Form.Item>
-                <Form.Item label="Họ" validateStatus={errors.lastName ? 'error' : ''} help={errors.lastName}>
+                <Form.Item label="Email">
                   <Input
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Email" validateStatus={errors.email ? 'error' : ''} help={errors.email}>
-                  <Input
-                    type="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    disabled
                   />
                 </Form.Item>
-                <Form.Item label="Số điện thoại" validateStatus={errors.phoneNumber ? 'error' : ''} help={errors.phoneNumber}>
+                <Form.Item label="Số điện thoại" validateStatus={errors.phone && "error"} help={errors.phone}>
                   <Input
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
+                    name="phone"
+                    value={formData.phone}
                     onChange={handleChange}
                   />
                 </Form.Item>
-                <Form.Item label="Địa chỉ" validateStatus={errors.address ? 'error' : ''} help={errors.address}>
+                <Form.Item label="Địa chỉ" validateStatus={errors.address && "error"} help={errors.address}>
                   <Input
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
                   />
                 </Form.Item>
-                <Form.Item>
-                  <Button type="primary" onClick={handleSave} className="mr-2">Lưu thay đổi</Button>
-                  <Button onClick={handleCancel}>Hủy</Button>
-                </Form.Item>
+                <div className="flex justify-between mt-6">
+                  <Button type="primary" onClick={handleSave} className="mr-2">Lưu</Button>
+                  <Button type="default" onClick={handleCancel}>Hủy</Button>
+                </div>
               </Form>
             ) : (
               <>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Title level={5}>Tên</Title>
-                    <p className="bg-gray-200 p-2 rounded-md">{user.firstName}</p>
-                  </Col>
-                  <Col span={12}>
-                    <Title level={5}>Họ</Title>
-                    <p className="bg-gray-200 p-2 rounded-md">{user.lastName}</p>
-                  </Col>
-                </Row>
+                <Title level={5}>Họ và tên</Title>
+                <p className="bg-gray-200 p-2 rounded-md">{user.fullname}</p>
                 <Title level={5}>Email</Title>
                 <p className="bg-gray-200 p-2 rounded-md">{user.email}</p>
                 <Title level={5}>Số điện thoại</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.phoneNumber}</p>
+                <p className="bg-gray-200 p-2 rounded-md">{user.phone}</p>
                 <Title level={5}>Địa chỉ</Title>
                 <p className="bg-gray-200 p-2 rounded-md">{user.address}</p>
                 <div className="flex justify-between mt-6">

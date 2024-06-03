@@ -1,5 +1,5 @@
 
-import Banner from '../components/UserProfilePage/Banner'
+import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
 import TransactionDetail from '../components/TransactionDetailPage/TransactionDetail'
 import { useEffect, useState } from 'react'

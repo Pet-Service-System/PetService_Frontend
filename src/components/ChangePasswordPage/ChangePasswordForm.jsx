@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Typography, message, Modal } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
@@ -11,25 +10,39 @@ const ChangePasswordForm = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Đổi mật khẩu
+  const [disableChangePassword, setDisableChangePassword] = useState(false); // State để điều khiển việc vô hiệu hóa nút Đổi mật khẩu
   const navigate = useNavigate();
 
-  const accountId = localStorage.getItem('account_id'); // Lấy account_id từ localStorage
+  useEffect(() => {
+    let timer;
+    if (disableChangePassword) {
+      timer = setTimeout(() => {
+        setDisableChangePassword(false);
+      }, 1000); // Vô hiệu hóa trong 1 giây
+    }
+
+    return () => clearTimeout(timer);
+  }, [disableChangePassword]);
 
   const validate = () => {
     const newErrors = {};
     if (!currentPassword.trim()) newErrors.currentPassword = 'Current password is required';
     if (!newPassword.trim()) newErrors.newPassword = 'New password is required';
+    if (!confirmPassword.trim()) newErrors.confirmPassword = 'Confirm password is required';
+    if (newPassword === currentPassword) newErrors.newPassword = 'New password must be different from current password';
     if (newPassword !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     return newErrors;
   };
 
   const handleSubmit = async () => {
+    if (disableChangePassword) return; // Nếu đang trong quá trình vô hiệu hóa, không thực hiện gì
     const token = localStorage.getItem('token'); // Get token from localStorage
-
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
+        setIsLoading(true); // Vô hiệu hóa nút Đổi mật khẩu
+        // Gửi request để đổi mật khẩu
         const response = await axios.post('http://localhost:3001/change-password', {
           currentPassword: currentPassword,
           newPassword: newPassword,
@@ -39,16 +52,21 @@ const ChangePasswordForm = () => {
           }
         });
         console.log('Password changed successfully', response.data);
-        message.success('Password changed successfully');
-        setTimeout(() => {
+        // Hiển thị thông báo thành công và mở modal
+        message.success('Đổi mật khẩu thành công!', 1).then(() => {
           navigate('/user-profile');
-        }, 2000);
+        });
+        setDisableChangePassword(true); // Bắt đầu quá trình vô hiệu hóa nút Đổi mật khẩu
       } catch (error) {
+        // Xử lý lỗi khi gặp lỗi trong quá trình đổi mật khẩu
         if (error.response) {
           message.error(error.response.data.message);
         } else {
           message.error('An error occurred');
         }
+        setDisableChangePassword(true); // Bắt đầu quá trình vô hiệu hóa nút Đổi mật khẩu
+      } finally {
+        setIsLoading(false); // Enable lại nút Đổi mật khẩu
       }
     } else {
       setErrors(validationErrors);
@@ -106,27 +124,16 @@ const ChangePasswordForm = () => {
           </Form.Item>
           <Form.Item>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button type="primary" htmlType="submit" className="mr-2">
-                Đổi mật khẩu
+              <Button type="primary" htmlType="submit" className="mr-2" disabled={isLoading || disableChangePassword}>
+                {disableChangePassword ? 'Đang đổi mật khẩu...' : 'Đổi mật khẩu'}
               </Button>
-              <Button type="default" onClick={handleCancel}>
-                Hủy bỏ
+              <Button onClick={handleCancel}>
+                Hủy
               </Button>
             </div>
           </Form.Item>
         </Form>
       </div>
-      <Modal
-        visible={successModalVisible}
-        onCancel={() => setSuccessModalVisible(false)}
-        footer={null}
-        centered
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <CheckCircleOutlined style={{ fontSize: '170px', color: '#52c41a' }} />
-          <p className="mt-4">Password changed successfully!</p>
-        </div>
-      </Modal>
     </div>
   );
 };

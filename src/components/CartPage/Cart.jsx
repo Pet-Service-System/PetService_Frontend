@@ -1,78 +1,97 @@
+import { Table, InputNumber, Button, Typography, Card } from 'antd';
 import useShopping from '../../hook/useShopping';
+import { useNavigate } from 'react-router-dom';
+
+const { Title, Text } = Typography;
 
 const Cart = () => {
     const { shoppingCart, handelUpdateQuantity, handleRemoveItem } = useShopping();
-
+    const navigate = useNavigate()
     // Calculate the total amount of the cart
     const totalAmount = shoppingCart.reduce((total, item) => {
         return total + item.price * item.quantity;
     }, 0);
 
+    const columns = [
+        {
+            title: '#',
+            dataIndex: 'index',
+            key: 'index',
+            render: (text, record, index) => index + 1,
+        },
+        {
+            title: 'Sản phẩm',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text, record) => (
+                <div className="flex items-center">
+                    <div
+                        className="w-20 h-20 bg-cover bg-center rounded mr-4"
+                        style={{ backgroundImage: `url(${record.image})` }}
+                    ></div>
+                    <span className="text-xl font-semibold">{text}</span>
+                </div>
+            ),
+        },
+        {
+            title: 'Giá',
+            dataIndex: 'price',
+            key: 'price',
+            render: (text) => `$${text.toFixed(2)}`,
+        },
+        {
+            title: 'Số lượng',
+            dataIndex: 'quantity',
+            key: 'quantity',
+            render: (text, record) => (
+                <InputNumber
+                    min={1}
+                    value={text}
+                    onChange={(value) => handelUpdateQuantity(record.id, value)}
+                    className="w-24"
+                />
+            ),
+        },
+        {
+            title: 'Thao tác',
+            key: 'action',
+            render: (text, record) => (
+                <Button
+                    type="primary"
+                    danger
+                    onClick={() => handleRemoveItem(record.id)}
+                >
+                    Xóa
+                </Button>
+            ),
+        },
+    ];
+
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="lg:text-5xl text-3xl font-bold mb-8 text-center">Shopping Cart</h1>
-            <div className="bg-white shadow-lg rounded-lg p-6">
+        <div className="container mx-auto px-4 py-44">
+            <Title className="text-center" level={2}>Shopping Cart</Title>
+            <Card className="shadow-lg rounded-lg p-6">
                 {shoppingCart && shoppingCart.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full table-auto">
-                            <thead>
-                                <tr className="bg-gray-200">
-                                    <th className="px-4 py-2 text-left">#</th>
-                                    <th className="px-4 py-2 text-left">Sản phẩm</th>
-                                    <th className="px-4 py-2 text-left">Giá</th>
-                                    <th className="px-4 py-2 text-left">Số lượng</th>
-                                    <th className="px-4 py-2 text-left">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {shoppingCart.map((item, index) => (
-                                    <tr key={item.id} className="border-t">
-                                        <td className="px-4 py-2">{index + 1}</td>
-                                        <td className="px-4 py-2 flex items-center">
-                                            <div
-                                                className="w-20 h-20 bg-cover bg-center rounded mr-4"
-                                                style={{ backgroundImage: `url(${item.image})` }}
-                                            ></div>
-                                            <span className="text-xl font-semibold">{item.name}</span>
-                                        </td>
-                                        <td className="px-4 py-2">${item.price}</td>
-                                        <td className="px-4 py-2">
-                                            <input
-                                                value={item.quantity}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value);
-                                                    if (value >= 1) {
-                                                        handelUpdateQuantity(item.id, value);
-                                                    }
-                                                }}
-                                                className="w-24 p-2 border border-gray-300 rounded-md text-center"
-                                                min="1"
-                                                required
-                                            />
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <button
-                                                onClick={() => handleRemoveItem(item.id)}
-                                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                            >
-                                                Xóa
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <Table
+                        dataSource={shoppingCart}
+                        columns={columns}
+                        rowKey="id"
+                        pagination={false}
+                    />
                 ) : (
-                    <p className="text-5xl text-center text-gray-500">Giỏ của bạn đang trống.</p>
+                    <Text className="text-center text-2xl text-gray-500">Giỏ của bạn đang trống.</Text>
                 )}
-            </div>
+            </Card>
             {shoppingCart && shoppingCart.length > 0 && (
                 <div className="mt-8 flex justify-end items-center">
-                    <span className="text-2xl text-green-600 font-bold mr-4">Tổng tiền: ${totalAmount.toFixed(2)}</span>
-                    <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
+                    <Text className="text-2xl text-green-600 font-bold mr-4">Tổng tiền: ${totalAmount.toFixed(2)}</Text>
+                    <Button type="primary" 
+                            className="bg-orange-500 
+                                       hover:bg-orange-700 
+                                       text-white font-bold py-2 px-4 rounded"
+                            onClick={navigate('/payment')}>
                         Thanh toán
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

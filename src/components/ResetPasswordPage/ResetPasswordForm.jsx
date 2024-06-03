@@ -1,12 +1,27 @@
 import React from 'react';
-import { Form, Input, Button, Typography } from 'antd';
-import { Link } from 'react-router-dom';
+import { Form, Input, Button, Typography, message } from 'antd';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const { Title } = Typography;
 
 const ResetPasswordForm = () => {
-  const handleSubmit = (values) => {
-    console.log('Nhận giá trị:', values);
+  const { accountId, token } = useParams();
+  const navigate = useNavigate();
+  console.log(accountId)
+
+  const handleSubmit = async (values) => {
+    const { password } = values;
+    try {
+      const response = await axios.post(`http://localhost:3001/reset-password/${accountId}/${token}`, {
+        newPassword: password,
+      });
+      message.success(response.data.message);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during password reset:', error);
+      message.error(error.response?.data?.message || 'Lỗi khi đặt lại mật khẩu');
+    }
   };
 
   return (
