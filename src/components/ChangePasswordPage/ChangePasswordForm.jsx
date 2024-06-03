@@ -29,11 +29,41 @@ const ChangePasswordForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const validationErrors = validate();
+  //   if (Object.keys(validationErrors).length === 0) {
+  //     console.log('Form submitted', formData);
+  //   } else {
+  //     setErrors(validationErrors);
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
-      console.log('Form submitted', formData);
+      try {
+        const response = await fetch('http://localhost:3001/api/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            currentPassword: formData.currentPassword,
+            newPassword: formData.newPassword,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to change password');
+        }
+        const result = await response.json();
+        console.log('Password changed successfully', result);
+        navigate('/user-profile');
+      } catch (error) {
+        console.error('Error:', error);
+        setErrors({ server: 'Failed to change password. Please try again later.' });
+      }
     } else {
       setErrors(validationErrors);
     }
