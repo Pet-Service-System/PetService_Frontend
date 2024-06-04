@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Typography, Button, Form, Input, Row, Col, message } from 'antd';
+import { Layout, Menu, Typography, Button, Form, Input, message, Grid } from 'antd';
 import {
   UserOutlined,
   UnorderedListOutlined,
@@ -10,6 +10,7 @@ import {
 
 const { Title } = Typography;
 const { Sider, Content } = Layout;
+const { useBreakpoint } = Grid;
 
 const UserProfile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -18,6 +19,7 @@ const UserProfile = () => {
   const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const navigate = useNavigate();
+  const screens = useBreakpoint();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -42,13 +44,13 @@ const UserProfile = () => {
   const handleSave = () => {
     let newErrors = {};
 
-    // Kiểm tra dữ liệu nhập vào và cập nhật state
+    // Validate inputs and update state
     if (!formData.fullname) newErrors.fullname = 'Họ và tên là bắt buộc';
     if (!formData.phone) newErrors.phone = 'Số điện thoại là bắt buộc';
     if (!formData.address) newErrors.address = 'Địa chỉ là bắt buộc';
 
     if (Object.keys(newErrors).length === 0) {
-      // Cập nhật thông tin người dùng và localStorage
+      // Update user info and localStorage
       localStorage.setItem('user', JSON.stringify(formData));
       setUser(formData);
       setIsEditMode(false);
@@ -82,39 +84,41 @@ const UserProfile = () => {
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
-      <Sider width={220}>
-        <div className="logo" />
-        <Menu theme="dark" mode="inline">
-          <Menu.Item
-            key="profile"
-            icon={<UserOutlined />}
-            onClick={() => navigate('/user-profile')}
-          >
-            Thông tin người dùng
-          </Menu.Item>
-          {role === 'customer' && (
+      {!screens.xs && (
+        <Sider width={220}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline">
             <Menu.Item
-              key="pet-list"
-              icon={<UnorderedListOutlined />}
-              onClick={() => navigate('/pet-list')}
+              key="profile"
+              icon={<UserOutlined />}
+              onClick={() => navigate('/user-profile')}
             >
-              Danh sách thú cưng
+              Thông tin người dùng
             </Menu.Item>
-          )}
-          {role === 'customer' && (
-            <Menu.Item
-              key="transaction-history"
-              icon={<HistoryOutlined />}
-              onClick={() => navigate('/transaction-history')}
-            >
-              Lịch sử giao dịch
+            {role === 'customer' && (
+              <>
+                <Menu.Item
+                  key="pet-list"
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => navigate('/pet-list')}
+                >
+                  Danh sách thú cưng
+                </Menu.Item>
+                <Menu.Item
+                  key="transaction-history"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate('/transaction-history')}
+                >
+                  Lịch sử giao dịch
+                </Menu.Item>
+              </>
+            )}
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              Đăng xuất
             </Menu.Item>
-          )}
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-            Đăng xuất
-          </Menu.Item>
-        </Menu>
-      </Sider>
+          </Menu>
+        </Sider>
+      )}
       <Layout>
         <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
           <div className="bg-white p-8 rounded-lg shadow-md">

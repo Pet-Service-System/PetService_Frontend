@@ -1,20 +1,28 @@
+import React from 'react';
+import { Typography, Card, Row, Col } from 'antd';
 
-  const Welcome = () => {
-    return (
-      <div>
-          <div className="text-left py-40 bg-cover bg-center" style={{ backgroundImage: "url(/src/assets/image/petbackground.jpg)" }}>
-          <div className="container mx-auto">
-            <div className="text-center inline-block bg-cyan-500 p-40 rounded-lg shadow-md opacity-90">
-              <h6 className="text-4xl">Welcome to <i>Pet Service</i></h6>
+const { Title, Text } = Typography;
+
+const Welcome = () => {
+  return (
+    <div className="text-left py-40 bg-cover bg-center" style={{ backgroundImage: "url(/src/assets/image/petbackground.jpg)" }}>
+      <div className="container mx-auto">
+        <Row justify="center" align="middle" style={{ minHeight: '35vh' }}>
+          <Col>
+            <Card className="bg-cyan-500 bg-opacity-90 p-10 rounded-lg shadow-md text-center">
+              <Title level={2} className="text-4xl">
+                Welcome to <i>Pet Service</i>
+              </Title>
               <div id="typed-strings" className="text-lg italic">
-                <p className='text-white'>Happy for pets is happy for you.</p>
+                <Text className="text-white">Happy for pets is happy for you.</Text>
               </div>
-              <span id="typed" className="text-lg italic" style={{ whiteSpace: "pre" }}></span>
-            </div>
-          </div>
-        </div>
+              <Text id="typed" className="text-lg italic" style={{ whiteSpace: 'pre' }}></Text>
+            </Card>
+          </Col>
+        </Row>
       </div>
-    )
-  }
+    </div>
+  );
+};
 
-  export default Welcome
+export default Welcome;

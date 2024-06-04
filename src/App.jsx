@@ -61,7 +61,7 @@ function App() {
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/payment' element={<PaymentPage/>}/>
       <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
-      <Route path='/manage-bookings' element={<BookingListPage/>}/>
+      <Route path='/booking-list' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
       <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>

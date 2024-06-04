@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getForCatProducts } from '../../../apis/ApiProduct';
 import { Card, Col, Row } from 'antd';
+import { getPetService } from '../../../apis/ApiService';
 
 const { Meta } = Card;
 
 const ServiceList = () => {
-  const [productData, setProductData] = useState([]);
+  const [serviceData, setServiceData] = useState([]);
 
   useEffect(() => {
-    getForCatProducts().then((data) => {
-      setProductData(data);
+    getPetService().then((data) => {
+      setServiceData(data);
     });
   }, []);
 
   const navigate = useNavigate();
 
   const handleProductClick = (id) => {
-    navigate(`/for-cat-product-detail/${id}`);
+    navigate(`/pet-service-detail/${id}`);
   };
 
   return (
     <div className="p-5">
       <Row gutter={[16, 16]} justify="center">
-        {productData.map((product) => (
+        {serviceData.map((product) => (
           <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
             <Card
               hoverable

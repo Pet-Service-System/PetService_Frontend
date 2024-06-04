@@ -28,9 +28,6 @@ const Banner = () => {
       }
     };
 
-    console.log('Role:', role);
-
-    
     handleResize();
     window.addEventListener('resize', handleResize);
 
@@ -44,50 +41,31 @@ const Banner = () => {
   const clickTitle = () => navigate('/');
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('account_id');
-    localStorage.removeItem('fullname');
-    localStorage.removeItem('email'); 
-    localStorage.removeItem('user'); 
+    localStorage.clear();
     setRole('guest');
-    setUser(null); 
-    navigate('/')
+    setUser(null);
+    navigate('/');
     window.location.reload();
   };
 
-  const userMenu = (
+  const userMenuItems = [
+    { key: 'profile', icon: <UserOutlined />, label: 'Thông tin người dùng', onClick: () => navigate('/user-profile') },
+    ...(role === 'customer' ? [
+      { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
+      { key: 'transaction-history', icon: <HistoryOutlined />, label: 'Lịch sử giao dịch', onClick: () => navigate('/transaction-history') },
+    ] : []),
+    { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
+  ];
+
+  const renderUserMenu = () => (
     <Menu>
-      <Menu.Item
-        key="profile"
-        icon={<UserOutlined />}
-        onClick={() => navigate('/user-profile')}
-      >
-        Thông tin người dùng
-      </Menu.Item>
-      {role === 'customer' && (
-        <Menu.Item
-          key="pet-list"
-          icon={<UnorderedListOutlined />}
-          onClick={() => navigate('/pet-list')}
-        >
-          Danh sách thú cưng
+      {userMenuItems.map(item => (
+        <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+          {item.label}
         </Menu.Item>
-      )}
-      {role === 'customer' && (
-        <Menu.Item
-          key="transaction-history"
-          icon={<HistoryOutlined />}
-          onClick={() => navigate('/transaction-history')}
-        >
-          Lịch sử giao dịch
-        </Menu.Item>
-      )}
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-        Đăng xuất
-      </Menu.Item>
+      ))}
     </Menu>
-  );  
+  );
 
   const renderMenuItems = (isVertical) => {
     let menuItems = [];
@@ -120,16 +98,16 @@ const Banner = () => {
         { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
-        { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
+        { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } else if (role === 'sale staff' || role === 'caretaker staff' || role === 'store manager') {
+    } else if (['sale staff', 'caretaker staff', 'store manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
         { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
-        { key: 'manage-bookings', label: 'QUẢN LÍ BOOKING', path: '/manage-bookings' },
+        { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
     } 
 
@@ -161,26 +139,37 @@ const Banner = () => {
           )
         ))}
         {role === 'guest' && isVertical && (
-          <Menu.Item key="login">ĐĂNG NHẬP</Menu.Item>
+          <Menu.Item key="login" onClick={handleLoginClick}>ĐĂNG NHẬP</Menu.Item>
         )}
         {role === 'customer' && isVertical && (
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
-            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
-            <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
+            <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
+              {userMenuItems.map(item => (
+                <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+                  {item.label}
+                </Menu.Item>
+              ))}
+            </Menu.SubMenu>
           </>
         )}
         {role === 'admin' && isVertical && (
-          <>
-            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
-            <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
-          </>
+          <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
+            {userMenuItems.map(item => (
+              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+                {item.label}
+              </Menu.Item>
+            ))}
+          </Menu.SubMenu>
         )}
-        {(role === 'sale staff' || role === 'caretaker staff' || role === 'store manager') && isVertical && (
-          <>
-            <Menu.Item key="user-profile" onClick={() => navigate('/user-profile')}>TÀI KHOẢN</Menu.Item>
-            <Menu.Item key="logout" onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
-          </>
+        {['sale staff', 'caretaker staff', 'store manager'].includes(role) && isVertical && (
+          <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
+            {userMenuItems.map(item => (
+              <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+                {item.label}
+              </Menu.Item>
+            ))}
+          </Menu.SubMenu>
         )}
       </Menu>
     );
@@ -217,7 +206,7 @@ const Banner = () => {
                 )}
                 {role !== 'guest' && (
                   <>
-                    <Popover content={userMenu} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
+                    <Popover content={renderUserMenu()} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
                       <Button shape="round" className="ml-4 py-2 px-4">
                         <span className="text-black">{user.fullname}</span>
                       </Button>
