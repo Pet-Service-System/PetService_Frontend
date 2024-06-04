@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, Card, Input, Typography, Alert } from 'antd';
+
+const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const Feedback = () => {
     const navigate = useNavigate();
@@ -31,60 +35,66 @@ const Feedback = () => {
     };
 
     return (
-        <div className="flex justify-center items-center p-20 bg-gray-100">
-            <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg">
-                <h2 className="text-3xl font-semibold mb-4 text-center">Phản Hồi Khách Hàng</h2>
+        <div className="flex justify-center items-center p-20 bg-gray-100 min-h-screen">
+            <Card className="w-full max-w-lg shadow-lg">
+                <Title level={2} className="text-center mb-4">Phản Hồi Khách Hàng</Title>
                 <div className="mb-4">
-                    <strong>Tên Khách Hàng:</strong> {feedbackData.customerName}
+                    <Text strong>Tên Khách Hàng:</Text> {feedbackData.customerName}
                 </div>
                 <div className="mb-4">
-                    <strong>Email:</strong> {feedbackData.email}
+                    <Text strong>Email:</Text> {feedbackData.email}
                 </div>
                 <div className="mb-4">
-                    <strong>Nội Dung Phản Hồi:</strong>
+                    <Text strong>Nội Dung Phản Hồi:</Text>
                     <p className='text-green-600'>{feedbackData.content}</p>
                 </div>
                 <div className="mb-4">
-                    <strong>Ngày Phản Hồi:</strong> {feedbackData.date}
+                    <Text strong>Ngày Phản Hồi:</Text> {feedbackData.date}
                 </div>
                 {showFeedbackForm ? (
                     <div className="mb-4">
-                        <textarea className="p-2 rounded-md w-full" placeholder="Nhập phản hồi của bạn"></textarea>
+                        <TextArea className="p-2 rounded-md w-full" placeholder="Nhập phản hồi của bạn" rows={4} />
                         <div className="mt-2 flex justify-between">
-                            <button
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                            <Button
+                                type="primary"
+                                className="mr-2"
                                 onClick={handleSendFeedback}
                             >
                                 Gửi
-                            </button>
-                            <button
-                                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                            </Button>
+                            <Button
+                                type="default"
                                 onClick={handleCancelFeedback}
                             >
                                 Hủy
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 ) : (
-                    <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mb-4"
+                    <Button
+                        type="primary"
+                        className="w-full mb-4"
                         onClick={handleFeedback}
                     >
                         Phản Hồi
-                    </button>
+                    </Button>
                 )}
-                <button
-                    className="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded w-full mb-4"
+                <Button
+                    type="default"
+                    className="w-full mb-4"
                     onClick={() => navigate('/booking-list')}
                 >
                     Trở Về
-                </button>
+                </Button>
                 {showSuccessMessage && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                        <strong className="font-bold">Gửi phản hồi thành công!</strong>
-                    </div>
+                    <Alert
+                        message="Gửi phản hồi thành công!"
+                        type="success"
+                        showIcon
+                        className="mt-4"
+                    />
                 )}
-            </div>
+            </Card>
         </div>
     );
 }

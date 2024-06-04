@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import useShopping from '../../hook/useShopping';
 import { getForCatProductsDetail, getForDogProductsDetail } from '../../apis/ApiProduct';
-import {useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const ProductDetail = ({ type }) => {
     const { id } = useParams();
@@ -46,11 +46,17 @@ const ProductDetail = ({ type }) => {
 
     return (
         productData && (
-            <div className="flex m-5 py-20 px-32">
-                <div className="w-1/2 bg-cover bg-center h-96" style={{ backgroundImage: `url(${productData.image})` }}></div>
-                <div className="w-1/2 p-5 ml-10">
-                    <h1 className="text-6xl font-bold mb-4">{productData.name}</h1>
-                    <p className="text-2xl text-green-500 mb-4">{`Price: $${productData.price}`}</p>
+            <div className="flex flex-col md:flex-row m-5 py-28 px-4 md:px-32">
+                <div className="w-full md:w-1/2 flex justify-center">
+                    <img 
+                        src={productData.image} 
+                        alt={productData.name} 
+                        className="max-w-full max-h-96 object-contain" 
+                    />
+                </div>
+                <div className="w-full md:w-1/2 p-5 md:ml-10">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-4">{productData.name}</h1>
+                    <p className="text-xl md:text-2xl text-green-500 mb-4">{`Price: $${productData.price}`}</p>
                     <p className="mb-6">{productData.description}</p>
                     <div className="flex items-center mb-6">
                         <button onClick={handleDecrease} className="bg-gray-600 text-white border border-gray-400 p-2">-</button>
