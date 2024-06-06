@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +43,7 @@ const ChangePasswordForm = () => {
       try {
         setIsLoading(true); // Vô hiệu hóa nút Đổi mật khẩu
         // Gửi request để đổi mật khẩu
-        const response = await axios.post('http://localhost:3001/change-password', {
+        const response = await axios.post('http://localhost:3001/api/auth/change-password', {
           currentPassword: currentPassword,
           newPassword: newPassword,
         }, {

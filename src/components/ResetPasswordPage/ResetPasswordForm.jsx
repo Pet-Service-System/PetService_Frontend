@@ -1,4 +1,3 @@
-import React from 'react';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,7 +12,7 @@ const ResetPasswordForm = () => {
   const handleSubmit = async (values) => {
     const { password } = values;
     try {
-      const response = await axios.post(`http://localhost:3001/reset-password/${accountId}/${token}`, {
+      const response = await axios.post(`http://localhost:3001/api/auth/reset-password/${accountId}/${token}`, {
         newPassword: password,
       });
       message.success(response.data.message);

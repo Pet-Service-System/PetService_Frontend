@@ -46,7 +46,7 @@ const RegisterForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true); // Vô hiệu hóa nút Đăng ký
-        const response = await axios.post('http://localhost:3001/register', {
+        const response = await axios.post('http://localhost:3001/api/auth/register', {
           fullname: fullname,
           password: password,
           email: email,
