@@ -106,6 +106,7 @@ const RegisterForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 name="email"
+                autoComplete="email"
               />
             </Form.Item>
             <Form.Item

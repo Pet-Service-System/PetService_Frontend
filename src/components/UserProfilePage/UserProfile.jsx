@@ -26,7 +26,7 @@ const UserProfile = () => {
     setUser(storedUser);
     setFormData({ ...storedUser });
   }, []);
-
+  console.log(user)
   const handleUpdateInfo = () => {
     setIsEditMode(true);
   };
