@@ -99,7 +99,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } else if (['sale staff', 'caretaker staff', 'store manager'].includes(role)) {
+    } else if (['sale staff', 'caretaker staff', 'manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
@@ -161,7 +161,7 @@ const Banner = () => {
             ))}
           </Menu.SubMenu>
         )}
-        {['sale staff', 'caretaker staff', 'store manager'].includes(role) && isVertical && (
+        {['sale staff', 'caretaker staff', 'manager'].includes(role) && isVertical && (
           <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
             {userMenuItems.map(item => (
               <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>

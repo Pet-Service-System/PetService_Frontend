@@ -138,7 +138,7 @@ const ProductDetail = () => {
                                 <Button type="primary" onClick={handleOrderNow}>Đặt ngay</Button>
                             </div>
                         </>
-                    ) : userRole === 'store manager' ? (
+                    ) : userRole === 'manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
                                 <Button type="primary" onClick={handleSaveEdit}>Lưu</Button>

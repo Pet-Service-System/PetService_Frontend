@@ -168,7 +168,7 @@ const ProductList = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        userRole === 'store manager' && (
+        userRole === 'manager' && (
           editMode === record.ProductID ? (
             <div>
               <Button type="primary" onClick={() => handleSaveEdit(record.ProductID)} style={{ marginRight: '8px' }}>Lưu</Button>
@@ -189,7 +189,7 @@ const ProductList = () => {
     <div className="p-36">
       <Title level={2}>Danh sách sản phẩm</Title>
       <Form form={form}>
-        {userRole === 'store manager' ? (
+        {userRole === 'manager' ? (
           <>
             <Table
               dataSource={productData}
