@@ -6,28 +6,29 @@ const { Title, Text } = Typography;
 
 const Cart = () => {
     const { shoppingCart, handelUpdateQuantity, handleRemoveItem } = useShopping();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
     // Calculate the total amount of the cart
     const totalAmount = shoppingCart.reduce((total, item) => {
-        return total + item.price * item.quantity;
+        return total + item.Price * item.quantity; // Use 'Price' property for price calculation
     }, 0);
 
     const columns = [
         {
             title: '#',
-            dataIndex: 'index',
-            key: 'index',
+            dataIndex: 'ProductID',
+            key: 'ProductID',
             render: (text, record, index) => index + 1,
         },
         {
             title: 'Sản phẩm',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'ProductName',
+            key: 'ProductName',
             render: (text, record) => (
                 <div className="flex items-center">
                     <div
                         className="w-20 h-20 bg-cover bg-center rounded mr-4"
-                        style={{ backgroundImage: `url(${record.image})` }}
+                        style={{ backgroundImage: `url(${record.ImageURL})` }}
                     ></div>
                     <span className="text-xl font-semibold">{text}</span>
                 </div>
@@ -35,19 +36,19 @@ const Cart = () => {
         },
         {
             title: 'Giá',
-            dataIndex: 'price',
-            key: 'price',
-            render: (text) => `$${text.toFixed(2)}`,
-        },
+            dataIndex: 'Price',
+            key: 'Price',
+            render: (text) => typeof text === 'number' ? `$${text.toFixed(2)}` : '',
+        },        
         {
             title: 'Số lượng',
-            dataIndex: 'quantity',
-            key: 'quantity',
+            dataIndex: 'quantity', 
+            key: 'Quantity',
             render: (text, record) => (
                 <InputNumber
                     min={1}
                     value={text}
-                    onChange={(value) => handelUpdateQuantity(record.id, value)}
+                    onChange={(value) => handelUpdateQuantity(record.ProductID, value)}
                     className="w-24"
                 />
             ),
@@ -59,7 +60,7 @@ const Cart = () => {
                 <Button
                     type="primary"
                     danger
-                    onClick={() => handleRemoveItem(record.id)}
+                    onClick={() => handleRemoveItem(record.ProductID)}
                 >
                     Xóa
                 </Button>
@@ -89,7 +90,7 @@ const Cart = () => {
                             className="bg-orange-500 
                                        hover:bg-orange-700 
                                        text-white font-bold py-2 px-4 rounded"
-                            onClick={navigate('/payment')}>
+                            onClick={() => navigate('/payment')}>
                         Thanh toán
                     </Button>
                 </div>

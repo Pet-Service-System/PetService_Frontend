@@ -14,8 +14,6 @@ import LoginPage from './pages/LoginPage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import { Route, Routes } from 'react-router-dom'
-import ForCatProductDetailPage from './pages/ForCatProductDetailPage'
-import ForDogProductDetailPage from './pages/ForDogProductDetailPage'
 import PetListPage from './pages/PetListPage'
 import TransactionHistoryPage from './pages/TransactionHistoryPage'
 import TransactionDetailPage from './pages/TransactionDetailPage'
@@ -31,6 +29,7 @@ import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
+import ProdutcDetailPage from './pages/ProdutcDetailPage'
 
 
 function App() {
@@ -51,8 +50,7 @@ function App() {
       <Route path='/pet-hotel' element={<PetHotelPage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
-      <Route path='/for-cat-product-detail/:id' element={<ForCatProductDetailPage/>}/>
-      <Route path='/for-dog-product-detail/:id' element={<ForDogProductDetailPage/>}/>
+      <Route path='/product-detail/:id' element={<ProdutcDetailPage/>}/>
       <Route path='/pet-list' element={<PetListPage/>}/>
       <Route path='/transaction-history' element={<TransactionHistoryPage/>}/>
       <Route path='/transaction-detail/:id' element={<TransactionDetailPage/>}/>

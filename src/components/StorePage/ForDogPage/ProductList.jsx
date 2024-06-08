@@ -1,47 +1,70 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getForDogProducts } from '../../../apis/ApiProduct';
-import { Card, Col, Row } from 'antd';
-const { Meta } = Card;
+import { Table, Typography } from 'antd';
+import axios from 'axios';
+const { Title } = Typography;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
-
-  useEffect(() => {
-    getForDogProducts().then((data) => {
-      setProductData(data);
-    });
-  }, []);
-
+  const [userRole, setUserRole] = useState(localStorage.getItem('role') || 'customer'); // Get role from localStorage or default to 'customer'
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/api/products');
+        // Filter products for dogs (PetTypeId: PT001)
+        const dogProducts = response.data.filter(product => product.PetTypeId === 'PT001');
+        setProductData(dogProducts);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const handleProductClick = (id) => {
-    navigate(`/for-dog-product-detail/${id}`);
+    navigate(`/product-detail/${id}`);
   };
 
+  const columns = [
+    {
+      title: 'Sản phẩm',
+      dataIndex: 'ProductName',
+      key: 'ProductName',
+      render: (text, record) => (
+        <div onClick={() => handleProductClick(record.ProductID)}>
+          <img src={record.ImageURL} alt={record.ProductName} style={{ width: '50px' }} />
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: 'Giá',
+      dataIndex: 'Price',
+      key: 'Price',
+      render: (text) => `$${text.toFixed(2)}`,
+    },
+    {
+      title: 'Mô tả',
+      dataIndex: 'Description',
+      key: 'Description',
+    },
+  ];
+
   return (
-    <div className="p-5">
-      <Row gutter={[16, 16]} justify="center">
-        {productData.map((product) => (
-          <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
-            <Card
-              hoverable
-              cover={<img alt={product.name} src={product.image} />}
-              onClick={() => handleProductClick(product.id)}
-            >
-              <Meta
-                title={product.name}
-                description={
-                  <>
-                    <p>${product.price}</p>
-                    <p>{product.description}</p>
-                  </>
-                }
-              />
-            </Card>
-          </Col>
-        ))}
-      </Row>
+    <div className="p-36">
+      {userRole === 'customer' ? ( // Render Card view for customer
+        <Title level={2}>Product List</Title>
+      ) : ( // Render Table view for other roles
+        <Table
+          dataSource={productData}
+          columns={columns}
+          rowKey="ProductID"
+          pagination={false}
+        />
+      )}
     </div>
   );
 };

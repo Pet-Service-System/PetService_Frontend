@@ -1,27 +1,25 @@
 import { useEffect, useState } from 'react';
-import useShopping from '../../hook/useShopping';
-import { getForCatProductsDetail, getForDogProductsDetail } from '../../apis/ApiProduct';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { Button, Input, Image } from 'antd';
+import useShopping from '../../hook/useShopping';
 
-const ProductDetail = ({ type }) => {
+const ProductDetail = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         const fetchProductDetail = async () => {
-            let data;
-            if (type === 'cat') {
-                data = await getForCatProductsDetail(id);
-            } else if (type === 'dog') {
-                data = await getForDogProductsDetail(id);
+            try {
+                const response = await axios.get(`http://localhost:3001/api/products/${id}`);
+                setProductData(response.data); // Ensure that the response data matches the schema
+            } catch (error) {
+                console.error('Error fetching product detail:', error);
             }
-            setProductData(data);
         };
         fetchProductDetail();
-    }, [id, type]);
-
-    const { handleAddItem } = useShopping();
+    }, [id]);
 
     const handleIncrease = () => setQuantity(quantity + 1);
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
@@ -30,6 +28,8 @@ const ProductDetail = ({ type }) => {
         console.log('Ordered:', productData, 'Quantity:', quantity);
     };
 
+    const { handleAddItem } = useShopping();
+
     const handleAddToCart = () => {
         if (productData) {
             const productWithQuantity = { ...productData, quantity };
@@ -37,8 +37,7 @@ const ProductDetail = ({ type }) => {
         }
     };
 
-    const handleChangeQuantity = (e) => {
-        const value = parseInt(e.target.value);
+    const handleChangeQuantity = (value) => {
         if (!isNaN(value) && value > 0) {
             setQuantity(value);
         }
@@ -48,30 +47,26 @@ const ProductDetail = ({ type }) => {
         productData && (
             <div className="flex flex-col md:flex-row m-5 py-28 px-4 md:px-32">
                 <div className="w-full md:w-1/2 flex justify-center">
-                    <img 
-                        src={productData.image} 
-                        alt={productData.name} 
-                        className="max-w-full max-h-96 object-contain" 
-                    />
+                    <Image src={productData.ImageURL} alt={productData.ProductName} />
                 </div>
                 <div className="w-full md:w-1/2 p-5 md:ml-10">
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4">{productData.name}</h1>
-                    <p className="text-xl md:text-2xl text-green-500 mb-4">{`Price: $${productData.price}`}</p>
-                    <p className="mb-6">{productData.description}</p>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-4">{productData.ProductName}</h1>
+                    <p className="text-xl md:text-2xl text-green-500 mb-4">{`Price: $${productData.Price}`}</p>
+                    <p className="mb-6">{productData.Description}</p>
                     <div className="flex items-center mb-6">
-                        <button onClick={handleDecrease} className="bg-gray-600 text-white border border-gray-400 p-2">-</button>
-                        <input
+                        <Button onClick={handleDecrease}>-</Button>
+                        <Input
                             value={quantity}
-                            onChange={handleChangeQuantity}
-                            className="mx-3 text-lg w-16 text-center"
+                            onChange={(e) => handleChangeQuantity(e.target.value)}
+                            className="mx-3 text-lg w-24 text-center"
                             type="number"
                             min="1"
                         />
-                        <button onClick={handleIncrease} className="bg-black text-white border border-gray-400 p-2">+</button>
+                        <Button onClick={handleIncrease}>+</Button>
                     </div>
                     <div className="flex space-x-4 justify-end">
-                        <button onClick={handleAddToCart} className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2">Add to Cart</button>
-                        <button onClick={handleOrderNow} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2">Order Now</button>
+                        <Button type="primary" onClick={handleAddToCart}>Thêm vào giỏ hàng</Button>
+                        <Button type="primary" onClick={handleOrderNow}>Đặt ngay</Button>
                     </div>
                 </div>
             </div>
