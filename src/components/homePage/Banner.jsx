@@ -44,7 +44,6 @@ const Banner = () => {
     localStorage.clear();
     setRole('guest');
     setUser(null);
-    navigate('/');
     window.location.reload();
   };
 
