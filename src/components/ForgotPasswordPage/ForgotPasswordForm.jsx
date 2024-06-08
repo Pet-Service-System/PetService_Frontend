@@ -22,7 +22,7 @@ const ForgotPasswordForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true); // Vô hiệu hóa nút Gửi yêu cầu
-        const response = await axios.post('http://localhost:3001/forgot-password', {
+        const response = await axios.post('http://localhost:3001/api/auth/forgot-password', {
             email: email,
         });
         console.log('Data from server:', response.data);
