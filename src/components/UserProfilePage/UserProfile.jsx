@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Typography, Button, Form, Input, message, Grid } from 'antd';
+import axios from 'axios';
 import {
   UserOutlined,
   UnorderedListOutlined,
@@ -23,10 +24,14 @@ const UserProfile = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
-    setFormData({ ...storedUser });
+    if (!storedUser) {
+      navigate('/');
+    } else {
+      setUser(storedUser);
+      setFormData({ ...storedUser });
+    }
   }, []);
-  console.log(user)
+
   const handleUpdateInfo = () => {
     setIsEditMode(true);
   };
@@ -41,6 +46,31 @@ const UserProfile = () => {
     setErrors({});
   };
 
+  const updateUserAccount = async (updatedData) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Authorization token not found. Please log in.');
+        return;
+      }
+      await axios.patch(`http://localhost:3001/api/accounts/${user.id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Update user info and localStorage
+      localStorage.setItem('user', JSON.stringify(updatedData));
+      setUser(updatedData);
+      setIsEditMode(false);
+      setErrors({});
+      message.success('Thông tin đã được cập nhật');
+    } catch (error) {
+      console.error('Failed to update account:', error);
+      message.error('Cập nhật thông tin thất bại. Vui lòng thử lại.');
+    }
+  };
+
   const handleSave = () => {
     let newErrors = {};
 
@@ -50,12 +80,7 @@ const UserProfile = () => {
     if (!formData.address) newErrors.address = 'Địa chỉ là bắt buộc';
 
     if (Object.keys(newErrors).length === 0) {
-      // Update user info and localStorage
-      localStorage.setItem('user', JSON.stringify(formData));
-      setUser(formData);
-      setIsEditMode(false);
-      setErrors({});
-      message.success('Thông tin đã được cập nhật');
+      updateUserAccount(formData);
     } else {
       setErrors(newErrors);
     }
