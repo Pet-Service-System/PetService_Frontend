@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message } from 'antd';
 import axios from 'axios';
+
 const { Title } = Typography;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole] = useState(localStorage.getItem('role') || 'guest');
+  const [petTypeId] = useState('PT002');
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
   const [form] = Form.useForm();
@@ -17,8 +19,8 @@ const ProductList = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/products');
-        const dogProducts = response.data.filter(product => product.PetTypeId === 'PT001');
-        setProductData(dogProducts);
+        const filteredProducts = response.data.filter(product => product.PetTypeId === petTypeId);
+        setProductData(filteredProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -27,7 +29,7 @@ const ProductList = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [petTypeId]);
 
   const handleProductClick = (id) => {
     navigate(`/product-detail/${id}`);
@@ -39,7 +41,7 @@ const ProductList = () => {
       ProductName: record.ProductName,
       Price: record.Price,
       Description: record.Description,
-      ImageURL: record.ImageURL // Thêm URL hình ảnh vào form
+      ImageURL: record.ImageURL // Add ImageURL to form
     });
   };
 
@@ -50,27 +52,70 @@ const ProductList = () => {
 
   const handleSaveEdit = async (id) => {
     try {
-      const values = await form.validateFields();
-      const response = await axios.put(`http://localhost:3001/api/products/${id}`, values);
-      setProductData(productData.map(product => product.ProductID === id ? response.data : product));
-      setEditMode(null);
-      form.resetFields();
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Authorization token not found. Please log in.');
+        return;
+      }
+  
+      const values = await form.validateFields(); // Validate form fields
+      const updatedProduct = {
+        ProductName: values.ProductName,
+        Price: parseFloat(values.Price),
+        Description: values.Description,
+        ImageURL: values.ImageURL
+      };
+  
+      await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      message.success('Product updated successfully', 0.5).then(() => {
+        window.location.reload(); // Reload the page after successful update
+      });
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error('Error updating product:', error);
+      if (error.response && error.response.status === 401) {
+        message.error('Unauthorized. Please log in.');
+      } else {
+        message.error('Error updating product');
+      }
     }
   };
+  
 
   const handleDeleteClick = (id) => {
     Modal.confirm({
-      title: 'Bạn có chắc chắn muốn xóa sản phẩm này không?',
-      onOk: async () => {
-        try {
-          await axios.delete(`http://localhost:3001/api/products/${id}`);
-          setProductData(productData.filter(product => product.ProductID !== id));
-        } catch (error) {
-          console.error('Error deleting product:', error);
-        }
-      },
+        title: 'Are you sure you want to delete this product?',
+        onOk: async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    message.error('Authorization token not found. Please log in.');
+                    return;
+                }
+                
+                await axios.delete(`http://localhost:3001/api/products/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                
+                message.success('Product deleted successfully', 0.5).then(() => {
+                  window.location.reload(); 
+                });
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                if (error.response && error.response.status === 401) {
+                    message.error('Unauthorized. Please log in.');
+                } else {
+                    message.error('Error deleting product');
+                }
+            }
+        },
     });
   };
 
@@ -85,26 +130,57 @@ const ProductList = () => {
 
   const handleSaveAdd = async () => {
     try {
-      const values = await form.validateFields();
-      const response = await axios.post('http://localhost:3001/api/products', values);
-      setProductData([...productData, response.data]);
-      setAddMode(false);
-      form.resetFields();
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Authorization token not found. Please log in.');
+        return;
+      }
+      
+      const values = await form.validateFields(); // Validate form fields
+      const newProduct = {
+        productName: values.ProductName,
+        price: parseFloat(values.Price),
+        description: values.Description,
+        imageURL: values.ImageURL,
+        petTypeId: petTypeId // Bổ sung petTypeId vào giá trị sản phẩm mới
+      };
+      console.log(newProduct)
+      const response = await axios.post(`http://localhost:3001/api/products`, newProduct, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (response.status === 201) {
+        message.success('Product added successfully', 0.5).then(() => {
+          window.location.reload();
+        });
+      } else {
+        message.error('Failed to add product: Unexpected server response');
+      }
     } catch (error) {
       console.error('Error adding product:', error);
+      if (error.response && error.response.status === 401) {
+        message.error('Unauthorized. Please log in.');
+      } else if (error.response && error.response.data && error.response.data.message) {
+        message.error(`Error adding product: ${error.response.data.message}`);
+      } else {
+        message.error('Error adding product');
+      }
     }
   };
+  
 
   const columns = [
     {
-      title: 'Sản phẩm',
+      title: 'Product Name',
       dataIndex: 'ProductName',
       key: 'ProductName',
       render: (text, record) => (
         editMode === record.ProductID ? (
           <Form.Item
             name="ProductName"
-            rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
+            rules={[{ required: true, message: 'Please enter the product name!' }]}
           >
             <Input placeholder="Product Name" />
           </Form.Item>
@@ -116,29 +192,31 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Giá',
+      title: 'Price',
       dataIndex: 'Price',
       key: 'Price',
       render: (text, record) => (
         editMode === record.ProductID ? (
           <Form.Item
             name="Price"
-            rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
+            rules={[{ required: true, message: 'Please enter the product price!' }]}
           >
             <Input placeholder="Price" />
           </Form.Item>
-        ) : `$${text.toFixed(2)}`
+        ) : (
+          <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
+        )
       ),
-    },
+    },    
     {
-      title: 'Mô tả',
+      title: 'Description',
       dataIndex: 'Description',
       key: 'Description',
       render: (text, record) => (
         editMode === record.ProductID ? (
           <Form.Item
             name="Description"
-            rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
+            rules={[{ required: true, message: 'Please enter the product description!' }]}
           >
             <Input placeholder="Description" />
           </Form.Item>
@@ -146,14 +224,14 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Hình ảnh',
+      title: 'Image URL',
       dataIndex: 'ImageURL',
       key: 'ImageURL',
       render: (text, record) => (
         editMode === record.ProductID ? (
           <Form.Item
             name="ImageURL"
-            rules={[{ required: true, message: 'Hãy tải hình ảnh sản phẩm!' }]}
+            rules={[{ required: true, message: 'Please upload the product image!' }]}
           >
             <Input placeholder="Image URL" />
           </Form.Item>
@@ -171,13 +249,13 @@ const ProductList = () => {
         userRole === 'manager' && (
           editMode === record.ProductID ? (
             <div>
-              <Button type="primary" onClick={() => handleSaveEdit(record.ProductID)} style={{ marginRight: '8px' }}>Lưu</Button>
-              <Button onClick={handleCancelEdit}>Hủy</Button>
+              <Button type="primary" onClick={() => handleSaveEdit(record.ProductID)} style={{ marginRight: '8px' }}>Save</Button>
+              <Button onClick={handleCancelEdit}>Cancel</Button>
             </div>
           ) : (
             <div>
-              <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Sửa</Button>
-              <Button danger onClick={() => handleDeleteClick(record.ProductID)}>Xóa</Button>
+              <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
+              <Button danger onClick={() => handleDeleteClick(record.ProductID)}>Delete</Button>
             </div>
           )
         )
@@ -187,7 +265,7 @@ const ProductList = () => {
 
   return (
     <div className="p-36">
-      <Title level={2}>Danh sách sản phẩm</Title>
+      <Title level={2}>Product List</Title>
       <Form form={form}>
         {userRole === 'manager' ? (
           <>
@@ -199,7 +277,7 @@ const ProductList = () => {
               loading={loading}
             />
             <div style={{ textAlign: 'right', marginTop: '16px' }}>
-              <Button type="primary" onClick={handleAddClick}>Thêm sản phẩm</Button>
+              <Button type="primary" onClick={handleAddClick}>Add Product</Button>
             </div>
           </>
         ) : (
@@ -230,45 +308,44 @@ const ProductList = () => {
       </Form>
 
       <Modal
-        title="Thêm sản phẩm mới"
+        title="Add New Product"
         visible={addMode}
         onCancel={handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={handleCancelAdd}>Hủy</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveAdd}>Thêm</Button>,
+          <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
         ]}
         style={{ textAlign: 'center' }}
       >
         <Form form={form}>
           <Form.Item
             name="ProductName"
-            rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
+            rules={[{ required: true, message: 'Please enter the product name!' }]}
           >
-            <Input placeholder="Tên sản phẩm" />
+            <Input placeholder="Product Name" />
           </Form.Item>
           <Form.Item
             name="Price"
-            rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
+            rules={[{ required: true, message: 'Please enter the product price!' }]}
           >
-            <Input placeholder="Giá" />
+            <Input placeholder="Price" />
           </Form.Item>
           <Form.Item
             name="Description"
-            rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm' }]}
+            rules={[{ required: true, message: 'Please enter the product description' }]}
           >
-            <Input placeholder="Mô tả" />
+            <Input placeholder="Description" />
           </Form.Item>
           <Form.Item
             name="ImageURL"
-            rules={[{ required: true, message: 'Hãy tải hình ảnh sản phẩm!' }]}
-            >
-              <Input placeholder="Hình ảnh" />
-            </Form.Item>
-          </Form>
-        </Modal>
-      </div>
-    );
-  };
-  
-  export default ProductList;
-  
+            rules={[{ required: true, message: 'Please upload the product image!' }]}
+          >
+            <Input placeholder="Image URL" />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default ProductList;

@@ -44,8 +44,8 @@ function App() {
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
-      <Route path='/for-dog' element={<ForDogPage/>}/>
-      <Route path='/for-cat' element={<ForCatPage/>}/>
+      <Route path='/for-dog-products' element={<ForDogPage/>}/>
+      <Route path='/for-cat-products' element={<ForCatPage/>}/>
       <Route path='/pet-service' element={<PetServicePage/>}/>
       <Route path='/pet-hotel' element={<PetHotelPage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
