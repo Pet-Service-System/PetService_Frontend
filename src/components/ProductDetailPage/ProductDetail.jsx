@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form } from 'antd';
+import { Button, Input, Image, Modal, Form, message } from 'antd';
 import useShopping from '../../hook/useShopping';
 
 const ProductDetail = () => {
@@ -11,6 +11,7 @@ const ProductDetail = () => {
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const userRole = localStorage.getItem('role') || 'guest';
+    const navigate = useNavigate();
 
     const fetchProductDetail = async () => {
         try {
@@ -19,6 +20,7 @@ const ProductDetail = () => {
             form.setFieldsValue(response.data); // Set initial form values
         } catch (error) {
             console.error('Error fetching product detail:', error);
+            message.error('Error fetching product detail');
         }
     };
 
@@ -57,26 +59,67 @@ const ProductDetail = () => {
         await fetchProductDetail(); // Reload product data from the database
     };
 
-    const handleSaveEdit = async () => {
+    const handleSaveEdit = async (id) => {
         try {
-            const values = await form.validateFields();
-            await axios.put(`http://localhost:3001/api/products/${id}`, values);
-            setProductData(values);
-            setEditMode(false);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                message.error('Authorization token not found. Please log in.');
+                return;
+            }
+    
+            const values = await form.validateFields(); // Validate form fields
+            const updatedProduct = {
+                ProductName: values.ProductName,
+                Price: parseFloat(values.Price),
+                Description: values.Description,
+                ImageURL: values.ImageURL
+            };
+    
+            await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            message.success('Product updated successfully', 0.5).then(() => {
+                window.location.reload(); // Reload the page after successful update
+            });
         } catch (error) {
-            console.error('Error saving product:', error);
+            console.error('Error updating product:', error);
+            if (error.response && error.response.status === 401) {
+                message.error('Unauthorized. Please log in.');
+            } else {
+                message.error('Error updating product');
+            }
         }
     };
 
     const handleDeleteProduct = () => {
         Modal.confirm({
-            title: 'Bạn có chắc chắn muốn xóa sản phẩm này không?',
+            title: 'Are you sure you want to delete this product?',
             onOk: async () => {
                 try {
-                    await axios.delete(`http://localhost:3001/api/products/${id}`);
-                    console.log('Product deleted');
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        message.error('Authorization token not found. Please log in.');
+                        return;
+                    }
+                    
+                    await axios.delete(`http://localhost:3001/api/products/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    message.success('Product deleted successfully');
+                    navigate(-1); // Redirect to product list after deletion
                 } catch (error) {
                     console.error('Error deleting product:', error);
+                    if (error.response && error.response.status === 401) {
+                        message.error('Unauthorized. Please log in.');
+                    } else {
+                        message.error('Error deleting product');
+                    }
                 }
             },
         });
@@ -141,7 +184,7 @@ const ProductDetail = () => {
                     ) : userRole === 'manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleSaveEdit}>Lưu</Button>
+                                <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
                                 <Button onClick={handleCancelEdit}>Hủy</Button>
                             </div>
                         ) : (
