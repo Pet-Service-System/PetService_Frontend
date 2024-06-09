@@ -7,7 +7,7 @@ const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
 const ServiceDetail = ({ serviceData }) => {
-  const navigate = useNavigate();
+  
   const [form] = Form.useForm();
   const [bookingDetails, setBookingDetails] = useState({});
   const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
@@ -56,22 +56,22 @@ const ServiceDetail = ({ serviceData }) => {
           layout="vertical"
           onValuesChange={(_, allValues) => handleFormChange(allValues)}
         >
-          <Form.Item name="pet" label="Your Pet">
-            <Select placeholder="Select your pet">
+          <Form.Item name="pet" label="Your Pet" >
+            <Select placeholder="Select your pet" disabled={role === 'guest'}>
               <Option value="dog">Dog</Option>
               <Option value="cat">Cat</Option>
               <Option value="rabbit">Rabbit</Option>
               <Option value="hamster">Hamster</Option>
             </Select>
           </Form.Item>
-          <Form.Item name="checkInDate" label="Check In Date">
-            <DatePicker className="w-full" />
+          <Form.Item name="checkInDate" label="Check In Date" >
+            <DatePicker className="w-full" disabled={role === 'guest'} />
           </Form.Item>
-          <Form.Item name="checkInTime" label="Check In Time">
-            <TimePicker className="w-full" />
+          <Form.Item name="checkInTime" label="Check In Time" >
+            <TimePicker className="w-full" disabled={role === 'guest'}/>
           </Form.Item>
-          <Form.Item name="checkOutDate" label="Check Out Date">
-            <DatePicker className="w-full" />
+          <Form.Item name="checkOutDate" label="Check Out Date" >
+            <DatePicker className="w-full" disabled={role === 'guest'}/>
           </Form.Item>
           <Form.Item>
             <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
