@@ -193,7 +193,7 @@ const Banner = () => {
             {renderMenuItems(false)}
             {role === 'guest' ? (
               // <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
-              <button 
+              <button
                 onClick={handleLoginClick}
                 className="relative border-2 border-teal-600 rounded px-4 py-2 inline cursor-pointer text-2xl font-bold before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0  before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">
                 ĐĂNG NHẬP
