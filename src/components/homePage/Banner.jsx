@@ -77,7 +77,7 @@ const Banner = () => {
         { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
-        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+        { key: 'contact', label: 'LIÊN HỆ', path: '/contact'},
       ];
     } else if (role === 'customer') {
       menuItems = [
@@ -108,7 +108,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } 
+    }
 
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
@@ -192,7 +192,11 @@ const Banner = () => {
           <div className="flex items-center">
             {renderMenuItems(false)}
             {role === 'guest' ? (
-              <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
+              // <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
+              <button
+                className="relative border-2 border-teal-600 rounded px-4 py-2 inline cursor-pointer text-2xl font-bold before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0  before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">
+                ĐĂNG NHẬP
+              </button>
             ) : (
               <div className="flex items-center ml-4">
                 {role === 'customer' && (
@@ -200,7 +204,7 @@ const Banner = () => {
                     <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
-                    
+
                   </>
                 )}
                 {role !== 'guest' && (
