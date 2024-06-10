@@ -182,7 +182,7 @@ const AccountList = () => {
       key: 'actions',
       render: (_, record) => (
         // Check if the role is "Administrator" and disable the edit button accordingly
-        record.role === 'admin' ? (
+        record.role === 'Administrator' ? (
           <Button type="primary" disabled>Edit</Button>
         ) : (
           editMode === record.account_id ? (

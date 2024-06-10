@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message } from 'antd';
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
-
-import { getPetInformation } from '../../apis/ApiPet';
+import axios from 'axios'; // Import axios for making API calls
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
@@ -18,10 +17,33 @@ const PetList = () => {
   const [editForm] = Form.useForm();
   const genders = ['Đực', 'Cái'];
 
+  // Fetch pets from the server
   useEffect(() => {
-    getPetInformation().then((data) => {
-      setPets(data);
-    });
+    const fetchPets = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const accountId = user.id; // Lấy ID người dùng từ localStorage
+        console.log(accountId)
+        if (!token || !accountId) {
+          console.error('Token or account ID not found in localStorage');
+          return;
+        }
+
+        const response = await axios.get(`http://localhost:3001/api/pets/account/${accountId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPets(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching pets:', error);
+        message.error('Failed to fetch pets');
+      }
+    };
+
+    fetchPets();
   }, []);
 
   const handleUpdatePet = (pet) => {
@@ -57,15 +79,16 @@ const PetList = () => {
   };
 
   const columns = [
-    { title: 'STT', dataIndex: 'id', key: 'id' },
-    { title: 'Tên', dataIndex: 'name', key: 'name' },
-    { title: 'Chủng loại', dataIndex: 'species', key: 'species' },
-    { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
+    { title: 'ID', dataIndex: 'PetID', key: 'PetID' },
+    { title: 'Tên', dataIndex: 'PetName', key: 'PetName' },
+    { title: 'Giới tính', dataIndex: 'Gender', key: 'Gender' },
+    { title: 'Trạng thái', dataIndex: 'Status', key: 'Status' },
+    { title: 'Loại thú cưng', dataIndex: 'PetTypeID', key: 'PetTypeID', render: (petTypeID) => petTypeID === 'PT001' ? 'Chó' : petTypeID === 'PT002' ? 'Mèo' : petTypeID },
     {
-      title: '',
+      title: 'Hành động',
       key: 'action',
       render: (_, record) => (
-        record.id === editPetId ? (
+        record.PetID === editPetId ? (
           <>
             <Button type="primary" onClick={handleSavePet} className="mr-2">Lưu</Button>
             <Button onClick={() => setEditPetId(null)}>Hủy</Button>
@@ -73,12 +96,13 @@ const PetList = () => {
         ) : (
           <>
             <Button type="primary" onClick={() => handleUpdatePet(record)} className="mr-2">Cập nhật</Button>
-            <Button danger onClick={() => handleDeletePet(record.id)}>Xóa</Button>
+            <Button danger onClick={() => handleDeletePet(record.PetID)}>Xóa</Button>
           </>
         )
       ),
     },
   ];
+  
 
   const handleMenuClick = (key) => {
     if (key === 'logout') {

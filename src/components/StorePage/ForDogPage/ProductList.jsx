@@ -8,7 +8,7 @@ const { Title } = Typography;
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userRole] = useState(localStorage.getItem('role') || 'guest');
+  const [userRole] = useState(localStorage.getItem('role') || 'Guest');
   const [petTypeId] = useState('PT001');
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
@@ -246,7 +246,7 @@ const ProductList = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        userRole === 'manager' && (
+        userRole === 'Store Manager' && (
           editMode === record.ProductID ? (
             <div>
               <Button type="primary" onClick={() => handleSaveEdit(record.ProductID)} style={{ marginRight: '8px' }}>Save</Button>
@@ -267,7 +267,7 @@ const ProductList = () => {
     <div className="p-36">
       <Title level={2}>Product List</Title>
       <Form form={form}>
-        {userRole === 'manager' ? (
+        {userRole === 'Store Manager' ? (
           <>
             <Table
               dataSource={productData}

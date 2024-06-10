@@ -17,7 +17,7 @@ const UserProfile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
-  const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const navigate = useNavigate();
   const screens = useBreakpoint();
@@ -101,7 +101,7 @@ const UserProfile = () => {
     localStorage.removeItem('fullname');
     localStorage.removeItem('email'); 
     localStorage.removeItem('user'); 
-    setRole('guest');
+    setRole('Guest');
     setUser(null); 
     navigate('/');
     window.location.reload();
@@ -120,7 +120,7 @@ const UserProfile = () => {
             >
               Thông tin người dùng
             </Menu.Item>
-            {role === 'customer' && (
+            {role === 'Customer' && (
               <>
                 <Menu.Item
                   key="pet-list"
