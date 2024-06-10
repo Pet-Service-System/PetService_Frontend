@@ -108,7 +108,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } 
+    }
 
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
@@ -200,7 +200,7 @@ const Banner = () => {
                     <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
-                    
+
                   </>
                 )}
                 {role !== 'Guest' && (
