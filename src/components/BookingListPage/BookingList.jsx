@@ -5,7 +5,7 @@ const { Title } = Typography;
 const BookingList = () => {
     const [bookings, setBookings] = useState([]);
     const [sortOrder, setSortOrder] = useState('desc');
-    const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
+    const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
 
     useEffect(() => {
         const sampleData = [
@@ -73,7 +73,7 @@ const BookingList = () => {
         },
     ];
 
-    if (role !== 'admin' && role !== 'sale staff') {
+    if (role !== 'Administrator' && role !== 'Sale Staff') {
         columns.push({
             title: 'Đánh giá',
             key: 'feedback',

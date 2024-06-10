@@ -10,7 +10,7 @@ const ProductDetail = () => {
     const [quantity, setQuantity] = useState(1);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
-    const userRole = localStorage.getItem('role') || 'guest';
+    const userRole = localStorage.getItem('role') || 'Guest';
     const navigate = useNavigate();
 
     const fetchProductDetail = async () => {
@@ -163,7 +163,7 @@ const ProductDetail = () => {
                         </Form.Item>
                     </Form>
 
-                    {userRole === 'guest' || userRole === 'customer' ? (
+                    {userRole === 'Guest' || userRole === 'Customer' ? (
                         <>
                             <div className="flex items-center mb-6">
                                 <Button onClick={handleDecrease}>-</Button>
@@ -181,7 +181,7 @@ const ProductDetail = () => {
                                 <Button type="primary" onClick={handleOrderNow}>Đặt ngay</Button>
                             </div>
                         </>
-                    ) : userRole === 'manager' ? (
+                    ) : userRole === 'Store Manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
                                 <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>

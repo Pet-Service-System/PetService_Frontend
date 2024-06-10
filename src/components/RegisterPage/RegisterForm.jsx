@@ -53,7 +53,7 @@ const RegisterForm = () => {
           phone: phoneNumber,
           address: address,
           status: 'active', // Assuming default status is 'active'
-          role: 'customer', // Assuming default role is 'customer'
+          role: 'Customer', // Assuming default role is 'customer'
         });
   
         // Hiển thị thông báo thành công và chuyển trang sau 2 giây

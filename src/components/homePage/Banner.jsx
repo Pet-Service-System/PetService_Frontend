@@ -9,7 +9,7 @@ const { Header } = Layout;
 const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
@@ -42,14 +42,14 @@ const Banner = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    setRole('guest');
+    setRole('Guest');
     setUser(null);
     navigate('/')
   };
 
   const userMenuItems = [
     { key: 'profile', icon: <UserOutlined />, label: 'Thông tin người dùng', onClick: () => navigate('/user-profile') },
-    ...(role === 'customer' ? [
+    ...(role === 'Customer' ? [
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
       { key: 'transaction-history', icon: <HistoryOutlined />, label: 'Lịch sử giao dịch', onClick: () => navigate('/transaction-history') },
     ] : []),
@@ -69,7 +69,7 @@ const Banner = () => {
   const renderMenuItems = (isVertical) => {
     let menuItems = [];
 
-    if (role === 'guest') {
+    if (role === 'Guest') {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
@@ -79,7 +79,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
-    } else if (role === 'customer') {
+    } else if (role === 'Customer') {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
@@ -89,7 +89,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
-    } else if (role === 'admin') {
+    } else if (role === 'Administrator') {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
@@ -99,7 +99,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } else if (['sale staff', 'caretaker staff', 'manager'].includes(role)) {
+    } else if (['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
@@ -137,10 +137,10 @@ const Banner = () => {
             <Menu.Item key={item.key} onClick={item.onClick}>{item.label}</Menu.Item>
           )
         ))}
-        {role === 'guest' && isVertical && (
+        {role === 'Guest' && isVertical && (
           <Menu.Item key="login" onClick={handleLoginClick}>ĐĂNG NHẬP</Menu.Item>
         )}
-        {role === 'customer' && isVertical && (
+        {role === 'Customer' && isVertical && (
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
             <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
@@ -152,7 +152,7 @@ const Banner = () => {
             </Menu.SubMenu>
           </>
         )}
-        {role === 'admin' && isVertical && (
+        {role === 'Administrator' && isVertical && (
           <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
             {userMenuItems.map(item => (
               <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
@@ -161,7 +161,7 @@ const Banner = () => {
             ))}
           </Menu.SubMenu>
         )}
-        {['sale staff', 'caretaker staff', 'manager'].includes(role) && isVertical && (
+        {['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role) && isVertical && (
           <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
             {userMenuItems.map(item => (
               <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
@@ -191,11 +191,11 @@ const Banner = () => {
         ) : (
           <div className="flex items-center">
             {renderMenuItems(false)}
-            {role === 'guest' ? (
+            {role === 'Guest' ? (
               <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
             ) : (
               <div className="flex items-center ml-4">
-                {role === 'customer' && (
+                {role === 'Customer' && (
                   <>
                     <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
@@ -203,7 +203,7 @@ const Banner = () => {
                     
                   </>
                 )}
-                {role !== 'guest' && (
+                {role !== 'Guest' && (
                   <>
                     <Popover content={renderUserMenu()} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
                       <Button shape="round" className="ml-4 py-2 px-4">
