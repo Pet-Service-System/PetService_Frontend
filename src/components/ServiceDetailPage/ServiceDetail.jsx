@@ -5,19 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
-
 const ServiceDetail = ({ serviceData }) => {
-  
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [bookingDetails, setBookingDetails] = useState({});
-  const [role, setRole] = useState(localStorage.getItem('role') || 'guest');
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [visible, setVisible] = useState(false);
-
-  const handleVisibleChange = (visible) => {
-    setVisible(visible);
-  };
-
 
   const handleBookingNow = () => {
     if (role === 'guest') {
