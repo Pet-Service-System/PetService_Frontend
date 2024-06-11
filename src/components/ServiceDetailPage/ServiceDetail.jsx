@@ -105,7 +105,7 @@ const ServiceDetail = () => {
 
     const handleBookingNow = () => {
         console.log('Booked:', serviceData);
-        // Add booking functionality here
+        navigate(`/pet-booking`);
     };
 
     if (!serviceData) {
