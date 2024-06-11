@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, message, Image, Card, Skeleton } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, message, Image, Card, Skeleton, Select } from 'antd';
 import axios from 'axios';
 
 const { Title } = Typography;
+const { Option } = Select;
 
 const ServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -25,12 +26,12 @@ const ServiceList = () => {
         setLoading(false);
       }
     };
-
+    
     fetchServices();
   }, []);
 
   const handleServiceClick = (id) => {
-    navigate(`/service-detail/${id}`);
+    navigate(`/pet-service-detail/${id}`)
   };
 
   const handleEditClick = (record) => {
@@ -39,7 +40,8 @@ const ServiceList = () => {
       ServiceName: record.ServiceName,
       Price: record.Price,
       Description: record.Description,
-      ImageURL: record.ImageURL
+      ImageURL: record.ImageURL,
+      Status: record.Status // Set the status in the form
     });
   };
 
@@ -61,7 +63,8 @@ const ServiceList = () => {
         ServiceName: values.ServiceName,
         Price: parseFloat(values.Price),
         Description: values.Description,
-        ImageURL: values.ImageURL
+        ImageURL: values.ImageURL,
+        Status: values.Status
       };
 
       await axios.patch(`http://localhost:3001/api/services/${editMode}`, updatedService, {
@@ -137,7 +140,8 @@ const ServiceList = () => {
         ServiceName: values.ServiceName,
         Price: parseFloat(values.Price),
         Description: values.Description,
-        ImageURL: values.ImageURL
+        ImageURL: values.ImageURL,
+        Status: values.Status // Include status in the new service
       };
 
       const response = await axios.post(`http://localhost:3001/api/services`, newService, {
@@ -167,6 +171,16 @@ const ServiceList = () => {
 
   const columns = [
     {
+      title: 'Service ID',
+      dataIndex: 'ServiceID',
+      key: 'ServiceID',
+      render: (text, record) => (
+        <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleServiceClick(record.ServiceID)}>
+          {text}
+        </div>
+      ),
+    },
+    {
       title: 'Service Name',
       dataIndex: 'ServiceName',
       key: 'ServiceName',
@@ -195,6 +209,14 @@ const ServiceList = () => {
       key: 'ImageURL',
       render: (text, record) => (
         <Image src={text} alt={record.ServiceName} style={{ width: '50px', cursor: 'pointer' }} />
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'Status',
+      key: 'Status',
+      render: (text) => (
+        <span>{text}</span>
       ),
     },
     {
@@ -249,96 +271,115 @@ const ServiceList = () => {
                     alt={service.ServiceName} 
                     src={service.ImageURL} 
                     className="rounded-t-lg w-full h-44 object-cover" 
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold">{service.ServiceName}</h3>
-                    <p className="text-gray-600 mt-2">${service.Price.toFixed(2)}</p>
-                    <p className="text-gray-700 mt-2">{service.Description}</p>
-                  </div>
-                </Card>
-              ))
-            )}
-          </div>
-        )}
-      </Form>
-
-      <Modal
-        title="Add New Service"
-        visible={addMode}
-        onCancel={handleCancelAdd}
-        footer={[
-          <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
-        ]}
-        style={{ textAlign: 'center' }}
-      >
-        <Form form={form}>
-          <Form.Item
-            name="ServiceName"
-            rules={[{ required: true, message: 'Please enter the service name!' }]}
-          >
-            <Input placeholder="Service Name" />
-          </Form.Item>
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the service price!' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item>
-          <Form.Item
-            name="Description"
-            rules={[{ required: true, message: 'Please enter the service description' }]}
-          >
-            <Input placeholder="Description" />
-          </Form.Item>
-          <Form.Item
-            name="ImageURL"
-            rules={[{ required: true, message: 'Please enter the service image URL!' }]}
-          >
-            <Input placeholder="Image URL" />
-          </Form.Item>
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold">{service.ServiceName}</h3>
+                      <p className="text-gray-600 mt-2">${service.Price.toFixed(2)}</p>
+                      <p className="text-gray-700 mt-2">{service.Description}</p>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
         </Form>
-      </Modal>
-
-      <Modal
-        title="Edit Service"
-        visible={editMode !== null}
-        onCancel={handleCancelEdit}
-        footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
-        ]}
-        style={{ textAlign: 'center' }}
-      >
-        <Form form={form}>
-          <Form.Item
-            name="ServiceName"
-            rules={[{ required: true, message: 'Please enter the service name!' }]}
-          >
-            <Input placeholder="Service Name" />
-          </Form.Item>
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the service price!' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item>
-          <Form.Item
-            name="Description"
-            rules={[{ required: true, message: 'Please enter the service description' }]}
-          >
-            <Input placeholder="Description" />
-          </Form.Item>
-          <Form.Item
-            name="ImageURL"
-            rules={[{ required: true, message: 'Please enter the service image URL!' }]}
-          >
-            <Input placeholder="Image URL" />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
-  );
-};
-
-export default ServiceList;
+  
+        <Modal
+          title="Add New Service"
+          visible={addMode}
+          onCancel={handleCancelAdd}
+          footer={[
+            <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
+          ]}
+          style={{ textAlign: 'center' }}
+        >
+          <Form form={form}>
+            <Form.Item
+              name="ServiceName"
+              rules={[{ required: true, message: 'Please enter the service name!' }]}
+            >
+              <Input placeholder="Service Name" />
+            </Form.Item>
+            <Form.Item
+              name="Price"
+              rules={[{ required: true, message: 'Please enter the service price!' }]}
+            >
+              <Input placeholder="Price" />
+            </Form.Item>
+            <Form.Item
+              name="Description"
+              rules={[{ required: true, message: 'Please enter the service description' }]}
+            >
+              <Input placeholder="Description" />
+            </Form.Item>
+            <Form.Item
+              name="ImageURL"
+              rules={[{ required: true, message: 'Please enter the service image URL!' }]}
+            >
+              <Input placeholder="Image URL" />
+            </Form.Item>
+            <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
+  
+        <Modal
+          title="Edit Service"
+          visible={editMode !== null}
+          onCancel={handleCancelEdit}
+          footer={[
+            <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+            <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
+          ]}
+          style={{ textAlign: 'center' }}
+        >
+          <Form form={form}>
+            <Form.Item
+              name="ServiceName"
+              rules={[{ required: true, message: 'Please enter the service name!' }]}
+            >
+              <Input placeholder="Service Name" />
+            </Form.Item>
+            <Form.Item
+              name="Price"
+              rules={[{ required: true, message: 'Please enter the service price!' }]}
+            >
+              <Input placeholder="Price" />
+            </Form.Item>
+            <Form.Item
+              name="Description"
+              rules={[{ required: true, message: 'Please enter the service description' }]}
+            >
+              <Input placeholder="Description" />
+            </Form.Item>
+            <Form.Item
+              name="ImageURL"
+              rules={[{ required: true, message: 'Please enter the service image URL!' }]}
+            >
+              <Input placeholder="Image URL" />
+            </Form.Item>
+            <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    );
+  };
+  
+  export default ServiceList;
+  

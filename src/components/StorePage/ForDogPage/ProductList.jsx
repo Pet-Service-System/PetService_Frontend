@@ -170,6 +170,16 @@ const ProductList = () => {
 
   const columns = [
     {
+      title: 'Product ID',
+      dataIndex: 'ProductID',
+      key: 'ProductID',
+      render: (text, record) => (
+        <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleProductClick(record.ProductID)}>
+          {text}
+        </div>
+      ),
+    }, 
+    {
       title: 'Product Name',
       dataIndex: 'ProductName',
       key: 'ProductName',
