@@ -157,7 +157,7 @@ row[day] = timeSlot ? timeSlot.employees : [];
   };
 
   return (
-    <div className="w-11/12 mx-auto mt-12">
+    <div className="w-11/12 mx-auto mt-12 py-10">
       {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên

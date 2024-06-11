@@ -88,38 +88,6 @@ const ProductList = () => {
     }
   };
 
-  const handleDeleteClick = (id) => {
-    Modal.confirm({
-      title: 'Are you sure you want to delete this product?',
-      onOk: async () => {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            message.error('Authorization token not found. Please log in.');
-            return;
-          }
-
-          await axios.delete(`http://localhost:3001/api/products/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-
-          message.success('Product deleted successfully', 0.5).then(() => {
-            window.location.reload();
-          });
-        } catch (error) {
-          console.error('Error deleting product:', error);
-          if (error.response && error.response.status === 401) {
-            message.error('Unauthorized. Please log in.');
-          } else {
-            message.error('Error deleting product');
-          }
-        }
-      },
-    });
-  };
-
   const handleAddClick = () => {
     setAddMode(true);
   };
@@ -231,16 +199,15 @@ const ProductList = () => {
         userRole === 'Store Manager' && (
           <div>
             <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
-            <Button danger onClick={() => handleDeleteClick(record.ProductID)}>Delete</Button>
           </div>
         )
       ),
     },
   ];
-
+  console.log(productData)
   return (
     <div className="p-24">
-      <Title level={1} className='text-center'>Product for dogs</Title>
+      <Title level={1} className='text-center'>Product for cats</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>

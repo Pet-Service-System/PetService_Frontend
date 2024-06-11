@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form, Typography, message, Skeleton, Select } from 'antd';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select } from 'antd';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -12,7 +12,6 @@ const ServiceDetail = () => {
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const userRole = localStorage.getItem('role') || 'Guest';
-    const navigate = useNavigate();
 
     const fetchServiceDetail = async () => {
         try {
@@ -27,6 +26,7 @@ const ServiceDetail = () => {
 
     useEffect(() => {
         fetchServiceDetail();
+        console.log(serviceData)
     }, [id, form]);
 
     const handleEditService = () => {
@@ -72,37 +72,6 @@ const ServiceDetail = () => {
                 message.error('Error updating service');
             }
         }
-    };
-
-    const handleDeleteService = () => {
-        Modal.confirm({
-            title: 'Are you sure you want to delete this service?',
-            onOk: async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    if (!token) {
-                        message.error('Authorization token not found. Please log in.');
-                        return;
-                    }
-
-                    await axios.delete(`http://localhost:3001/api/services/${id}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-
-                    message.success('Service deleted successfully');
-                    navigate(-1); // Redirect to service list after deletion
-                } catch (error) {
-                    console.error('Error deleting service:', error);
-                    if (error.response && error.response.status === 401) {
-                        message.error('Unauthorized. Please log in.');
-                    } else {
-                        message.error('Error deleting service');
-                    }
-                }
-            },
-        });
     };
 
     const handleBookingNow = () => {
@@ -193,7 +162,6 @@ const ServiceDetail = () => {
                     ) : (
                         <div className="flex space-x-4 justify-end">
                             <Button type="primary" onClick={handleEditService}>Sửa</Button>
-                            <Button danger onClick={handleDeleteService}>Xóa</Button>
                         </div>
                     )
                 ) : null}
