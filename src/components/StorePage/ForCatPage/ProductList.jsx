@@ -245,12 +245,19 @@ const ProductList = () => {
                 <Card
                   key={product.ProductID}
                   hoverable
-                  style={{ width: 240, margin: '16px' }}
-                  cover={<img alt={product.ProductName} src={product.ImageURL} />}
+                  className="w-72 mx-4 my-6 bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleProductClick(product.ProductID)}
                 >
-                  <Card.Meta title={product.ProductName} description={`$${product.Price.toFixed(2)}`} />
-                  <p>{product.Description}</p>
+                  <img 
+                    alt={product.ProductName} 
+                    src={product.ImageURL} 
+                    className="rounded-t-lg w-full h-44 object-cover" 
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{product.ProductName}</h3>
+                    <p className="text-gray-600 mt-2">${product.Price.toFixed(2)}</p>
+                    <p className="text-gray-700 mt-2">{product.Description}</p>
+                  </div>
                 </Card>
               ))
             )}
