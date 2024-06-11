@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Typography, Button, Input, Modal, Form, message, Image, Card, Skeleton } from 'antd';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
@@ -48,14 +48,14 @@ const ServiceList = () => {
     form.resetFields();
   };
 
-  const handleSaveEdit = async (id) => {
+  const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
         return;
       }
-  
+
       const values = await form.validateFields(); // Validate form fields
       const updatedService = {
         ServiceName: values.ServiceName,
@@ -63,13 +63,13 @@ const ServiceList = () => {
         Description: values.Description,
         ImageURL: values.ImageURL
       };
-  
-      await axios.patch(`http://localhost:3001/api/services/${id}`, updatedService, {
+
+      await axios.patch(`http://localhost:3001/api/services/${editMode}`, updatedService, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       message.success('Service updated successfully', 0.5).then(() => {
         window.location.reload(); // Reload the page after successful update
       });
@@ -93,15 +93,15 @@ const ServiceList = () => {
             message.error('Authorization token not found. Please log in.');
             return;
           }
-          
+
           await axios.delete(`http://localhost:3001/api/services/${id}`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
           });
-  
+
           message.success('Service deleted successfully', 0.5).then(() => {
-            window.location.reload(); 
+            window.location.reload();
           });
         } catch (error) {
           console.error('Error deleting service:', error);
@@ -131,7 +131,7 @@ const ServiceList = () => {
         message.error('Authorization token not found. Please log in.');
         return;
       }
-      
+
       const values = await form.validateFields(); // Validate form fields
       const newService = {
         ServiceName: values.ServiceName,
@@ -139,13 +139,13 @@ const ServiceList = () => {
         Description: values.Description,
         ImageURL: values.ImageURL
       };
-      
+
       const response = await axios.post(`http://localhost:3001/api/services`, newService, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       if (response.status === 201) {
         message.success('Service added successfully', 0.5).then(() => {
           window.location.reload();
@@ -166,101 +166,50 @@ const ServiceList = () => {
   };
 
   const columns = [
-  {
-    title: 'Service Name',
-    dataIndex: 'ServiceName',
-    key: 'ServiceName',
-    render: (text, record) => (
-      editMode === record.ServiceID ? (
-        <Form.Item
-          name="ServiceName"
-          initialValue={text}
-          rules={[{ required: true, message: 'Please enter the service name!' }]}
-        >
-          <Input placeholder="Service Name" />
-        </Form.Item>
-      ) : (
-        <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleEditClick(record)}>
+    {
+      title: 'Service Name',
+      dataIndex: 'ServiceName',
+      key: 'ServiceName',
+      render: (text, record) => (
+        <div className='hover:text-sky-600 hover:cursor-pointer' onClick={() => handleServiceClick(record.ServiceID)}>
           {text}
         </div>
-      )
-    ),
-  },
-  {
-    title: 'Price',
-    dataIndex: 'Price',
-    key: 'Price',
-    render: (text, record) => (
-      editMode === record.ServiceID ? (
-        <Form.Item
-          name="Price"
-          initialValue={text.toString()} // Ensure it's a string for Input component
-          rules={[{ required: true, message: 'Please enter the service price!' }]}
-        >
-          <Input placeholder="Price" />
-        </Form.Item>
-      ) : (
+      ),
+    },
+    {
+      title: 'Price',
+      dataIndex: 'Price',
+      key: 'Price',
+      render: (text) => (
         <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
-      )
-    ),
-  },
-  {
-    title: 'Description',
-    dataIndex: 'Description',
-    key: 'Description',
-    render: (text, record) => (
-    editMode === record.ServiceID ? (
-        <Form.Item
-          name="Description"
-          initialValue={text}
-          rules={[{ required: true, message: 'Please enter the service description!' }]}
-        >
-          <Input placeholder="Description" />
-        </Form.Item>
-      ) : (
-        text
-      )
-    ),
-  },
-  {
-    title: 'Image URL',
-    dataIndex: 'ImageURL',
-    key: 'ImageURL',
-    render: (text, record) => (
-    editMode === record.ServiceID ? (
-        <Form.Item
-          name="ImageURL"
-          initialValue={text}
-          rules={[{ required: true, message: 'Please upload the service image!' }]}
-        >
-          <Input placeholder="Image URL" />
-        </Form.Item>
-      ) : (
+      ),
+    },
+    {
+      title: 'Description',
+      dataIndex: 'Description',
+      key: 'Description',
+    },
+    {
+      title: 'Image URL',
+      dataIndex: 'ImageURL',
+      key: 'ImageURL',
+      render: (text, record) => (
         <Image src={text} alt={record.ServiceName} style={{ width: '50px', cursor: 'pointer' }} />
-      )
-    ),
-  },
-  {
-    title: 'Actions',
-    key: 'actions',
-    render: (_, record) => (
-      userRole === 'Store Manager' && (
-        editMode === record.ServiceID ? (
-          <div>
-            <Button type="primary" onClick={() => handleSaveEdit(record.ServiceID)} style={{ marginRight: '8px' }}>Save</Button>
-            <Button onClick={handleCancelEdit}>Cancel</Button>
-          </div>
-        ) : (
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        userRole === 'Store Manager' && (
           <div>
             <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
             <Button danger onClick={() => handleDeleteClick(record.ServiceID)}>Delete</Button>
           </div>
         )
-      )
-    ),
-  },
-];
-
+      ),
+    },
+  ];
 
   return (
     <div className="p-36">
@@ -297,7 +246,7 @@ const ServiceList = () => {
                   cover={<img alt={service.ServiceName} src={service.ImageURL} />}
                   onClick={() => handleServiceClick(service.ServiceID)}
                 >
-                  <Card.Meta title={service.ProductName} description={`$${service.Price.toFixed(2)}`} />
+                  <Card.Meta title={service.ServiceName} description={`$${service.Price.toFixed(2)}`} />
                   <p>{service.Description}</p>
                 </Card>
               ))
@@ -336,7 +285,45 @@ const ServiceList = () => {
             <Input placeholder="Description" />
           </Form.Item>
           <Form.Item
-            name="Image"
+            name="ImageURL"
+            rules={[{ required: true, message: 'Please enter the service image URL!' }]}
+          >
+            <Input placeholder="Image URL" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Edit Service"
+        visible={editMode !== null}
+        onCancel={handleCancelEdit}
+        footer={[
+          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
+        ]}
+        style={{ textAlign: 'center' }}
+      >
+        <Form form={form}>
+          <Form.Item
+            name="ServiceName"
+            rules={[{ required: true, message: 'Please enter the service name!' }]}
+          >
+            <Input placeholder="Service Name" />
+          </Form.Item>
+          <Form.Item
+            name="Price"
+            rules={[{ required: true, message: 'Please enter the service price!' }]}
+          >
+            <Input placeholder="Price" />
+          </Form.Item>
+          <Form.Item
+            name="Description"
+            rules={[{ required: true, message: 'Please enter the service description' }]}
+          >
+            <Input placeholder="Description" />
+          </Form.Item>
+          <Form.Item
+            name="ImageURL"
             rules={[{ required: true, message: 'Please enter the service image URL!' }]}
           >
             <Input placeholder="Image URL" />
