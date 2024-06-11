@@ -27,7 +27,7 @@ const Contact = () => {
               <div className="address-right ml-4">
                 <Title level={5} className="font-semibold">Mail Us</Title>
                 <Paragraph>
-                  <a href="mailto:petservicemanagement@gmail.com">petservicemanagement@gmail.com</a>
+                  <a href="mailto:petservicemanagement@gmail.com">petservicesswp391@gmail.com</a>
                 </Paragraph>
               </div>
             </div>

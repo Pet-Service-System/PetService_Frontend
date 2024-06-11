@@ -242,12 +242,19 @@ const ServiceList = () => {
                 <Card
                   key={service.ServiceID}
                   hoverable
-                  style={{ width: 240, margin: '16px' }}
-                  cover={<img alt={service.ServiceName} src={service.ImageURL} />}
+                  className="w-72 mx-4 my-6 bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleServiceClick(service.ServiceID)}
                 >
-                  <Card.Meta title={service.ServiceName} description={`$${service.Price.toFixed(2)}`} />
-                  <p>{service.Description}</p>
+                  <img 
+                    alt={service.ServiceName} 
+                    src={service.ImageURL} 
+                    className="rounded-t-lg w-full h-44 object-cover" 
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{service.ServiceName}</h3>
+                    <p className="text-gray-600 mt-2">${service.Price.toFixed(2)}</p>
+                    <p className="text-gray-700 mt-2">{service.Description}</p>
+                  </div>
                 </Card>
               ))
             )}

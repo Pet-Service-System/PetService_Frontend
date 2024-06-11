@@ -10,7 +10,7 @@ const Schedule = () => {
   const [error, setError] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [users, setUsers] = useState([]);
+  const [users] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
@@ -38,25 +38,25 @@ const Schedule = () => {
     fetchSchedules();
   }, []);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3001/api/accounts/role', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log('Users fetched:', response.data); // Log the fetched staffs
-        setUsers(response.data); // Set the fetched staffs to state
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        setError('Error fetching users');
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const response = await axios.get('http://localhost:3001/api/accounts/role', {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+  //       console.log('Users fetched:', response.data); // Log the fetched staffs
+  //       setUsers(response.data); // Set the fetched staffs to state
+  //     } catch (error) {
+  //       console.error('Error fetching users:', error);
+  //       setError('Error fetching users');
+  //     }
+  //   };
 
-    fetchUsers();
-  }, []);
+  //   fetchUsers();
+  // }, []);
 
   const timeSlots = [
     { start: '08:00', end: '10:00' },
@@ -160,7 +160,7 @@ const Schedule = () => {
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
       </Title>
-      <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6">
+      <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
         Schedule Employee
       </Button>
       <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
@@ -204,7 +204,7 @@ const Schedule = () => {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" className='float-right'>
               Submit
             </Button>
           </Form.Item>

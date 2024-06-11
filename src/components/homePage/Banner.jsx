@@ -178,7 +178,7 @@ const Banner = () => {
     <Layout>
       <Header className="flex justify-between items-center bg-cyan-400 shadow-md px-4 py-2 md:px-8 md:py-4">
         <div className="flex items-center">
-          <img className="h-20 w-20" src="/src/assets/image/iconPet.png" alt="Pet Service Logo" />
+          <img className="h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" />
           <span className="text-4xl ml-2 px-7 cursor-pointer text-white" onClick={clickTitle}>Pet Service</span>
         </div>
         {isSmallScreen ? (

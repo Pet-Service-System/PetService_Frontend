@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Typography, Card, Row, Col } from 'antd';
 
 const { Title, Text } = Typography;
@@ -7,7 +7,7 @@ const Welcome = () => {
   return (
     <div className="text-left py-40 bg-cover bg-center" style={{ backgroundImage: "url(/src/assets/image/petbackground.jpg)" }}>
       <div className="container mx-auto">
-        <Row justify="center" align="middle" style={{ minHeight: '35vh' }}>
+        <Row justify="left" align="middle" style={{ minHeight: '35vh' }}>
           <Col>
             <Card className="bg-cyan-500 bg-opacity-90 p-10 rounded-lg shadow-md text-center">
               <Title level={2} className="text-4xl">
