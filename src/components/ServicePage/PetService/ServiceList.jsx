@@ -10,8 +10,8 @@ const ServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
-  const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
-  const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
+  const [editMode, setEditMode] = useState(null); 
+  const [addMode, setAddMode] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
@@ -216,7 +216,9 @@ const ServiceList = () => {
       dataIndex: 'Status',
       key: 'Status',
       render: (text) => (
-        <span>{text}</span>
+        <span style={{ color: text === 'Available' ? 'green' : text === 'Unavailable' ? 'red' : 'black' }}>
+          {text}
+        </span>
       ),
     },
     {

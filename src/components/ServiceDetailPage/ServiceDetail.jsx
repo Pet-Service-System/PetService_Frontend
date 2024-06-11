@@ -109,11 +109,11 @@ const ServiceDetail = () => {
     };
 
     if (!serviceData) {
-        return <Skeleton active />; // Render skeleton while loading
+        return <Skeleton active />;
     }
 
     return (
-        <div className="flex flex-col md:flex-row m-5 py-44 px-4 md:px-32">
+        <div className="flex flex-col md:flex-row m-5 py-48 px-4 md:px-32">
             <div className="w-full md:w-1/2 flex justify-center">
                 <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
             </div>
@@ -151,14 +151,27 @@ const ServiceDetail = () => {
                     </Form>
                 ) : (
                     <div>
-                        <Title level={3}>{serviceData.ProductName}</Title>
+                        <Title level={3}>{serviceData.ServiceName}</Title>
                         <Paragraph>{`Giá: ${serviceData.Price}`}</Paragraph>
                         <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
                     </div>
                 )}
 
                 {userRole === 'Guest' || userRole === 'Customer' ? (
-                    <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
+                    <>
+                        <div className='flex space-x-4 justify-end'>
+                            <Button
+                                type="primary"
+                                onClick={handleBookingNow}
+                                disabled={serviceData.Status === 'Unavailable'}
+                            >
+                                Booking Now
+                            </Button>
+                        </div>
+                        {serviceData.Status === 'Unavailable' && (
+                            <p className="text-red-500 text-right">Dịch vụ tạm ngưng.</p>
+                        )}
+                    </>
                 ) : userRole === 'Store Manager' ? (
                     editMode ? (
                         <div className="flex space-x-4 justify-end">

@@ -194,9 +194,22 @@ const ProductDetail = () => {
                                 <Button onClick={handleIncrease}>+</Button>
                             </div>
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleAddToCart}>Thêm vào giỏ hàng</Button>
-                                <Button type="primary" onClick={handleOrderNow}>Đặt ngay</Button>
+                                <Button type="primary" 
+                                        onClick={handleAddToCart}
+                                        disabled={productData.Status === 'Unavailable'}
+                                >
+                                        Thêm vào giỏ hàng
+                                </Button>
+                                <Button type="primary" 
+                                        onClick={handleOrderNow}
+                                        disabled={productData.Status === 'Unavailable'}
+                                >
+                                        Đặt ngay
+                                </Button>
                             </div>
+                            {productData.Status === 'Unavailable' && (
+                                <p className="text-red-500 text-right"> Sản phẩm hiện đang tạm ngừng kinh doanh hoặc đã hết hàng.</p>
+                            )}
                         </>
                     ) : userRole === 'Store Manager' ? (
                         editMode ? (

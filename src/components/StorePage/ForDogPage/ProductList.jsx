@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
 
+const { Option } = Select;
 const { Title } = Typography;
 
 const ProductList = () => {
@@ -41,7 +42,8 @@ const ProductList = () => {
       ProductName: record.ProductName,
       Price: record.Price,
       Description: record.Description,
-      ImageURL: record.ImageURL
+      ImageURL: record.ImageURL,
+      Status: record.Status
     });
   };
 
@@ -63,7 +65,8 @@ const ProductList = () => {
         ProductName: values.ProductName,
         Price: parseFloat(values.Price),
         Description: values.Description,
-        ImageURL: values.ImageURL
+        ImageURL: values.ImageURL,
+        Status: values.Status
       };
 
       await axios.patch(`http://localhost:3001/api/products/${editMode}`, updatedProduct, {
@@ -140,7 +143,8 @@ const ProductList = () => {
         price: parseFloat(values.Price),
         description: values.Description,
         imageURL: values.ImageURL,
-        petTypeId: petTypeId // Include petTypeId in the new product data
+        petTypeId: petTypeId,
+        status: values.Status
       };
 
       const response = await axios.post(`http://localhost:3001/api/products`, newProduct, {
@@ -208,6 +212,16 @@ const ProductList = () => {
       key: 'ImageURL',
       render: (text, record) => (
         <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'Status',
+      key: 'Status',
+      render: (text) => (
+        <span style={{ color: text === 'Available' ? 'green' : text === 'Unavailable' ? 'red' : 'black' }}>
+          {text}
+        </span>
       ),
     },
     {
@@ -285,7 +299,7 @@ const ProductList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form}>
+        <Form form={form} className='text-left'>
           <Form.Item
             name="ProductName"
             rules={[{ required: true, message: 'Please enter the product name!' }]}
@@ -310,6 +324,15 @@ const ProductList = () => {
           >
             <Input placeholder="Image URL" />
           </Form.Item>
+          <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
         </Form>
       </Modal>
 
@@ -323,7 +346,7 @@ const ProductList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form}>
+        <Form form={form} className='text-left'>
           <Form.Item
             name="ProductName"
             rules={[{ required: true, message: 'Please enter the product name!' }]}
@@ -348,6 +371,15 @@ const ProductList = () => {
           >
             <Input placeholder="Image URL" />
           </Form.Item>
+          <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
         </Form>
       </Modal>
     </div>
