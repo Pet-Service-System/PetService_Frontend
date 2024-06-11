@@ -294,7 +294,7 @@ const ServiceList = () => {
           ]}
           style={{ textAlign: 'center' }}
         >
-          <Form form={form}>
+          <Form form={form} className='text-left'>
             <Form.Item
               name="ServiceName"
               rules={[{ required: true, message: 'Please enter the service name!' }]}
@@ -341,7 +341,7 @@ const ServiceList = () => {
           ]}
           style={{ textAlign: 'center' }}
         >
-          <Form form={form}>
+          <Form form={form} className='text-left'>
             <Form.Item
               name="ServiceName"
               rules={[{ required: true, message: 'Please enter the service name!' }]}
