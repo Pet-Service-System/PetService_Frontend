@@ -1,76 +1,176 @@
-import React, { useState } from 'react';
-import { Button, Typography, Form, Input, Select, DatePicker, TimePicker } from 'antd';
-import { useNavigate } from 'react-router-dom';
-
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Button, Input, Image, Modal, Form, Typography, message } from 'antd';
 
 const { Title, Paragraph } = Typography;
-const { Option } = Select;
-const ServiceDetail = ({ serviceData }) => {
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const [bookingDetails, setBookingDetails] = useState({});
 
-  const handleBookingNow = () => {
-    if (role === 'guest') {
-      // Redirect to the login page
-      navigate('/login');
-    } else {
-      // Proceed with booking logic
-      console.log('Booking Now', bookingDetails);
-      // Implement booking logic here
+const ServiceDetail = () => {
+    const { id } = useParams();
+    const [serviceData, setServiceData] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [form] = Form.useForm();
+    const userRole = localStorage.getItem('role') || 'Guest';
+    const navigate = useNavigate();
+
+    const fetchServiceDetail = async () => {
+        try {
+            const response = await axios.get(`http://localhost:3001/api/services/${id}`);
+            setServiceData(response.data);
+            form.setFieldsValue(response.data); // Set initial form values
+        } catch (error) {
+            console.error('Error fetching service detail:', error);
+            message.error('Error fetching service detail');
+        }
+    };
+
+    useEffect(() => {
+        fetchServiceDetail();
+    }, [id, form]);
+
+    const handleEditService = () => {
+        setEditMode(true);
+    };
+
+    const handleCancelEdit = async () => {
+        setEditMode(false);
+        await fetchServiceDetail(); // Reload service data from the database
+    };
+
+    const handleSaveEdit = async (id) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                message.error('Authorization token not found. Please log in.');
+                return;
+            }
+
+            const values = await form.validateFields(); // Validate form fields
+            const updatedService = {
+                ServiceName: values.ServiceName,
+                Price: parseFloat(values.Price),
+                Description: values.Description,
+                ImageURL: values.ImageURL
+            };
+
+            await axios.patch(`http://localhost:3001/api/services/${id}`, updatedService, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            message.success('Service updated successfully', 0.5).then(() => {
+                window.location.reload(); // Reload the page after successful update
+            });
+        } catch (error) {
+            console.error('Error updating service:', error);
+            if (error.response && error.response.status === 401) {
+                message.error('Unauthorized. Please log in.');
+            } else {
+                message.error('Error updating service');
+            }
+        }
+    };
+
+    const handleDeleteService = () => {
+        Modal.confirm({
+            title: 'Are you sure you want to delete this service?',
+            onOk: async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        message.error('Authorization token not found. Please log in.');
+                        return;
+                    }
+
+                    await axios.delete(`http://localhost:3001/api/services/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    message.success('Service deleted successfully');
+                    navigate(-1); // Redirect to service list after deletion
+                } catch (error) {
+                    console.error('Error deleting service:', error);
+                    if (error.response && error.response.status === 401) {
+                        message.error('Unauthorized. Please log in.');
+                    } else {
+                        message.error('Error deleting service');
+                    }
+                }
+            },
+        });
+    };
+
+    const handleBookingNow = () => {
+        console.log('Booked:', serviceData);
+        // Add booking functionality here
+    };
+
+    if (!serviceData) {
+        return <div>Loading...</div>; // Add a proper loading indicator here
     }
-  };
 
-  const handleFormChange = (changedFields) => {
-    setBookingDetails((prevDetails) => ({
-      ...prevDetails,
-      ...changedFields,
-    }));
-  };
+    return (
+        <div className="flex flex-col md:flex-row m-5 py-32 px-4 md:px-32">
+            <div className="w-full md:w-1/2 flex justify-center">
+                <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
+            </div>
+            <div className="w-full md:w-1/2 p-5 md:ml-10">
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        name="ServiceName"
+                        label="Tên dịch vụ"
+                        rules={[{ required: true, message: 'Hãy nhập tên dịch vụ!' }]}
+                    >
+                        <Input disabled={!editMode} />
+                    </Form.Item>
+                    <Form.Item
+                        name="Price"
+                        label="Giá"
+                        rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
+                    >
+                        <Input type="number" disabled={!editMode} />
+                    </Form.Item>
+                    <Form.Item
+                        name="Description"
+                        label="Mô tả"
+                        rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
+                    >
+                        <Input disabled={!editMode} />
+                    </Form.Item>
+                    <Form.Item
+                        name="ImageURL"
+                        label="Hình ảnh"
+                        rules={[{ required: true, message: 'Hãy tải hình ảnh dịch vụ!' }]}
+                    >
+                        <Input disabled={!editMode} />
+                    </Form.Item>
+                </Form>
 
-  return (
-    <div className="flex flex-col md:flex-row m-5 py-28 px-4 md:px-32">
-      <div className="w-full md:w-1/2 flex justify-center">
-        <img
-          src={serviceData.image}
-          alt={serviceData.name}
-          className="max-w-full max-h-96 md:max-h-full object-contain"
-        />
-      </div>
-      <div className="w-full md:w-1/2 p-5 md:ml-10">
-        <Title level={1} className="mb-4">{serviceData.name}</Title>
-        <Title level={3} className="text-green-500 mb-4">{`Price: ${serviceData.price} VND`}</Title>
-        <Paragraph className="text-4xl mb-6 text-bold">{serviceData.description}</Paragraph>
+                <Title level={1} className="mb-4">{serviceData.ServiceName}</Title>
+                <Title level={3} className="text-green-500 mb-4">{`Price: $${serviceData.Price}`}</Title>
+                <Paragraph className="mb-6">{serviceData.Description}</Paragraph>
 
-        <Form
-          form={form}
-          layout="vertical"
-          onValuesChange={(_, allValues) => handleFormChange(allValues)}
-        >
-          <Form.Item name="pet" label="Your Pet" >
-            <Select placeholder="Select your pet" disabled={role === 'guest'}>
-              <Option value="dog">Dog</Option>
-              <Option value="cat">Cat</Option>
-              <Option value="rabbit">Rabbit</Option>
-              <Option value="hamster">Hamster</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="checkInDate" label="Check In Date" >
-            <DatePicker className="w-full" disabled={role === 'guest'} />
-          </Form.Item>
-          <Form.Item name="checkInTime" label="Check In Time" >
-            <TimePicker className="w-full" disabled={role === 'guest'}/>
-          </Form.Item>
-          <Form.Item name="checkOutDate" label="Check Out Date" >
-            <DatePicker className="w-full" disabled={role === 'guest'}/>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
-          </Form.Item>
-        </Form>
-      </div>
-    </div>
-  );
+                {userRole === 'Guest' || userRole === 'Customer' ? (
+                    <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
+                ) : userRole === 'Store Manager' ? (
+                    editMode ? (
+                        <div className="flex space-x-4 justify-end">
+                            <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
+                            <Button onClick={handleCancelEdit}>Hủy</Button>
+                        </div>
+                    ) : (
+                        <div className="flex space-x-4 justify-end">
+                            <Button type="primary" onClick={handleEditService}>Sửa</Button>
+                            <Button danger onClick={handleDeleteService}>Xóa</Button>
+                        </div>
+                    )
+                ) : null}
+            </div>
+        </div>
+    );
 };
 
 export default ServiceDetail;
