@@ -234,8 +234,8 @@ const ServiceList = () => {
   ];
 
   return (
-    <div className="p-36">
-      <Title level={2}>Service List</Title>
+    <div className="p-24">
+      <Title level={1} className='text-center'>Pet Services</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -247,7 +247,7 @@ const ServiceList = () => {
               loading={loading}
             />
             <div style={{ textAlign: 'right', marginTop: '16px' }}>
-              <Button type="primary" onClick={handleAddClick}>Add Service</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Service</Button>
             </div>
           </>
         ) : (
@@ -294,7 +294,7 @@ const ServiceList = () => {
           ]}
           style={{ textAlign: 'center' }}
         >
-          <Form form={form}>
+          <Form form={form} className='text-left'>
             <Form.Item
               name="ServiceName"
               rules={[{ required: true, message: 'Please enter the service name!' }]}
@@ -341,7 +341,7 @@ const ServiceList = () => {
           ]}
           style={{ textAlign: 'center' }}
         >
-          <Form form={form}>
+          <Form form={form} className='text-left'>
             <Form.Item
               name="ServiceName"
               rules={[{ required: true, message: 'Please enter the service name!' }]}

@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form, message } from 'antd';
+import { Button, Input, Image, Modal, Form, message, Typography, Skeleton } from 'antd';
 import useShopping from '../../hook/useShopping';
+
+const { Title, Paragraph } = Typography;
 
 const ProductDetail = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const userRole = localStorage.getItem('role') || 'Guest';
@@ -18,9 +21,11 @@ const ProductDetail = () => {
             const response = await axios.get(`http://localhost:3001/api/products/${id}`);
             setProductData(response.data);
             form.setFieldsValue(response.data); // Set initial form values
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching product detail:', error);
             message.error('Error fetching product detail');
+            setLoading(false);
         }
     };
 
@@ -125,6 +130,10 @@ const ProductDetail = () => {
         });
     };
 
+    if (loading) {
+        return <Skeleton active />;
+    }
+
     return (
         productData && (
             <div className="flex flex-col md:flex-row m-5 py-32 px-4 md:px-32">
@@ -132,36 +141,44 @@ const ProductDetail = () => {
                     <Image src={productData.ImageURL} alt={productData.ProductName} />
                 </div>
                 <div className="w-full md:w-1/2 p-5 md:ml-10">
-                    <Form form={form} layout="vertical">
-                        <Form.Item
-                            name="ProductName"
-                            label="Tên sản phẩm"
-                            rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
-                        >
-                            <Input disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="Price"
-                            label="Giá"
-                            rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
-                        >
-                            <Input type="number" disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="Description"
-                            label="Mô tả"
-                            rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
-                        >
-                            <Input disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="ImageURL"
-                            label="Hình ảnh"
-                            rules={[{ required: true, message: 'Hãy tải hình ảnh sản phẩm!' }]}
-                        >
-                            <Input disabled={!editMode} />
-                        </Form.Item>
-                    </Form>
+                    {userRole === 'Store Manager' ? (
+                        <Form form={form} layout="vertical">
+                            <Form.Item
+                                name="ProductName"
+                                label="Tên sản phẩm"
+                                rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
+                            >
+                                <Input disabled={!editMode} />
+                            </Form.Item>
+                            <Form.Item
+                                name="Price"
+                                label="Giá"
+                                rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
+                            >
+                                <Input type="number" disabled={!editMode} />
+                            </Form.Item>
+                            <Form.Item
+                                name="Description"
+                                label="Mô tả"
+                                rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
+                            >
+                                <Input disabled={!editMode} />
+                            </Form.Item>
+                            <Form.Item
+                                name="ImageURL"
+                                label="Hình ảnh"
+                                rules={[{ required: true, message: 'Hãy tải hình ảnh sản phẩm!' }]}
+                            >
+                                <Input disabled={!editMode} />
+                            </Form.Item>
+                        </Form>
+                    ) : (
+                        <div>
+                            <Title level={3}>{productData.ProductName}</Title>
+                            <Paragraph>{`Giá: ${productData.Price}`}</Paragraph>
+                            <Paragraph>{`Mô tả: ${productData.Description}`}</Paragraph>
+                        </div>
+                    )}
 
                     {userRole === 'Guest' || userRole === 'Customer' ? (
                         <>

@@ -1,6 +1,3 @@
-import React from 'react'
-
-import Title from '../components/ServicePage/PetService/Title'
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
 import ServiceList from '../components/ServicePage/PetService/ServiceList'
@@ -10,7 +7,6 @@ const PetServicePage = () => {
   return (
     <div>
         <Banner/>
-        <Title/>
         <ServiceList/>
         <Footer/>
     </div>

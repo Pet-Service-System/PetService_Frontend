@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form, Typography, message } from 'antd';
+import { Button, Input, Image, Modal, Form, Typography, message, Skeleton } from 'antd';
 
 const { Title, Paragraph } = Typography;
 
@@ -109,49 +109,53 @@ const ServiceDetail = () => {
     };
 
     if (!serviceData) {
-        return <div>Loading...</div>; // Add a proper loading indicator here
+        return <Skeleton active />; // Render skeleton while loading
     }
 
     return (
-        <div className="flex flex-col md:flex-row m-5 py-32 px-4 md:px-32">
+        <div className="flex flex-col md:flex-row m-5 py-44 px-4 md:px-32">
             <div className="w-full md:w-1/2 flex justify-center">
                 <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
             </div>
             <div className="w-full md:w-1/2 p-5 md:ml-10">
-                <Form form={form} layout="vertical">
-                    <Form.Item
-                        name="ServiceName"
-                        label="Tên dịch vụ"
-                        rules={[{ required: true, message: 'Hãy nhập tên dịch vụ!' }]}
-                    >
-                        <Input disabled={!editMode} />
-                    </Form.Item>
-                    <Form.Item
-                        name="Price"
-                        label="Giá"
-                        rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
-                    >
-                        <Input type="number" disabled={!editMode} />
-                    </Form.Item>
-                    <Form.Item
-                        name="Description"
-                        label="Mô tả"
-                        rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
-                    >
-                        <Input disabled={!editMode} />
-                    </Form.Item>
-                    <Form.Item
-                        name="ImageURL"
-                        label="Hình ảnh"
-                        rules={[{ required: true, message: 'Hãy tải hình ảnh dịch vụ!' }]}
-                    >
-                        <Input disabled={!editMode} />
-                    </Form.Item>
-                </Form>
-
-                <Title level={1} className="mb-4">{serviceData.ServiceName}</Title>
-                <Title level={3} className="text-green-500 mb-4">{`Price: $${serviceData.Price}`}</Title>
-                <Paragraph className="mb-6">{serviceData.Description}</Paragraph>
+                {userRole === 'Store Manager' ? (
+                    <Form form={form} layout="vertical">
+                        <Form.Item
+                            name="ServiceName"
+                            label="Tên dịch vụ"
+                            rules={[{ required: true, message: 'Hãy nhập tên dịch vụ!' }]}
+                        >
+                            <Input disabled={!editMode} />
+                        </Form.Item>
+                        <Form.Item
+                            name="Price"
+                            label="Giá"
+                            rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
+                        >
+                            <Input type="number" disabled={!editMode} />
+                        </Form.Item>
+                        <Form.Item
+                            name="Description"
+                            label="Mô tả"
+                            rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
+                        >
+                            <Input disabled={!editMode} />
+                        </Form.Item>
+                        <Form.Item
+                            name="ImageURL"
+                            label="Hình ảnh"
+                            rules={[{ required: true, message: 'Hãy tải hình ảnh dịch vụ!' }]}
+                        >
+                            <Input disabled={!editMode} />
+                        </Form.Item>
+                    </Form>
+                ) : (
+                    <div>
+                        <Title level={3}>{serviceData.ProductName}</Title>
+                        <Paragraph>{`Giá: ${serviceData.Price}`}</Paragraph>
+                        <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
+                    </div>
+                )}
 
                 {userRole === 'Guest' || userRole === 'Customer' ? (
                     <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
