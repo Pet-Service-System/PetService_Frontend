@@ -10,8 +10,8 @@ const ServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
-  const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
-  const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
+  const [editMode, setEditMode] = useState(null); 
+  const [addMode, setAddMode] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
@@ -84,38 +84,6 @@ const ServiceList = () => {
         message.error('Error updating service');
       }
     }
-  };
-
-  const handleDeleteClick = (id) => {
-    Modal.confirm({
-      title: 'Are you sure you want to delete this service?',
-      onOk: async () => {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            message.error('Authorization token not found. Please log in.');
-            return;
-          }
-
-          await axios.delete(`http://localhost:3001/api/services/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-
-          message.success('Service deleted successfully', 0.5).then(() => {
-            window.location.reload();
-          });
-        } catch (error) {
-          console.error('Error deleting service:', error);
-          if (error.response && error.response.status === 401) {
-            message.error('Unauthorized. Please log in.');
-          } else {
-            message.error('Error deleting service');
-          }
-        }
-      },
-    });
   };
 
   const handleAddClick = () => {
@@ -216,7 +184,9 @@ const ServiceList = () => {
       dataIndex: 'Status',
       key: 'Status',
       render: (text) => (
-        <span>{text}</span>
+        <span style={{ color: text === 'Available' ? 'green' : text === 'Unavailable' ? 'red' : 'black' }}>
+          {text}
+        </span>
       ),
     },
     {
@@ -226,7 +196,6 @@ const ServiceList = () => {
         userRole === 'Store Manager' && (
           <div>
             <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
-            <Button danger onClick={() => handleDeleteClick(record.ServiceID)}>Delete</Button>
           </div>
         )
       ),

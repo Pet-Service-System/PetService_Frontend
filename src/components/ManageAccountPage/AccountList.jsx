@@ -64,7 +64,8 @@ const AccountList = () => {
         email: values.email,
         phone: values.phone,
         address: values.address,
-        role: values.role
+        role: values.role,
+        status: values.status
       };
 
       await axios.patch(`http://localhost:3001/api/accounts/${id}`, updatedAccount, {
@@ -113,6 +114,16 @@ const AccountList = () => {
       key: 'role',
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <span style={{ color: status === 1 ? 'green' : 'red' }}>
+          {status === 1 ? 'Active' : 'Inactive'}
+        </span>
+      ), // Hiển thị giá trị 'Active' hoặc 'Inactive'
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
@@ -150,6 +161,7 @@ const AccountList = () => {
         ]}
       >
         <Form form={form}>
+          {/* Các trường dữ liệu */}
           <Form.Item
             name="fullname"
             rules={[{ required: true, message: 'Please enter the fullname!' }]}
@@ -160,7 +172,7 @@ const AccountList = () => {
             name="email"
             rules={[{ required: true, message: 'Please enter the email!' }]}
           >
-            <Input placeholder="Email"            />
+            <Input placeholder="Email" />
           </Form.Item>
           <Form.Item
             name="phone"
@@ -179,11 +191,22 @@ const AccountList = () => {
             rules={[{ required: true, message: 'Please select the role!' }]}
           >
             <Select placeholder="Select Role">
+              {/* Tùy chọn cho vai trò */}
               <Option value="Customer">Customer</Option>
               <Option value="Sale Staff">Sale Staff</Option>
               <Option value="Caretaker Staff">Caretaker Staff</Option>
               <Option value="Store Manager">Store Manager</Option>
               <Option value="Administrator">Administrator</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="status"
+            rules={[{ required: true, message: 'Please select the status!' }]}
+          >
+            <Select placeholder="Select Status">
+              {/* Tùy chọn cho trạng thái */}
+              <Option value={1}>Active</Option>
+              <Option value={0}>Inactive</Option>
             </Select>
           </Form.Item>
         </Form>

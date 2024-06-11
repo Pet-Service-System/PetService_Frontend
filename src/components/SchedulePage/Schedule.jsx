@@ -10,7 +10,7 @@ const Schedule = () => {
   const [error, setError] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [users] = useState([]);
+  const [users, setUsers] = useState([]); // Updated to use setUsers
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
@@ -38,25 +38,25 @@ const Schedule = () => {
     fetchSchedules();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchUsers = async () => {
-  //     try {
-  //       const token = localStorage.getItem('token');
-  //       const response = await axios.get('http://localhost:3001/api/accounts/role', {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       console.log('Users fetched:', response.data); // Log the fetched staffs
-  //       setUsers(response.data); // Set the fetched staffs to state
-  //     } catch (error) {
-  //       console.error('Error fetching users:', error);
-  //       setError('Error fetching users');
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3001/api/accounts/role', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Users fetched:', response.data.accounts); // Log the fetched users
+        setUsers(response.data.accounts); // Set the fetched users to state
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setError('Error fetching users');
+      }
+    };
 
-  //   fetchUsers();
-  // }, []);
+    fetchUsers();
+  }, []);
 
   const timeSlots = [
     { start: '08:00', end: '10:00' },
@@ -65,7 +65,7 @@ const Schedule = () => {
     { start: '14:00', end: '16:00' },
     { start: '16:00', end: '18:00' },
   ];
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
   const columns = [
     {
@@ -97,7 +97,7 @@ const Schedule = () => {
       const schedule = schedules.find((sch) => sch.day === day);
       if (schedule) {
         const timeSlot = schedule.slots.find((s) => s.start_time === slot.start && s.end_time === slot.end);
-        row[day] = timeSlot ? timeSlot.employees : [];
+row[day] = timeSlot ? timeSlot.employees : [];
       } else {
         row[day] = [];
       }
@@ -116,6 +116,7 @@ const Schedule = () => {
       const { day, timeSlot, fullname } = values;
       const [start_time, end_time] = timeSlot.split(' - ');
       const accountId = selectedUser ? selectedUser.account_id : null;
+      const role = selectedUser ? selectedUser.role : null;
 
       await axios.post(
         'http://localhost:3001/api/schedules/assign',
@@ -124,6 +125,7 @@ const Schedule = () => {
           slots: [{ start_time, end_time }],
           accountId,
           fullname,
+          role,
         },
         {
           headers: {
@@ -155,7 +157,7 @@ const Schedule = () => {
   };
 
   return (
-    <div className="w-11/12 mx-auto mt-12">
+    <div className="w-11/12 mx-auto mt-12 py-10">
       {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
@@ -184,7 +186,7 @@ const Schedule = () => {
             <Select placeholder="Select time slot">
               {timeSlots.map((slot) => (
                 <Option key={`${slot.start} - ${slot.end}`} value={`${slot.start} - ${slot.end}`}>
-                  {slot.start} - {slot.end}
+{slot.start} - {slot.end}
                 </Option>
               ))}
             </Select>
@@ -204,7 +206,7 @@ const Schedule = () => {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className='float-right'>
+            <Button type="primary" htmlType="submit" className="float-right">
               Submit
             </Button>
           </Form.Item>

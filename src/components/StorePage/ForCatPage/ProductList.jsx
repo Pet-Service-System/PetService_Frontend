@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
 
+const { Option } = Select;
 const { Title } = Typography;
 
 const ProductList = () => {
@@ -41,7 +42,8 @@ const ProductList = () => {
       ProductName: record.ProductName,
       Price: record.Price,
       Description: record.Description,
-      ImageURL: record.ImageURL
+      ImageURL: record.ImageURL,
+      Status: record.Status
     });
   };
 
@@ -63,7 +65,8 @@ const ProductList = () => {
         ProductName: values.ProductName,
         Price: parseFloat(values.Price),
         Description: values.Description,
-        ImageURL: values.ImageURL
+        ImageURL: values.ImageURL,
+        Status: values.Status
       };
 
       await axios.patch(`http://localhost:3001/api/products/${editMode}`, updatedProduct, {
@@ -83,38 +86,6 @@ const ProductList = () => {
         message.error('Error updating product');
       }
     }
-  };
-
-  const handleDeleteClick = (id) => {
-    Modal.confirm({
-      title: 'Are you sure you want to delete this product?',
-      onOk: async () => {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            message.error('Authorization token not found. Please log in.');
-            return;
-          }
-
-          await axios.delete(`http://localhost:3001/api/products/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-
-          message.success('Product deleted successfully', 0.5).then(() => {
-            window.location.reload();
-          });
-        } catch (error) {
-          console.error('Error deleting product:', error);
-          if (error.response && error.response.status === 401) {
-            message.error('Unauthorized. Please log in.');
-          } else {
-            message.error('Error deleting product');
-          }
-        }
-      },
-    });
   };
 
   const handleAddClick = () => {
@@ -140,7 +111,8 @@ const ProductList = () => {
         price: parseFloat(values.Price),
         description: values.Description,
         imageURL: values.ImageURL,
-        petTypeId: petTypeId // Include petTypeId in the new product data
+        petTypeId: petTypeId,
+        status: values.Status
       };
 
       const response = await axios.post(`http://localhost:3001/api/products`, newProduct, {
@@ -211,19 +183,28 @@ const ProductList = () => {
       ),
     },
     {
+      title: 'Status',
+      dataIndex: 'Status',
+      key: 'Status',
+      render: (text) => (
+        <span style={{ color: text === 'Available' ? 'green' : text === 'Unavailable' ? 'red' : 'black' }}>
+          {text}
+        </span>
+      ),
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         userRole === 'Store Manager' && (
           <div>
             <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
-            <Button danger onClick={() => handleDeleteClick(record.ProductID)}>Delete</Button>
           </div>
         )
       ),
     },
   ];
-
+  console.log(productData)
   return (
     <div className="p-24">
       <Title level={1} className='text-center'>Product for cats</Title>
@@ -285,7 +266,7 @@ const ProductList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form}>
+        <Form form={form} className='text-left'>
           <Form.Item
             name="ProductName"
             rules={[{ required: true, message: 'Please enter the product name!' }]}
@@ -310,6 +291,15 @@ const ProductList = () => {
           >
             <Input placeholder="Image URL" />
           </Form.Item>
+          <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
         </Form>
       </Modal>
 
@@ -323,7 +313,7 @@ const ProductList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form}>
+        <Form form={form} className='text-left'>
           <Form.Item
             name="ProductName"
             rules={[{ required: true, message: 'Please enter the product name!' }]}
@@ -348,6 +338,15 @@ const ProductList = () => {
           >
             <Input placeholder="Image URL" />
           </Form.Item>
+          <Form.Item
+              name="Status"
+              rules={[{ required: true, message: 'Please select the service status!' }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
         </Form>
       </Modal>
     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message } from 'antd';
+import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal } from 'antd';
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios'; // Import axios for making API calls
 
@@ -11,8 +11,10 @@ const { Option } = Select;
 const PetList = () => {
   const navigate = useNavigate();
   const [pets, setPets] = useState([]);
-  const [isAddMode, setIsAddMode] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editPetId, setEditPetId] = useState(null);
+  const [confirmDeletePetId, setConfirmDeletePetId] = useState(null);
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const genders = ['Đực', 'Cái'];
@@ -23,20 +25,21 @@ const PetList = () => {
       try {
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user'));
-        const accountId = user.id; // Lấy ID người dùng từ localStorage
-        console.log(accountId)
-        if (!token || !accountId) {
+        const accountID = user.id;
+        console.log(accountID); // Debugging statement
+
+        if (!token || !accountID) {
           console.error('Token or account ID not found in localStorage');
           return;
         }
 
-        const response = await axios.get(`http://localhost:3001/api/pets/account/${accountId}`, {
+        const response = await axios.get(`http://localhost:3001/api/pets/account/${accountID}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log('Pets response:', response.data); // Debugging statement
         setPets(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error('Error fetching pets:', error);
         message.error('Failed to fetch pets');
@@ -47,62 +50,117 @@ const PetList = () => {
   }, []);
 
   const handleUpdatePet = (pet) => {
-    setEditPetId(pet.id);
+    setEditPetId(pet.PetID);
     editForm.setFieldsValue(pet);
+    setIsEditModalVisible(true);
   };
 
-  const handleSavePet = () => {
-    editForm.validateFields().then((values) => {
-      setPets(pets.map((pet) => (pet.id === editPetId ? { ...pet, ...values } : pet)));
+  const handleSavePet = async () => {
+    try {
+      const values = await editForm.validateFields();
+      const token = localStorage.getItem('token');
+      console.log(values)
+      await axios.patch(`http://localhost:3001/api/pets/${editPetId}`, values, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setPets((prevPets) =>
+        prevPets.map((pet) => (pet.PetID === editPetId ? { ...pet, ...values } : pet))
+      );
       setEditPetId(null);
+      setIsEditModalVisible(false);
       message.success('Pet updated successfully');
-    }).catch((info) => {
+    } catch (info) {
       console.log('Validate Failed:', info);
-    });
+    }
   };
 
-  const handleDeletePet = (id) => {
-    setPets(pets.filter((pet) => pet.id !== id));
-    message.success('Pet deleted successfully');
+  const handleConfirmDelete = async () => {
+    if (confirmDeletePetId) {
+      await handleDeletePet(confirmDeletePetId);
+      setConfirmDeletePetId(null); // Reset confirm delete pet id
+    }
   };
 
-  const handleAddPet = () => {
-    form.validateFields().then((values) => {
-      const newPet = { id: pets.length + 1, ...values };
-      setPets([...pets, newPet]);
-      setIsAddMode(false);
+  const handleCancelDelete = () => {
+    setConfirmDeletePetId(null); // Reset confirm delete pet id
+  };
+  
+  const handleDeleteButtonClick = (id) => {
+    setConfirmDeletePetId(id);
+  };
+
+  const handleDeletePet = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      await axios.delete(`http://localhost:3001/api/pets/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setPets((prevPets) => prevPets.filter((pet) => pet.PetID !== id));
+      message.success('Pet deleted successfully');
+    } catch (error) {
+      console.error('Error deleting pet:', error);
+      message.error('Failed to delete pet');
+    }
+  };
+
+  const handleAddPet = async () => {
+    try {
+      const values = await form.validateFields();
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const accountID = user.id;
+
+      const response = await axios.post(
+        'http://localhost:3001/api/pets',
+        { ...values, AccountID: accountID },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setPets((prevPets) => [...prevPets, response.data]);
+      setIsAddModalVisible(false);
       form.resetFields();
       message.success('Pet added successfully');
-    }).catch((info) => {
+    } catch (info) {
       console.log('Validate Failed:', info);
-    });
+    }
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'PetID', key: 'PetID' },
     { title: 'Tên', dataIndex: 'PetName', key: 'PetName' },
     { title: 'Giới tính', dataIndex: 'Gender', key: 'Gender' },
     { title: 'Trạng thái', dataIndex: 'Status', key: 'Status' },
-    { title: 'Loại thú cưng', dataIndex: 'PetTypeID', key: 'PetTypeID', render: (petTypeID) => petTypeID === 'PT001' ? 'Chó' : petTypeID === 'PT002' ? 'Mèo' : petTypeID },
+    {
+      title: 'Loại thú cưng',
+      dataIndex: 'PetTypeID',
+      key: 'PetTypeID',
+      render: (petTypeID) => petTypeID?.TypeName || 'Unknown',
+    },
     {
       title: 'Hành động',
       key: 'action',
       render: (_, record) => (
-        record.PetID === editPetId ? (
-          <>
-            <Button type="primary" onClick={handleSavePet} className="mr-2">Lưu</Button>
-            <Button onClick={() => setEditPetId(null)}>Hủy</Button>
-          </>
-        ) : (
-          <>
-            <Button type="primary" onClick={() => handleUpdatePet(record)} className="mr-2">Cập nhật</Button>
-            <Button danger onClick={() => handleDeletePet(record.PetID)}>Xóa</Button>
-          </>
-        )
+        <>
+          <Button type="primary" onClick={() => handleUpdatePet(record)} className="mr-2">
+            Cập nhật
+          </Button>
+          <Button danger onClick={() => handleDeleteButtonClick(record.PetID)}>
+            Xóa
+          </Button>
+        </>
       ),
     },
   ];
-  
 
   const handleMenuClick = (key) => {
     if (key === 'logout') {
@@ -133,51 +191,100 @@ const PetList = () => {
       </Sider>
       <Layout>
         <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
-          <Title level={2} style={{ margin: '16px 0' }} className='text-center'>Danh sách thú cưng</Title>
-          <Table columns={columns} dataSource={pets} rowKey="id" pagination={false} />
-          {isAddMode && (
-            <Form form={form} layout="inline" onFinish={handleAddPet} style={{ marginTop: '16px' }} className='justify-end'>
-              <Form.Item name="name" rules={[{ required: true, message: 'Tên không được để trống' }]}>
-                <Input placeholder="Tên" />
-              </Form.Item>
-              <Form.Item name="species" rules={[{ required: true, message: 'Chủng loại không được để trống' }]}>
-                <Input placeholder="Chủng loại" />
-              </Form.Item>
-              <Form.Item name="gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
-                <Select placeholder="Chọn giới tính">
-                  {genders.map((gender, index) => (
-                    <Option key={index} value={gender}>{gender}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">Thêm</Button>
-              </Form.Item>
-              <Form.Item>
-                <Button onClick={() => setIsAddMode(false)}>Hủy</Button>
-              </Form.Item>
-            </Form>
-          )}
+          <Title level={2} style={{ margin: '16px 0' }} className="text-center">
+            Danh sách thú cưng
+          </Title>
+          <Table columns={columns} dataSource={pets} rowKey="PetID" pagination={false} />
           <div className="flex justify-end mt-4">
-            {!isAddMode && <Button type="primary" onClick={() => setIsAddMode(true)}>Thêm thú cưng</Button>}
+            <Button type="primary" onClick={() => setIsAddModalVisible(true)}>
+              Thêm thú cưng
+            </Button>
           </div>
-          {editPetId && (
-            <Form form={editForm} layout="inline" onFinish={handleSavePet} style={{ marginTop: '16px' }}>
-              <Form.Item name="name" rules={[{ required: true, message: 'Tên không được để trống' }]}>
+
+          <Modal
+            title="Thêm thú cưng"
+            visible={isAddModalVisible}
+            onCancel={() => setIsAddModalVisible(false)}
+            footer={[
+              <Button key="back" onClick={() => setIsAddModalVisible(false)}>
+                Hủy
+              </Button>,
+              <Button key="submit" type="primary" onClick={handleAddPet}>
+                Thêm
+              </Button>,
+            ]}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item name="PetName" rules={[{ required: true, message: 'Tên không được để trống' }]}>
                 <Input placeholder="Tên" />
               </Form.Item>
-              <Form.Item name="species" rules={[{ required: true, message: 'Chủng loại không được để trống' }]}>
-                <Input placeholder="Chủng loại" />
+              <Form.Item name="PetTypeID" rules={[{ required: true, message: 'Loại thú cưng không được để trống' }]}>
+                <Select placeholder="Chọn loại thú cưng">
+                  <Option value="PT001">Chó</Option>
+                  <Option value="PT002">Mèo</Option>
+                </Select>
               </Form.Item>
-              <Form.Item name="gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
+              <Form.Item name="Gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
                 <Select placeholder="Chọn giới tính">
                   {genders.map((gender, index) => (
-                    <Option key={index} value={gender}>{gender}</Option>
+                    <Option key={index} value={gender}>
+                      {gender}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
+              <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
+                <Input placeholder="Trạng thái" />
+              </Form.Item>
             </Form>
-          )}
+          </Modal>
+
+          <Modal
+            title="Xác nhận xóa thú cưng"
+            visible={confirmDeletePetId !== null}
+            onOk={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+          >
+            <p>Bạn có chắc chắn muốn xóa thú cưng này?</p>
+          </Modal>
+
+          <Modal
+            title="Cập nhật thú cưng"
+            visible={isEditModalVisible}
+            onCancel={() => setIsEditModalVisible(false)}
+            footer={[
+              <Button key="back" onClick={() => setIsEditModalVisible(false)}>
+                Hủy
+              </Button>,
+              <Button key="submit" type="primary" onClick={handleSavePet}>
+                Lưu
+              </Button>,
+            ]}
+          >
+            <Form form={editForm} layout="vertical">
+              <Form.Item name="PetName" rules={[{ required: true, message: 'Tên không được để trống' }]}>
+                <Input placeholder="Tên" />
+              </Form.Item>
+              <Form.Item name="PetTypeID" rules={[{ required: true, message: 'Loại thú cưng không được để trống' }]}>
+                <Select placeholder="Chọn loại thú cưng">
+                  <Option value="PT001">Chó</Option>
+                  <Option value="PT002">Mèo</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item name="Gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
+                <Select placeholder="Chọn giới tính">
+                  {genders.map((gender, index) => (
+                    <Option key={index} value={gender}>
+                      {gender}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
+                <Input placeholder="Trạng thái" />
+              </Form.Item>
+            </Form>
+          </Modal>
         </Content>
       </Layout>
     </Layout>

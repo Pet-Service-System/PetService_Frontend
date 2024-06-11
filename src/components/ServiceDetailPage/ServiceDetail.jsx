@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form, Typography, message, Skeleton } from 'antd';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select } from 'antd';
 
 const { Title, Paragraph } = Typography;
+const { Option } = Select;
 
 const ServiceDetail = () => {
     const { id } = useParams();
@@ -11,7 +12,6 @@ const ServiceDetail = () => {
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const userRole = localStorage.getItem('role') || 'Guest';
-    const navigate = useNavigate();
 
     const fetchServiceDetail = async () => {
         try {
@@ -26,6 +26,7 @@ const ServiceDetail = () => {
 
     useEffect(() => {
         fetchServiceDetail();
+        console.log(serviceData)
     }, [id, form]);
 
     const handleEditService = () => {
@@ -50,7 +51,8 @@ const ServiceDetail = () => {
                 ServiceName: values.ServiceName,
                 Price: parseFloat(values.Price),
                 Description: values.Description,
-                ImageURL: values.ImageURL
+                ImageURL: values.ImageURL,
+                Status: values.Status
             };
 
             await axios.patch(`http://localhost:3001/api/services/${id}`, updatedService, {
@@ -72,48 +74,17 @@ const ServiceDetail = () => {
         }
     };
 
-    const handleDeleteService = () => {
-        Modal.confirm({
-            title: 'Are you sure you want to delete this service?',
-            onOk: async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    if (!token) {
-                        message.error('Authorization token not found. Please log in.');
-                        return;
-                    }
-
-                    await axios.delete(`http://localhost:3001/api/services/${id}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    });
-
-                    message.success('Service deleted successfully');
-                    navigate(-1); // Redirect to service list after deletion
-                } catch (error) {
-                    console.error('Error deleting service:', error);
-                    if (error.response && error.response.status === 401) {
-                        message.error('Unauthorized. Please log in.');
-                    } else {
-                        message.error('Error deleting service');
-                    }
-                }
-            },
-        });
-    };
-
     const handleBookingNow = () => {
         console.log('Booked:', serviceData);
         navigate(`/pet-booking`);
     };
 
     if (!serviceData) {
-        return <Skeleton active />; // Render skeleton while loading
+        return <Skeleton active />;
     }
 
     return (
-        <div className="flex flex-col md:flex-row m-5 py-44 px-4 md:px-32">
+        <div className="flex flex-col md:flex-row m-5 py-36 px-4 md:px-32">
             <div className="w-full md:w-1/2 flex justify-center">
                 <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
             </div>
@@ -148,17 +119,40 @@ const ServiceDetail = () => {
                         >
                             <Input disabled={!editMode} />
                         </Form.Item>
+                        <Form.Item
+                            name="Status"
+                            label="Status"
+                            rules={[{ required: true, message: 'Please select the service status!' }]}
+                            >
+                            <Select placeholder="Select Status" disabled={!editMode}>
+                                <Option value="Available">Available</Option>
+                                <Option value="Unavailable">Unavailable</Option>
+                            </Select>
+                            </Form.Item>
                     </Form>
                 ) : (
                     <div>
-                        <Title level={3}>{serviceData.ProductName}</Title>
+                        <Title level={3}>{serviceData.ServiceName}</Title>
                         <Paragraph>{`Giá: ${serviceData.Price}`}</Paragraph>
                         <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
                     </div>
                 )}
 
                 {userRole === 'Guest' || userRole === 'Customer' ? (
-                    <Button type="primary" onClick={handleBookingNow}>Booking Now</Button>
+                    <>
+                        <div className='flex space-x-4 justify-end'>
+                            <Button
+                                type="primary"
+                                onClick={handleBookingNow}
+                                disabled={serviceData.Status === 'Unavailable'}
+                            >
+                                Booking Now
+                            </Button>
+                        </div>
+                        {serviceData.Status === 'Unavailable' && (
+                            <p className="text-red-500 text-right">Dịch vụ tạm ngưng.</p>
+                        )}
+                    </>
                 ) : userRole === 'Store Manager' ? (
                     editMode ? (
                         <div className="flex space-x-4 justify-end">
@@ -168,7 +162,6 @@ const ServiceDetail = () => {
                     ) : (
                         <div className="flex space-x-4 justify-end">
                             <Button type="primary" onClick={handleEditService}>Sửa</Button>
-                            <Button danger onClick={handleDeleteService}>Xóa</Button>
                         </div>
                     )
                 ) : null}
