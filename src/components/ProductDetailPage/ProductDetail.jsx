@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form, message, Typography, Skeleton } from 'antd';
+import { Button, Input, Image, Modal, Form, message, Typography, Skeleton, Select } from 'antd';
 import useShopping from '../../hook/useShopping';
 
 const { Title, Paragraph } = Typography;
+const { Option } = Select;
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -77,7 +78,8 @@ const ProductDetail = () => {
                 ProductName: values.ProductName,
                 Price: parseFloat(values.Price),
                 Description: values.Description,
-                ImageURL: values.ImageURL
+                ImageURL: values.ImageURL,
+                Status: values.Status
             };
     
             await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
@@ -171,6 +173,16 @@ const ProductDetail = () => {
                             >
                                 <Input disabled={!editMode} />
                             </Form.Item>
+                            <Form.Item
+                                name="Status"
+                                label="Status"
+                                rules={[{ required: true, message: 'Please select the service status!' }]}
+                                >
+                                <Select placeholder="Select Status" disabled={!editMode}>
+                                    <Option value="Available">Available</Option>
+                                    <Option value="Unavailable">Unavailable</Option>
+                                </Select>
+                                </Form.Item>
                         </Form>
                     ) : (
                         <div>

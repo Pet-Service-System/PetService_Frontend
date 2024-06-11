@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Modal, Form, Typography, message, Skeleton } from 'antd';
+import { Button, Input, Image, Modal, Form, Typography, message, Skeleton, Select } from 'antd';
 
 const { Title, Paragraph } = Typography;
+const { Option } = Select;
 
 const ServiceDetail = () => {
     const { id } = useParams();
@@ -50,7 +51,8 @@ const ServiceDetail = () => {
                 ServiceName: values.ServiceName,
                 Price: parseFloat(values.Price),
                 Description: values.Description,
-                ImageURL: values.ImageURL
+                ImageURL: values.ImageURL,
+                Status: values.Status
             };
 
             await axios.patch(`http://localhost:3001/api/services/${id}`, updatedService, {
@@ -113,7 +115,7 @@ const ServiceDetail = () => {
     }
 
     return (
-        <div className="flex flex-col md:flex-row m-5 py-48 px-4 md:px-32">
+        <div className="flex flex-col md:flex-row m-5 py-36 px-4 md:px-32">
             <div className="w-full md:w-1/2 flex justify-center">
                 <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
             </div>
@@ -148,6 +150,16 @@ const ServiceDetail = () => {
                         >
                             <Input disabled={!editMode} />
                         </Form.Item>
+                        <Form.Item
+                            name="Status"
+                            label="Status"
+                            rules={[{ required: true, message: 'Please select the service status!' }]}
+                            >
+                            <Select placeholder="Select Status" disabled={!editMode}>
+                                <Option value="Available">Available</Option>
+                                <Option value="Unavailable">Unavailable</Option>
+                            </Select>
+                            </Form.Item>
                     </Form>
                 ) : (
                     <div>
