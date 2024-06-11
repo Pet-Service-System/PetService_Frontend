@@ -178,7 +178,7 @@ const ProductList = () => {
           {text}
         </div>
       ),
-    }, 
+    },
     {
       title: 'Product Name',
       dataIndex: 'ProductName',
@@ -225,8 +225,8 @@ const ProductList = () => {
   ];
 
   return (
-    <div className="p-36">
-      <Title level={2}>Product List</Title>
+    <div className="p-24">
+      <Title level={1} className='text-center'>Product for dogs</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -238,7 +238,7 @@ const ProductList = () => {
               loading={loading}
             />
             <div style={{ textAlign: 'right', marginTop: '16px' }}>
-              <Button type="primary" onClick={handleAddClick}>Add Product</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
             </div>
           </>
         ) : (
