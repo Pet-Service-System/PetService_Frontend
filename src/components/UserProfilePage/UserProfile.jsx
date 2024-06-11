@@ -73,10 +73,17 @@ const UserProfile = () => {
 
   const handleSave = () => {
     let newErrors = {};
+    if (!formData.fullname) {
+      newErrors.fullname = 'Họ và tên là bắt buộc';
+    } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
+      newErrors.fullname = 'Họ và tên không được chứa ký tự đặc biệt';
+    }
 
-    // Validate inputs and update state
-    if (!formData.fullname) newErrors.fullname = 'Họ và tên là bắt buộc';
-    if (!formData.phone) newErrors.phone = 'Số điện thoại là bắt buộc';
+    if (!formData.phone) {
+      newErrors.phone = 'Số điện thoại là bắt buộc';
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Số điện thoại phải chứa đúng 10 chữ số';
+    }
     if (!formData.address) newErrors.address = 'Địa chỉ là bắt buộc';
 
     if (Object.keys(newErrors).length === 0) {
@@ -99,10 +106,10 @@ const UserProfile = () => {
     localStorage.removeItem('role');
     localStorage.removeItem('account_id');
     localStorage.removeItem('fullname');
-    localStorage.removeItem('email'); 
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('email');
+    localStorage.removeItem('user');
     setRole('Guest');
-    setUser(null); 
+    setUser(null);
     navigate('/');
     window.location.reload();
   };
