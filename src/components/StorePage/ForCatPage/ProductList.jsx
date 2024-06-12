@@ -20,7 +20,7 @@ const ProductList = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/products');
-        const filteredProducts = response.data.filter(product => product.PetTypeId === petTypeId);
+        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeId);
         setProductData(filteredProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -111,7 +111,7 @@ const ProductList = () => {
         price: parseFloat(values.Price),
         description: values.Description,
         imageURL: values.ImageURL,
-        petTypeId: petTypeId,
+        petTypeID: petTypeId,
         status: values.Status
       };
 
