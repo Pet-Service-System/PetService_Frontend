@@ -1,24 +1,25 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Typography, Alert, Button, Modal, Form, Select } from 'antd';
+import { Table, Typography, Button, Modal, Form, Select, Skeleton, message } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
-  const [error, setError] = useState('');
+  const [users, setUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [users, setUsers] = useState([]); // Updated to use setUsers
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSchedules = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          setError('Authorization token not found. Please log in.');
+          message.error('Authorization token not found. Please log in.');
           return;
         }
 
@@ -31,8 +32,9 @@ const Schedule = () => {
         setSchedules(response.data);
       } catch (error) {
         console.error('Error fetching schedules:', error);
-        setError('Error fetching schedules');
+        message.error('Error fetching schedules');
       }
+      setLoading(false);
     };
 
     fetchSchedules();
@@ -40,6 +42,7 @@ const Schedule = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:3001/api/accounts/role', {
@@ -47,12 +50,13 @@ const Schedule = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('Users fetched:', response.data.accounts); // Log the fetched users
-        setUsers(response.data.accounts); // Set the fetched users to state
+        console.log('Users fetched:', response.data.accounts);
+        setUsers(response.data.accounts);
       } catch (error) {
         console.error('Error fetching users:', error);
-        setError('Error fetching users');
+        message.error('Error fetching users');
       }
+      setLoading(false);
     };
 
     fetchUsers();
@@ -97,7 +101,7 @@ const Schedule = () => {
       const schedule = schedules.find((sch) => sch.day === day);
       if (schedule) {
         const timeSlot = schedule.slots.find((s) => s.start_time === slot.start && s.end_time === slot.end);
-row[day] = timeSlot ? timeSlot.employees : [];
+        row[day] = timeSlot ? timeSlot.employees : [];
       } else {
         row[day] = [];
       }
@@ -109,7 +113,7 @@ row[day] = timeSlot ? timeSlot.employees : [];
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('Authorization token not found. Please log in.');
+        message.error('Authorization token not found. Please log in.');
         return;
       }
 
@@ -134,7 +138,6 @@ row[day] = timeSlot ? timeSlot.employees : [];
         }
       );
 
-      // Refetch schedules after successful assignment
       const response = await axios.get('http://localhost:3001/api/schedules', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -144,9 +147,14 @@ row[day] = timeSlot ? timeSlot.employees : [];
       setSchedules(response.data);
       setIsModalVisible(false);
       form.resetFields();
+      message.success('Employee scheduled successfully');
     } catch (error) {
       console.error('Error scheduling employee:', error);
-      setError('Error scheduling employee');
+      if (error.response && error.response.data && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error('Error scheduling employee');
+      }
     }
   };
 
@@ -158,14 +166,17 @@ row[day] = timeSlot ? timeSlot.employees : [];
 
   return (
     <div className="w-11/12 mx-auto mt-12 py-10">
-      {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
       </Title>
       <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
         Schedule Employee
       </Button>
-      <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
+      {loading ? (
+        <Skeleton active paragraph={{ rows: 10 }} />
+      ) : (
+        <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
+      )}
       <Modal
         title="Schedule Employee"
         visible={isModalVisible}
@@ -186,7 +197,7 @@ row[day] = timeSlot ? timeSlot.employees : [];
             <Select placeholder="Select time slot">
               {timeSlots.map((slot) => (
                 <Option key={`${slot.start} - ${slot.end}`} value={`${slot.start} - ${slot.end}`}>
-{slot.start} - {slot.end}
+                  {slot.start} - {slot.end}
                 </Option>
               ))}
             </Select>

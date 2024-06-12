@@ -1,5 +1,5 @@
 
-import { Row, Col, Typography } from 'antd';
+import { Row, Col, Typography, Image } from 'antd';
 
 const { Title, Paragraph } = Typography;
 
@@ -11,7 +11,7 @@ const Welcome = () => {
           <Col xs={24} md={12}>
             <div className="flex justify-center">
               <div className="w-full">
-                <img src="/src/assets/image/Team.jpg" alt=" " className="w-full h-auto" />
+                <Image src="/src/assets/image/Team.jpg" alt=" " className="w-full h-auto" />
               </div>
             </div>
           </Col>

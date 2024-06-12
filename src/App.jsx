@@ -32,10 +32,7 @@ import SchedulePage from './pages/SchedulePage'
 import ProdutcDetailPage from './pages/ProdutcDetailPage'
 import PetBooking from './pages/PetBooking'
 
-
 function App() {
-
-
   return (
     <>
     <Routes>

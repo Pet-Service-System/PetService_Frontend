@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message } from "antd";
+import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid } from "antd";
 import { FcCheckmark } from "react-icons/fc";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import { getTransactionHistory } from "../../apis/ApiTransaction";
 
 const { Text } = Typography;
 const { Sider } = Layout;
+const { useBreakpoint } = Grid;
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
@@ -14,9 +15,11 @@ const TransactionHistory = () => {
   const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
   const [isReviewing, setIsReviewing] = useState(false);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
+  const screens = useBreakpoint();
 
   useEffect(() => {
     getTransactionHistory().then((data) => {
@@ -63,10 +66,6 @@ const TransactionHistory = () => {
     setIsReviewing(false);
     setReviewText('');
     message.success('Đánh giá của bạn đã được gửi thành công');
-  };
-
-  const formatDate = (date) => {
-    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
   };
 
   const columns = [
@@ -117,37 +116,55 @@ const TransactionHistory = () => {
     },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('account_id');
+    localStorage.removeItem('fullname');
+    localStorage.removeItem('email'); 
+    localStorage.removeItem('user'); 
+    setRole('Guest');
+    navigate('/');
+    window.location.reload();
+  };
+
   return (
     <Layout style={{ minHeight: '80vh' }}>
-      <Sider width={220}>
-        <div className="logo" />
-        <Menu theme="dark" mode="inline">
-          <Menu.Item
-            key="profile"
-            icon={<UserOutlined />}
-            onClick={() => navigate('/user-profile')}
-          >
-            Thông tin người dùng
-          </Menu.Item>
-          <Menu.Item
-            key="pet-list"
-            icon={<UnorderedListOutlined />}
-            onClick={() => navigate('/pet-list')}
-          >
-            Danh sách thú cưng
-          </Menu.Item>
-          <Menu.Item
-            key="transaction-history"
-            icon={<HistoryOutlined />}
-            onClick={() => navigate('/transaction-history')}
-          >
-            Lịch sử giao dịch
-          </Menu.Item>
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => navigate('/')}>
-            Đăng xuất
-          </Menu.Item>
-        </Menu>
-      </Sider>
+      {!screens.xs && (
+        <Sider width={220}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline">
+            <Menu.Item
+              key="profile"
+              icon={<UserOutlined />}
+              onClick={() => navigate('/user-profile')}
+            >
+              Thông tin người dùng
+            </Menu.Item>
+            {role === 'Customer' && (
+              <>
+                <Menu.Item
+                  key="pet-list"
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => navigate('/pet-list')}
+                >
+                  Danh sách thú cưng
+                </Menu.Item>
+                <Menu.Item
+                  key="transaction-history"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate('/transaction-history')}
+                >
+                  Lịch sử giao dịch
+                </Menu.Item>
+              </>
+            )}
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              Đăng xuất
+            </Menu.Item>
+          </Menu>
+        </Sider>
+      )}
       <Layout style={{ padding: '0 24px 24px' }}>
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử giao dịch</h2>
