@@ -20,10 +20,26 @@ const RegisterForm = () => {
   const validate = () => {
     const newErrors = {};
     if (!fullname) newErrors.fullname = 'Fullname is required';
+    //Validate Information
+    // if (!formData.fullname) {
+    //   newErrors.fullname = 'Họ và tên là bắt buộc';
+    // } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
+    //   newErrors.fullname = 'Họ và tên không được chứa ký tự đặc biệt';
+    // }
     if (!email) newErrors.email = 'Email is required';
+    // if (!formData.email) {
+    //   newErrors.email = 'Email là bắt buộc';
+    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    //   newErrors.email = 'Email không hợp lệ';
+    // }
     if (!password) newErrors.password = 'Password is required';
     if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     if (!phoneNumber) newErrors.phoneNumber = 'Phone number is required';
+    // if (!formData.phoneNumber) {
+    //   newErrors.phone = 'Số điện thoại là bắt buộc';
+    // } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
+    //   newErrors.phone = 'Số điện thoại phải chứa đúng 10 chữ số';
+    // }
     if (!address) newErrors.address = 'Address is required';
     return newErrors;
   };
@@ -33,15 +49,15 @@ const RegisterForm = () => {
     if (disableRegister) {
       timer = setTimeout(() => {
         setDisableRegister(false);
-      }, 1000); 
+      }, 1000);
     }
-  
+
     return () => clearTimeout(timer);
   }, [disableRegister]);
 
   const handleSubmit = async () => {
     if (disableRegister) return; // Nếu đang trong quá trình vô hiệu hóa, không thực hiện gì
-  
+
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
@@ -55,7 +71,7 @@ const RegisterForm = () => {
           status: 'active', // Assuming default status is 'active'
           role: 'Customer', // Assuming default role is 'customer'
         });
-  
+
         // Hiển thị thông báo thành công và chuyển trang sau 2 giây
         message.success('Registration successful', 2).then(() => {
           navigate('/login');
@@ -158,9 +174,9 @@ const RegisterForm = () => {
               />
             </Form.Item>
             <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableRegister}>
-              {disableRegister ? 'Đang đăng ký...' : 'Đăng ký'}
-            </Button> {/* Sử dụng disableLogin để vô hiệu hóa nút */}
+              <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableRegister}>
+                {disableRegister ? 'Đang đăng ký...' : 'Đăng ký'}
+              </Button> {/* Sử dụng disableLogin để vô hiệu hóa nút */}
             </Form.Item>
           </Form>
           <div className="text-center mt-4">
