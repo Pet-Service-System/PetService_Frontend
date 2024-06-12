@@ -16,6 +16,7 @@ const Banner = () => {
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
+  console.log(token)
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
