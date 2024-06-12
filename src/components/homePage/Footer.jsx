@@ -16,7 +16,7 @@ const Footer = () => {
                 Pet Service ra đời với mong muốn mang lại cho khách hàng sự chuyên nghiệp, uy tín mang nét đẹp hoa mỹ mà chúng tôi đem lại sự trải nghiệm tốt nhất cho thú cưng của chúng ta. Với nhiều năm kinh nghiệm trong ngành dịch vụ thú cưng bao gồm: Spa thú cưng, Khách sạn thú cưng, Dịch vụ thú cưng tại nhà,…
               </p>
               <p className="text-base md:text-lg lg:text-xl">Contact us : (+00) 123 234</p>
-              <p className="text-base md:text-lg lg:text-xl">Email: petservicemanagement@gmail.com</p>
+              <p className="text-base md:text-lg lg:text-xl">Email: petservicesswp391@gmail.com</p>
             </div>
             <div>
               <h3 className="text-lg md:text-xl font-semibold mb-4">Địa chỉ</h3>

@@ -6,7 +6,7 @@ const ForCatProductDetailPage = () => {
   return (
     <div>
         <Banner/>
-        <ProductDetail type='cat'/>
+        <ProductDetail/>
         <Footer/>
     </div>
   )

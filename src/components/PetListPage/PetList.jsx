@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal, Skeleton } from 'antd';
+import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal, Spin, Grid } from 'antd';
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios'; // Import axios for making API calls
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 const PetList = () => {
   const navigate = useNavigate();
@@ -19,9 +20,11 @@ const PetList = () => {
   const [editForm] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [operationLoading, setOperationLoading] = useState(false);
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const genders = ['Đực', 'Cái'];
   const user = JSON.parse(localStorage.getItem('user'));
   const accountID = user.id;
+  const screens = useBreakpoint();
 
   const fetchPets = async () => {
     setLoading(true);
@@ -45,7 +48,6 @@ const PetList = () => {
     setLoading(false);
   };
 
-  // Fetch pets from the server
   useEffect(() => {
     fetchPets();
   }, []);
@@ -181,45 +183,73 @@ const PetList = () => {
     },
   ];
 
-  const handleMenuClick = (key) => {
-    if (key === 'logout') {
-      navigate('/');
-    } else {
-      navigate(`/${key}`);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('account_id');
+    localStorage.removeItem('fullname');
+    localStorage.removeItem('email'); 
+    localStorage.removeItem('user'); 
+    setRole('Guest');
+    navigate('/');
+    window.location.reload();
   };
 
   return (
-    <Layout style={{ minHeight: '80vh' }}>
-      <Sider width={220}>
-        <div className="logo" />
-        <Menu theme="dark" mode="inline" onClick={({ key }) => handleMenuClick(key)}>
-          <Menu.Item key="user-profile" icon={<UserOutlined />}>
-            Thông tin người dùng
-          </Menu.Item>
-          <Menu.Item key="pet-list" icon={<UnorderedListOutlined />}>
-            Danh sách thú cưng
-          </Menu.Item>
-          <Menu.Item key="transaction-history" icon={<HistoryOutlined />}>
-            Lịch sử giao dịch
-          </Menu.Item>
-          <Menu.Item key="logout" icon={<LogoutOutlined />}>
-            Đăng xuất
-          </Menu.Item>
-        </Menu>
-      </Sider>
+    <Layout className="min-h-screen">
+      {!screens.xs && (
+        <Sider width={220}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline">
+            <Menu.Item
+              key="profile"
+              icon={<UserOutlined />}
+              onClick={() => navigate('/user-profile')}
+            >
+              Thông tin người dùng
+            </Menu.Item>
+            {role === 'Customer' && (
+              <>
+                <Menu.Item
+                  key="pet-list"
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => navigate('/pet-list')}
+                >
+                  Danh sách thú cưng
+                </Menu.Item>
+                <Menu.Item
+                  key="transaction-history"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate('/transaction-history')}
+                >
+                  Lịch sử giao dịch
+                </Menu.Item>
+              </>
+            )}
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              Đăng xuất
+            </Menu.Item>
+          </Menu>
+        </Sider>
+      )}
       <Layout>
-        <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
-          <Title level={2} style={{ margin: '16px 0' }} className="text-center">
-            Danh sách thú cưng
-          </Title>
-          <Skeleton loading={loading} active>
-            <Table columns={columns} dataSource={pets} rowKey="PetID" pagination={false} />
-          </Skeleton>
-          <div className="flex justify-end mt-4">
-            <Button type="primary" onClick={() => setIsAddModalVisible(true)} loading={operationLoading}>
-              Thêm thú cưng
-            </Button>
+        <Content className="m-4 p-6 bg-white">
+          <div className="flex flex-col items-center">
+            <Title level={2} className="my-4">
+              Danh sách thú cưng
+            </Title>
+            {loading ? (
+              <Spin size="large" />
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <Table columns={columns} dataSource={pets} rowKey="PetID" pagination={false} />
+              </div>
+            )}
+            <div className="flex justify-end w-full mt-4">
+              <Button type="primary" onClick={() => setIsAddModalVisible(true)} loading={operationLoading}>
+                Thêm thú cưng
+              </Button>
+            </div>
           </div>
 
           <Modal

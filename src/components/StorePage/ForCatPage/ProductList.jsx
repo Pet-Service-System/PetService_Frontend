@@ -206,27 +206,29 @@ const ProductList = () => {
   ];
   console.log(productData)
   return (
-    <div className="p-24">
+    <div className="p-10">
       <Title level={1} className='text-center'>Product for cats</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
             <Table
-              dataSource={productData}
-              columns={columns}
-              rowKey="ProductID"
-              pagination={false}
-              loading={loading}
+               dataSource={productData}
+               columns={columns}
+               rowKey="ProductID"
+               pagination={false}
+               loading={loading}
+               bordered
+               scroll={{ x: 'max-content' }}
             />
-            <div style={{ textAlign: 'right', marginTop: '16px' }}>
+                        <div className="flex justify-end mt-4">
               <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
             </div>
           </>
         ) : (
-          <div className="card-container" style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {loading ? (
               Array.from({ length: 4 }).map((_, index) => (
-                <Card key={index} style={{ width: 240, margin: '16px' }}>
+                <Card key={index} style={{ width: 240 }}>
                   <Skeleton.Image style={{ width: 240, height: 150 }} />
                   <Skeleton active />
                 </Card>
@@ -236,7 +238,7 @@ const ProductList = () => {
                 <Card
                   key={product.ProductID}
                   hoverable
-                  className="w-72 mx-4 my-6 bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
+                  className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleProductClick(product.ProductID)}
                 >
                   <img 
@@ -354,3 +356,4 @@ const ProductList = () => {
 };
 
 export default ProductList;
+

@@ -203,8 +203,8 @@ const ServiceList = () => {
   ];
 
   return (
-    <div className="p-24">
-      <Title level={1} className='text-center'>Pet Services</Title>
+    <div className="p-10">
+      <Title level={1} className="text-center">Services</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -214,16 +214,18 @@ const ServiceList = () => {
               rowKey="ServiceID"
               pagination={false}
               loading={loading}
+              bordered
+              scroll={{ x: 'max-content' }}
             />
-            <div style={{ textAlign: 'right', marginTop: '16px' }}>
+            <div className="flex justify-end mt-4">
               <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Service</Button>
             </div>
           </>
         ) : (
-          <div className="card-container" style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {loading ? (
               Array.from({ length: 4 }).map((_, index) => (
-                <Card key={index} style={{ width: 240, margin: '16px' }}>
+                <Card key={index} style={{ width: 240 }}>
                   <Skeleton.Image style={{ width: 240, height: 150 }} />
                   <Skeleton active />
                 </Card>
@@ -233,122 +235,121 @@ const ServiceList = () => {
                 <Card
                   key={service.ServiceID}
                   hoverable
-                  className="w-72 mx-4 my-6 bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
-                  onClick={() => handleServiceClick(service.ServiceID)}
+                  className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
+                  onClick={() => handleEditClick(service.ServiceID)}
                 >
                   <img 
                     alt={service.ServiceName} 
                     src={service.ImageURL} 
                     className="rounded-t-lg w-full h-44 object-cover" 
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold">{service.ServiceName}</h3>
-                      <p className="text-gray-600 mt-2">${service.Price.toFixed(2)}</p>
-                      <p className="text-gray-700 mt-2">{service.Description}</p>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          )}
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold">{service.ServiceName}</h3>
+                    <p className="text-gray-600 mt-2">${service.Price.toFixed(2)}</p>
+                    <p className="text-gray-700 mt-2">{service.Description}</p>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        )}
+      </Form>
+
+      <Modal
+        title="Add New Service"
+        visible={addMode}
+        onCancel={handleCancelAdd}
+        footer={[
+          <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
+        ]}
+        style={{ textAlign: 'center' }}
+      >
+        <Form form={form} className="text-left">
+          <Form.Item
+            name="ServiceName"
+            rules={[{ required: true, message: 'Please enter the service name!' }]}
+          >
+            <Input placeholder="Service Name" />
+          </Form.Item>
+          <Form.Item
+            name="Price"
+            rules={[{ required: true, message: 'Please enter the service price!' }]}
+          >
+            <Input placeholder="Price" />
+          </Form.Item>
+          <Form.Item
+            name="Description"
+            rules={[{ required: true, message: 'Please enter the service description' }]}
+          >
+            <Input placeholder="Description" />
+          </Form.Item>
+          <Form.Item
+            name="ImageURL"
+            rules={[{ required: true, message: 'Please upload the service image!' }]}
+          >
+            <Input placeholder="Image URL" />
+          </Form.Item>
+          <Form.Item
+            name="Status"
+            rules={[{ required: true, message: 'Please select the service status!' }]}
+          >
+            <Select placeholder="Select Status">
+              <Option value="Available">Available</Option>
+              <Option value="Unavailable">Unavailable</Option>
+            </Select>
+          </Form.Item>
         </Form>
-  
-        <Modal
-          title="Add New Service"
-          visible={addMode}
-          onCancel={handleCancelAdd}
-          footer={[
-            <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
-            <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
-          ]}
-          style={{ textAlign: 'center' }}
-        >
-          <Form form={form} className='text-left'>
-            <Form.Item
-              name="ServiceName"
-              rules={[{ required: true, message: 'Please enter the service name!' }]}
-            >
-              <Input placeholder="Service Name" />
-            </Form.Item>
-            <Form.Item
-              name="Price"
-              rules={[{ required: true, message: 'Please enter the service price!' }]}
-            >
-              <Input placeholder="Price" />
-            </Form.Item>
-            <Form.Item
-              name="Description"
-              rules={[{ required: true, message: 'Please enter the service description' }]}
-            >
-              <Input placeholder="Description" />
-            </Form.Item>
-            <Form.Item
-              name="ImageURL"
-              rules={[{ required: true, message: 'Please enter the service image URL!' }]}
-            >
-              <Input placeholder="Image URL" />
-            </Form.Item>
-            <Form.Item
-              name="Status"
-              rules={[{ required: true, message: 'Please select the service status!' }]}
-            >
-              <Select placeholder="Select Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
-          </Form>
-        </Modal>
-  
-        <Modal
-          title="Edit Service"
-          visible={editMode !== null}
-          onCancel={handleCancelEdit}
-          footer={[
-            <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
-            <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
-          ]}
-          style={{ textAlign: 'center' }}
-        >
-          <Form form={form} className='text-left'>
-            <Form.Item
-              name="ServiceName"
-              rules={[{ required: true, message: 'Please enter the service name!' }]}
-            >
-              <Input placeholder="Service Name" />
-            </Form.Item>
-            <Form.Item
-              name="Price"
-              rules={[{ required: true, message: 'Please enter the service price!' }]}
-            >
-              <Input placeholder="Price" />
-            </Form.Item>
-            <Form.Item
-              name="Description"
-              rules={[{ required: true, message: 'Please enter the service description' }]}
-            >
-              <Input placeholder="Description" />
-            </Form.Item>
-            <Form.Item
-              name="ImageURL"
-              rules={[{ required: true, message: 'Please enter the service image URL!' }]}
-            >
-              <Input placeholder="Image URL" />
-            </Form.Item>
-            <Form.Item
-              name="Status"
-              rules={[{ required: true, message: 'Please select the service status!' }]}
-            >
-              <Select placeholder="Select Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
-          </Form>
-        </Modal>
-      </div>
-    );
-  };
-  
-  export default ServiceList;
-  
+      </Modal>
+
+      <Modal
+        title="Edit Service"
+        visible={editMode !== null}
+        onCancel={handleCancelEdit}
+        footer={[
+          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
+        ]}
+        style={{ textAlign: 'center' }}
+      >
+        <Form form={form} className="text-left">
+          <Form.Item
+            name="ServiceName"
+            rules={[{ required: true, message: 'Please enter the service name!' }]}
+          >
+            <Input placeholder="Service Name" />
+          </Form.Item>
+          <Form.Item
+            name="Price"
+            rules={[{ required: true, message: 'Please enter the service price!' }]}
+          >
+            <Input placeholder="Price" />
+          </Form.Item>
+          <Form.Item
+            name="Description"
+            rules={[{ required: true, message: 'Please enter the service description' }]}
+          >
+            <Input placeholder="Description" />
+          </Form.Item>
+          <Form.Item
+            name="ImageURL"
+            rules={[{ required: true, message: 'Please upload the service image!' }]}
+          >
+            <Input placeholder="Image URL" />
+          </Form.Item>
+          <Form.Item
+            name="Status"
+            rules={[{ required: true, message: 'Please select the service status!' }]}
+          >
+            <Select placeholder="Select Status">
+              <Option value="Available">Available</Option>
+              <Option value="Unavailable">Unavailable</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default ServiceList;

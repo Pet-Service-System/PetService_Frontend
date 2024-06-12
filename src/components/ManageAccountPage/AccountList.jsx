@@ -121,7 +121,7 @@ const AccountList = () => {
         <span style={{ color: status === 1 ? 'green' : 'red' }}>
           {status === 1 ? 'Active' : 'Inactive'}
         </span>
-      ), // Hiển thị giá trị 'Active' hoặc 'Inactive'
+      ), // Display 'Active' or 'Inactive'
     },
     {
       title: 'Actions',
@@ -138,15 +138,17 @@ const AccountList = () => {
   ];
 
   return (
-    <div className="p-36">
+    <div className="p-4 sm:p-8">
       <Title level={2}>Account List</Title>
       <Form form={form}>
         <Table
           dataSource={loading ? [] : accountData}
           columns={columns}
+          bordered
           rowKey="account_id"
           pagination={false}
           loading={loading}
+          scroll={{ x: 'max-content' }}
         />
         {loading && <Skeleton active />}
       </Form>
@@ -161,7 +163,7 @@ const AccountList = () => {
         ]}
       >
         <Form form={form}>
-          {/* Các trường dữ liệu */}
+          {/* Fields */}
           <Form.Item
             name="fullname"
             rules={[{ required: true, message: 'Please enter the fullname!' }]}
@@ -191,7 +193,7 @@ const AccountList = () => {
             rules={[{ required: true, message: 'Please select the role!' }]}
           >
             <Select placeholder="Select Role">
-              {/* Tùy chọn cho vai trò */}
+              {/* Options for roles */}
               <Option value="Customer">Customer</Option>
               <Option value="Sale Staff">Sale Staff</Option>
               <Option value="Caretaker Staff">Caretaker Staff</Option>
@@ -204,7 +206,7 @@ const AccountList = () => {
             rules={[{ required: true, message: 'Please select the status!' }]}
           >
             <Select placeholder="Select Status">
-              {/* Tùy chọn cho trạng thái */}
+              {/* Options for status */}
               <Option value={1}>Active</Option>
               <Option value={0}>Inactive</Option>
             </Select>
@@ -216,4 +218,3 @@ const AccountList = () => {
 };
 
 export default AccountList;
-

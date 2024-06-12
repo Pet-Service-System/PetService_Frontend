@@ -31,10 +31,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
 import ProdutcDetailPage from './pages/ProdutcDetailPage'
 
-
 function App() {
-
-
   return (
     <>
     <Routes>

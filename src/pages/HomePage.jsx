@@ -5,11 +5,9 @@ import Welcome from '../components/HomePage/Welcome';
 
 const HomePage = () => {
   return (
-    <div className='min-h-screen flex flex-col'>
+    <div >
         <Banner />
-        <div className='flex-grow'>
-          <Welcome />
-        </div>
+        <Welcome />
         <Footer />
     </div>
   );

@@ -8,7 +8,7 @@ const ForDogProductDetailPage = () => {
     return (
       <div>
           <Banner/>
-          <ProductDetail type='dog'/>
+          <ProductDetail/>
           <Footer/>
       </div>
     )

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Typography, Button, Form, Input, message, Grid } from 'antd';
+import { Layout, Menu, Typography, Button, Form, Input, message, Grid, Skeleton } from 'antd';
 import axios from 'axios';
 import {
   UserOutlined,
@@ -19,17 +19,24 @@ const UserProfile = () => {
   const [errors, setErrors] = useState({});
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const screens = useBreakpoint();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (!storedUser) {
-      navigate('/');
-    } else {
-      setUser(storedUser);
-      setFormData({ ...storedUser });
-    }
+    const fetchUserData = async () => {
+      setLoading(true);
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (!storedUser) {
+        navigate('/');
+      } else {
+        setUser(storedUser);
+        setFormData({ ...storedUser });
+      }
+      setLoading(false);
+    };
+
+    fetchUserData();
   }, []);
 
   const handleUpdateInfo = () => {
@@ -150,7 +157,9 @@ const UserProfile = () => {
             <Title level={2} className="text-center">
               Thông tin người dùng
             </Title>
-            {isEditMode ? (
+            {loading ? (
+              <Skeleton active />
+            ) : isEditMode ? (
               <Form layout="vertical">
                 <Form.Item label="Họ và tên" validateStatus={errors.fullname && "error"} help={errors.fullname}>
                   <Input
