@@ -71,7 +71,9 @@ const UserProfile = () => {
       setUser(updatedData);
       setIsEditMode(false);
       setErrors({});
-      message.success('Thông tin đã được cập nhật');
+      message.success('Thông tin đã được cập nhật', 1).then(() => {
+        window.location.reload()
+      })
     } catch (error) {
       console.error('Failed to update account:', error);
       message.error('Cập nhật thông tin thất bại. Vui lòng thử lại.');
