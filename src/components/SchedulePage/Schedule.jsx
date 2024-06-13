@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Typography, Button, Modal, Form, Select, Skeleton, message } from 'antd';
+import { Table, Typography, Alert, Button, Modal, Form, Select } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [error, setError] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     const fetchSchedules = async () => {
-      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          message.error('Authorization token not found. Please log in.');
+          setError('Authorization token not found. Please log in.');
           return;
         }
 
@@ -32,9 +32,8 @@ const Schedule = () => {
         setSchedules(response.data);
       } catch (error) {
         console.error('Error fetching schedules:', error);
-        message.error('Error fetching schedules');
+        setError('Error fetching schedules');
       }
-      setLoading(false);
     };
 
     fetchSchedules();
@@ -42,7 +41,6 @@ const Schedule = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      setLoading(true);
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:3001/api/accounts/role', {
@@ -54,9 +52,8 @@ const Schedule = () => {
         setUsers(response.data.accounts);
       } catch (error) {
         console.error('Error fetching users:', error);
-        message.error('Error fetching users');
+        setError('Error fetching users');
       }
-      setLoading(false);
     };
 
     fetchUsers();
@@ -103,7 +100,7 @@ const Schedule = () => {
         const timeSlot = schedule.slots.find((s) => s.start_time === slot.start && s.end_time === slot.end);
         row[day] = timeSlot ? timeSlot.employees : [];
       } else {
-        row[day] = [];
+row[day] = [];
       }
     });
     return row;
@@ -113,14 +110,13 @@ const Schedule = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        setError('Authorization token not found. Please log in.');
         return;
       }
 
       const { day, timeSlot, fullname } = values;
       const [start_time, end_time] = timeSlot.split(' - ');
-      const accountId = selectedUser ? selectedUser.account_id : null;
-      const role = selectedUser ? selectedUser.role : null;
+      const accountId = selectedUser ? selectedUser.AccountID : null;
 
       await axios.post(
         'http://localhost:3001/api/schedules/assign',
@@ -138,6 +134,7 @@ const Schedule = () => {
         }
       );
 
+      // Refetch schedules after successful assignment
       const response = await axios.get('http://localhost:3001/api/schedules', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,36 +144,29 @@ const Schedule = () => {
       setSchedules(response.data);
       setIsModalVisible(false);
       form.resetFields();
-      message.success('Employee scheduled successfully');
     } catch (error) {
       console.error('Error scheduling employee:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error('Error scheduling employee');
-      }
+      setError('Error scheduling employee');
     }
   };
 
   const handleFullnameChange = (value) => {
     const user = users.find((user) => user.fullname === value);
     setSelectedUser(user);
-    form.setFieldsValue({ account_id: user ? user.account_id : '' });
+    setRole(user ? user.role : '');
+    form.setFieldsValue({ AccountID: user ? user.AccountID : '', role: user ? user.role : '' });
   };
 
   return (
     <div className="w-11/12 mx-auto mt-12 py-10">
+      {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
       </Title>
       <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
         Schedule Employee
       </Button>
-      {loading ? (
-        <Skeleton active paragraph={{ rows: 10 }} />
-      ) : (
-        <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
-      )}
+      <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
       <Modal
         title="Schedule Employee"
         visible={isModalVisible}
@@ -200,20 +190,20 @@ const Schedule = () => {
                   {slot.start} - {slot.end}
                 </Option>
               ))}
-            </Select>
+</Select>
           </Form.Item>
           <Form.Item name="fullname" label="Full Name" rules={[{ required: true, message: 'Please select a full name' }]}>
             <Select placeholder="Select full name" onChange={handleFullnameChange}>
               {users.map((user) => (
-                <Option key={user.account_id} value={user.fullname}>
+                <Option key={user.AccountID} value={user.fullname}>
                   {user.fullname}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="account_id" label="Account ID">
+          <Form.Item name="role" label="Role">
             <Select disabled>
-              <Option value={selectedUser ? selectedUser.account_id : ''}>{selectedUser ? selectedUser.account_id : ''}</Option>
+              <Option value={role}>{role}</Option>
             </Select>
           </Form.Item>
           <Form.Item>

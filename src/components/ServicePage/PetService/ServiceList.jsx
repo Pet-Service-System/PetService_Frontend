@@ -236,7 +236,7 @@ const ServiceList = () => {
                   key={service.ServiceID}
                   hoverable
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
-                  onClick={() => handleEditClick(service.ServiceID)}
+                  onClick={() => handleServiceClick(service.ServiceID)}
                 >
                   <img 
                     alt={service.ServiceName} 

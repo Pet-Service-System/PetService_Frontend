@@ -15,8 +15,7 @@ import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
 import { Route, Routes } from 'react-router-dom'
 import PetListPage from './pages/PetListPage'
-import TransactionHistoryPage from './pages/TransactionHistoryPage'
-import TransactionDetailPage from './pages/TransactionDetailPage'
+import OrderHistoryPage from './pages/OrderHistoryPage'
 import CartPage from './pages/CartPage'
 import PaymentPage from './pages/PaymentPage'
 import ManageAccountPage from './pages/ManageAccountPage'
@@ -50,8 +49,7 @@ function App() {
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
       <Route path='/product-detail/:id' element={<ProdutcDetailPage/>}/>
       <Route path='/pet-list' element={<PetListPage/>}/>
-      <Route path='/transaction-history' element={<TransactionHistoryPage/>}/>
-      <Route path='/transaction-detail/:id' element={<TransactionDetailPage/>}/>
+      <Route path='/orders-history' element={<OrderHistoryPage/>}/>
       <Route path='/pet-service-detail/:id' element={<PetServiceDetailPage/>}/>
       <Route path='/hotel-service-detail/:id' element={<HotelServiceDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>

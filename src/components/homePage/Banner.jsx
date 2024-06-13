@@ -16,7 +16,6 @@ const Banner = () => {
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
-  console.log(token)
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -24,7 +23,7 @@ const Banner = () => {
 
   const checkTokenValidity = async () => {
     if (!token) {
-      return; // No token found, allow guest to browse
+      return;
     }
 
     try {
@@ -92,7 +91,7 @@ const Banner = () => {
     { key: 'profile', icon: <UserOutlined />, label: 'Thông tin người dùng', onClick: () => navigate('/user-profile') },
     ...(role === 'Customer' ? [
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
-      { key: 'transaction-history', icon: <HistoryOutlined />, label: 'Lịch sử giao dịch', onClick: () => navigate('/transaction-history') },
+      { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
   ];

@@ -1,4 +1,4 @@
-import { Table, InputNumber, Button, Typography, Card } from 'antd';
+import { Table, InputNumber, Button, Typography, Card, Image } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +10,7 @@ const Cart = () => {
 
     // Calculate the total amount of the cart
     const totalAmount = shoppingCart.reduce((total, item) => {
-        return total + item.Price * item.quantity; // Use 'Price' property for price calculation
+        return total + item.Price * item.quantity; 
     }, 0);
 
     const columns = [
@@ -26,11 +26,14 @@ const Cart = () => {
             key: 'ProductName',
             render: (text, record) => (
                 <div className="flex items-center">
-                    <div
-                        className="w-20 h-20 bg-cover bg-center rounded mr-4"
-                        style={{ backgroundImage: `url(${record.ImageURL})` }}
-                    ></div>
-                    <span className="text-xl font-semibold">{text}</span>
+                    <div>
+                        <Image
+                            src={record.ImageURL}
+                            alt={record.ProductName}
+                            width={80}
+                        />
+                        <span className="text-xl font-semibold">{text}</span><br />
+                    </div>
                 </div>
             ),
         },
@@ -58,7 +61,6 @@ const Cart = () => {
             key: 'action',
             render: (text, record) => (
                 <Button
-                    type="primary"
                     danger
                     onClick={() => handleRemoveItem(record.ProductID)}
                 >
@@ -87,9 +89,6 @@ const Cart = () => {
                 <div className="mt-8 flex justify-end items-center">
                     <Text className="text-2xl text-green-600 font-bold mr-4">Tổng tiền: ${totalAmount.toFixed(2)}</Text>
                     <Button type="primary" 
-                            className="bg-orange-500 
-                                       hover:bg-orange-700 
-                                       text-white font-bold py-2 px-4 rounded"
                             onClick={() => navigate('/payment')}>
                         Thanh toán
                     </Button>

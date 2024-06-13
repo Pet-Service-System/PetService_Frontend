@@ -22,7 +22,6 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const screens = useBreakpoint();
-
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
@@ -146,11 +145,11 @@ const UserProfile = () => {
                   Danh sách thú cưng
                 </Menu.Item>
                 <Menu.Item
-                  key="transaction-history"
+                  key="orders-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/transaction-history')}
+                  onClick={() => navigate('/orders-history')}
                 >
-                  Lịch sử giao dịch
+                  Lịch sử đặt hàng
                 </Menu.Item>
               </>
             )}

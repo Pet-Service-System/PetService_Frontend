@@ -9,7 +9,7 @@ const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
-const TransactionHistory = () => {
+const OrderHistory = () => {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
@@ -151,11 +151,11 @@ const TransactionHistory = () => {
                   Danh sách thú cưng
                 </Menu.Item>
                 <Menu.Item
-                  key="transaction-history"
+                  key="orders-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/transaction-history')}
+                  onClick={() => navigate('/orders-history')}
                 >
-                  Lịch sử giao dịch
+                  Lịch sử đặt hàng
                 </Menu.Item>
               </>
             )}
@@ -167,7 +167,7 @@ const TransactionHistory = () => {
       )}
       <Layout style={{ padding: '0 24px 24px' }}>
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử giao dịch</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
           <Button onClick={handleSortOrder} className="mb-4">
             Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
           </Button>
@@ -205,4 +205,4 @@ const TransactionHistory = () => {
   );
 }
 
-export default TransactionHistory;
+export default OrderHistory;
