@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Typography, Alert, Button, Modal, Form, Select } from 'antd';
+import { Table, Typography, Alert, Button, Modal, Form, Select, message } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -146,7 +146,11 @@ row[day] = [];
       form.resetFields();
     } catch (error) {
       console.error('Error scheduling employee:', error);
-      setError('Error scheduling employee');
+      if (error.response && error.response.data && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error('Error scheduling employee');
+      }
     }
   };
 
@@ -159,7 +163,6 @@ row[day] = [];
 
   return (
     <div className="w-11/12 mx-auto mt-12 py-10">
-      {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
       </Title>

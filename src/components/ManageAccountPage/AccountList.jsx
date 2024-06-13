@@ -33,7 +33,7 @@ const AccountList = () => {
   }, []);
 
   const handleEditClick = (record) => {
-    setEditMode(record.account_id);
+    setEditMode(record.AccountID);
     form.setFieldsValue({
       fullname: record.fullname,
       email: record.email,
@@ -52,6 +52,7 @@ const AccountList = () => {
 
   const handleSaveEdit = async (id) => {
     try {
+      console.log(id)
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
@@ -67,6 +68,8 @@ const AccountList = () => {
         role: values.role,
         status: values.status
       };
+
+      console.log(updatedAccount)
 
       await axios.patch(`http://localhost:3001/api/accounts/${id}`, updatedAccount, {
         headers: {
@@ -206,7 +209,6 @@ const AccountList = () => {
             rules={[{ required: true, message: 'Please select the status!' }]}
           >
             <Select placeholder="Select Status">
-              {/* Options for status */}
               <Option value={1}>Active</Option>
               <Option value={0}>Inactive</Option>
             </Select>
