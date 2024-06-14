@@ -93,14 +93,16 @@ const Banner = () => {
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
       { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
       {
-        key: 'service-history',
+        key: 'pet-service-history',
+        label: 'Dịch vụ thú cưng',
         icon: <HistoryOutlined />,
-        label: 'Lịch sử dịch vụ',
         onClick: () => navigate('/pet-service-history'),
-        children: [
-          { key: 'pet-service-history', label: 'Dịch vụ thú cưng', onClick: () => navigate('/pet-service-history') },
-          { key: 'hotel-service-history', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-service-history') },
-        ],
+      },
+      {
+        key: 'hotel-service-history',
+        label: 'Dịch vụ khách sạn',
+        icon: <HistoryOutlined />,
+        onClick: () => navigate('/hotel-service-history'),
       },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
