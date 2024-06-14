@@ -215,7 +215,6 @@ const ProductList = () => {
                dataSource={productData}
                columns={columns}
                rowKey="ProductID"
-               pagination={false}
                loading={loading}
                bordered
                scroll={{ x: 'max-content' }}

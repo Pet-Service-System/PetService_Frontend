@@ -28,7 +28,7 @@ const getTransactionHistory = async () => {
 
 const OrderHistory = () => {
   const navigate = useNavigate();
-  const [transactions, setTransactions] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
   const [isReviewing, setIsReviewing] = useState(false);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
@@ -50,7 +50,7 @@ const OrderHistory = () => {
       const sortedData = sortOrder === 'desc' 
         ? formattedData.sort((a, b) => b.date - a.date) 
         : formattedData.sort((a, b) => a.date - b.date);
-      setTransactions(sortedData); // Sắp xếp theo ngày
+      setOrders(sortedData); // Sắp xếp theo ngày
     }).catch(error => {
       console.error('Error processing transaction history:', error);
     });
@@ -201,13 +201,14 @@ setIsReviewSuccess(true);
       )}
       <Layout style={{ padding: '0 24px 24px' }}>
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-<h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
+        <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
           <Button onClick={handleSortOrder} className="mb-4">
             Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
           </Button>
           <Table
             columns={columns}
-            dataSource={transactions}
+            dataSource={orders}
+            scroll={{ x: 'max-content' }}
             rowKey="id"
           />
           <Modal

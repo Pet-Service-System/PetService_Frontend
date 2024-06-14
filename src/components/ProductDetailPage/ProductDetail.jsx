@@ -46,6 +46,7 @@ const ProductDetail = () => {
             const productWithQuantity = { ...productData, quantity };
             handleAddItem(productWithQuantity);
         }
+        message.success('Product added to cart successfully');
     };
 
     const handleChangeQuantity = (value) => {
@@ -102,8 +103,8 @@ const ProductDetail = () => {
     if (loading) {
         return <Skeleton active />;
     }
-    const petTypeID = productData.PetTypeId
-    console.log(petTypeID)
+    const PetTypeID = productData.PetTypeID
+    console.log(PetTypeID)
     return (
         productData && (
             <div>
@@ -113,9 +114,9 @@ const ProductDetail = () => {
                             <Link to="/">Trang chủ</Link>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
-                            {petTypeID === 'PT001' ? (
+                            {PetTypeID === 'PT001' ? (
                                 <Link to="/for-dog-products">Sản phẩm cho chó</Link>
-                            ) : petTypeID === 'PT002' ? (
+                            ) : PetTypeID === 'PT002' ? (
                                 <Link to="/for-cat-products">Sản phẩm cho mèo</Link>
                             ) : (
                                 <Link to="/for-other-products">Danh sách sản phẩm</Link>
@@ -180,7 +181,7 @@ const ProductDetail = () => {
 
                         {userRole === 'Guest' || userRole === 'Customer' ? (
                             <>
-                                <div className="flex items-center mb-6">
+                                <div className="flex items-center mb-6 p-14">
                                     <Button onClick={handleDecrease}>-</Button>
                                     <Input
                                         value={quantity}

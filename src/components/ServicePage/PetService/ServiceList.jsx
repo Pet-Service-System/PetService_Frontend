@@ -204,7 +204,7 @@ const ServiceList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className="text-center">Services</Title>
+      <Title level={1} className="text-center">Pet Services</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -212,7 +212,6 @@ const ServiceList = () => {
               dataSource={serviceData}
               columns={columns}
               rowKey="ServiceID"
-              pagination={false}
               loading={loading}
               bordered
               scroll={{ x: 'max-content' }}

@@ -93,16 +93,14 @@ const Banner = () => {
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
       { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
       {
-        key: 'service-booking',
-        label: 'Dịch vụ thú cưng',
+        key: 'service-history',
         icon: <HistoryOutlined />,
-        onClick: () => navigate('/service-booking'),
-      },
-      {
-        key: 'hotel-booking',
-        label: 'Dịch vụ khách sạn',
-        icon: <HistoryOutlined />,
-        onClick: () => navigate('/hotel-booking'),
+        label: 'Lịch sử dịch vụ',
+        onClick: () => navigate('/pet-service-history'),
+        children: [
+          { key: 'pet-service-history', label: 'Dịch vụ thú cưng', onClick: () => navigate('/pet-service-history') },
+          { key: 'hotel-service-history', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-service-history') },
+        ],
       },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
@@ -206,11 +204,14 @@ const Banner = () => {
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
             <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-              {userMenuItems.map(item => (
-                <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-                  {item.label}
-                </Menu.Item>
-              ))}
+              <Menu.Item onClick={() =>{navigate('/user-profile')}}>Thông tin người dùng</Menu.Item>
+              <Menu.Item onClick={() =>{navigate('/pet-list')}}>Danh sách thú cưng</Menu.Item>
+              <Menu.Item onClick={() =>{navigate('/orders-history')}}>Lịch sử đặt hàng</Menu.Item>
+              <Menu.SubMenu title="Lịch sử dịch vụ">
+                <Menu.Item onClick={() =>{navigate('/service-booking')}}>Dịch vụ thú cưng</Menu.Item>
+                <Menu.Item onClick={() =>{navigate('/hotel-booking')}}>Dịch vụ khách sạn</Menu.Item>
+              </Menu.SubMenu>
+              <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>
             </Menu.SubMenu>
           </>
         )}
