@@ -96,10 +96,9 @@ const Banner = () => {
         key: 'service-history',
         icon: <HistoryOutlined />,
         label: 'Lịch sử dịch vụ',
-        onClick: () => navigate('/pet-service-history'),
         children: [
-          { key: 'pet-service-history', label: 'Dịch vụ thú cưng', onClick: () => navigate('/pet-service-history') },
-          { key: 'hotel-service-history', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-service-history') },
+          { key: 'service-booking', label: 'Dịch vụ thú cưng', onClick: () => navigate('/service-booking') },
+          { key: 'hotel-booking', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-booking') },
         ],
       },
     ] : []),

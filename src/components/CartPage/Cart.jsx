@@ -87,7 +87,7 @@ const Cart = () => {
       </Card>
       {shoppingCart.length > 0 && (
         <div className="mt-8 flex justify-end items-center">
-          <Text className="text-2xl text-green-600 font-bold mr-4">
+          <Text className="text-2xl text-green-600 mr-4">
             Tổng tiền: ${totalAmount.toFixed(2)}
           </Text>
           <Button type="primary" onClick={() => navigate('/payment')}>
