@@ -68,22 +68,68 @@ const Schedule = () => {
   ];
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
+  const handleRemoveEmployee = async (day, slot, employee) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Authorization token not found. Please log in.');
+        return;
+      }
+
+      await axios.post(
+        'http://localhost:3001/api/schedules/remove',
+        {
+          day,
+          start_time: slot.start,
+          end_time: slot.end,
+          accountId: employee.AccountID,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Refetch schedules after successful removal
+      const response = await axios.get('http://localhost:3001/api/schedules', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      message.success('Xóa lịch cho nhân viên thành công.')
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Error removing employee:', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error('Error removing employee');
+      }
+    }
+  };
+
   const columns = [
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
+      fixed: 'left', 
       render: (text) => <strong>{text}</strong>,
+      className: 'sticky left-0 bg-white',
     },
     ...days.map((day) => ({
       title: day,
       dataIndex: day,
       key: day,
-      render: (text) =>
+      render: (text, record) =>
         text && text.length > 0 ? (
           text.map((employee, index) => (
-            <div key={index}>
-              {employee.fullname} ({employee.role})
+            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>{employee.fullname} ({employee.role})</div>
+              <Button type="link" onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
+                Remove
+              </Button>
             </div>
           ))
         ) : (
@@ -100,7 +146,7 @@ const Schedule = () => {
         const timeSlot = schedule.slots.find((s) => s.start_time === slot.start && s.end_time === slot.end);
         row[day] = timeSlot ? timeSlot.employees : [];
       } else {
-row[day] = [];
+        row[day] = [];
       }
     });
     return row;
@@ -140,7 +186,7 @@ row[day] = [];
           Authorization: `Bearer ${token}`,
         },
       });
-
+      message.success('Lập lịch cho nhân viên thành công.')
       setSchedules(response.data);
       setIsModalVisible(false);
       form.resetFields();
@@ -169,6 +215,7 @@ row[day] = [];
       <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
         Schedule Employee
       </Button>
+      {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
       <Modal
         title="Schedule Employee"
@@ -193,7 +240,7 @@ row[day] = [];
                   {slot.start} - {slot.end}
                 </Option>
               ))}
-</Select>
+            </Select>
           </Form.Item>
           <Form.Item name="fullname" label="Full Name" rules={[{ required: true, message: 'Please select a full name' }]}>
             <Select placeholder="Select full name" onChange={handleFullnameChange}>
