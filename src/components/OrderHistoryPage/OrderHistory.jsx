@@ -126,7 +126,7 @@ setIsReviewSuccess(true);
       title: 'Chi tiết',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/transaction-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/order-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
     {
@@ -184,10 +184,10 @@ setIsReviewSuccess(true);
                   icon={<HistoryOutlined />}
                   title="Lịch sử dịch vụ"
                 >
-                  <Menu.Item key="pet-service-history" onClick={() => navigate('/pet-service-history')}>
+                  <Menu.Item key="service-booking" onClick={() => navigate('/service-booking')}>
                     Dịch vụ thú cưng
                   </Menu.Item>
-                  <Menu.Item key="hotel-service-history" onClick={() => navigate('/hotel-service-history')}>
+                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
                     Dịch vụ khách sạn
                   </Menu.Item>
                 </SubMenu>

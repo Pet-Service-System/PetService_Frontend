@@ -12,7 +12,7 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token] = useState(localStorage.getItem('token'));
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
@@ -93,16 +93,16 @@ const Banner = () => {
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
       { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
       {
-        key: 'pet-service-history',
+        key: 'service-booking',
         label: 'Dịch vụ thú cưng',
         icon: <HistoryOutlined />,
-        onClick: () => navigate('/pet-service-history'),
+        onClick: () => navigate('/service-booking'),
       },
       {
-        key: 'hotel-service-history',
+        key: 'hotel-booking',
         label: 'Dịch vụ khách sạn',
         icon: <HistoryOutlined />,
-        onClick: () => navigate('/hotel-service-history'),
+        onClick: () => navigate('/hotel-booking'),
       },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }

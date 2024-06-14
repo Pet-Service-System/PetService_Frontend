@@ -30,8 +30,11 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
 import ProdutcDetailPage from './pages/ProdutcDetailPage'
 import PetBooking from './pages/PetBooking'
-import PetServiceHistoryPage from './pages/PetServiceHistoryPage'
-import HotelServiceHistoryPage from './pages/HotelServiceHistoryPage'
+import ServiceBookingPage from './pages/ServiceBookingPage'
+import HotelBookingPage from './pages/HotelBookingPage'
+import OrderDetailPage from './pages/OrderDetailPage'
+import ServiceBookingDetailPage from './pages/ServiceBookingDetailPage'
+import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
 
 function App() {
   return (
@@ -63,8 +66,11 @@ function App() {
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
       <Route path='/pet-booking' element={<PetBooking/>}/>
-      <Route path='/pet-service-history' element={<PetServiceHistoryPage/>}/>
-      <Route path='/hotel-service-history' element={<HotelServiceHistoryPage/>}/>
+      <Route path='/service-booking' element={<ServiceBookingPage/>}/>
+      <Route path='/hotel-booking' element={<HotelBookingPage/>}/>
+      <Route path='/order-detail/:id' element={<OrderDetailPage/>}/>
+      <Route path='/service-booking-detail/:id' element={<ServiceBookingDetailPage/>}/>
+      <Route path='/hotel-booking-detail/:id' element={<HotelBookingDetailPage/>}/>
     </Routes>
     </>
   )
