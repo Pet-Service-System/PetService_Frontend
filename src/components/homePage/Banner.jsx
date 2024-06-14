@@ -30,7 +30,7 @@ const Banner = () => {
       const response = await fetch('http://localhost:3001/api/auth/check-token', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}` // Assuming token is defined in your component's state
+          'Authorization': `Bearer ${token}`
         }
       });
       if (response.ok) {

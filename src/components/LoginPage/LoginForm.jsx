@@ -49,7 +49,7 @@ const LoginForm = () => {
         console.log('Login successful', response.data.user);
   
         // Hiển thị thông báo thành công và chuyển trang sau 2 giây
-        message.success('Bạn đã đăng nhập thành công!', 0.1).then(() => {
+        message.success('Bạn đã đăng nhập thành công!', 1).then(() => {
           navigate('/');
         });
         setDisableLogin(true); 
