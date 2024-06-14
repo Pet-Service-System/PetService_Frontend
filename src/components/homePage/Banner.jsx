@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
 import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import useShopping from '../../hook/useShopping';
+import SubMenu from 'antd/es/menu/SubMenu';
 
 const { Header } = Layout;
 
@@ -11,7 +12,7 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [token, setToken] = useState(localStorage.getItem('token'))
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
@@ -44,7 +45,7 @@ const Banner = () => {
           localStorage.clear();
           setRole('Guest');
           setUser(null);
-          navigate('/login')
+          navigate('/login');
           // Inform the user
           alert('Your session has expired. Please log in again.');
         } else {
@@ -57,7 +58,6 @@ const Banner = () => {
       // Handle error
     }
   };
-  
 
   useEffect(() => {
     checkTokenValidity();
@@ -84,7 +84,7 @@ const Banner = () => {
     localStorage.clear();
     setRole('Guest');
     setUser(null);
-    navigate('/')
+    navigate('/');
   };
 
   const userMenuItems = [
@@ -92,6 +92,16 @@ const Banner = () => {
     ...(role === 'Customer' ? [
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
       { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
+      {
+        key: 'service-history',
+        icon: <HistoryOutlined />,
+        label: 'Lịch sử dịch vụ',
+        onClick: () => navigate('/pet-service-history'),
+        children: [
+          { key: 'pet-service-history', label: 'Dịch vụ thú cưng', onClick: () => navigate('/pet-service-history') },
+          { key: 'hotel-service-history', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-service-history') },
+        ],
+      },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
   ];
@@ -99,9 +109,19 @@ const Banner = () => {
   const renderUserMenu = () => (
     <Menu>
       {userMenuItems.map(item => (
-        <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
-          {item.label}
-        </Menu.Item>
+        item.children ? (
+          <SubMenu key={item.key} icon={item.icon} title={item.label}>
+            {item.children.map(child => (
+              <Menu.Item key={child.key} onClick={child.onClick}>
+                {child.label}
+              </Menu.Item>
+            ))}
+          </SubMenu>
+        ) : (
+          <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
+            {item.label}
+          </Menu.Item>
+        )
       ))}
     </Menu>
   );
@@ -240,7 +260,6 @@ const Banner = () => {
                     <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
-
                   </>
                 )}
                 {role !== 'Guest' && (

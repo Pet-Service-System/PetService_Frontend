@@ -1,7 +1,7 @@
 
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
-import OrderHistory from '../components/OrderHistoryPage/OrderHistoryPage'
+import OrderHistory from '../components/OrderHistoryPage/OrderHistory'
 
 const OrderHistoryPage = () => {
   return (

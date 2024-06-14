@@ -8,6 +8,7 @@ import {
   HistoryOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import SubMenu from 'antd/es/menu/SubMenu';
 
 const { Title } = Typography;
 const { Sider, Content } = Layout;
@@ -151,6 +152,18 @@ const UserProfile = () => {
                 >
                   Lịch sử đặt hàng
                 </Menu.Item>
+                <SubMenu
+                  key="service-history"
+                  icon={<HistoryOutlined />}
+                  title="Lịch sử dịch vụ"
+                >
+                  <Menu.Item key="pet-service-history" onClick={() => navigate('/pet-service-history')}>
+                    Dịch vụ thú cưng
+                  </Menu.Item>
+                  <Menu.Item key="hotel-service-history" onClick={() => navigate('/hotel-service-history')}>
+                    Dịch vụ khách sạn
+                  </Menu.Item>
+                </SubMenu>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>

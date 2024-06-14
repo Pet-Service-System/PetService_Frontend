@@ -4,6 +4,7 @@ import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, G
 import { FcCheckmark } from "react-icons/fc";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import SubMenu from "antd/es/menu/SubMenu";
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -25,7 +26,7 @@ const getTransactionHistory = async () => {
   }
 };
 
-const OrderHistory = () => {
+const HotelServiceHistory = () => {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
@@ -178,6 +179,18 @@ setIsReviewSuccess(true);
                 >
                   Lịch sử đặt hàng
                 </Menu.Item>
+                <SubMenu
+                  key="service-history"
+                  icon={<HistoryOutlined />}
+                  title="Lịch sử dịch vụ"
+                >
+                  <Menu.Item key="pet-service-history" onClick={() => navigate('/pet-service-history')}>
+                    Dịch vụ thú cưng
+                  </Menu.Item>
+                  <Menu.Item key="hotel-service-history" onClick={() => navigate('/hotel-service-history')}>
+                    Dịch vụ khách sạn
+                  </Menu.Item>
+                </SubMenu>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
@@ -226,4 +239,4 @@ setIsReviewSuccess(true);
   );
 }
 
-export default OrderHistory;
+export default HotelServiceHistory;

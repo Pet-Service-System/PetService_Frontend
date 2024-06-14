@@ -30,6 +30,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
 import ProdutcDetailPage from './pages/ProdutcDetailPage'
 import PetBooking from './pages/PetBooking'
+import PetServiceHistoryPage from './pages/PetServiceHistoryPage'
+import HotelServiceHistoryPage from './pages/HotelServiceHistoryPage'
 
 function App() {
   return (
@@ -61,6 +63,8 @@ function App() {
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
       <Route path='/pet-booking' element={<PetBooking/>}/>
+      <Route path='/pet-service-history' element={<PetServiceHistoryPage/>}/>
+      <Route path='/hotel-service-history' element={<HotelServiceHistoryPage/>}/>
     </Routes>
     </>
   )
