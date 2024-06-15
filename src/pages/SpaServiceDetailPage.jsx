@@ -1,8 +1,8 @@
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
-import ServiceDetail from '../components/ServiceDetailPage/ServiceDetail';
+import ServiceDetail from '../components/SpaServiceDetailPage/SpaServiceDetail';
 
-const PetServiceDetailPage = () => {
+const SpaServiceDetailPage = () => {
     
     return (
       <div>
@@ -13,4 +13,4 @@ const PetServiceDetailPage = () => {
     )
 }
 
-export default PetServiceDetailPage
+export default SpaServiceDetailPage

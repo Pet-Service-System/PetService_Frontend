@@ -1,16 +1,16 @@
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
-import ServiceList from '../components/ServicePage/PetService/ServiceList'
+import SpaServiceList from '../components/ServicePage/SpaService/SpaServiceList'
 
 
-const PetServicePage = () => {
+const SpaServicePage = () => {
   return (
     <div>
         <Banner/>
-        <ServiceList/>
+        <SpaServiceList/>
         <Footer/>
     </div>
   )
 }
 
-export default PetServicePage
+export default SpaServicePage

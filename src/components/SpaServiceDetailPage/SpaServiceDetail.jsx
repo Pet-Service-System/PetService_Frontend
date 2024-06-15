@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select } from 'antd';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
-const ServiceDetail = () => {
+const SpaServiceDetail = () => {
     const { id } = useParams();
     const [serviceData, setServiceData] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const userRole = localStorage.getItem('role') || 'Guest';
+    const navigate = useNavigate()
 
     const fetchServiceDetail = async () => {
         try {
@@ -170,4 +171,4 @@ const ServiceDetail = () => {
     );
 };
 
-export default ServiceDetail;
+export default SpaServiceDetail;

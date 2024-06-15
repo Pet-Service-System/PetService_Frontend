@@ -26,7 +26,7 @@ const getTransactionHistory = async () => {
   }
 };
 
-const ServiceBooking = () => {
+const SpaBooking = () => {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
@@ -126,7 +126,7 @@ setIsReviewSuccess(true);
       title: 'Chi tiết',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/service-booking/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
     {
@@ -239,4 +239,4 @@ setIsReviewSuccess(true);
   );
 }
 
-export default ServiceBooking;
+export default SpaBooking;

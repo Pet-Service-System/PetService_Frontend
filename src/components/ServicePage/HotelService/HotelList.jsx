@@ -31,7 +31,7 @@ const HotelList = () => {
   }, []);
 
   const handleServiceClick = (id) => {
-    navigate(`/pet-service-detail/${id}`)
+    navigate(`/hotel-service-detail/${id}`)
   };
 
   const handleEditClick = (record) => {

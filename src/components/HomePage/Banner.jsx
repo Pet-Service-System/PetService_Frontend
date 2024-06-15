@@ -97,7 +97,7 @@ const Banner = () => {
         icon: <HistoryOutlined />,
         label: 'Lịch sử dịch vụ',
         children: [
-          { key: 'service-booking', label: 'Dịch vụ thú cưng', onClick: () => navigate('/service-booking') },
+          { key: 'spa-booking', label: 'Dịch vụ thú cưng', onClick: () => navigate('/spa-booking') },
           { key: 'hotel-booking', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-booking') },
         ],
       },
@@ -132,8 +132,8 @@ const Banner = () => {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
@@ -142,8 +142,8 @@ const Banner = () => {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
@@ -152,8 +152,8 @@ const Banner = () => {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
@@ -161,8 +161,8 @@ const Banner = () => {
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
-        { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
-        { key: 'pet-hotel', label: 'Khách sạn thú cưng', path: '/pet-hotel', parent: 'DỊCH VỤ' },
+        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
         { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
@@ -207,7 +207,7 @@ const Banner = () => {
               <Menu.Item onClick={() =>{navigate('/pet-list')}}>Danh sách thú cưng</Menu.Item>
               <Menu.Item onClick={() =>{navigate('/orders-history')}}>Lịch sử đặt hàng</Menu.Item>
               <Menu.SubMenu title="Lịch sử dịch vụ">
-                <Menu.Item onClick={() =>{navigate('/service-booking')}}>Dịch vụ thú cưng</Menu.Item>
+                <Menu.Item onClick={() =>{navigate('/spa-booking')}}>Dịch vụ thú cưng</Menu.Item>
                 <Menu.Item onClick={() =>{navigate('/hotel-booking')}}>Dịch vụ khách sạn</Menu.Item>
               </Menu.SubMenu>
               <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>

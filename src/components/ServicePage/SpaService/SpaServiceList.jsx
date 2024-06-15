@@ -6,7 +6,7 @@ import axios from 'axios';
 const { Title } = Typography;
 const { Option } = Select;
 
-const ServiceList = () => {
+const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
@@ -31,7 +31,7 @@ const ServiceList = () => {
   }, []);
 
   const handleServiceClick = (id) => {
-    navigate(`/pet-service-detail/${id}`)
+    navigate(`/spa-service-detail/${id}`)
   };
 
   const handleEditClick = (record) => {
@@ -351,4 +351,4 @@ const ServiceList = () => {
   );
 };
 
-export default ServiceList;
+export default SpaServiceList;
