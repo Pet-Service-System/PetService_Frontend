@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid } from "antd";
+import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
 import { FcCheckmark } from "react-icons/fc";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -10,7 +10,7 @@ const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
-const getTransactionHistory = async () => {
+const getOrderHistory = async () => {
   const token = localStorage.getItem('token');
   try {
     const response = await axios.get('http://localhost:3001/api/orders', {
@@ -21,7 +21,7 @@ const getTransactionHistory = async () => {
     console.log('Fetched data:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching transaction history:', error);
+    console.error('Error fetching order history:', error);
     throw error;
   }
 };
@@ -32,29 +32,38 @@ const OrderHistory = () => {
   const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
   const [isReviewing, setIsReviewing] = useState(false);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
-  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
+  const [loading, setLoading] = useState(false); // State for loading indicator
   const screens = useBreakpoint();
 
   useEffect(() => {
-    getTransactionHistory().then((data) => {
-      const formattedData = data.map(transaction => ({
-        id: transaction.OrderID,
-        date: new Date(transaction.OrderDate),
-        description: transaction.Address,
-        amount: transaction.OrderDetails[0].TotalPrice,
-        status: transaction.Status
+    fetchOrderHistory();
+  }, [sortOrder]);
+
+  const fetchOrderHistory = async () => {
+    setLoading(true); // Start loading indicator
+    try {
+      const data = await getOrderHistory();
+      const formattedData = data.map(order => ({
+        id: order.OrderID,
+        date: new Date(order.OrderDate),
+        description: order.Address,
+        amount: order.OrderDetails[0].TotalPrice,
+        status: order.Status
       }));
       const sortedData = sortOrder === 'desc' 
         ? formattedData.sort((a, b) => b.date - a.date) 
         : formattedData.sort((a, b) => a.date - b.date);
       setOrders(sortedData); // Sắp xếp theo ngày
-    }).catch(error => {
-      console.error('Error processing transaction history:', error);
-    });
-  }, [sortOrder]); // Chạy lại khi sortOrder thay đổi
+    } catch (error) {
+      console.error('Error fetching order history:', error);
+    } finally {
+      setLoading(false); // Stop loading indicator
+    }
+  };
 
   useEffect(() => {
     let timeout;
@@ -84,7 +93,7 @@ const OrderHistory = () => {
     }
 
     // Xử lý gửi đánh giá ở đây
-setIsReviewSuccess(true);
+    setIsReviewSuccess(true);
     setIsReviewing(false);
     setReviewText('');
     message.success('Đánh giá của bạn đã được gửi thành công');
@@ -143,8 +152,8 @@ setIsReviewSuccess(true);
     localStorage.removeItem('role');
     localStorage.removeItem('account_id');
     localStorage.removeItem('fullname');
-    localStorage.removeItem('email'); 
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('email');
+    localStorage.removeItem('user');
     setRole('Guest');
     navigate('/');
     window.location.reload();
@@ -184,8 +193,8 @@ setIsReviewSuccess(true);
                   icon={<HistoryOutlined />}
                   title="Lịch sử dịch vụ"
                 >
-                  <Menu.Item key="service-booking" onClick={() => navigate('/service-booking')}>
-                    Dịch vụ thú cưng
+                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
+                    Dịch vụ spa
                   </Menu.Item>
                   <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
                     Dịch vụ khách sạn
@@ -199,18 +208,20 @@ setIsReviewSuccess(true);
           </Menu>
         </Sider>
       )}
-      <Layout style={{ padding: '0 24px 24px' }}>
+      <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-        <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
           <Button onClick={handleSortOrder} className="mb-4">
             Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
           </Button>
-          <Table
-            columns={columns}
-            dataSource={orders}
-            scroll={{ x: 'max-content' }}
-            rowKey="id"
-          />
+          <Spin spinning={loading}>
+            <Table
+              columns={columns}
+              dataSource={orders}
+              scroll={{ x: 'max-content' }}
+              rowKey="id"
+            />
+          </Spin>
           <Modal
             title={`Đánh giá giao dịch #${reviewTransactionId}`}
             visible={isReviewing}
@@ -238,6 +249,6 @@ setIsReviewSuccess(true);
       </Layout>
     </Layout>
   );
-}
+};
 
 export default OrderHistory;

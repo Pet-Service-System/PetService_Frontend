@@ -1,28 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Radio, Button, Form, Typography, Alert } from 'antd';
 
 const { Title, Text } = Typography;
 
-const PaymentMethod = () => {
+const Payment = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
-  const [form] = Form.useForm();
+  const [orderDetails, setOrderDetails] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    totalAmount: 0,
+    cartItems: [],
+  });
   const navigate = useNavigate();
 
-  const orderDetails = {
-    orderId: '123456',
-    name: 'Nguyen Van A',
-    address: '123 Main St, City, Country',
-    phone: '0123456789',
-    totalAmount: 850,
-  };
+  useEffect(() => {
+    // Lấy thông tin người dùng từ localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setOrderDetails((prevOrderDetails) => ({
+        ...prevOrderDetails,
+        name: user.fullName,
+        address: user.address,
+        phone: user.phone,
+      }));
+    }
+
+    // Tính tổng tiền từ giỏ hàng
+    const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    const totalAmount = shoppingCart.reduce((total, item) => {
+      return total + item.Price * item.quantity;
+    }, 0);
+
+    // Cập nhật thông tin giỏ hàng để hiển thị
+    setOrderDetails((prevOrderDetails) => ({
+      ...prevOrderDetails,
+      totalAmount: totalAmount,
+      cartItems: shoppingCart,
+    }));
+  }, []);
 
   const handlePayment = (values) => {
     if (!selectedPaymentMethod) {
-      Alert.error('Please select a payment method.');
+      Alert.error('Vui lòng chọn phương thức thanh toán.');
       return;
     }
-    Alert.success(`Order ID: ${orderDetails.orderId}, Payment Method: ${selectedPaymentMethod}, Total Amount: ${orderDetails.totalAmount}`);
+    // Xử lý thanh toán và hiển thị thông tin đơn hàng
+    Alert.success(`Đơn hàng đã được thanh toán thành công.`);
+    // Sau khi thanh toán thành công, có thể xử lý lưu đơn hàng vào cơ sở dữ liệu MongoDB (sử dụng Mongoose).
   };
 
   const handleCancel = () => {
@@ -33,11 +59,8 @@ const PaymentMethod = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-10">
       <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md">
         <Title level={2} className="text-red-500 text-center mb-6">Phương thức thanh toán</Title>
-        <Form form={form} onFinish={handlePayment}>
+        <Form onFinish={handlePayment}>
           <div className="mb-4">
-            <div className="mb-2">
-              <Text strong>Mã đơn hàng:</Text> {orderDetails.orderId}
-            </div>
             <div className="mb-2">
               <Text strong>Họ tên:</Text> {orderDetails.name}
             </div>
@@ -48,8 +71,16 @@ const PaymentMethod = () => {
               <Text strong>Số điện thoại:</Text> {orderDetails.phone}
             </div>
             <div className="mb-2">
-              <Text strong>Tổng tiền giỏ hàng:</Text> ${orderDetails.totalAmount}
+              <Text strong>Tổng tiền giỏ hàng:</Text> ${orderDetails.totalAmount.toFixed(2)}
             </div>
+          </div>
+          <div className="mb-4">
+            <Title level={3} className="mb-2">Danh sách sản phẩm</Title>
+            {orderDetails.cartItems.map((item, index) => (
+              <div key={index} className="mb-2">
+                <Text strong>{item.ProductName}</Text> - Số lượng: {item.quantity} - Đơn giá: ${item.Price.toFixed(2)}
+              </div>
+            ))}
           </div>
           <div className="mb-4">
             <Title level={3} className="mb-2">Chọn phương thức thanh toán</Title>
@@ -82,4 +113,4 @@ const PaymentMethod = () => {
   );
 };
 
-export default PaymentMethod;
+export default Payment;

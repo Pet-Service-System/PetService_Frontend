@@ -1,4 +1,4 @@
-import PaymentMethod from "../components/PaymentPage/PaymentMethod"
+import PaymentMethod from "../components/PaymentPage/Payment"
 import Banner from "../components/HomePage/Banner"
 import Footer from "../components/HomePage/Footer"
 

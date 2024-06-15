@@ -100,7 +100,7 @@ const Banner = () => {
         icon: <HistoryOutlined />,
         label: 'Lịch sử dịch vụ',
         children: [
-          { key: 'spa-booking', label: 'Dịch vụ thú cưng', onClick: () => navigate('/spa-booking') },
+          { key: 'spa-booking', label: 'Dịch vụ spa', onClick: () => navigate('/spa-booking') },
           { key: 'hotel-booking', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-booking') },
         ],
       },

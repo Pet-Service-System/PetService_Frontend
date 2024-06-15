@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid } from "antd";
+import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
 import { FcCheckmark } from "react-icons/fc";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -10,51 +10,60 @@ const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
-const getTransactionHistory = async () => {
+const getHotelBookings = async () => {
   const token = localStorage.getItem('token');
   try {
-    const response = await axios.get('http://localhost:3001/api/orders', {
+    const response = await axios.get('http://localhost:3001/api/Hotel-bookings', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('Fetched data:', response.data);
+    console.log('Fetched hotel bookings:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching transaction history:', error);
+    console.error('Error fetching hotel bookings:', error);
     throw error;
   }
 };
 
 const HotelBooking = () => {
   const navigate = useNavigate();
-  const [transactions, setTransactions] = useState([]);
-  const [sortOrder, setSortOrder] = useState('desc'); // Trạng thái quản lý thứ tự sắp xếp
+  const [hotelBookings, setHotelBookings] = useState([]);
+  const [sortOrder, setSortOrder] = useState('desc');
   const [isReviewing, setIsReviewing] = useState(false);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
-  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
+  const [loading, setLoading] = useState(false); // State for loading indicator
   const screens = useBreakpoint();
 
   useEffect(() => {
-    getTransactionHistory().then((data) => {
-      const formattedData = data.map(transaction => ({
-        id: transaction.OrderID,
-        date: new Date(transaction.OrderDate),
-        description: transaction.Address,
-        amount: transaction.OrderDetails[0].TotalPrice,
-        status: transaction.Status
+    fetchHotelBookings();
+  }, [sortOrder]);
+
+  const fetchHotelBookings = async () => {
+    setLoading(true); // Start loading indicator
+    try {
+      const data = await getHotelBookings();
+      const formattedData = data.map(booking => ({
+        id: booking.BookingDetailID, // Adjust as per your backend response
+        date: new Date(booking.CreateDate), // Adjust as per your backend response
+        description: booking.BookingDetails[0].HotelID, // Adjust as per your backend response
+        amount: booking.BookingDetails[0].TotalPrice, // Adjust as per your backend response
+        status: booking.Status // Adjust as per your backend response
       }));
-      const sortedData = sortOrder === 'desc' 
-        ? formattedData.sort((a, b) => b.date - a.date) 
+      const sortedData = sortOrder === 'desc'
+        ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
-      setTransactions(sortedData); // Sắp xếp theo ngày
-    }).catch(error => {
-      console.error('Error processing transaction history:', error);
-    });
-  }, [sortOrder]); // Chạy lại khi sortOrder thay đổi
+      setHotelBookings(sortedData);
+    } catch (error) {
+      console.error('Error fetching hotel bookings:', error);
+    } finally {
+      setLoading(false); // Stop loading indicator
+    }
+  };
 
   useEffect(() => {
     let timeout;
@@ -79,15 +88,15 @@ const HotelBooking = () => {
 
   const handleSubmitReview = () => {
     if (reviewText.trim() === '') {
-      setReviewError('Đánh giá không được để trống');
+      setReviewError('Review cannot be empty');
       return;
     }
 
-    // Xử lý gửi đánh giá ở đây
-setIsReviewSuccess(true);
+    // Placeholder for actual review submission logic
+    setIsReviewSuccess(true);
     setIsReviewing(false);
     setReviewText('');
-    message.success('Đánh giá của bạn đã được gửi thành công');
+    message.success('Your review has been submitted successfully');
   };
 
   const columns = [
@@ -97,20 +106,20 @@ setIsReviewSuccess(true);
       key: 'id',
     },
     {
-      title: 'Ngày',
+      title: 'Date',
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
+        <Text>{new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
       )
     },
     {
-      title: 'Mô tả',
+      title: 'Hotel ID',
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: 'Số tiền',
+      title: 'Total Price',
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
@@ -118,22 +127,22 @@ setIsReviewSuccess(true);
       )
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
     },
     {
-      title: 'Chi tiết',
+      title: 'Detail',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/hotel-booking-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/hotel-booking-detail/${record.id}`)}>Detail</Button>
       ),
     },
     {
-      title: 'Đánh giá',
+      title: 'Review',
       key: 'review',
       render: (text, record) => (
-        <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Đánh giá</Button>
+        <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Review</Button>
       ),
     },
   ];
@@ -141,10 +150,7 @@ setIsReviewSuccess(true);
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    localStorage.removeItem('account_id');
-    localStorage.removeItem('fullname');
-    localStorage.removeItem('email'); 
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('user');
     setRole('Guest');
     navigate('/');
     window.location.reload();
@@ -184,8 +190,8 @@ setIsReviewSuccess(true);
                   icon={<HistoryOutlined />}
                   title="Lịch sử dịch vụ"
                 >
-                  <Menu.Item key="service-booking" onClick={() => navigate('/service-booking')}>
-                    Dịch vụ thú cưng
+                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
+                    Dịch vụ spa
                   </Menu.Item>
                   <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
                     Dịch vụ khách sạn
@@ -199,44 +205,46 @@ setIsReviewSuccess(true);
           </Menu>
         </Sider>
       )}
-      <Layout style={{ padding: '0 24px 24px' }}>
+      <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-<h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt lịch khách sạn</h2>
           <Button onClick={handleSortOrder} className="mb-4">
-            Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
+            Sort by Date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
           </Button>
-          <Table
-            columns={columns}
-            dataSource={transactions}
-            rowKey="id"
-          />
+          <Spin spinning={loading}>
+            <Table
+              columns={columns}
+              dataSource={hotelBookings}
+              rowKey="id"
+            />
+          </Spin>
           <Modal
-            title={`Đánh giá giao dịch #${reviewTransactionId}`}
+            title={`Review Transaction #${reviewTransactionId}`}
             visible={isReviewing}
             onOk={handleSubmitReview}
             onCancel={() => setIsReviewing(false)}
           >
             <Form>
-              <Form.Item label="Đánh giá" validateStatus={reviewError ? 'error' : ''} help={reviewError}>
+              <Form.Item label="Review" validateStatus={reviewError ? 'error' : ''} help={reviewError}>
                 <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
               </Form.Item>
             </Form>
           </Modal>
           <Modal
-            title="Thông báo"
+            title="Notification"
             visible={isReviewSuccess}
             onCancel={() => setIsReviewSuccess(false)}
             footer={null}
           >
             <div className="flex justify-center items-center">
               <FcCheckmark className="text-green-500 mr-4" />
-              <span>Đánh giá của bạn đã được gửi thành công!</span>
+              <span>Your review has been submitted successfully!</span>
             </div>
           </Modal>
         </div>
       </Layout>
     </Layout>
   );
-}
+};
 
 export default HotelBooking;

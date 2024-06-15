@@ -230,8 +230,8 @@ const PetList = () => {
                   icon={<HistoryOutlined />}
                   title="Lịch sử dịch vụ"
                 >
-                  <Menu.Item key="service-booking" onClick={() => navigate('/service-booking')}>
-                    Dịch vụ thú cưng
+                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
+                    Dịch vụ spa
                   </Menu.Item>
                   <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
                     Dịch vụ khách sạn
