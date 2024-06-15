@@ -4,7 +4,8 @@ import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
 import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import useShopping from '../../hook/useShopping';
 import SubMenu from 'antd/es/menu/SubMenu';
-
+import { useDispatch } from 'react-redux';
+import { setShoppingCart } from '../../redux/shoppingCart';
 const { Header } = Layout;
 
 const Banner = () => {
@@ -17,6 +18,7 @@ const Banner = () => {
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
+  const dispatch = useDispatch()
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -43,6 +45,7 @@ const Banner = () => {
           console.error('Token is expired or invalid');
           // Perform logout
           localStorage.clear();
+          dispatch(setShoppingCart([]));
           setRole('Guest');
           setUser(null);
           navigate('/login');
@@ -55,7 +58,6 @@ const Banner = () => {
       }
     } catch (error) {
       console.error('Error checking token validity:', error);
-      // Handle error
     }
   };
 
@@ -82,6 +84,7 @@ const Banner = () => {
 
   const handleLogout = () => {
     localStorage.clear();
+    dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
     navigate('/');
