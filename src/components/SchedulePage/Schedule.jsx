@@ -12,7 +12,10 @@ const Schedule = () => {
   const [form] = Form.useForm();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [role, setRole] = useState('');
+  const [roleOfEmp, setRoleOfEmp] = useState('');
+  const [roleOfUser, setRoleOfUser] = useState(localStorage.getItem('role'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [accountID, setAccountID] = useState(user.id);
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -69,6 +72,11 @@ const Schedule = () => {
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
   const handleRemoveEmployee = async (day, slot, employee) => {
+    if (roleOfUser !== 'Store Manager') {
+      message.error('Bạn không có quyền xóa lịch của nhân viên.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -97,7 +105,7 @@ const Schedule = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      message.success('Xóa lịch cho nhân viên thành công.')
+      message.success('Xóa lịch cho nhân viên thành công.');
       setSchedules(response.data);
     } catch (error) {
       console.error('Error removing employee:', error);
@@ -114,7 +122,7 @@ const Schedule = () => {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      fixed: 'left', 
+      fixed: 'left',
       render: (text) => <strong>{text}</strong>,
       className: 'sticky left-0 bg-white',
     },
@@ -125,11 +133,17 @@ const Schedule = () => {
       render: (text, record) =>
         text && text.length > 0 ? (
           text.map((employee, index) => (
-            <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div
+              key={index}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              className={employee.AccountID === accountID ? 'bg-yellow-200' : ''}
+            >
               <div>{employee.fullname} ({employee.role})</div>
-              <Button type="link" onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
-                Remove
-              </Button>
+              {roleOfUser === 'Store Manager' && (
+                <Button type="link" onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
+                  Remove
+                </Button>
+              )}
             </div>
           ))
         ) : (
@@ -153,6 +167,11 @@ const Schedule = () => {
   });
 
   const handleSchedule = async (values) => {
+    if (roleOfUser !== 'Store Manager') {
+      message.error('Bạn không có quyền lập lịch cho nhân viên.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -171,7 +190,7 @@ const Schedule = () => {
           slots: [{ start_time, end_time }],
           accountId,
           fullname,
-          role,
+          role: roleOfEmp,
         },
         {
           headers: {
@@ -186,7 +205,7 @@ const Schedule = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      message.success('Lập lịch cho nhân viên thành công.')
+      message.success('Lập lịch cho nhân viên thành công.');
       setSchedules(response.data);
       setIsModalVisible(false);
       form.resetFields();
@@ -203,7 +222,7 @@ const Schedule = () => {
   const handleFullnameChange = (value) => {
     const user = users.find((user) => user.fullname === value);
     setSelectedUser(user);
-    setRole(user ? user.role : '');
+    setRoleOfEmp(user ? user.role : '');
     form.setFieldsValue({ AccountID: user ? user.AccountID : '', role: user ? user.role : '' });
   };
 
@@ -212,9 +231,11 @@ const Schedule = () => {
       <Title level={2} className="text-center text-red-500 mb-6">
         Lịch làm việc của nhân viên
       </Title>
-      <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
-        Schedule Employee
-      </Button>
+      {roleOfUser === 'Store Manager' && (
+        <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
+          Schedule Employee
+        </Button>
+      )}
       {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
       <Modal
@@ -253,7 +274,7 @@ const Schedule = () => {
           </Form.Item>
           <Form.Item name="role" label="Role">
             <Select disabled>
-              <Option value={role}>{role}</Option>
+              <Option value={roleOfEmp}>{roleOfEmp}</Option>
             </Select>
           </Form.Item>
           <Form.Item>

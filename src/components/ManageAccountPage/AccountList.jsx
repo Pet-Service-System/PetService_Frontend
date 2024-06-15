@@ -198,7 +198,7 @@ const AccountList = () => {
             <Select placeholder="Select Role">
               {/* Options for roles */}
               <Option value="Customer">Customer</Option>
-              <Option value="Sale Staff">Sale Staff</Option>
+              <Option value="Sales Staff">Sales Staff</Option>
               <Option value="Caretaker Staff">Caretaker Staff</Option>
               <Option value="Store Manager">Store Manager</Option>
               <Option value="Administrator">Administrator</Option>

@@ -158,7 +158,7 @@ const Banner = () => {
         { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
-    } else if (['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role)) {
+    } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'pet-service', label: 'Dịch vụ thú cưng', path: '/pet-service', parent: 'DỊCH VỤ' },
