@@ -31,7 +31,7 @@ import ProdutcDetailPage from './pages/ProdutcDetailPage'
 import PetBooking from './pages/PetBooking'
 import SpaBookingPage from './pages/SpaBookingPage'
 import HotelBookingPage from './pages/HotelBookingPage'
-import OrderDetailPage from './pages/OrderDetailPage'
+import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
 
@@ -66,7 +66,7 @@ function App() {
       <Route path='/pet-booking' element={<PetBooking/>}/>
       <Route path='/spa-booking' element={<SpaBookingPage/>}/>
       <Route path='/hotel-booking' element={<HotelBookingPage/>}/>
-      <Route path='/order-detail/:id' element={<OrderDetailPage/>}/>
+      <Route path='/orders-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
       <Route path='/hotel-booking-detail/:id' element={<HotelBookingDetailPage/>}/>
     </Routes>
