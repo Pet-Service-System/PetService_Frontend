@@ -71,7 +71,7 @@ const Cart = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-44">
+    <div className="container px-4 mt-4 mb-4">
       <Title className="text-center" level={2}>Shopping Cart</Title>
       <Card className="shadow-lg rounded-lg p-6">
         {shoppingCart.length > 0 ? (
@@ -90,7 +90,7 @@ const Cart = () => {
           <Text className="text-2xl text-green-600 mr-4">
             Tổng tiền: ${totalAmount.toFixed(2)}
           </Text>
-          <Button type="primary" onClick={() => navigate('/payment')}>
+          <Button type="primary" onClick={() => navigate('/order')}>
             Thanh toán
           </Button>
         </div>

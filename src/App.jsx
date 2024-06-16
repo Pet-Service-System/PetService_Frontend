@@ -17,7 +17,7 @@ import { Route, Routes } from 'react-router-dom'
 import PetListPage from './pages/PetListPage'
 import OrderHistoryPage from './pages/OrderHistoryPage'
 import CartPage from './pages/CartPage'
-import PaymentPage from './pages/PaymentPage'
+import OrderPage from './pages/OrderPage'
 import ManageAccountPage from './pages/ManageAccountPage'
 import BookingListPage from './pages/BookingListPage'
 import BookingDetailPage from './pages/BookingDetailPage'
@@ -56,7 +56,7 @@ function App() {
       <Route path='/orders-history' element={<OrderHistoryPage/>}/>
       <Route path='/spa-service-detail/:id' element={<SpaServiceDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
-      <Route path='/payment' element={<PaymentPage/>}/>
+      <Route path='/order' element={<OrderPage/>}/>
       <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
       <Route path='/booking-list' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
