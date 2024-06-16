@@ -35,3 +35,23 @@ export const getPetService= async()=>{
       console.log(error);
     }
   };
+
+  export const getHotels = async () => {
+    try {
+        const response = await axios.get(`http://localhost:3001/api/hotels`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching hotels:', error);
+        throw error; // Optionally handle or rethrow the error
+    }
+};
+
+export const getHotelById = async (id) => {
+    try {
+        const response = await axios.get(`http://localhost:3001/api/hotels/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching hotel with ID ${id}:`, error);
+        throw error; // Optionally handle or rethrow the error
+    }
+};

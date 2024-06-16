@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from 'react-google-login';
 
 const { Title } = Typography;
 
@@ -9,8 +10,8 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Đăng nhập
-  const [disableLogin, setDisableLogin] = useState(false); // State để điều khiển việc vô hiệu hóa nút Đăng nhập
+  const [isLoading, setIsLoading] = useState(false); // State to control the loading state of the login button
+  const [disableLogin, setDisableLogin] = useState(false); // State to control disabling the login button
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +19,7 @@ const LoginForm = () => {
     if (disableLogin) {
       timer = setTimeout(() => {
         setDisableLogin(false);
-      }, 1000); // Vô hiệu hóa trong 2 giây
+      }, 2000); // Disable for 2 seconds
     }
 
     return () => clearTimeout(timer);
@@ -32,36 +33,34 @@ const LoginForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (disableLogin) return; // Nếu đang trong quá trình vô hiệu hóa, không thực hiện gì
+    if (disableLogin) return; // Do nothing if in disable period
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
-        setIsLoading(true); // Vô hiệu hóa nút Đăng nhập
+        setIsLoading(true);
         const response = await axios.post('http://localhost:3001/api/auth/login', {
-          email: email,
-          password: password,
+          email,
+          password,
         });
         const { token, user } = response.data;
         localStorage.setItem('token', token);
         localStorage.setItem('role', user.role);
         localStorage.setItem('user', JSON.stringify(user));
-        console.log('Login successful', response.data.user);
-  
-        // Hiển thị thông báo thành công và chuyển trang sau 2 giây
-        message.success('Bạn đã đăng nhập thành công!', 1).then(() => {
+
+        message.success('Login successful!', 1).then(() => {
           navigate('/');
         });
-        setDisableLogin(true); 
+        setDisableLogin(true);
       } catch (error) {
         if (error.response) {
           message.error(error.response.data.message);
         } else {
           message.error('An error occurred');
         }
-        setDisableLogin(true); // Bắt đầu quá trình vô hiệu hóa nút Đăng nhập
+        setDisableLogin(true);
       } finally {
-        setIsLoading(false); // Enable lại nút Đăng nhập
+        setIsLoading(false);
       }
     } else {
       setErrors(validationErrors);
@@ -76,10 +75,35 @@ const LoginForm = () => {
     setPassword(event.target.value);
   };
 
+  const handleGoogleLoginSuccess = async (response) => {
+    try {
+      const { tokenId } = response;
+      const res = await axios.post('http://localhost:3001/api/auth/google', { tokenId });
+      const { token, user } = res.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', user.role);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      message.success('Google login successful!', 1).then(() => {
+        navigate('/');
+      });
+    } catch (error) {
+      if (error.response) {
+        message.error(error.response.data.message);
+      } else {
+        message.error('An error occurred');
+      }
+    }
+  };
+const handleGoogleLoginFailure = (response) => {
+    console.error('Google login failed', response);
+    message.error('Google login failed');
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-12 bg-white rounded-lg py-20">
       <div className="max-w-4xl p-12 bg-white rounded-lg shadow-lg">
-        <Title level={3} className="text-blue-500 text-center font-semibold mb-2">ĐĂNG NHẬP</Title>
+        <Title level={3} className="text-blue-500 text-center font-semibold mb-2">Login</Title>
         <Form onFinish={handleSubmit} layout="vertical">
           <Form.Item
             label="Email"
@@ -95,7 +119,7 @@ const LoginForm = () => {
             />
           </Form.Item>
           <Form.Item
-            label="Mật khẩu"
+            label="Password"
             name="password"
             rules={[{ required: true, message: 'Password is required' }]}
             validateStatus={errors.password ? 'error' : ''}
@@ -108,13 +132,22 @@ const LoginForm = () => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableLogin}>
-              {disableLogin  ? 'Đang đăng nhập...' : 'Đăng nhập'}
-            </Button> {/* Sử dụng disableLogin để vô hiệu hóa nút */}
+              {disableLogin ? 'Logging in...' : 'Login'}
+            </Button>
           </Form.Item>
         </Form>
         <div className="mt-4 flex justify-between">
-          <Button type="link" onClick={() => navigate('/register')}>Đăng kí</Button>
-          <Button type="link" onClick={() => navigate('/forgot-password')}>Quên mật khẩu</Button>
+          <Button type="link" onClick={() => navigate('/register')}>Register</Button>
+          <Button type="link" onClick={() => navigate('/forgot-password')}>Forgot Password</Button>
+        </div>
+        <div className="mt-4 flex justify-center">
+          <GoogleLogin
+            clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+            buttonText="Login with Google"
+            onSuccess={handleGoogleLoginSuccess}
+            onFailure={handleGoogleLoginFailure}
+            cookiePolicy={'single_host_origin'}
+          />
         </div>
       </div>
     </div>
