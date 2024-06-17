@@ -140,7 +140,7 @@ const handleGoogleLoginFailure = (response) => {
           <Button type="link" onClick={() => navigate('/register')}>Register</Button>
           <Button type="link" onClick={() => navigate('/forgot-password')}>Forgot Password</Button>
         </div>
-        <div className="mt-4 flex justify-center">
+        {/* <div className="mt-4 flex justify-center">
           <GoogleLogin
             clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
             buttonText="Login with Google"
@@ -148,7 +148,7 @@ const handleGoogleLoginFailure = (response) => {
             onFailure={handleGoogleLoginFailure}
             cookiePolicy={'single_host_origin'}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
