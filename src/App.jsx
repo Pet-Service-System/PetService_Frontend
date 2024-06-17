@@ -17,7 +17,7 @@ import { Route, Routes } from 'react-router-dom'
 import PetListPage from './pages/PetListPage'
 import OrderHistoryPage from './pages/OrderHistoryPage'
 import CartPage from './pages/CartPage'
-import PaymentPage from './pages/PaymentPage'
+import OrderPage from './pages/OrderPage'
 import ManageAccountPage from './pages/ManageAccountPage'
 import BookingListPage from './pages/BookingListPage'
 import BookingDetailPage from './pages/BookingDetailPage'
@@ -31,7 +31,7 @@ import ProdutcDetailPage from './pages/ProdutcDetailPage'
 import PetBooking from './pages/PetBooking'
 import SpaBookingPage from './pages/SpaBookingPage'
 import HotelBookingPage from './pages/HotelBookingPage'
-import OrderDetailPage from './pages/OrderDetailPage'
+import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
 
@@ -56,7 +56,7 @@ function App() {
       <Route path='/orders-history' element={<OrderHistoryPage/>}/>
       <Route path='/spa-service-detail/:id' element={<SpaServiceDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
-      <Route path='/payment' element={<PaymentPage/>}/>
+      <Route path='/order' element={<OrderPage/>}/>
       <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
       <Route path='/booking-list' element={<BookingListPage/>}/>
       <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
@@ -66,7 +66,7 @@ function App() {
       <Route path='/pet-booking' element={<PetBooking/>}/>
       <Route path='/spa-booking' element={<SpaBookingPage/>}/>
       <Route path='/hotel-booking' element={<HotelBookingPage/>}/>
-      <Route path='/order-detail/:id' element={<OrderDetailPage/>}/>
+      <Route path='/orders-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
       <Route path='/hotel-booking-detail/:id' element={<HotelBookingDetailPage/>}/>
     </Routes>

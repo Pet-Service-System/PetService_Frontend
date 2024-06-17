@@ -13,7 +13,7 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [token] = useState(localStorage.getItem('token'));
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
@@ -28,7 +28,6 @@ const Banner = () => {
     if (!token) {
       return;
     }
-
     try {
       const response = await fetch('http://localhost:3001/api/auth/check-token', {
         method: 'POST',
@@ -37,11 +36,9 @@ const Banner = () => {
         }
       });
       if (response.ok) {
-        // Token is valid
         console.log('Token is valid');
       } else {
         if (response.status === 401) {
-          // Token is expired or invalid
           console.error('Token is expired or invalid');
           // Perform logout
           localStorage.clear();
@@ -51,9 +48,6 @@ const Banner = () => {
           navigate('/login');
           // Inform the user
           alert('Your session has expired. Please log in again.');
-        } else {
-          // Other server errors
-          console.error('Token validation failed with status:', response.status);
         }
       }
     } catch (error) {

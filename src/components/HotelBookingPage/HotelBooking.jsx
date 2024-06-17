@@ -11,9 +11,11 @@ const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
 const getHotelBookings = async () => {
+  const user = JSON.parse(localStorage.getItem('user'))
+  const AccountID = user.id
   const token = localStorage.getItem('token');
   try {
-    const response = await axios.get('http://localhost:3001/api/Hotel-bookings', {
+    const response = await axios.get(`http://localhost:3001/api/Hotel-bookings/account/${AccountID}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
