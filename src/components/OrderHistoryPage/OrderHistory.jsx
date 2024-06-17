@@ -10,22 +10,6 @@ const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
-const getOrderHistory = async () => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get('http://localhost:3001/api/orders', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log('Fetched data:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching order history:', error);
-    throw error;
-  }
-};
-
 const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -38,6 +22,24 @@ const OrderHistory = () => {
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false); // State for loading indicator
   const screens = useBreakpoint();
+  const [user] = useState(JSON.parse(localStorage.getItem('user')))
+  const AccountID = user.id
+
+  const getOrderHistory = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/orders/account/${AccountID}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Fetched data:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order history:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     fetchOrderHistory();
