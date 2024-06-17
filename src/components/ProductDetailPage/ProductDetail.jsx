@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, message, Typography, Skeleton, Select, Breadcrumb } from 'antd';
+import { Button, Input, Image, Form, message, Typography, Skeleton, Select, Breadcrumb, List, Rate } from 'antd';
 import useShopping from '../../hook/useShopping';
 
 const { Title, Paragraph } = Typography;
@@ -10,6 +10,7 @@ const { Option } = Select;
 const ProductDetail = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
+    const [comments, setComments] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
@@ -20,7 +21,7 @@ const ProductDetail = () => {
         try {
             const response = await axios.get(`http://localhost:3001/api/products/${id}`);
             setProductData(response.data);
-            form.setFieldsValue(response.data); // Set initial form values
+            form.setFieldsValue(response.data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching product detail:', error);
@@ -28,8 +29,37 @@ const ProductDetail = () => {
             setLoading(false);
         }
     };
+
+    const fetchComments = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+    
+            const response = await axios.get(`http://localhost:3001/api/comments/product/${id}`, config);
+            if (response.data && response.data.comments[0] && response.data.comments[0].CommentDetails) {
+                const commentsData = response.data.comments[0].CommentDetails;
+                const updatedComments = await Promise.all(
+                    commentsData.map(async (comment) => {
+                        // Fetch account information for each comment
+                        const accountResponse = await axios.get(`http://localhost:3001/api/accounts/${comment.AccountID}`, config);                        const accountName = accountResponse.data.account.fullname;
+                        return { ...comment, username: accountName };
+                    })
+                );
+                setComments(updatedComments);
+            }
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            message.error('Error fetching comments');
+        }
+    };    
+    
     useEffect(() => {
         fetchProductDetail();
+        fetchComments();
     }, [id]);
 
     const handleIncrease = () => setQuantity(quantity + 1);
@@ -61,7 +91,7 @@ const ProductDetail = () => {
 
     const handleCancelEdit = async () => {
         setEditMode(false);
-        await fetchProductDetail(); // Reload product data from the database
+        await fetchProductDetail();
     };
 
     const handleSaveEdit = async (id) => {
@@ -71,8 +101,8 @@ const ProductDetail = () => {
                 message.error('Authorization token not found. Please log in.');
                 return;
             }
-    
-            const values = await form.validateFields(); // Validate form fields
+
+            const values = await form.validateFields();
             const updatedProduct = {
                 ProductName: values.ProductName,
                 Price: parseFloat(values.Price),
@@ -80,15 +110,15 @@ const ProductDetail = () => {
                 ImageURL: values.ImageURL,
                 Status: values.Status
             };
-    
+
             await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-    
+
             message.success('Product updated successfully', 0.5).then(() => {
-                window.location.reload(); // Reload the page after successful update
+                window.location.reload();
             });
         } catch (error) {
             console.error('Error updating product:', error);
@@ -103,8 +133,17 @@ const ProductDetail = () => {
     if (loading) {
         return <Skeleton active />;
     }
-    const PetTypeID = productData.PetTypeID
-    console.log(PetTypeID)
+
+    // Function to calculate average rating
+    const calculateAverageRating = (comments) => {
+        if (comments.length === 0) return 0;
+
+        const totalRating = comments.reduce((acc, curr) => acc + curr.Rating, 0);
+        return totalRating / comments.length;
+    };
+
+    
+    const PetTypeID = productData.PetTypeID;
     return (
         productData && (
             <div>
@@ -164,12 +203,12 @@ const ProductDetail = () => {
                                     name="Status"
                                     label="Status"
                                     rules={[{ required: true, message: 'Please select the service status!' }]}
-                                    >
+                                >
                                     <Select placeholder="Select Status" disabled={!editMode}>
                                         <Option value="Available">Available</Option>
                                         <Option value="Unavailable">Unavailable</Option>
                                     </Select>
-                                    </Form.Item>
+                                </Form.Item>
                             </Form>
                         ) : (
                             <div>
@@ -197,17 +236,17 @@ const ProductDetail = () => {
                                             onClick={handleAddToCart}
                                             disabled={productData.Status === 'Unavailable'}
                                     >
-                                            Thêm vào giỏ hàng
+                                        Thêm vào giỏ hàng
                                     </Button>
                                     <Button type="primary" 
                                             onClick={handleOrderNow}
                                             disabled={productData.Status === 'Unavailable'}
                                     >
-                                            Đặt ngay
+                                        Đặt ngay
                                     </Button>
                                 </div>
                                 {productData.Status === 'Unavailable' && (
-                                    <p className="text-red-500 text-right"> Sản phẩm hiện đang tạm ngừng kinh doanh hoặc đã hết hàng.</p>
+                                    <p className="text-red-500 text-right">Sản phẩm hiện đang tạm ngừng kinh doanh hoặc đã hết hàng.</p>
                                 )}
                             </>
                         ) : userRole === 'Store Manager' ? (
@@ -223,6 +262,29 @@ const ProductDetail = () => {
                             )
                         ) : null}
                     </div>
+                </div>
+                <div className="m-5 px-4 md:px-32">
+                    <Title level={4}>Đánh giá sản phẩm</Title>
+                    {comments.length > 0 && (
+                        <div>
+                            <Rate disabled allowHalf value={calculateAverageRating(comments)} />
+                            <span style={{ marginLeft: '10px' }}>
+                                {comments.length} {comments.length === 1 ? 'review' : 'reviews'}
+                            </span>
+                        </div>
+                    )}
+                    <List
+                        dataSource={comments}
+                        renderItem={(item) => (
+                            <List.Item key={item.AccountID}>
+                                <List.Item.Meta
+                                    title={item.username}  // Display username here
+                                    description={item.Comment}
+                                />
+                                <Rate disabled defaultValue={item.Rating} />
+                            </List.Item>
+                        )}
+                    />
                 </div>
             </div>
         )
