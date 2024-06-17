@@ -45,7 +45,8 @@ const ProductDetail = () => {
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
-                        const accountResponse = await axios.get(`http://localhost:3001/api/accounts/${comment.AccountID}`, config);                        const accountName = accountResponse.data.account.fullname;
+                        const accountResponse = await axios.get(`http://localhost:3001/api/accounts/${comment.AccountID}`, config);    
+                        const accountName = accountResponse.data.user.fullname;
                         return { ...comment, username: accountName };
                     })
                 );
