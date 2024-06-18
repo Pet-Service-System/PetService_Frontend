@@ -46,7 +46,6 @@ const HotelBookingDetail = () => {
   if (loading || !hotelBooking) {
     return <Spin size="large" className="flex justify-center items-center h-screen" />;
   }
-
   return (
     <div className="p-4 md:p-8 lg:p-12">
       <Button

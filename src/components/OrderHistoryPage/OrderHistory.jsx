@@ -53,7 +53,7 @@ const OrderHistory = () => {
         id: order.OrderID,
         date: new Date(order.OrderDate),
         description: order.Address,
-        amount: order.OrderDetails[0].TotalPrice,
+        amount: order.TotalPrice,
         status: order.Status
       }));
       const sortedData = sortOrder === 'desc' 
