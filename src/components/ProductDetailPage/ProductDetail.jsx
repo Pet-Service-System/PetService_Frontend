@@ -38,14 +38,13 @@ const ProductDetail = () => {
                     'Authorization': `Bearer ${token}`
                 }
             };
-    
             const response = await axios.get(`http://localhost:3001/api/comments/product/${id}`, config);
             if (response.data && response.data.comments[0] && response.data.comments[0].CommentDetails) {
                 const commentsData = response.data.comments[0].CommentDetails;
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
-                        const accountResponse = await axios.get(`http://localhost:3001/api/accounts/${comment.AccountID}`, config);    
+                        const accountResponse = await axios.get(`http://localhost:3001/api/accounts/${comment.AccountID}`, config);
                         const accountName = accountResponse.data.user.fullname;
                         return { ...comment, username: accountName };
                     })
@@ -54,10 +53,8 @@ const ProductDetail = () => {
             }
         } catch (error) {
             console.error('Error fetching comments:', error);
-            message.error('Error fetching comments');
         }
     };    
-    
     useEffect(() => {
         fetchProductDetail();
         fetchComments();

@@ -26,7 +26,7 @@ const getSpaBookings = async () => {
     console.error('Error fetching spa bookings:', error);
     throw error;
   }
-};
+}
 
 const SpaBooking = () => {
   const navigate = useNavigate();
