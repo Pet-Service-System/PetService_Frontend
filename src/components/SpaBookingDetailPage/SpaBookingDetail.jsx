@@ -1,50 +1,49 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, List, Button } from 'antd'; // Import các componess)
-import { useNavigate } from "react-router-dom";
+import { Spin, Card, Typography, List, Button} from 'antd';
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
-const getSpaBookings = async () => {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const AccountID = user.id;
+const getSpaBookingById = async (id) => {
   const token = localStorage.getItem('token');
   try {
-    const response = await axios.get(`http://localhost:3001/api/Spa-bookings/account/${AccountID}`, {
+    const response = await axios.get(`http://localhost:3001/api/spa-bookings/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data[0];
+    return response.data;
   } catch (error) {
-    console.error('Error fetching spa bookings:', error);
+    console.error('Error fetching spa booking:', error);
     throw error;
   }
 }
 
 const SpaBookingDetail = () => {
-  const [spaBookings, setSpaBookings] = useState(null);
+  const [spaBooking, setSpaBooking] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Hook useHistory từ React Router
+  const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
-    fetchSpaBookings();
-  }, []);
+    fetchSpaBooking(id);
+  }, [id]);
 
-  const fetchSpaBookings = async () => {
-    setLoading(true); // Start loading indicator
+  const fetchSpaBooking = async (id) => {
+    setLoading(true);
     try {
-      const data = await getSpaBookings();
-      setSpaBookings(data);
+      const data = await getSpaBookingById(id);
+      setSpaBooking(data);
     } catch (error) {
-      console.error('Error fetching spa bookings:', error);
+      console.error('Error fetching spa booking:', error);
     } finally {
-      setLoading(false); // Stop loading indicator
+      setLoading(false);
     }
   };
 
-  if (loading || !spaBookings) {
+  if (loading || !spaBooking) {
     return <Spin size="large" className="flex justify-center items-center h-screen" />;
   }
 
@@ -52,35 +51,37 @@ const SpaBookingDetail = () => {
     <div className="p-4 md:p-8 lg:p-12">
       <Button
         onClick={() => navigate(-1)}
-        className="mb-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
-        icon={<ArrowLeftOutlined />} 
+        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+        icon={<ArrowLeftOutlined />}
         size="large"
       >
         Quay về
       </Button>
-      <Card className="p-6 max-w-4xl mx-auto mt-10 shadow-lg rounded-lg">
-        <Title level={2} className="mb-4 text-center">Chi tiết đặt dịch vụ Spa #{spaBookings.BookingDetailID}</Title>
+      <Card className="p-10 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg ">
+        <Title level={2} className="mb-4 text-center">
+          Chi tiết đặt dịch vụ Spa #{spaBooking.BookingDetailID}
+        </Title>
         <div className="mb-4">
-          <Text strong>Ngày tạo:</Text> <Text>{new Date(spaBookings.CreateDate).toLocaleDateString()}</Text>
+          <Text strong>Ngày tạo:</Text> <Text>{new Date(spaBooking.CreateDate).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái:</Text> <Text>{spaBookings.Status}</Text>
+          <Text strong>Trạng thái:</Text> <Text>{spaBooking.Status}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Thời lượng:</Text> <Text>{spaBookings.Duration}</Text>
+          <Text strong>Thời lượng:</Text> <Text>{new Date(spaBooking.Duration).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tổng giá:</Text> <Text>${spaBookings.TotalPrice}</Text>
+          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.BookingDetails.reduce((acc, detail) => acc + detail.Price, 0)}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Dịch vụ đã đặt:</Text>
         </div>
-        
         <List
-          dataSource={spaBookings.BookingDetails}
-          renderItem={(service, index) => (
-            <List.Item key={index} className="px-4 py-2">
-              <Text>{service.ServiceName} - ${service.Price}</Text>
+          dataSource={spaBooking.BookingDetails}
+          renderItem={(detail, index) => (
+            <List.Item key={index} className="px-4 py-2 flex-row">
+              <Text>{detail.ServiceName}</Text>
+              <Text className="text-green-600">${detail.Price}</Text>
             </List.Item>
           )}
           bordered

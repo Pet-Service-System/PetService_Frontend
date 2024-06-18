@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
+import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
 import { FcCheckmark } from "react-icons/fc";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -38,7 +38,7 @@ const SpaBooking = () => {
   const [reviewError, setReviewError] = useState('');
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
-  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [loading, setLoading] = useState(false);
   const screens = useBreakpoint();
 
   useEffect(() => {
@@ -46,15 +46,15 @@ const SpaBooking = () => {
   }, [sortOrder]);
 
   const fetchSpaBookings = async () => {
-    setLoading(true); // Start loading indicator
+    setLoading(true);
     try {
       const data = await getSpaBookings();
       const formattedData = data.map(booking => ({
-        id: booking.BookingDetailID, // Adjust as per your backend response
-        date: new Date(booking.CreateDate), // Adjust as per your backend response
-        description: booking.PetID, // Adjust as per your backend response
-        amount: booking.TotalPrice, // Adjust as per your backend response
-        status: booking.Status // Adjust as per your backend response
+        id: booking.BookingDetailID,
+        date: new Date(booking.CreateDate),
+        description: booking.PetID,
+        amount: booking.TotalPrice,
+        status: booking.Status
       }));
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
@@ -63,7 +63,7 @@ const SpaBooking = () => {
     } catch (error) {
       console.error('Error fetching spa bookings:', error);
     } finally {
-      setLoading(false); // Stop loading indicator
+      setLoading(false);
     }
   };
 
@@ -94,7 +94,6 @@ const SpaBooking = () => {
       return;
     }
 
-    // Placeholder for actual review submission logic
     setIsReviewSuccess(true);
     setIsReviewing(false);
     setReviewText('');
@@ -144,7 +143,31 @@ const SpaBooking = () => {
       title: 'Đánh giá',
       key: 'review',
       render: (text, record) => (
-        <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Đánh giá</Button>
+        <>
+          <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Đánh giá</Button>
+          {isReviewing && reviewTransactionId === record.id && (
+            <div className="mt-4">
+              <Form>
+                <Form.Item
+                  label="Đánh giá"
+                  validateStatus={reviewError ? 'error' : ''}
+                  help={reviewError}
+                >
+                  <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" onClick={handleSubmitReview}>Gửi</Button>
+                </Form.Item>
+              </Form>
+              {isReviewSuccess && (
+                <div className="flex justify-center items-center mt-4">
+                  <FcCheckmark className="text-green-500 mr-2" />
+                  <span>Đánh giá của bạn đã được gửi thành công!</span>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       ),
     },
   ];
@@ -153,7 +176,7 @@ const SpaBooking = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('user');
-    setRole('Guest')
+    setRole('Guest');
     navigate('/');
     window.location.reload();
   };
@@ -214,35 +237,13 @@ const SpaBooking = () => {
             Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
           </Button>
           <Spin spinning={loading}>
-            <Table columns={columns} dataSource={spaBookings} rowKey="id" />
+            <Table
+              columns={columns}
+              dataSource={spaBookings}
+              rowKey="id"
+              scroll={{ x: '100%' }} // Enable horizontal scrolling
+            />
           </Spin>
-          <Modal
-            title={`Đánh giá giao dịch #${reviewTransactionId}`}
-            visible={isReviewing}
-            onOk={handleSubmitReview}
-            onCancel={() => setIsReviewing(false)}
-          >
-            <Form>
-              <Form.Item
-                label="Đánh giá"
-                validateStatus={reviewError ? 'error' : ''}
-                help={reviewError}
-              >
-                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-              </Form.Item>
-            </Form>
-          </Modal>
-          <Modal
-            title="Thông báo"
-            visible={isReviewSuccess}
-            onCancel={() => setIsReviewSuccess(false)}
-            footer={null}
-          >
-            <div className="flex justify-center items-center">
-              <FcCheckmark className="text-green-500 mr-4" />
-              <span>Đánh giá của bạn đã được gửi thành công!</span>
-            </div>
-          </Modal>
         </div>
       </Layout>
     </Layout>

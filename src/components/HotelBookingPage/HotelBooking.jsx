@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Modal, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
-import { FcCheckmark } from "react-icons/fc";
+import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import SubMenu from "antd/es/menu/SubMenu";
@@ -32,8 +31,6 @@ const HotelBooking = () => {
   const navigate = useNavigate();
   const [hotelBookings, setHotelBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [isReviewSuccess, setIsReviewSuccess] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
@@ -67,23 +64,12 @@ const HotelBooking = () => {
     }
   };
 
-  useEffect(() => {
-    let timeout;
-    if (isReviewSuccess) {
-      timeout = setTimeout(() => {
-        setIsReviewSuccess(false);
-      }, 2000);
-    }
-    return () => clearTimeout(timeout);
-  }, [isReviewSuccess]);
-
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
 
   const handleReviewTransaction = (id) => {
     setReviewTransactionId(id);
-    setIsReviewing(true);
     setReviewText('');
     setReviewError('');
   };
@@ -95,10 +81,8 @@ const HotelBooking = () => {
     }
 
     // Placeholder for actual review submission logic
-    setIsReviewSuccess(true);
-    setIsReviewing(false);
-    setReviewText('');
     message.success('Your review has been submitted successfully');
+    setReviewTransactionId(null); // Close the review form
   };
 
   const columns = [
@@ -144,7 +128,24 @@ const HotelBooking = () => {
       title: 'Review',
       key: 'review',
       render: (text, record) => (
-        <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Review</Button>
+        <div>
+          <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Review</Button>
+          {reviewTransactionId === record.id && (
+            <Form layout="vertical" onFinish={handleSubmitReview}>
+              <Form.Item
+                label="Review"
+                validateStatus={reviewError ? 'error' : ''}
+                help={reviewError}
+              >
+                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">Submit</Button>
+                <Button onClick={() => setReviewTransactionId(null)}>Cancel</Button>
+              </Form.Item>
+            </Form>
+          )}
+        </div>
       ),
     },
   ];
@@ -218,31 +219,9 @@ const HotelBooking = () => {
               columns={columns}
               dataSource={hotelBookings}
               rowKey="id"
+              scroll={{ x: true }}
             />
           </Spin>
-          <Modal
-            title={`Review Transaction #${reviewTransactionId}`}
-            visible={isReviewing}
-            onOk={handleSubmitReview}
-            onCancel={() => setIsReviewing(false)}
-          >
-            <Form>
-              <Form.Item label="Review" validateStatus={reviewError ? 'error' : ''} help={reviewError}>
-                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-              </Form.Item>
-            </Form>
-          </Modal>
-          <Modal
-            title="Notification"
-            visible={isReviewSuccess}
-            onCancel={() => setIsReviewSuccess(false)}
-            footer={null}
-          >
-            <div className="flex justify-center items-center">
-              <FcCheckmark className="text-green-500 mr-4" />
-              <span>Your review has been submitted successfully!</span>
-            </div>
-          </Modal>
         </div>
       </Layout>
     </Layout>
