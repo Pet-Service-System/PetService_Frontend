@@ -31,7 +31,7 @@ const HotelList = () => {
   }, []);
 
   const handleServiceClick = (id) => {
-    navigate(`/hotel-service-detail/${id}`)
+    navigate(`/hotel-booking-detail/${id}`)
   };
 
   const handleEditClick = (record) => {
