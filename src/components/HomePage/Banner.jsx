@@ -6,6 +6,8 @@ import useShopping from '../../hook/useShopping';
 import SubMenu from 'antd/es/menu/SubMenu';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
+import '../../assets/fonts/fonts.css';
+
 const { Header } = Layout;
 
 const Banner = () => {
@@ -181,7 +183,7 @@ const Banner = () => {
     }, []);
 
     return (
-      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-end bg-cyan-400'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-end bg-white'} disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>
@@ -200,12 +202,12 @@ const Banner = () => {
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
             <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-              <Menu.Item onClick={() =>{navigate('/user-profile')}}>Thông tin người dùng</Menu.Item>
-              <Menu.Item onClick={() =>{navigate('/pet-list')}}>Danh sách thú cưng</Menu.Item>
-              <Menu.Item onClick={() =>{navigate('/orders-history')}}>Lịch sử đặt hàng</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/user-profile') }}>Thông tin người dùng</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/pet-list') }}>Danh sách thú cưng</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/orders-history') }}>Lịch sử đặt hàng</Menu.Item>
               <Menu.SubMenu title="Lịch sử dịch vụ">
-                <Menu.Item onClick={() =>{navigate('/spa-booking')}}>Dịch vụ thú cưng</Menu.Item>
-                <Menu.Item onClick={() =>{navigate('/hotel-booking')}}>Dịch vụ khách sạn</Menu.Item>
+                <Menu.Item onClick={() => { navigate('/spa-booking') }}>Dịch vụ thú cưng</Menu.Item>
+                <Menu.Item onClick={() => { navigate('/hotel-booking') }}>Dịch vụ khách sạn</Menu.Item>
               </Menu.SubMenu>
               <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>
             </Menu.SubMenu>
@@ -235,10 +237,18 @@ const Banner = () => {
 
   return (
     <Layout>
-      <Header className="flex justify-between items-center bg-cyan-400 shadow-md px-4 py-2 md:px-8 md:py-4">
+      <Header className="flex justify-between items-center bg-white shadow-md px-4 py-2 md:px-8 md:py-4">
         <div className="flex items-center">
-          <img className="h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" />
-          <span className="text-4xl ml-2 px-7 cursor-pointer text-white" onClick={clickTitle}>Pet Service</span>
+          {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
+          <span
+            className="text-7xl ml-10 px-10 cursor-pointer text-black"
+            style={{ fontFamily: 'Playground' }}
+            onClick={clickTitle}
+          >
+            Pet Service
+          </span>
+
+
         </div>
         {isSmallScreen ? (
           <>
@@ -251,7 +261,7 @@ const Banner = () => {
           <div className="flex items-center">
             {renderMenuItems(false)}
             {role === 'Guest' ? (
-              <Button type="primary" onClick={handleLoginClick} className="ml-4">ĐĂNG NHẬP</Button>
+              <Button type="primary" onClick={handleLoginClick} className="ml-4 relative border-2 border-teal-600 rounded-lg px-4 py-2 inline cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0  before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">ĐĂNG NHẬP</Button>
             ) : (
               <div className="flex items-center ml-4">
                 {role === 'Customer' && (
