@@ -170,7 +170,7 @@ const Banner = () => {
 
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
-        const parent = acc.find((menu) => menu.key === item.parent);
+        const parent = acc.find(menu => menu.key === item.parent);
         if (parent) {
           parent.children.push({ key: item.key, label: item.label, onClick: () => navigate(item.path) });
         } else {
@@ -183,7 +183,7 @@ const Banner = () => {
     }, []);
 
     return (
-      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-end bg-white'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center bg-white'} disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>
@@ -247,8 +247,6 @@ const Banner = () => {
           >
             Pet Service
           </span>
-
-
         </div>
         {isSmallScreen ? (
           <>
@@ -258,12 +256,13 @@ const Banner = () => {
             </Drawer>
           </>
         ) : (
-          <div className="flex items-center">
+          <div className="flex flex-1 justify-center items-center relative">
             {renderMenuItems(false)}
-            {role === 'Guest' ? (
-              <Button type="primary" onClick={handleLoginClick} className="ml-4 relative border-2 border-teal-600 rounded-lg px-4 py-2 inline cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0  before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">ĐĂNG NHẬP</Button>
-            ) : (
-              <div className="flex items-center ml-4">
+            {role === 'Guest' && (
+              <Button type="primary" onClick={handleLoginClick} className="absolute right-0 border-2 border-teal-600 rounded-lg px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0  before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">ĐĂNG NHẬP</Button>
+            )}
+            {role !== 'Guest' && (
+              <div className="flex items-center absolute right-0">
                 {role === 'Customer' && (
                   <>
                     <Badge count={productCount}>
