@@ -10,17 +10,18 @@ const ProductList = () => {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
-  const [petTypeId] = useState('PT001');
+  const [petTypeID] = useState('PT001');
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
   const [form] = Form.useForm();
+  const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/products');
-        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeId);
+        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
         setProductData(filteredProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -30,7 +31,7 @@ const ProductList = () => {
     };
 
     fetchProducts();
-  }, [petTypeId]);
+  }, [petTypeID]);
 
   const handleProductClick = (id) => {
     navigate(`/product-detail/${id}`);
@@ -43,13 +44,16 @@ const ProductList = () => {
       Price: record.Price,
       Description: record.Description,
       ImageURL: record.ImageURL,
-      Status: record.Status
+      Status: record.Status,
+      Quantity: record.Quantity
     });
+    setProductImg(record.ImageURL); // Set initial image URL
   };
 
   const handleCancelEdit = () => {
     setEditMode(null);
     form.resetFields();
+    setProductImg(""); // Reset image state
   };
 
   const handleSaveEdit = async () => {
@@ -65,8 +69,9 @@ const ProductList = () => {
         ProductName: values.ProductName,
         Price: parseFloat(values.Price),
         Description: values.Description,
-        ImageURL: values.ImageURL,
-        Status: values.Status
+        ImageURL: productImg,
+        Status: values.Status,
+        Quantity: parseInt(values.Quantity, 10)
       };
 
       await axios.patch(`http://localhost:3001/api/products/${editMode}`, updatedProduct, {
@@ -95,6 +100,7 @@ const ProductList = () => {
   const handleCancelAdd = () => {
     setAddMode(false);
     form.resetFields();
+    setProductImg(""); // Reset image state
   };
 
   const handleSaveAdd = async () => {
@@ -107,12 +113,13 @@ const ProductList = () => {
 
       const values = await form.validateFields(); // Validate form fields
       const newProduct = {
-        productName: values.ProductName,
-        price: parseFloat(values.Price),
-        description: values.Description,
-        imageURL: values.ImageURL,
-        petTypeID: petTypeId,
-        status: values.Status
+        ProductName: values.ProductName,
+        Price: parseFloat(values.Price),
+        Description: values.Description,
+        ImageURL: productImg,
+        petTypeId: petTypeID,
+        Status: values.Status,
+        Quantity: parseInt(values.Quantity, 10)
       };
 
       const response = await axios.post(`http://localhost:3001/api/products`, newProduct, {
@@ -137,6 +144,23 @@ const ProductList = () => {
       } else {
         message.error('Error adding product');
       }
+    }
+  };
+
+  const handleProductImageUpload = (e) => {
+    const file = e.target.files[0];
+    transformFileData(file);
+  };
+
+  const transformFileData = (file) => {
+    const reader = new FileReader();
+    if (file) {
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        setProductImg(reader.result);
+      };
+    } else {
+      setProductImg("");
     }
   };
 
@@ -193,6 +217,11 @@ const ProductList = () => {
       ),
     },
     {
+      title: 'Quantity',
+      dataIndex: 'Quantity',
+      key: 'Quantity',
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
@@ -204,10 +233,10 @@ const ProductList = () => {
       ),
     },
   ];
-  console.log(productData)
+
   return (
     <div className="p-10">
-      <Title level={1} className='text-center'>Product for dogs</Title>
+      <Title level={1} className='text-center'>Product for cats</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -219,7 +248,7 @@ const ProductList = () => {
                bordered
                scroll={{ x: 'max-content' }}
             />
-                        <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4">
               <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
             </div>
           </>
@@ -290,17 +319,26 @@ const ProductList = () => {
             name="ImageURL"
             rules={[{ required: true, message: 'Please upload the product image!' }]}
           >
-            <Input placeholder="Image URL" />
+            <Input type="file" onChange={handleProductImageUpload} />
+            {productImg && (
+              <Image src={productImg} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} />
+            )}
           </Form.Item>
           <Form.Item
-              name="Status"
-              rules={[{ required: true, message: 'Please select the service status!' }]}
-            >
-              <Select placeholder="Select Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
+            name="Quantity"
+            rules={[{ required: true, message: 'Please enter the product quantity!' }]}
+          >
+            <Input placeholder="Quantity" />
+          </Form.Item>
+          <Form.Item
+            name="Status"
+            rules={[{ required: true, message: 'Please select the service status!' }]}
+          >
+            <Select placeholder="Select Status">
+              <Option value="Available">Available</Option>
+              <Option value="Unavailable">Unavailable</Option>
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
 
@@ -337,17 +375,26 @@ const ProductList = () => {
             name="ImageURL"
             rules={[{ required: true, message: 'Please upload the product image!' }]}
           >
-            <Input placeholder="Image URL" />
+            <Input type="file" onChange={handleProductImageUpload} />
+            {productImg && (
+              <Image src={productImg} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} />
+            )}
           </Form.Item>
           <Form.Item
-              name="Status"
-              rules={[{ required: true, message: 'Please select the service status!' }]}
-            >
-              <Select placeholder="Select Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
+            name="Quantity"
+            rules={[{ required: true, message: 'Please enter the product quantity!' }]}
+          >
+            <Input placeholder="Quantity" />
+          </Form.Item>
+          <Form.Item
+            name="Status"
+            rules={[{ required: true, message: 'Please select the service status!' }]}
+          >
+            <Select placeholder="Select Status">
+              <Option value="Available">Available</Option>
+              <Option value="Unavailable">Unavailable</Option>
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
     </div>
@@ -355,4 +402,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-
