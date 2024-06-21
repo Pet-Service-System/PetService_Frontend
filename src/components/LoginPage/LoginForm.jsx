@@ -104,10 +104,10 @@ const LoginForm = () => {
 
   return (
     <GoogleOAuthProvider clientId={GoogleClientID}>
-      <Row justify="center" style={{ minHeight: '100vh', alignItems: 'center' }}>
+      <Row justify="center" style={{ alignItems: 'center' }}>
         <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10 py-10'>
           <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
-            <Title level={3} className="text-blue-500 text-center mb-4">Login</Title>
+            <Title level={3} className="text-blue-500 text-center">Login</Title>
             <Form onFinish={handleSubmit} layout="vertical">
               <Form.Item
                 label="Email"

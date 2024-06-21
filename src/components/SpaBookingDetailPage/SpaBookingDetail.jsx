@@ -46,7 +46,7 @@ const SpaBookingDetail = () => {
   if (loading || !spaBooking) {
     return <Spin size="large" className="flex justify-center items-center h-screen" />;
   }
-
+  
   return (
     <div className="p-4 md:p-8 lg:p-12">
       <Button
@@ -71,7 +71,7 @@ const SpaBookingDetail = () => {
           <Text strong>Thời lượng:</Text> <Text>{new Date(spaBooking.Duration).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.BookingDetails.reduce((acc, detail) => acc + detail.Price, 0)}</Text>
+          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Dịch vụ đã đặt:</Text>
