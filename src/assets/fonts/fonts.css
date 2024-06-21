@@ -8,3 +8,14 @@
 body {
   font-family: 'Playground';
 } 
+
+@font-face {
+  font-family: 'COWBOY';
+  src: url('../../assets/fonts/COWBOYWILDWEST.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} 
+
+body {
+  font-family: 'COWBOY';
+} 

@@ -266,7 +266,7 @@ const Banner = () => {
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
-            Pet <span className="text-cyan-500">Service</span>
+            Pet <span className="text-cyan-500">Bro</span>
           </span>
         </div>
         {isSmallScreen ? (
@@ -280,13 +280,18 @@ const Banner = () => {
           <div className="flex flex-1 justify-center items-center relative">
             {renderMenuItems(false)}
             {role === 'Guest' && (
-              <Button
-                type="primary"
-                onClick={handleLoginClick}
-                className="absolute right-0 border-2 border-teal-600 rounded-lg px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0 before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100"
-              >
-                ĐĂNG NHẬP
-              </Button>
+              // <Button
+              //   type="primary"
+              //   onClick={handleLoginClick}
+              //   className="absolute right-0 border-2 border-teal-600 rounded-lg px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0 before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100"
+              // >
+              //   ĐĂNG NHẬP
+              // </Button>
+              <Popover content={handleLoginClick} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
+                <Button shape="round" className="absolute right-0 border-2 border-teal-600 px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0 before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">
+                  ĐĂNG NHẬP
+                </Button>
+              </Popover>
             )}
             {role !== 'Guest' && (
               <div className="flex items-center absolute right-0">
