@@ -21,9 +21,7 @@ const Footer = () => {
               <div>
                 <h3 className="text-lg md:text-xl font-semibold mb-4">Địa chỉ</h3>
                 <ul className="space-y-2">
-                  <li className="text-base md:text-lg lg:text-xl">Chi nhánh 1: 217 Lâm Văn Bền, Phường Bình Thuận, Quận 7, TPHCM</li>
-                  <li className="text-base md:text-lg lg:text-xl">Chi nhánh 2: 168 Thượng Đình, Thanh Xuân, Hà Nội</li>
-                  <li className="text-base md:text-lg lg:text-xl">Chi nhánh 3: 627 Ngô Quyền, An Hải Bắc, Sơn Trà, TP. Đà Nẵng</li>
+                  <li className="text-base md:text-lg lg:text-xl">Địa chỉ: 217 Lâm Văn Bền, Phường Bình Thuận, Quận 7, TPHCM</li>
                 </ul>
               </div>
             </div>
