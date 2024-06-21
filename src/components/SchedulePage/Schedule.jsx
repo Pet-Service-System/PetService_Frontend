@@ -1,28 +1,27 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Typography, Alert, Button, Modal, Form, Select, message } from 'antd';
+import { Table, Typography, Button, Modal, Form, Select, message } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
-  const [error, setError] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [roleOfEmp, setRoleOfEmp] = useState('');
-  const [roleOfUser, setRoleOfUser] = useState(localStorage.getItem('role'));
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [accountID, setAccountID] = useState(user.id);
+  const [roleOfUser] = useState(localStorage.getItem('role'));
+  const [user] = useState(JSON.parse(localStorage.getItem('user')));
+  const [accountID] = useState(user.id);
 
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          setError('Authorization token not found. Please log in.');
+          message.error('Authorization token not found. Please log in.');
           return;
         }
 
@@ -35,7 +34,7 @@ const Schedule = () => {
         setSchedules(response.data);
       } catch (error) {
         console.error('Error fetching schedules:', error);
-        setError('Error fetching schedules');
+        message.error('Error fetching schedules');
       }
     };
 
@@ -55,7 +54,7 @@ const Schedule = () => {
         setUsers(response.data.accounts);
       } catch (error) {
         console.error('Error fetching users:', error);
-        setError('Error fetching users');
+        message.error('Error fetching users');
       }
     };
 
@@ -80,7 +79,7 @@ const Schedule = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('Authorization token not found. Please log in.');
+        message.error('Authorization token not found. Please log in.');
         return;
       }
 
@@ -175,7 +174,7 @@ const Schedule = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('Authorization token not found. Please log in.');
+        message.error('Authorization token not found. Please log in.');
         return;
       }
 
