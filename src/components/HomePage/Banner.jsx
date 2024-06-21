@@ -20,7 +20,11 @@ const Banner = () => {
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const [scrollY, setScrollY] = useState(0);
+  const [scrollDirection, setScrollDirection] = useState('none');
+  const [lastScrollTop, setLastScrollTop] = useState(0);
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -66,13 +70,28 @@ const Banner = () => {
       }
     };
 
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      setScrollDirection((prevDirection) => {
+        if (window.scrollY > lastScrollTop) {
+          return 'down';
+        } else if (window.scrollY < lastScrollTop) {
+          return 'up';
+        }
+        return prevDirection;
+      });
+      setLastScrollTop(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
     handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [lastScrollTop]);
 
   const closeMenu = () => setIsDrawerVisible(false);
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };
@@ -237,15 +256,17 @@ const Banner = () => {
 
   return (
     <Layout>
-      <Header className="flex justify-between items-center bg-white shadow-md px-4 py-2 md:px-8 md:py-4">
+      <Header
+        className={`flex justify-between items-center bg-white shadow-md px-4 py-2 md:px-8 md:py-4 ${scrollDirection === 'up' || scrollY === 0 ? '' : '-translate-y-full transition-transform duration-300 ease-in-out'}`}
+        style={{ top: '0', width: '100%', position: 'fixed', zIndex: '1000' }}
+      >
         <div className="flex items-center">
-          {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
             className="text-7xl ml-10 px-10 cursor-pointer text-black"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
-            Pet Service
+            Pet <span className="text-cyan-500">Service</span>
           </span>
         </div>
         {isSmallScreen ? (
@@ -259,7 +280,13 @@ const Banner = () => {
           <div className="flex flex-1 justify-center items-center relative">
             {renderMenuItems(false)}
             {role === 'Guest' && (
-              <Button type="primary" onClick={handleLoginClick} className="absolute right-0 border-2 border-teal-600 rounded-lg px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0  before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">ĐĂNG NHẬP</Button>
+              <Button
+                type="primary"
+                onClick={handleLoginClick}
+                className="absolute right-0 border-2 border-teal-600 rounded-lg px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0 before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100"
+              >
+                ĐĂNG NHẬP
+              </Button>
             )}
             {role !== 'Guest' && (
               <div className="flex items-center absolute right-0">
