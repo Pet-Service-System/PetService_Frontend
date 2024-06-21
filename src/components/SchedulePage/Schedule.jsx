@@ -236,7 +236,6 @@ const Schedule = () => {
           Schedule Employee
         </Button>
       )}
-      {error && <Alert message={error} type="error" showIcon className="mb-6" />}
       <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
       <Modal
         title="Schedule Employee"
