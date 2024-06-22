@@ -20,11 +20,7 @@ const Banner = () => {
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
-  const dispatch = useDispatch();
-
-  const [scrollY, setScrollY] = useState(0);
-  const [scrollDirection, setScrollDirection] = useState('none');
-  const [lastScrollTop, setLastScrollTop] = useState(0);
+  const dispatch = useDispatch()
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -70,28 +66,13 @@ const Banner = () => {
       }
     };
 
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-      setScrollDirection((prevDirection) => {
-        if (window.scrollY > lastScrollTop) {
-          return 'down';
-        } else if (window.scrollY < lastScrollTop) {
-          return 'up';
-        }
-        return prevDirection;
-      });
-      setLastScrollTop(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
     handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [lastScrollTop]);
+  }, []);
 
   const closeMenu = () => setIsDrawerVisible(false);
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };
@@ -189,7 +170,7 @@ const Banner = () => {
 
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
-        const parent = acc.find(menu => menu.key === item.parent);
+        const parent = acc.find((menu) => menu.key === item.parent);
         if (parent) {
           parent.children.push({ key: item.key, label: item.label, onClick: () => navigate(item.path) });
         } else {
@@ -202,7 +183,7 @@ const Banner = () => {
     }, []);
 
     return (
-      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center bg-white'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-white'} disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>
@@ -256,18 +237,18 @@ const Banner = () => {
 
   return (
     <Layout>
-      <Header
-        className={`flex justify-between items-center bg-white shadow-md px-4 py-2 md:px-8 md:py-4 ${scrollDirection === 'up' || scrollY === 0 ? '' : '-translate-y-full transition-transform duration-300 ease-in-out'}`}
-        style={{ top: '0', width: '100%', position: 'fixed', zIndex: '1000' }}
-      >
+      <Header className="flex justify-between items-center bg-white shadow-md px-4 py-2 md:px-8 md:py-4">
         <div className="flex items-center">
+          {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
             className="text-7xl ml-10 px-10 cursor-pointer text-black"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
-            Pet <span className="text-cyan-500">Bro</span>
+            Pet <span style={{ color: 'cyan' }}>Service</span>
           </span>
+
+
         </div>
         {isSmallScreen ? (
           <>
@@ -277,24 +258,12 @@ const Banner = () => {
             </Drawer>
           </>
         ) : (
-          <div className="flex flex-1 justify-center items-center relative">
+          <div className="flex items-center">
             {renderMenuItems(false)}
-            {role === 'Guest' && (
-              // <Button
-              //   type="primary"
-              //   onClick={handleLoginClick}
-              //   className="absolute right-0 border-2 border-teal-600 rounded-lg px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0 before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100"
-              // >
-              //   ĐĂNG NHẬP
-              // </Button>
-              <Popover content={handleLoginClick} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
-                <Button shape="round" className="absolute right-0 border-2 border-teal-600 px-4 py-2 cursor-pointer text-2xl before:bg-teal-600 hover:rounded-b-none before:absolute before:-bottom-0 before:-left-0 before:block before:h-[4px] before:w-full before:origin-bottom-right before:scale-x-0 before:transition before:duration-300 before:ease-in-out hover:before:origin-bottom-left hover:before:scale-x-100">
-                  ĐĂNG NHẬP
-                </Button>
-              </Popover>
-            )}
-            {role !== 'Guest' && (
-              <div className="flex items-center absolute right-0">
+            {role === 'Guest' ? (
+              <Button type="primary" onClick={handleLoginClick} className="ml-4 relative">ĐĂNG NHẬP</Button>
+            ) : (
+              <div className="flex items-center ml-4">
                 {role === 'Customer' && (
                   <>
                     <Badge count={productCount}>
