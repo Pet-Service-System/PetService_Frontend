@@ -13,13 +13,15 @@ const SpaServiceList = () => {
   const [editMode, setEditMode] = useState(null); 
   const [addMode, setAddMode] = useState(false);
   const [form] = Form.useForm();
+  const [petTypeID] = useState('PT001');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await axios.get('http://localhost:3001/api/services');
-        setServiceData(response.data);
+        const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
+        setServiceData(filteredServices);
       } catch (error) {
         console.error('Error fetching services:', error);
       } finally {
@@ -201,10 +203,9 @@ const SpaServiceList = () => {
       ),
     },
   ];
-
   return (
     <div className="p-10">
-      <Title level={1} className="text-center">Pet Services</Title>
+      <Title level={1} className="text-center">Services for Dogs</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>

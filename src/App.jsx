@@ -8,8 +8,10 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import HotelServicePage from './pages/HotelServicePage'
 import SpaServicePage from './pages/SpaServicePage'
-import ForDogPage from './pages/ForDogPage'
-import ForCatPage from './pages/ForCatPage'
+import ProductForDogPage from './pages/ProductForDogPage'
+import ProductForCatPage from './pages/ProductForCatPage'
+import ServiceForDogPage from './pages/ServiceForDogPage'
+import ServiceForCatPage from './pages/ServiceForCatPage'
 import LoginPage from './pages/LoginPage'
 import UserProfilePage from './pages/UserProfilePage'
 import ChangePasswordPage from './pages/ChangePasswordPage'
@@ -45,8 +47,10 @@ function App() {
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
-      <Route path='/for-dog-products' element={<ForDogPage/>}/>
-      <Route path='/for-cat-products' element={<ForCatPage/>}/>
+      <Route path='/products-for-dog' element={<ProductForDogPage/>}/>
+      <Route path='/products-for-cat' element={<ProductForCatPage/>}/>
+      <Route path='/services-for-dog' element={<ServiceForDogPage/>}/>
+      <Route path='/services-for-cat' element={<ServiceForCatPage/>}/>
       <Route path='/spa-service' element={<SpaServicePage/>}/>
       <Route path='/hotel-service' element={<HotelServicePage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>

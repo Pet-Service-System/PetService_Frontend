@@ -1,9 +1,8 @@
 import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
-import ProductList from '../components/StorePage/ForDogPage/ProductList'
+import ProductList from '../components/StorePage/ForCatPage/ProductList'
 
-
-const ForDogPage = () => {
+const ProductForCatPage = () => {
   return (
     <div>
         <Banner/>
@@ -13,4 +12,4 @@ const ForDogPage = () => {
   )
 }
 
-export default ForDogPage
+export default ProductForCatPage

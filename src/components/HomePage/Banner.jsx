@@ -131,39 +131,43 @@ const Banner = () => {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
+        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
+        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'Customer') {
       menuItems = [
         { key: 'home', label: 'TRANG CHỦ', path: '/' },
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
+        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
+        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'Administrator') {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
-        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
+        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
+        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
-        { key: 'spa-service', label: 'Dịch vụ thú cưng', path: '/spa-service', parent: 'DỊCH VỤ' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'DỊCH VỤ' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/for-dog-products', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/for-cat-products', parent: 'CỬA HÀNG' },
+        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
+        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
+        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
+        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
       ];
     }

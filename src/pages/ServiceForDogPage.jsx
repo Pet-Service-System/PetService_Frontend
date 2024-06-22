@@ -2,8 +2,7 @@ import Banner from '../components/HomePage/Banner'
 import Footer from '../components/HomePage/Footer'
 import SpaServiceList from '../components/ServicePage/SpaService/ForDogPage/SpaServiceList'
 
-
-const SpaServicePage = () => {
+const ServiceForDogPage = () => {
   return (
     <div>
         <Banner/>
@@ -13,4 +12,4 @@ const SpaServicePage = () => {
   )
 }
 
-export default SpaServicePage
+export default ServiceForDogPage

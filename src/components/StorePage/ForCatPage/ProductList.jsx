@@ -9,6 +9,7 @@ const { Title } = Typography;
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false); // State for API call status
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
   const [petTypeID] = useState('PT002');
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
@@ -49,6 +50,7 @@ const ProductList = () => {
 
   const handleSaveAdd = async () => {
     try {
+      setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
@@ -99,6 +101,8 @@ const ProductList = () => {
       } else {
         message.error(`Error adding product: ${error.message}`);
       }
+    } finally {
+      setSaving(false); // End saving
     }
   };
 
@@ -122,6 +126,7 @@ const ProductList = () => {
 
   const handleSaveEdit = async () => {
     try {
+      setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
@@ -168,6 +173,8 @@ const ProductList = () => {
       } else {
         message.error(`Error updating product: ${error.message}`);
       }
+    } finally {
+      setSaving(false); // End saving
     }
   };
 
@@ -247,6 +254,10 @@ const ProductList = () => {
     },
   ];
 
+  if(saving){
+    message.warning('Processing...')
+  }
+
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>Product for cats</Title>
@@ -304,8 +315,10 @@ const ProductList = () => {
         visible={addMode || editMode !== null}
         onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd}>{editMode ? "Save" : "Add"}</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
+            {editMode ? "Save" : "Add"}
+          </Button>,
         ]}
         style={{ textAlign: 'center' }}
       >
@@ -347,7 +360,7 @@ const ProductList = () => {
             name="Status"
             rules={[{ required: true, message: 'Please select the product status' }]}
           >
-            <Select>
+            <Select placeholder="Status">
               <Option value="Available">Available</Option>
               <Option value="Unavailable">Unavailable</Option>
             </Select>
