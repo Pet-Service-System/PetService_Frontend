@@ -168,6 +168,8 @@ const PetList = () => {
     },
     { title: 'Giới tính', dataIndex: 'Gender', key: 'Gender' },
     { title: 'Trạng thái', dataIndex: 'Status', key: 'Status' },
+    { title: 'Cân nặng', dataIndex: 'Weight', key: 'Weight' },
+    { title: 'Tuổi', dataIndex: 'Age', key: 'Age' },
     {
       title: 'Hành động',
       key: 'action',
@@ -300,6 +302,12 @@ const PetList = () => {
               <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
                 <Input placeholder="Trạng thái" />
               </Form.Item>
+              <Form.Item name="Weight" rules={[{ required: true, message: 'Cân nặng không được để trống' }]}>
+                <Input placeholder="Cân nặng" type="number" />
+              </Form.Item>
+              <Form.Item name="Age" rules={[{ required: true, message: 'Tuổi không được để trống' }]}>
+                <Input placeholder="Tuổi" type="number" />
+              </Form.Item>
             </Form>
           </Modal>
 
@@ -350,6 +358,12 @@ const PetList = () => {
               </Form.Item>
               <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
                 <Input placeholder="Trạng thái" />
+              </Form.Item>
+              <Form.Item name="Weight" rules={[{ required: true, message: 'Cân nặng không được để trống' }]}>
+                <Input placeholder="Cân nặng" type="number" />
+              </Form.Item>
+              <Form.Item name="Age" rules={[{ required: true, message: 'Tuổi không được để trống' }]}>
+                <Input placeholder="Tuổi" type="number" />
               </Form.Item>
             </Form>
           </Modal>
