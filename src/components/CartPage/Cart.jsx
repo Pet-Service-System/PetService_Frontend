@@ -71,9 +71,9 @@ const Cart = () => {
   ];
 
   return (
-    <div className="container px-4 mt-4 mb-4">
+    <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
       <Title className="text-center" level={2}>Shopping Cart</Title>
-      <Card className="shadow-lg rounded-lg p-6">
+      <Card className="shadow-lg rounded-lg p-10">
         {shoppingCart.length > 0 ? (
           <Table
             dataSource={shoppingCart}

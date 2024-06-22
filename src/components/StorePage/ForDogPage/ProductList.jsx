@@ -73,7 +73,7 @@ const ProductList = () => {
         Status: values.Status,
         Quantity: parseInt(values.Quantity, 10)
       };
-
+      console.log(productImg)
       await axios.patch(`http://localhost:3001/api/products/${editMode}`, updatedProduct, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -236,7 +236,7 @@ const ProductList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className='text-center'>Product for cats</Title>
+      <Title level={1} className='text-center'>Product for dogs</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
