@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Row, Col, Radio, Button, Form, Typography, Alert, Image, Input } from 'antd';
+import { Row, Col, Radio, Typography, Alert, Image, Input } from 'antd';
 import { loadScript } from '@paypal/paypal-js';
-const PAYPAL_CLIENT_ID = "ASkdIv_JdadSoULo3TqRN2myTh6S3jDxLScEFfPlYyMammVmg0o8xKMTUp1kx15u47lWwLgSeovDXnaY";
+const PAYPAL_CLIENT_ID = 'ASkdIv_JdadSoULo3TqRN2myTh6S3jDxLScEFfPlYyMammVmg0o8xKMTUp1kx15u47lWwLgSeovDXnaY'
 
 const { Title, Text } = Typography;
 
 const Order = () => {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
     fullname: '',
@@ -52,26 +51,17 @@ const Order = () => {
           });
         },
         onApprove: (data, actions) => {
-          return actions.order.capture().then((details) => {
+          return actions.order.capture().then(() => {
             Alert.success('Đơn hàng đã được thanh toán thành công.');
             // After successful payment, handle order saving to the database here.
           });
         },
-        onError: (err) => {
+        onError: () => {
           Alert.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
         }
       }).render('#paypal-button-container');
     });
   }, [orderDetails.totalAmount, orderDetails.shippingCost]);
-
-  const handlePayment = () => {
-    if (!selectedPaymentMethod) {
-      Alert.error('Vui lòng chọn phương thức thanh toán.');
-      return;
-    }
-    Alert.success('Đơn hàng đã được thanh toán thành công.');
-    // After successful payment, handle order saving to the database here.
-  };
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
@@ -85,10 +75,6 @@ const Order = () => {
       ...prevOrderDetails,
       shippingCost: shippingCost,
     }));
-  };
-
-  const handleCancel = () => {
-navigate('/cart');
   };
 
   const handleInputChange = (e) => {
@@ -163,20 +149,6 @@ navigate('/cart');
             </Col>
 
             <Col xs={24} md={8}>
-              {/* Payment Method */}
-              <div className="p-8 bg-white rounded-lg shadow-md">
-                <Title level={3} className="mb-6">Phương thức thanh toán</Title>
-                <Form onFinish={handlePayment}>
-                  <Radio.Group
-                    value={selectedPaymentMethod}
-                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                  >
-                    <Radio value="vnpay" className="font-medium block mb-2">VNPay</Radio>
-                    <Radio value="cod" className="font-medium block mb-2">Thanh toán khi nhận hàng (COD)</Radio>
-                  </Radio.Group>
-                </Form>
-              </div>
-
               {/* Shipping Method */}
               <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
                 <Title level={3} className="mb-6">Phương thức vận chuyển</Title>
@@ -208,20 +180,6 @@ navigate('/cart');
                   </div>
                 </div>
                 <div className="text-right">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="mr-2"
-                    onClick={handlePayment}
-                  >
-                    Thanh toán
-                  </Button>
-                  <Button
-                    type="default"
-                    onClick={handleCancel}
-                  >
-                    Hủy
-                  </Button>
                   <div id="paypal-button-container" className="mt-4"></div>
                 </div>
               </div>
