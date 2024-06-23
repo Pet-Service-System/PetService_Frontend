@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Row, Col, Radio, Typography, Alert, Image, Input } from 'antd';
-import { loadScript } from '@paypal/paypal-js';
-const PAYPAL_CLIENT_ID = 'ASkdIv_JdadSoULo3TqRN2myTh6S3jDxLScEFfPlYyMammVmg0o8xKMTUp1kx15u47lWwLgSeovDXnaY'
+import { loadScript } from '@paypal/paypal-js'
+const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID
 
 const { Title, Text } = Typography;
 

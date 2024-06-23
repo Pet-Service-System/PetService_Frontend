@@ -33,7 +33,7 @@ import HotelBookingPage from './pages/HotelBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
-
+console.log(process.env.PAYPAL_CLIENT_ID)
 function App() {
   return (
     <>
