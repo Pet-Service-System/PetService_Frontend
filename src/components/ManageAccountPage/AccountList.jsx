@@ -11,6 +11,7 @@ const AccountList = () => {
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false); // State to track save button loading
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -39,7 +40,8 @@ const AccountList = () => {
       email: record.email,
       phone: record.phone,
       address: record.address,
-      role: record.role
+      role: record.role,
+      status: record.status
     });
     setIsModalVisible(true);
   };
@@ -52,7 +54,8 @@ const AccountList = () => {
 
   const handleSaveEdit = async (id) => {
     try {
-      console.log(id)
+      setSaveLoading(true); // Set loading state to true
+      message.warning('Processing...')
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
@@ -68,8 +71,6 @@ const AccountList = () => {
         role: values.role,
         status: values.status
       };
-
-      console.log(updatedAccount)
 
       await axios.patch(`http://localhost:3001/api/accounts/${id}`, updatedAccount, {
         headers: {
@@ -87,7 +88,7 @@ const AccountList = () => {
       } else {
         message.error('Error updating account');
       }
-    }
+    } 
   };
 
   const columns = [
@@ -162,7 +163,7 @@ const AccountList = () => {
         onCancel={handleCancelEdit}
         footer={[
           <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)}>Save</Button>,
+          <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
         ]}
       >
         <Form form={form}>

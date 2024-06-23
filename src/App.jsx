@@ -33,6 +33,9 @@ import HotelBookingPage from './pages/HotelBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
+import ManageOrderPage from './pages/ManageOrderPage'
+import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
+import ManageHotelBookingsList from './pages/ManageHotelBookingsList'
 console.log(process.env.PAYPAL_CLIENT_ID)
 function App() {
   return (
@@ -67,6 +70,9 @@ function App() {
       <Route path='/orders-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
       <Route path='/hotel-booking-detail/:id' element={<HotelBookingDetailPage/>}/>
+      <Route path='/manage-orders' element={<ManageOrderPage/>}/>
+      <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
+      <Route path='/manage-hotel-bookings' element={<ManageHotelBookingsList/>}/>
     </Routes>
     </>
   )

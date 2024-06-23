@@ -251,7 +251,6 @@ const SpaServiceList = () => {
       ),
     },
   ];
-
   return (
     <div className="p-10">
       <Title level={1} className="text-center">Services for Cats</Title>
