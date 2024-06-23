@@ -5,6 +5,7 @@ import { Form, Input, Button, Typography, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import 'tailwindcss/tailwind.css';
+const GOOGLE_CLIENT_ID = "848503713048-irbkvis08l2o57hisk0ne6q6tcqcch6b.apps.googleusercontent.com";
 
 const { Title } = Typography;
 
@@ -15,7 +16,7 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [disableLogin, setDisableLogin] = useState(false);
   const navigate = useNavigate();
-  const GoogleClientID = "848503713048-irbkvis08l2o57hisk0ne6q6tcqcch6b.apps.googleusercontent.com";
+  const GoogleClientID = GOOGLE_CLIENT_ID;
 
   useEffect(() => {
     let timer;

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Row, Col, Radio, Button, Form, Typography, Alert, Image, Input } from 'antd';
+import { loadScript } from '@paypal/paypal-js';
+const PAYPAL_CLIENT_ID = "ASkdIv_JdadSoULo3TqRN2myTh6S3jDxLScEFfPlYyMammVmg0o8xKMTUp1kx15u47lWwLgSeovDXnaY";
 
 const { Title, Text } = Typography;
 
-const Payment = () => {
+const Order = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
@@ -37,7 +39,30 @@ const Payment = () => {
       shippingCost: 3, // default shipping cost for nationwide
       cartItems: shoppingCart,
     }));
-  }, []);
+
+    loadScript({ "client-id": PAYPAL_CLIENT_ID }).then((paypal) => {
+      paypal.Buttons({
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: (orderDetails.totalAmount + orderDetails.shippingCost).toFixed(2),
+              },
+            }],
+          });
+        },
+        onApprove: (data, actions) => {
+          return actions.order.capture().then((details) => {
+            Alert.success('Đơn hàng đã được thanh toán thành công.');
+            // After successful payment, handle order saving to the database here.
+          });
+        },
+        onError: (err) => {
+          Alert.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
+        }
+      }).render('#paypal-button-container');
+    });
+  }, [orderDetails.totalAmount, orderDetails.shippingCost]);
 
   const handlePayment = () => {
     if (!selectedPaymentMethod) {
@@ -63,7 +88,7 @@ const Payment = () => {
   };
 
   const handleCancel = () => {
-    navigate('/cart');
+navigate('/cart');
   };
 
   const handleInputChange = (e) => {
@@ -73,7 +98,6 @@ const Payment = () => {
       [name]: value,
     });
   };
-
   return (
     <div>
         <Title className="text-center mt-4 mb-4" level={2}>Order</Title>
@@ -115,7 +139,7 @@ const Payment = () => {
                     <Row key={index} className="mb-4" gutter={[16, 16]}>
                       <Col span={4}>
                         <Image 
-                          src={item.imageUrl} 
+                          src={item.ImageURL} 
                           alt={item.ProductName} 
                           className="w-16 h-16 object-cover rounded" 
                         />
@@ -198,6 +222,7 @@ const Payment = () => {
                   >
                     Hủy
                   </Button>
+                  <div id="paypal-button-container" className="mt-4"></div>
                 </div>
               </div>
             </Col>
@@ -207,4 +232,4 @@ const Payment = () => {
   );
 };
 
-export default Payment;
+export default Order;
