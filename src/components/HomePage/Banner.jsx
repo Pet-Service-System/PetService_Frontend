@@ -134,8 +134,8 @@ const Banner = () => {
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
         { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'Customer') {
@@ -145,8 +145,8 @@ const Banner = () => {
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
         { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'Administrator') {
@@ -156,9 +156,11 @@ const Banner = () => {
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
         { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-hotel-booking', label: 'Hotel Booking', path: '/manage-hotel-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
@@ -166,9 +168,11 @@ const Banner = () => {
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
         { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-hotel-booking', label: 'Hotel Booking', path: '/manage-hotel-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
       ];
     }
 

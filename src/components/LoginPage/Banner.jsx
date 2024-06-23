@@ -25,7 +25,6 @@ const Banner = () => {
     setVisible(visible);
   };
 
-
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
@@ -155,7 +154,7 @@ const Banner = () => {
     }, []);
 
     return (
-      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-white'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>
@@ -209,15 +208,15 @@ const Banner = () => {
 
   return (
     <Layout>
-      <Header className="flex justify-between items-center bg-white shadow-md px-4 py-2 md:px-8 md:py-4">
+      <Header className="flex justify-between items-center bg-cyan-400 shadow-md px-4 py-2 md:px-8 md:py-4">
         <div className="flex items-center">
           {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
-            className="text-7xl ml-10 px-10 cursor-pointer text-black"
+            className="text-7xl ml-10 px-10 cursor-pointer text-white"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
-            Pet <span style={{ color: 'cyan' }}>Service</span>
+            Pet Service
           </span>
 
 

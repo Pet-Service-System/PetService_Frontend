@@ -21,9 +21,6 @@ import OrderHistoryPage from './pages/OrderHistoryPage'
 import CartPage from './pages/CartPage'
 import OrderPage from './pages/OrderPage'
 import ManageAccountPage from './pages/ManageAccountPage'
-import BookingListPage from './pages/BookingListPage'
-import BookingDetailPage from './pages/BookingDetailPage'
-import BookingFeedbackPage from './pages/BookingFeedbackPage'
 import SpaServiceDetailPage from './pages/SpaServiceDetailPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
@@ -62,9 +59,6 @@ function App() {
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/order' element={<OrderPage/>}/>
       <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
-      <Route path='/booking-list' element={<BookingListPage/>}/>
-      <Route path='/booking-detail/:id' element={<BookingDetailPage/>}/>
-      <Route path='/booking-feedback' element={<BookingFeedbackPage/>}/>
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
       <Route path='/pet-booking' element={<PetBooking/>}/>
