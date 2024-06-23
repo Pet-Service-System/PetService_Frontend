@@ -71,14 +71,14 @@ const ProductList = () => {
         message.error('Please upload the product image!');
         return;
       }
-  
+      message.warning('Processing...')
       const response = await axios.post('http://localhost:3001/api/products', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+      
       if (response.status === 201) {
         message.success('Product added successfully', 0.5).then(() => {
           window.location.reload();
@@ -143,14 +143,17 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       }
-
+      message.warning('Processing...')
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(`${key}: ${value}`);
+      // }
       const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-
+      
       if (response.status === 200) {
         message.success('Product updated successfully', 0.5).then(() => {
           window.location.reload();
@@ -253,10 +256,6 @@ const ProductList = () => {
       ),
     },
   ];
-
-  if(saving){
-    message.warning('Processing...')
-  }
 
   return (
     <div className="p-10">

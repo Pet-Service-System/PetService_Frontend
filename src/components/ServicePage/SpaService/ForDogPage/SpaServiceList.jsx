@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, message, Image, Card, Skeleton, Select } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
 
-const { Title } = Typography;
 const { Option } = Select;
+const { Title } = Typography;
 
 const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false); // State for API call status
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
-  const [editMode, setEditMode] = useState(null); 
-  const [addMode, setAddMode] = useState(false);
-  const [form] = Form.useForm();
   const [petTypeID] = useState('PT001');
+  const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
+  const [addMode, setAddMode] = useState(false); // false: view mode, true: add mode
+  const [form] = Form.useForm();
+  const [serviceImg, setServiceImg] = useState(""); // For image upload
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,64 +30,12 @@ const SpaServiceList = () => {
         setLoading(false);
       }
     };
-    
+
     fetchServices();
-  }, []);
+  }, [petTypeID]);
 
   const handleServiceClick = (id) => {
-    navigate(`/spa-service-detail/${id}`)
-  };
-
-  const handleEditClick = (record) => {
-    setEditMode(record.ServiceID);
-    form.setFieldsValue({
-      ServiceName: record.ServiceName,
-      Price: record.Price,
-      Description: record.Description,
-      ImageURL: record.ImageURL,
-      Status: record.Status // Set the status in the form
-    });
-  };
-
-  const handleCancelEdit = () => {
-    setEditMode(null);
-    form.resetFields();
-  };
-
-  const handleSaveEdit = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.error('Authorization token not found. Please log in.');
-        return;
-      }
-
-      const values = await form.validateFields(); // Validate form fields
-      const updatedService = {
-        ServiceName: values.ServiceName,
-        Price: parseFloat(values.Price),
-        Description: values.Description,
-        ImageURL: values.ImageURL,
-        Status: values.Status
-      };
-
-      await axios.patch(`http://localhost:3001/api/services/${editMode}`, updatedService, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      message.success('Service updated successfully', 0.5).then(() => {
-        window.location.reload(); // Reload the page after successful update
-      });
-    } catch (error) {
-      console.error('Error updating service:', error);
-      if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
-      } else {
-        message.error('Error updating service');
-      }
-    }
+    navigate(`/spa-service-detail/${id}`);
   };
 
   const handleAddClick = () => {
@@ -95,28 +45,39 @@ const SpaServiceList = () => {
   const handleCancelAdd = () => {
     setAddMode(false);
     form.resetFields();
+    setServiceImg(""); // Reset image state
   };
 
   const handleSaveAdd = async () => {
     try {
+      setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token not found. Please log in.');
         return;
       }
 
-      const values = await form.validateFields(); // Validate form fields
-      const newService = {
-        ServiceName: values.ServiceName,
-        Price: parseFloat(values.Price),
-        Description: values.Description,
-        ImageURL: values.ImageURL,
-        Status: values.Status // Include status in the new service
-      };
-
-      const response = await axios.post(`http://localhost:3001/api/services`, newService, {
+      const values = await form.validateFields();
+      const formData = new FormData();
+      formData.append('ServiceName', values.ServiceName);
+      formData.append('Price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('PetTypeID', petTypeID);
+      formData.append('Status', values.Status);
+      if (serviceImg) {
+        formData.append('image', serviceImg);
+      } else {
+        message.error('Please upload the service image!');
+        return;
+      }
+      message.warning('Processing...');
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      const response = await axios.post('http://localhost:3001/api/services', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
 
@@ -129,14 +90,101 @@ const SpaServiceList = () => {
       }
     } catch (error) {
       console.error('Error adding service:', error);
-      if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
-      } else if (error.response && error.response.data && error.response.data.message) {
-        message.error(`Error adding service: ${error.response.data.message}`);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error('Unauthorized. Please log in.');
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`Error adding service: ${error.response.data.message}`);
+        } else {
+          message.error('Error adding service');
+        }
+      } else if (error.request) {
+        message.error('Error adding service: Network or server issue');
       } else {
-        message.error('Error adding service');
+        message.error(`Error adding service: ${error.message}`);
       }
+    } finally {
+      setSaving(false); // End saving
     }
+  };
+
+  const handleEditClick = (record) => {
+    setEditMode(record.ServiceID);
+    form.setFieldsValue({
+      ServiceName: record.ServiceName,
+      Price: record.Price,
+      Description: record.Description,
+      Status: record.Status,
+    });
+    setServiceImg(""); // Reset image state
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(null);
+    form.resetFields();
+    setServiceImg(""); // Reset image state
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      setSaving(true); // Start saving
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Authorization token not found. Please log in.');
+        return;
+      }
+
+      const values = await form.validateFields();
+      const formData = new FormData();
+      formData.append('serviceName', values.ServiceName);
+      formData.append('price', parseFloat(values.Price));
+      formData.append('description', values.Description);
+      formData.append('status', values.Status);
+      if (serviceImg) {
+        formData.append('image', serviceImg);
+      }
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      message.warning('Processing...');
+      const response = await axios.patch(`http://localhost:3001/api/services/${editMode}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.status === 200) {
+        message.success('Service updated successfully', 0.5).then(() => {
+          window.location.reload();
+        });
+      } else {
+        message.error('Failed to update service: Unexpected server response');
+      }
+    } catch (error) {
+      console.error('Error updating service:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error('Unauthorized. Please log in.');
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`Error updating service: ${error.response.data.message}`);
+        } else {
+          message.error('Error updating service');
+        }
+      } else if (error.request) {
+        message.error('Error updating service: Network or server issue');
+      } else {
+        message.error(`Error updating service: ${error.message}`);
+      }
+    } finally {
+      setSaving(false); // End saving
+    }
+  };
+
+  const handleServiceImageUpload = (e) => {
+    const file = e.target.files[0];
+    setServiceImg(file);
+    form.setFieldsValue({ Image: file });
   };
 
   const columns = [
@@ -203,6 +251,7 @@ const SpaServiceList = () => {
       ),
     },
   ];
+
   return (
     <div className="p-10">
       <Title level={1} className="text-center">Services for Dogs</Title>
@@ -256,12 +305,14 @@ const SpaServiceList = () => {
       </Form>
 
       <Modal
-        title="Add New Service"
-        visible={addMode}
-        onCancel={handleCancelAdd}
+        title={editMode ? "Edit Service" : "Add New Service"}
+        visible={addMode || editMode !== null}
+        onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={handleCancelAdd}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveAdd}>Add</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
+            {editMode ? "Save" : "Add"}
+          </Button>,
         ]}
         style={{ textAlign: 'center' }}
       >
@@ -285,61 +336,17 @@ const SpaServiceList = () => {
             <Input placeholder="Description" />
           </Form.Item>
           <Form.Item
-            name="ImageURL"
+            name="Image"
             rules={[{ required: true, message: 'Please upload the service image!' }]}
           >
-            <Input placeholder="Image URL" />
+            <Input type="file" onChange={handleServiceImageUpload} />
+            {serviceImg && (
+              <Image src={URL.createObjectURL(serviceImg)} alt="Service Preview" style={{ width: '100px', marginTop: '10px' }} />
+            )}
           </Form.Item>
           <Form.Item
             name="Status"
-            rules={[{ required: true, message: 'Please select the service status!' }]}
-          >
-            <Select placeholder="Select Status">
-              <Option value="Available">Available</Option>
-              <Option value="Unavailable">Unavailable</Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      <Modal
-        title="Edit Service"
-        visible={editMode !== null}
-        onCancel={handleCancelEdit}
-        footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
-          <Button key="submit" type="primary" onClick={handleSaveEdit}>Save</Button>,
-        ]}
-        style={{ textAlign: 'center' }}
-      >
-        <Form form={form} className="text-left">
-          <Form.Item
-            name="ServiceName"
-            rules={[{ required: true, message: 'Please enter the service name!' }]}
-          >
-            <Input placeholder="Service Name" />
-          </Form.Item>
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the service price!' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item>
-          <Form.Item
-            name="Description"
-            rules={[{ required: true, message: 'Please enter the service description' }]}
-          >
-            <Input placeholder="Description" />
-          </Form.Item>
-          <Form.Item
-            name="ImageURL"
-            rules={[{ required: true, message: 'Please upload the service image!' }]}
-          >
-            <Input placeholder="Image URL" />
-          </Form.Item>
-          <Form.Item
-            name="Status"
-            rules={[{ required: true, message: 'Please select the service status!' }]}
+            rules={[{ required: true, message: 'Please select the service status' }]}
           >
             <Select placeholder="Select Status">
               <Option value="Available">Available</Option>

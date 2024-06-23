@@ -71,7 +71,7 @@ const ProductList = () => {
         message.error('Please upload the product image!');
         return;
       }
-  
+      message.warning('Processing...')
       const response = await axios.post('http://localhost:3001/api/products', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -143,7 +143,7 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       }
-
+      message.warning('Processing...')
       const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
