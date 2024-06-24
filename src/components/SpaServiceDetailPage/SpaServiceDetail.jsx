@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select } from 'antd';
-
+import { ArrowLeftOutlined } from '@ant-design/icons';
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
@@ -27,8 +27,7 @@ const SpaServiceDetail = () => {
 
     useEffect(() => {
         fetchServiceDetail();
-        console.log(serviceData)
-    }, [id, form]);
+    }, [id]);
 
     const handleEditService = () => {
         setEditMode(true);
@@ -85,87 +84,99 @@ const SpaServiceDetail = () => {
     }
 
     return (
-        <div className="flex flex-col md:flex-row m-5 py-36 px-4 md:px-32">
-            <div className="w-full md:w-1/2 flex justify-center">
-                <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
+        <div className="relative">
+            <div className="flex flex-row md:flex-row m-5 px-4 md:px-32">
+                <Button
+                    onClick={() => navigate(-1)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+                    icon={<ArrowLeftOutlined />}
+                    size="large"
+                >
+                    Quay về
+                </Button>
             </div>
-            <div className="w-full md:w-1/2 p-5 md:ml-10">
-                {userRole === 'Store Manager' ? (
-                    <Form form={form} layout="vertical">
-                        <Form.Item
-                            name="ServiceName"
-                            label="Tên dịch vụ"
-                            rules={[{ required: true, message: 'Hãy nhập tên dịch vụ!' }]}
-                        >
-                            <Input disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="Price"
-                            label="Giá"
-                            rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
-                        >
-                            <Input type="number" disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="Description"
-                            label="Mô tả"
-                            rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
-                        >
-                            <Input disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="ImageURL"
-                            label="Hình ảnh"
-                            rules={[{ required: true, message: 'Hãy tải hình ảnh dịch vụ!' }]}
-                        >
-                            <Input disabled={!editMode} />
-                        </Form.Item>
-                        <Form.Item
-                            name="Status"
-                            label="Status"
-                            rules={[{ required: true, message: 'Please select the service status!' }]}
+            <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
+                <div className="w-full md:w-1/2 flex justify-center">
+                    <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
+                </div>
+                <div className="w-full md:w-1/2 p-5 md:ml-10">
+                    {userRole === 'Store Manager' ? (
+                        <Form form={form} layout="vertical">
+                            <Form.Item
+                                name="ServiceName"
+                                label="Tên dịch vụ"
+                                rules={[{ required: true, message: 'Hãy nhập tên dịch vụ!' }]}
                             >
-                            <Select placeholder="Select Status" disabled={!editMode}>
-                                <Option value="Available">Available</Option>
-                                <Option value="Unavailable">Unavailable</Option>
-                            </Select>
+                                <Input disabled={!editMode} />
                             </Form.Item>
-                    </Form>
-                ) : (
-                    <div>
-                        <Title level={3}>{serviceData.ServiceName}</Title>
-                        <Paragraph>{`Giá: ${serviceData.Price}`}</Paragraph>
-                        <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
-                    </div>
-                )}
-
-                {userRole === 'Guest' || userRole === 'Customer' ? (
-                    <>
-                        <div className='flex space-x-4 justify-end'>
-                            <Button
-                                type="primary"
-                                onClick={handleBookingNow}
-                                disabled={serviceData.Status === 'Unavailable'}
+                            <Form.Item
+                                name="Price"
+                                label="Giá"
+                                rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
                             >
-                                Booking Now
-                            </Button>
-                        </div>
-                        {serviceData.Status === 'Unavailable' && (
-                            <p className="text-red-500 text-right">Dịch vụ tạm ngưng.</p>
-                        )}
-                    </>
-                ) : userRole === 'Store Manager' ? (
-                    editMode ? (
-                        <div className="flex space-x-4 justify-end">
-                            <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
-                            <Button onClick={handleCancelEdit}>Hủy</Button>
-                        </div>
+                                <Input type="number" disabled={!editMode} />
+                            </Form.Item>
+                            <Form.Item
+                                name="Description"
+                                label="Mô tả"
+                                rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
+                            >
+                                <Input disabled={!editMode} />
+                            </Form.Item>
+                            <Form.Item
+                                name="ImageURL"
+                                label="Hình ảnh"
+                                rules={[{ required: true, message: 'Hãy tải hình ảnh dịch vụ!' }]}
+                            >
+                                <Input disabled={!editMode} />
+                            </Form.Item>
+                            <Form.Item
+                                name="Status"
+                                label="Status"
+                                rules={[{ required: true, message: 'Please select the service status!' }]}
+                            >
+                                <Select placeholder="Select Status" disabled={!editMode}>
+                                    <Option value="Available">Available</Option>
+                                    <Option value="Unavailable">Unavailable</Option>
+                                </Select>
+                            </Form.Item>
+                        </Form>
                     ) : (
-                        <div className="flex space-x-4 justify-end">
-                            <Button type="primary" onClick={handleEditService}>Sửa</Button>
+                        <div>
+                            <Title level={3}>{serviceData.ServiceName}</Title>
+                            <Paragraph>{`Giá: ${serviceData.Price}`}</Paragraph>
+                            <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
                         </div>
-                    )
-                ) : null}
+                    )}
+
+                    {userRole === 'Guest' || userRole === 'Customer' ? (
+                        <>
+                            <div className='flex space-x-4 justify-end'>
+                                <Button
+                                    type="primary"
+                                    onClick={handleBookingNow}
+                                    disabled={serviceData.Status === 'Unavailable'}
+                                >
+                                    Booking Now
+                                </Button>
+                            </div>
+                            {serviceData.Status === 'Unavailable' && (
+                                <p className="text-red-500 text-right">Dịch vụ tạm ngưng.</p>
+                            )}
+                        </>
+                    ) : userRole === 'Store Manager' ? (
+                        editMode ? (
+                            <div className="flex space-x-4 justify-end">
+                                <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
+                                <Button onClick={handleCancelEdit}>Hủy</Button>
+                            </div>
+                        ) : (
+                            <div className="flex space-x-4 justify-end">
+                                <Button type="primary" onClick={handleEditService}>Sửa</Button>
+                            </div>
+                        )
+                    ) : null}
+                </div>
             </div>
         </div>
     );

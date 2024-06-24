@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Table, InputNumber, Button, Typography, Card, Image } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -72,6 +73,16 @@ const Cart = () => {
 
   return (
     <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
+      <div className="flex flex-row md:flex-row m-5 px-4 md:px-32">
+            <Button
+                onClick={() => navigate(-1)}
+                className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+                icon={<ArrowLeftOutlined />}
+                size="large"
+            >
+                Quay về
+            </Button>
+        </div>
       <Title className="text-center" level={2}>Shopping Cart</Title>
       <Card className="shadow-lg rounded-lg p-10">
         {shoppingCart.length > 0 ? (

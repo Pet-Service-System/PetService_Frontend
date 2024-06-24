@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, message, Typography, Skeleton, Select, Breadcrumb, List, Rate } from 'antd';
+import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate } from 'antd';
 import useShopping from '../../hook/useShopping';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -15,6 +16,7 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
+    const navigate = useNavigate();
     const userRole = localStorage.getItem('role') || 'Guest';
 
     const fetchProductDetail = async () => {
@@ -139,28 +141,18 @@ const ProductDetail = () => {
         const totalRating = comments.reduce((acc, curr) => acc + curr.Rating, 0);
         return totalRating / comments.length;
     };
-
-    
-    const PetTypeID = productData.PetTypeID;
     return (
         productData && (
             <div>
-                <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
-                    <Breadcrumb style={{ marginBottom: '20px' }}>
-                        <Breadcrumb.Item>
-                            <Link to="/">Trang chủ</Link>
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>
-                            {PetTypeID === 'PT001' ? (
-                                <Link to="/for-dog-products">Sản phẩm cho chó</Link>
-                            ) : PetTypeID === 'PT002' ? (
-                                <Link to="/for-cat-products">Sản phẩm cho mèo</Link>
-                            ) : (
-                                <Link to="/for-other-products">Danh sách sản phẩm</Link>
-                            )}
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>{productData.ProductName}</Breadcrumb.Item>
-                    </Breadcrumb>
+                <div className="flex flex-row md:flex-row m-5 px-4 md:px-32">
+                    <Button
+                        onClick={() => navigate(-1)}
+                        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+                        icon={<ArrowLeftOutlined />}
+                        size="large"
+                    >
+                        Quay về
+                    </Button>
                 </div>
                 <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
                     <div className="w-full md:w-1/2 flex justify-center">
