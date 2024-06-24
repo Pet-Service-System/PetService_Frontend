@@ -32,7 +32,7 @@ const Order = () => {
 
     const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     const totalAmount = shoppingCart.reduce((total, item) => total + item.Price * item.quantity, 0);
-
+    
     setOrderDetails((prevOrderDetails) => ({
       ...prevOrderDetails,
       totalAmount: totalAmount,
@@ -43,7 +43,6 @@ const Order = () => {
     // Enable PayPal button only when order details are ready
     setIsPayPalEnabled(true);
   }, [orderDetails, orderDetails.shippingCost, orderDetails.totalAmount]);
-
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
     let shippingCost = 3;

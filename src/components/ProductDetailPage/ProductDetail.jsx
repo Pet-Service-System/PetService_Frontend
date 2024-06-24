@@ -41,8 +41,9 @@ const ProductDetail = () => {
                 }
             };
             const response = await axios.get(`http://localhost:3001/api/comments/product/${id}`, config);
-            if (response.data && response.data.comments[0] && response.data.comments[0].CommentDetails) {
-                const commentsData = response.data.comments[0].CommentDetails;
+            if (response.data && response.data.comments) {
+                const commentsData = response.data.comments;
+                console.log(commentsData)
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
@@ -269,7 +270,7 @@ const ProductDetail = () => {
                             <List.Item key={item.AccountID}>
                                 <List.Item.Meta
                                     title={item.username}  // Display username here
-                                    description={item.Comment}
+                                    description={item.CommentContent}
                                 />
                                 <Rate disabled defaultValue={item.Rating} />
                             </List.Item>

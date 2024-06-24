@@ -36,7 +36,6 @@ import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
 import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
 import ManageHotelBookingsList from './pages/ManageHotelBookingsList'
-console.log(process.env.PAYPAL_CLIENT_ID)
 function App() {
   return (
     <>

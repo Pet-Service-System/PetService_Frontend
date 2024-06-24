@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, List, Button, Row, Col } from 'antd';
+import { Spin, Card, Typography, Button, Row, Col, Modal, Rate, Input, message, Table } from 'antd';
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
+const accountID = JSON.parse(localStorage.getItem('user')).id
 
 const getOrder = async (id) => {
   const token = localStorage.getItem('token');
@@ -29,7 +30,6 @@ const getOrderDetail = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error('Error fetching order details:', error);
@@ -37,14 +37,17 @@ const getOrderDetail = async (id) => {
   }
 }
 
-
 const OrderHistoryDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [orderDetail, setOrderDetail] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [rating, setRating] = useState(0); // Initial rating
+  const [comment, setComment] = useState('');
   const navigate = useNavigate();
-
+  const [userHasCommented, setUserHasCommented] = useState(false);
+  
   useEffect(() => {
     fetchOrderDetails(id);
   }, [id]);
@@ -54,8 +57,24 @@ const OrderHistoryDetail = () => {
     try {
       const data = await getOrder(orderId);
       setOrder(data);
-      const detailData = await getOrderDetail(orderId)
-      setOrderDetail(detailData)
+      const detailData = await getOrderDetail(orderId);
+      setOrderDetail(detailData);
+  
+      // Check if the user has already commented on each product in the order
+      // const productsWithComments = await Promise.all(detailData.Products.map(async (product) => {
+      //   const comments = (await getComments(product.ProductID)).comments;
+      //   const userComment = comments.find(comment => comment.AccountID === accountID);
+      //   console.log(userComment)
+      //   return {
+      //     ...product,
+      //     userHasCommented: !!userComment,
+      //   };
+      // }));
+  
+      // setOrderDetail({
+      //   ...detailData,
+      //   Products: productsWithComments,
+      // });
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
@@ -63,9 +82,86 @@ const OrderHistoryDetail = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:3001/api/comments/',
+        {
+          ProductID: orderDetail.Products[0].ProductID,
+          AccountID: accountID,
+          Rating: rating,
+          CommentContent: comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log('Comment created:', response.data);
+      message.success('Comment successfully!')
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    } finally {
+      setShowModal(false);
+    }
+  }; 
+
+  const getComments = async (productId) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/comments/product/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      throw error;
+    }
+  };
+
   if (loading || !order) {
     return <Spin size="large" className="flex justify-center items-center h-screen" />;
   }
+
+  const columns = [
+    {
+      title: 'Tên sản phẩm',
+      dataIndex: 'ProductName',
+      key: 'ProductName',
+    },
+    {
+      title: 'Số lượng',
+      dataIndex: 'Quantity',
+      key: 'Quantity',
+    },
+    {
+      title: 'Giá',
+      dataIndex: 'Price',
+      key: 'Price',
+      render: (text) => <Text className="text-green-600">${text}</Text>,
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (text, record) => (
+        <Button 
+          type="primary" 
+          onClick={() => {
+            setShowModal(true);
+            setUserHasCommented(record.userHasCommented);
+          }} 
+          disabled={order.Status !== 'Shipped' || record.userHasCommented}
+        >
+          {record.userHasCommented ? 'Đã đánh giá' : 'Đánh giá'}
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="p-4 md:p-8 lg:p-12">
       <Button
@@ -100,25 +196,35 @@ const OrderHistoryDetail = () => {
           <Text strong>Chi tiết đơn hàng:</Text>
         </div>
         
-        <List
-          dataSource={orderDetail.OrderDetails}
-          renderItem={(detail, index) => (
-            <List.Item key={index} className="px-4 py-2">
-              <Row style={{ width: '100%' }}>
-                <Col span={8}>
-                 <Text>{detail.ProductName}</Text>
-                </Col>
-                <Col span={8}>
-                  <Text strong>Số lượng:</Text> <Text>{detail.Quantity}</Text>
-                </Col>
-                <Col span={8}>
-                  <Text strong>Giá:</Text> <Text className="text-green-600">${detail.Price}</Text>
-                </Col>
-              </Row>
-            </List.Item>
-          )}
-          bordered
+        <Table 
+          dataSource={orderDetail.Products} 
+          columns={columns} 
+          pagination={false} 
+          rowKey="ProductID"
         />
+        
+        <Modal
+          title="Đánh giá sản phẩm"
+          visible={showModal}
+          onCancel={() => setShowModal(false)}
+          footer={[
+            <Button key="cancel" onClick={() => setShowModal(false)}>
+              Hủy
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleSubmit}>
+              Đánh giá
+            </Button>,
+          ]}
+        >
+          <Rate onChange={(value) => setRating(value)} value={rating} />
+          <Input.TextArea
+            placeholder="Nhập nhận xét của bạn..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={4}
+            disabled={userHasCommented}
+          />
+        </Modal>
       </Card>
     </div>
   );
