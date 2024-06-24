@@ -39,7 +39,7 @@ const Order = () => {
 
     // Enable PayPal button only when order details are ready
     setIsPayPalEnabled(true);
-  }, []);
+  }, [orderDetails.totalAmount, orderDetails.shippingCost]);
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
