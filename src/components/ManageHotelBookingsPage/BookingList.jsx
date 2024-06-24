@@ -9,24 +9,6 @@ const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
-const getHotelBookings = async () => {
-  const user = JSON.parse(localStorage.getItem('user'))
-  const AccountID = user.id
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/Hotel-bookings/account/${AccountID}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log('Fetched hotel bookings:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching hotel bookings:', error);
-    throw error;
-  }
-};
-
 const BookingList = () => {
   const navigate = useNavigate();
   const [hotelBookings, setHotelBookings] = useState([]);
@@ -38,6 +20,22 @@ const BookingList = () => {
   const [loading, setLoading] = useState(false); // State for loading indicator
   const screens = useBreakpoint();
 
+  const getHotelBookingHistory = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/Hotel-bookings/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Fetched data:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order history:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchHotelBookings();
   }, [sortOrder]);
@@ -45,7 +43,7 @@ const BookingList = () => {
   const fetchHotelBookings = async () => {
     setLoading(true); // Start loading indicator
     try {
-      const data = await getHotelBookings();
+      const data = await getHotelBookingHistory();
       const formattedData = data.map(booking => ({
         id: booking.BookingDetailID, // Adjust as per your backend response
         date: new Date(booking.CreateDate), // Adjust as per your backend response
@@ -67,6 +65,88 @@ const BookingList = () => {
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
+
+  const showConfirm = (hotelID, newStatus) => {
+    confirm({
+      title: 'Are you sure you want to update the hotel booking status?',
+      content: `Change status to "${newStatus}"?`,
+      onOk() {
+        handleUpdateStatus(hotelID, newStatus);
+      },
+      onCancel() {
+        console.log('Cancelled');
+      },
+    });
+  };
+
+  const handleUpdateStatus = async (hotelID, newStatus) => {
+    const token = localStorage.getItem('token');
+    try {
+      await axios.put(
+        `http://localhost:3001/api/Hotel-bookings/${hotelID}`,
+        { Status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      message.success('hotel booking status updated successfully');
+      fetchOrderHistory(); // Refresh order list after update
+    } catch (error) {
+      console.error('Error updating hotel booking status:', error);
+      message.error('Failed to update hotel booking status');
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'Pending':
+        return { color: 'blue' };
+      case 'Processing':
+        return { color: 'orange' };
+      case 'Completed':
+        return { color: 'green' };
+      case 'Canceled':
+        return { color: 'red' };
+      default:
+        return {};
+    }
+  };
+
+  const renderUpdateButton = (record) => {
+    if (role === 'Sales Staff') {
+      switch (record.status) {
+        case 'Pending':
+          return (
+            <div>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Processing')}>
+                Processing
+              </Button>
+              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
+                Cancel
+              </Button>
+            </div>
+          );
+        case 'Processing':
+          return (
+            <div>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Completed')}>
+                Completed
+              </Button>
+              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
+                Cancel
+              </Button>
+            </div>
+          );
+        default:
+          return null;
+      }
+    } else {
+      return null;
+    }
+  };
+
 
   const handleReviewTransaction = (id) => {
     setReviewTransactionId(id);
@@ -116,13 +196,21 @@ const BookingList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-    },
+      render: (text, record) => (
+        <Text style={getStatusStyle(record.status)}>{record.status}</Text>
+      )
+    },    
     {
       title: 'Detail',
       key: 'detail',
       render: (text, record) => (
         <Button type="link" onClick={() => navigate(`/hotel-booking-detail/${record.id}`)}>Detail</Button>
       ),
+    },
+    {
+      title: 'Cập nhật trạng thái',
+      key: 'updateStatus',
+      render: (text, record) => renderUpdateButton(record),
     },
     {
       title: 'Review',
