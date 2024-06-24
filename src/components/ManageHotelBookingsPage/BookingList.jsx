@@ -249,53 +249,6 @@ const BookingList = () => {
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
-      {!screens.xs && (
-        <Sider width={220}>
-          <div className="logo" />
-          <Menu theme="dark" mode="inline">
-            <Menu.Item
-              key="profile"
-              icon={<UserOutlined />}
-              onClick={() => navigate('/user-profile')}
-            >
-              Thông tin người dùng
-            </Menu.Item>
-            {role === 'Customer' && (
-              <>
-                <Menu.Item
-                  key="pet-list"
-                  icon={<UnorderedListOutlined />}
-                  onClick={() => navigate('/pet-list')}
-                >
-                  Danh sách thú cưng
-                </Menu.Item>
-                <Menu.Item
-                  key="orders-history"
-                  icon={<HistoryOutlined />}
-                  onClick={() => navigate('/orders-history')}
-                >
-                  Lịch sử đặt hàng
-                </Menu.Item>
-                <SubMenu
-                  key="service-history"
-                  icon={<HistoryOutlined />}
-                  title="Lịch sử dịch vụ"
-                >
-                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
-                    Dịch vụ spa
-                  </Menu.Item>
-                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
-                    Dịch vụ khách sạn
-                  </Menu.Item>
-                </SubMenu>
-              </>
-            )}
-            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Đăng xuất
-            </Menu.Item>
-          </Menu>
-        </Sider>
-      )}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt lịch khách sạn</h2>
