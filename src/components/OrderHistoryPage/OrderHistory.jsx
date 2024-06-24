@@ -107,6 +107,24 @@ const OrderHistory = () => {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
+      render: (text, record) => {
+        let color;
+        switch (record.status.toLowerCase()) {
+          case 'canceled':
+            color = 'red';
+            break;
+          case 'processing':
+          case 'delivering':
+            color = 'orange';
+            break;
+          case 'shipped':
+            color = 'green';
+            break;
+          default:
+            color = 'black';
+        }
+        return <Text style={{ color }}>{record.status}</Text>;
+      }
     },
     {
       title: 'Chi tiết',

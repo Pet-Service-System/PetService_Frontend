@@ -253,7 +253,7 @@ const Banner = () => {
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
-            Pet Service
+            Pet Bro
           </span>
 
 

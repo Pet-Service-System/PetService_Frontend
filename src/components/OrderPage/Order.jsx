@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Radio, Typography, Alert, Image, Input } from 'antd';
+import { Row, Col, Radio, Typography, Alert, Image, Input, Button } from 'antd';
 import { PayPalButtons } from '@paypal/react-paypal-js';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
@@ -15,6 +17,7 @@ const Order = () => {
     cartItems: [],
   });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -39,7 +42,7 @@ const Order = () => {
 
     // Enable PayPal button only when order details are ready
     setIsPayPalEnabled(true);
-  }, [orderDetails.totalAmount, orderDetails.shippingCost]);
+  }, [orderDetails, orderDetails.shippingCost, orderDetails.totalAmount]);
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
@@ -84,9 +87,18 @@ const Order = () => {
     Alert.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
   };
 
-  return (
+  return ( orderDetails &&
     <div>
-      <Title className="text-center mt-4 mb-4" level={2}>Order</Title>
+      <div className="flex flex-row md:flex-row m-5 px-8">
+          <Button
+              onClick={() => navigate(-1)}
+              className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+              icon={<ArrowLeftOutlined />}
+              size="large"
+          >
+              Quay về
+          </Button>
+      </div>
       <div className="flex items-center justify-center bg-gray-100 px-10">
         <Row gutter={[16, 16]} className="w-full">
           <Col xs={24} md={16}>

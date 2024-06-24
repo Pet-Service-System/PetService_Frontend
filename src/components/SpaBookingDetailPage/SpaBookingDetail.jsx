@@ -65,10 +65,19 @@ const SpaBookingDetail = () => {
           <Text strong>Ngày tạo:</Text> <Text>{new Date(spaBooking.CreateDate).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái:</Text> <Text>{spaBooking.Status}</Text>
+          <Text strong>Tên khách hàng: </Text>
+          <Text>{spaBooking.CustomerName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Thời lượng:</Text> <Text>{new Date(spaBooking.Duration).toLocaleDateString()}</Text>
+          <Text strong>SĐT: </Text>
+          <Text>{spaBooking.Phone}</Text>
+        </div>
+        <div className="mb-4">
+          <Text strong>Tên thú cưng: </Text>
+          <Text>{spaBooking.PetName}</Text>
+        </div>
+        <div className="mb-4">
+          <Text strong>Trạng thái:</Text> <Text>{spaBooking.Status}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
@@ -86,6 +95,12 @@ const SpaBookingDetail = () => {
           )}
           bordered
         />
+        {spaBooking.Feedback && (
+          <div className="mt-4">
+            <Text strong>Đánh giá: </Text>
+            <Text>{spaBooking.Feedback}</Text>
+          </div>
+        )}
       </Card>
     </div>
   );

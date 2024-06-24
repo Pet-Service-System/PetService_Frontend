@@ -6,7 +6,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
-const getOrderDetails = async (id) => {
+const getOrder = async (id) => {
   const token = localStorage.getItem('token');
   try {
     const response = await axios.get(`http://localhost:3001/api/orders/${id}`, {
@@ -21,10 +21,27 @@ const getOrderDetails = async (id) => {
   }
 }
 
+const getOrderDetail = async (id) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.get(`http://localhost:3001/api/order-details/order/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    throw error;
+  }
+}
+
 
 const OrderHistoryDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
+  const [orderDetail, setOrderDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -35,8 +52,10 @@ const OrderHistoryDetail = () => {
   const fetchOrderDetails = async (orderId) => {
     setLoading(true);
     try {
-      const data = await getOrderDetails(orderId);
+      const data = await getOrder(orderId);
       setOrder(data);
+      const detailData = await getOrderDetail(orderId)
+      setOrderDetail(detailData)
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
@@ -66,7 +85,10 @@ const OrderHistoryDetail = () => {
           <Text strong>Trạng thái:</Text> <Text>{order.Status}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Số điện thoại:</Text> <Text>{order.phone}</Text>
+          <Text strong>Tên khách hàng:</Text> <Text>{order.CustomerName}</Text>
+        </div>
+        <div className="mb-4">
+          <Text strong>Số điện thoại:</Text> <Text>{order.Phone}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Địa chỉ:</Text> <Text>{order.Address}</Text>
@@ -79,7 +101,7 @@ const OrderHistoryDetail = () => {
         </div>
         
         <List
-          dataSource={order.OrderDetails}
+          dataSource={orderDetail.OrderDetails}
           renderItem={(detail, index) => (
             <List.Item key={index} className="px-4 py-2">
               <Row style={{ width: '100%' }}>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
-import { FcCheckmark } from "react-icons/fc";
+import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin, Modal } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import SubMenu from "antd/es/menu/SubMenu";
@@ -20,7 +19,6 @@ const getSpaBookings = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('Fetched spa bookings:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching spa bookings:', error);
@@ -33,7 +31,6 @@ const SpaBooking = () => {
   const [spaBookings, setSpaBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
   const [isReviewing, setIsReviewing] = useState(false);
-  const [isReviewSuccess, setIsReviewSuccess] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [reviewTransactionId, setReviewTransactionId] = useState(null);
@@ -54,7 +51,8 @@ const SpaBooking = () => {
         date: new Date(booking.CreateDate),
         description: booking.PetID,
         amount: booking.TotalPrice,
-        status: booking.Status
+        status: booking.Status,
+        reviewed: booking.Reviewed,
       }));
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
@@ -67,16 +65,6 @@ const SpaBooking = () => {
     }
   };
 
-  useEffect(() => {
-    let timeout;
-    if (isReviewSuccess) {
-      timeout = setTimeout(() => {
-        setIsReviewSuccess(false);
-      }, 2000);
-    }
-    return () => clearTimeout(timeout);
-  }, [isReviewSuccess]);
-
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
@@ -88,16 +76,39 @@ const SpaBooking = () => {
     setReviewError('');
   };
 
-  const handleSubmitReview = () => {
+  const handleSubmitReview = async () => {
     if (reviewText.trim() === '') {
-      setReviewError('Đánh giá không được để trống');
+      setReviewError('Review cannot be empty');
       return;
     }
-
-    setIsReviewSuccess(true);
-    setIsReviewing(false);
-    setReviewText('');
-    message.success('Đánh giá của bạn đã được gửi thành công');
+  
+    const token = localStorage.getItem('token');
+    try {
+        await axios.put(
+        `http://localhost:3001/api/Spa-bookings/submit-review/${reviewTransactionId}`, 
+        { feedback: reviewText }, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      message.success('Your review has been submitted successfully');
+  
+      // Cập nhật lại state của spaBookings sau khi cập nhật thành công
+      setSpaBookings(prevBookings => prevBookings.map(booking => {
+        if (booking.id === reviewTransactionId) {
+          return { ...booking, reviewed: true, feedback: reviewText };
+        }
+        return booking;
+      }));
+      
+      setIsReviewing(false);
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      message.error('Failed to submit review');
+    }
   };
 
   const columns = [
@@ -107,7 +118,7 @@ const SpaBooking = () => {
       key: 'id',
     },
     {
-      title: 'Ngày',
+      title: 'Date',
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -115,12 +126,12 @@ const SpaBooking = () => {
       )
     },
     {
-      title: 'Mô tả',
+      title: 'Description',
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: 'Số tiền',
+      title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
@@ -128,46 +139,28 @@ const SpaBooking = () => {
       )
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
     },
     {
-      title: 'Chi tiết',
+      title: 'Detail',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>Detail</Button>
       ),
     },
     {
-      title: 'Đánh giá',
+      title: 'Review',
       key: 'review',
       render: (text, record) => (
-        <>
-          <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Đánh giá</Button>
-          {isReviewing && reviewTransactionId === record.id && (
-            <div className="mt-4">
-              <Form>
-                <Form.Item
-                  label="Đánh giá"
-                  validateStatus={reviewError ? 'error' : ''}
-                  help={reviewError}
-                >
-                  <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" onClick={handleSubmitReview}>Gửi</Button>
-                </Form.Item>
-              </Form>
-              {isReviewSuccess && (
-                <div className="flex justify-center items-center mt-4">
-                  <FcCheckmark className="text-green-500 mr-2" />
-                  <span>Đánh giá của bạn đã được gửi thành công!</span>
-                </div>
-              )}
-            </div>
-          )}
-        </>
+        <Button
+          type="primary"
+          onClick={() => handleReviewTransaction(record.id)}
+          disabled={record.status !== 'Completed' || record.reviewed}
+        >
+          Review
+        </Button>
       ),
     },
   ];
@@ -185,65 +178,84 @@ const SpaBooking = () => {
     <Layout style={{ minHeight: '100vh' }}>
       {!screens.xs && (
         <Sider width={220}>
-          <div className="logo" />
-          <Menu theme="dark" mode="inline">
-            <Menu.Item
-              key="profile"
-              icon={<UserOutlined />}
-              onClick={() => navigate('/user-profile')}
-            >
-              Thông tin người dùng
-            </Menu.Item>
-            {role === 'Customer' && (
-              <>
-                <Menu.Item
-                  key="pet-list"
-                  icon={<UnorderedListOutlined />}
-                  onClick={() => navigate('/pet-list')}
-                >
-                  Danh sách thú cưng
+        <div className="logo" />
+        <Menu theme="dark" mode="inline">
+          <Menu.Item
+            key="profile"
+            icon={<UserOutlined />}
+            onClick={() => navigate('/user-profile')}
+          >
+            Thông tin người dùng
+          </Menu.Item>
+          {role === 'Customer' && (
+            <>
+              <Menu.Item
+                key="pet-list"
+                icon={<UnorderedListOutlined />}
+                onClick={() => navigate('/pet-list')}
+              >
+                Danh sách thú cưng
+              </Menu.Item>
+              <Menu.Item
+                key="orders-history"
+                icon={<HistoryOutlined />}
+                onClick={() => navigate('/orders-history')}
+              >
+                Lịch sử đặt hàng
+              </Menu.Item>
+              <SubMenu
+                key="service-history"
+                icon={<HistoryOutlined />}
+                title="Lịch sử dịch vụ"
+              >
+                <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
+                  Dịch vụ spa
                 </Menu.Item>
-                <Menu.Item
-                  key="orders-history"
-                  icon={<HistoryOutlined />}
-                  onClick={() => navigate('/orders-history')}
-                >
-                  Lịch sử đặt hàng
+                <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
+                  Dịch vụ khách sạn
                 </Menu.Item>
-                <SubMenu
-                  key="service-history"
-                  icon={<HistoryOutlined />}
-                  title="Lịch sử dịch vụ"
-                >
-                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
-                    Dịch vụ spa
-                  </Menu.Item>
-                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
-                    Dịch vụ khách sạn
-                  </Menu.Item>
-                </SubMenu>
-              </>
-            )}
-            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Đăng xuất
-            </Menu.Item>
-          </Menu>
-        </Sider>
+              </SubMenu>
+            </>
+          )}
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+            Đăng xuất
+          </Menu.Item>
+        </Menu>
+      </Sider>
       )}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt dịch vụ Spa</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">Spa Service Booking History</h2>
           <Button onClick={handleSortOrder} className="mb-4">
-            Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
+            Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
           </Button>
           <Spin spinning={loading}>
             <Table
               columns={columns}
               dataSource={spaBookings}
               rowKey="id"
-              scroll={{ x: '100%' }} // Enable horizontal scrolling
+              scroll={{ x: '100%' }}
             />
           </Spin>
+          <Modal
+            title="Submit Review"
+            visible={isReviewing}
+            onCancel={() => setIsReviewing(false)}
+            footer={[
+              <Button key="cancel" onClick={() => setIsReviewing(false)}>Cancel</Button>,
+              <Button key="submit" type="primary" onClick={handleSubmitReview}>Submit</Button>,
+            ]}
+          >
+            <Form>
+              <Form.Item
+                label="Review"
+                validateStatus={reviewError ? 'error' : ''}
+                help={reviewError}
+              >
+                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+              </Form.Item>
+            </Form>
+          </Modal>
         </div>
       </Layout>
     </Layout>
