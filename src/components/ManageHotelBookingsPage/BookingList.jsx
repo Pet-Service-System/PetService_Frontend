@@ -1,24 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
-import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Table, Button, Typography, Layout, message, Grid, Spin } from "antd";
 import axios from 'axios';
-import SubMenu from "antd/es/menu/SubMenu";
 
 const { Text } = Typography;
-const { Sider } = Layout;
-const { useBreakpoint } = Grid;
 
 const BookingList = () => {
   const navigate = useNavigate();
   const [hotelBookings, setHotelBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [reviewText, setReviewText] = useState('');
-  const [reviewError, setReviewError] = useState('');
-  const [reviewTransactionId, setReviewTransactionId] = useState(null);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false); // State for loading indicator
-  const screens = useBreakpoint();
 
   const getHotelBookingHistory = async () => {
     const token = localStorage.getItem('token');
@@ -147,24 +139,6 @@ const BookingList = () => {
     }
   };
 
-
-  const handleReviewTransaction = (id) => {
-    setReviewTransactionId(id);
-    setReviewText('');
-    setReviewError('');
-  };
-
-  const handleSubmitReview = () => {
-    if (reviewText.trim() === '') {
-      setReviewError('Review cannot be empty');
-      return;
-    }
-
-    // Placeholder for actual review submission logic
-    message.success('Your review has been submitted successfully');
-    setReviewTransactionId(null); // Close the review form
-  };
-
   const columns = [
     {
       title: 'ID',
@@ -212,40 +186,7 @@ const BookingList = () => {
       key: 'updateStatus',
       render: (text, record) => renderUpdateButton(record),
     },
-    {
-      title: 'Review',
-      key: 'review',
-      render: (text, record) => (
-        <div>
-          <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Review</Button>
-          {reviewTransactionId === record.id && (
-            <Form layout="vertical" onFinish={handleSubmitReview}>
-              <Form.Item
-                label="Review"
-                validateStatus={reviewError ? 'error' : ''}
-                help={reviewError}
-              >
-                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">Submit</Button>
-                <Button onClick={() => setReviewTransactionId(null)}>Cancel</Button>
-              </Form.Item>
-            </Form>
-          )}
-        </div>
-      ),
-    },
   ];
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('user');
-    setRole('Guest');
-    navigate('/');
-    window.location.reload();
-  };
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
