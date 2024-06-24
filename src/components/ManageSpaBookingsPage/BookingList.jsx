@@ -1,13 +1,13 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Form, Input, Layout, message, Spin, Modal } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal } from "antd";
 import axios from 'axios';
 
 const { Text } = Typography;
 
 const getSpaBookings = async () => {
-  const user = JSON.parse(localStorage.getItem('user'))
-  const AccountID = user.id
+  const user = JSON.parse(localStorage.getItem('user'));
   const token = localStorage.getItem('token');
   try {
     const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
@@ -20,18 +20,19 @@ const getSpaBookings = async () => {
     console.error('Error fetching spa bookings:', error);
     throw error;
   }
-}
+};
 
 const SpaBooking = () => {
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [reviewText, setReviewText] = useState('');
-  const [reviewError, setReviewError] = useState('');
-  const [reviewTransactionId, setReviewTransactionId] = useState(null);
-  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
+  const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
+
+  // State for status update modal
+  const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [pendingStatus, setPendingStatus] = useState('');
 
   useEffect(() => {
     fetchSpaBookings();
@@ -44,7 +45,7 @@ const SpaBooking = () => {
       const formattedData = data.map(booking => ({
         id: booking.BookingDetailID,
         date: new Date(booking.CreateDate),
-        description: booking.PetID,
+        description: booking.PetName,
         amount: booking.TotalPrice,
         status: booking.Status,
         reviewed: booking.Reviewed,
@@ -64,46 +65,46 @@ const SpaBooking = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
 
-  const handleReviewTransaction = (id) => {
-    setReviewTransactionId(id);
-    setIsReviewing(true);
-    setReviewText('');
-    setReviewError('');
-  };
-
-  const handleSubmitReview = async () => {
-    if (reviewText.trim() === '') {
-      setReviewError('Review cannot be empty');
-      return;
-    }
-  
-    const token = localStorage.getItem('token');
+  const handleUpdateStatus = async () => {
     try {
-        await axios.put(
-        `http://localhost:3001/api/Spa-bookings/submit-review/${reviewTransactionId}`, 
-        { feedback: reviewText }, 
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:3001/api/Spa-bookings/${selectedBookingId}`,
+        { Status: pendingStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-  
-      message.success('Your review has been submitted successfully');
-  
-      // Cập nhật lại state của spaBookings sau khi cập nhật thành công
-      setSpaBookings(prevBookings => prevBookings.map(booking => {
-        if (booking.id === reviewTransactionId) {
-          return { ...booking, reviewed: true, feedback: reviewText };
-        }
-        return booking;
-      }));
-      
-      setIsReviewing(false);
+      message.success(`Booking status updated successfully to "${pendingStatus}"`);
+      setUpdateStatusModalVisible(false);
+      fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
-      console.error('Error submitting review:', error);
-      message.error('Failed to submit review');
+      console.error('Error updating booking status:', error);
+      message.error('Failed to update booking status');
     }
+  };
+
+  const renderActions = (record) => {
+    if (role === 'Sales Staff') {
+      if (record.status === 'Pending') {
+        return (
+          <>
+            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>Processing</Button>
+            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>Cancel</Button>
+          </>
+        );
+      } else if (record.status === 'Processing') {
+        return (
+          <>
+            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>Completed</Button>
+            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>Cancel</Button>
+          </>
+        );
+      }
+    }
+    return null;
   };
 
   const columns = [
@@ -137,6 +138,9 @@ const SpaBooking = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (text, record) => (
+        <Text className={` ${getStatusColor(record.status)}`}>{record.status}</Text>
+      ),
     },
     {
       title: 'Detail',
@@ -145,7 +149,33 @@ const SpaBooking = () => {
         <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>Detail</Button>
       ),
     },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (text, record) => renderActions(record),
+    },
   ];
+
+  const showUpdateStatusModal = (id, status) => {
+    setSelectedBookingId(id);
+    setPendingStatus(status);
+    setUpdateStatusModalVisible(true);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Pending':
+        return 'text-yellow-500';
+      case 'Processing':
+        return 'text-yellow-500';
+      case 'Completed':
+        return 'text-green-500';
+      case 'Canceled':
+        return 'text-red-500';
+      default:
+        return '';
+    }
+  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -164,23 +194,15 @@ const SpaBooking = () => {
             />
           </Spin>
           <Modal
-            title="Submit Review"
-            visible={isReviewing}
-            onCancel={() => setIsReviewing(false)}
+            title={`Update Status (${pendingStatus})`}
+            visible={updateStatusModalVisible}
+            onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[
-              <Button key="cancel" onClick={() => setIsReviewing(false)}>Cancel</Button>,
-              <Button key="submit" type="primary" onClick={handleSubmitReview}>Submit</Button>,
+              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)}>Cancel</Button>,
+              <Button key="submit" type="primary" onClick={handleUpdateStatus}>Confirm</Button>,
             ]}
           >
-            <Form>
-              <Form.Item
-                label="Review"
-                validateStatus={reviewError ? 'error' : ''}
-                help={reviewError}
-              >
-                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-              </Form.Item>
-            </Form>
+            <p>Are you sure you want to update the status to "{pendingStatus}"?</p>
           </Modal>
         </div>
       </Layout>
