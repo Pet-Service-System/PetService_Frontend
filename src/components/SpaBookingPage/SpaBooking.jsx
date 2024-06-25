@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin, Modal } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import SubMenu from "antd/es/menu/SubMenu";
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -178,50 +177,43 @@ const SpaBooking = () => {
     <Layout style={{ minHeight: '100vh' }}>
       {!screens.xs && (
         <Sider width={220}>
-        <div className="logo" />
-        <Menu theme="dark" mode="inline">
-          <Menu.Item
-            key="profile"
-            icon={<UserOutlined />}
-            onClick={() => navigate('/user-profile')}
-          >
-            Thông tin người dùng
-          </Menu.Item>
-          {role === 'Customer' && (
-            <>
-              <Menu.Item
-                key="pet-list"
-                icon={<UnorderedListOutlined />}
-                onClick={() => navigate('/pet-list')}
-              >
-                Danh sách thú cưng
-              </Menu.Item>
-              <Menu.Item
-                key="orders-history"
-                icon={<HistoryOutlined />}
-                onClick={() => navigate('/orders-history')}
-              >
-                Lịch sử đặt hàng
-              </Menu.Item>
-              <SubMenu
-                key="service-history"
-                icon={<HistoryOutlined />}
-                title="Lịch sử dịch vụ"
-              >
-                <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
-                  Dịch vụ spa
+          <div className="logo" />
+          <Menu theme="dark" mode="inline">
+            <Menu.Item
+              key="profile"
+              icon={<UserOutlined />}
+              onClick={() => navigate('/user-profile')}
+            >
+              Thông tin người dùng
+            </Menu.Item>
+            {role === 'Customer' && (
+              <>
+                <Menu.Item
+                  key="pet-list"
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => navigate('/pet-list')}
+                >
+                  Danh sách thú cưng
                 </Menu.Item>
-                <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
-                  Dịch vụ khách sạn
+                <Menu.Item
+                  key="orders-history"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate('/orders-history')}
+                >
+                  Lịch sử đặt hàng
                 </Menu.Item>
-              </SubMenu>
-            </>
-          )}
-          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-            Đăng xuất
-          </Menu.Item>
-        </Menu>
-      </Sider>
+                <Menu.Item key="spa-booking" 
+                           onClick={() => navigate('/spa-booking')}
+                           icon={<HistoryOutlined />}>
+                    Lịch sử dịch vụ
+                </Menu.Item>
+              </>
+            )}
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              Đăng xuất
+            </Menu.Item>
+          </Menu>
+        </Sider>
       )}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>

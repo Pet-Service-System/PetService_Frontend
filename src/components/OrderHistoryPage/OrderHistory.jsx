@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Menu, Grid, Spin } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import SubMenu from "antd/es/menu/SubMenu";
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -176,18 +175,11 @@ const OrderHistory = () => {
                 >
                   Lịch sử đặt hàng
                 </Menu.Item>
-                <SubMenu
-                  key="service-history"
-                  icon={<HistoryOutlined />}
-                  title="Lịch sử dịch vụ"
-                >
-                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
-                    Dịch vụ spa
-                  </Menu.Item>
-                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
-                    Dịch vụ khách sạn
-                  </Menu.Item>
-                </SubMenu>
+                <Menu.Item key="spa-booking" 
+                           onClick={() => navigate('/spa-booking')}
+                           icon={<HistoryOutlined />}>
+                    Lịch sử dịch vụ
+                </Menu.Item>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>

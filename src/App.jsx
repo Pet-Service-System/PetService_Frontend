@@ -6,8 +6,6 @@ import "./styles/flexslider.css"
 import "./styles/style.css"
 import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
-import HotelServicePage from './pages/HotelServicePage'
-import SpaServicePage from './pages/SpaServicePage'
 import ProductForDogPage from './pages/ProductForDogPage'
 import ProductForCatPage from './pages/ProductForCatPage'
 import ServiceForDogPage from './pages/ServiceForDogPage'
@@ -29,13 +27,10 @@ import SchedulePage from './pages/SchedulePage'
 import ProdutcDetailPage from './pages/ProdutcDetailPage'
 import PetBooking from './pages/PetBooking'
 import SpaBookingPage from './pages/SpaBookingPage'
-import HotelBookingPage from './pages/HotelBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
-import HotelBookingDetailPage from './pages/HotelBookingDetailPage'
 import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
-import ManageHotelBookingsList from './pages/ManageHotelBookingsList'
 function App() {
   return (
     <>
@@ -50,8 +45,6 @@ function App() {
       <Route path='/products-for-cat' element={<ProductForCatPage/>}/>
       <Route path='/services-for-dog' element={<ServiceForDogPage/>}/>
       <Route path='/services-for-cat' element={<ServiceForCatPage/>}/>
-      <Route path='/spa-service' element={<SpaServicePage/>}/>
-      <Route path='/hotel-service' element={<HotelServicePage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
       <Route path='/product-detail/:id' element={<ProdutcDetailPage/>}/>
@@ -65,13 +58,10 @@ function App() {
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
       <Route path='/pet-booking' element={<PetBooking/>}/>
       <Route path='/spa-booking' element={<SpaBookingPage/>}/>
-      <Route path='/hotel-booking' element={<HotelBookingPage/>}/>
       <Route path='/orders-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
-      <Route path='/hotel-booking-detail/:id' element={<HotelBookingDetailPage/>}/>
       <Route path='/manage-orders' element={<ManageOrderPage/>}/>
       <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
-      <Route path='/manage-hotel-bookings' element={<ManageHotelBookingsList/>}/>
     </Routes>
     </>
   )

@@ -25,6 +25,7 @@ const Banner = () => {
     setVisible(visible);
   };
 
+
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
@@ -62,10 +63,7 @@ const Banner = () => {
         key: 'service-history',
         icon: <HistoryOutlined />,
         label: 'Lịch sử dịch vụ',
-        children: [
-          { key: 'spa-booking', label: 'Dịch vụ spa', onClick: () => navigate('/spa-booking') },
-          { key: 'hotel-booking', label: 'Dịch vụ khách sạn', onClick: () => navigate('/hotel-booking') },
-        ],
+        onClick: () => navigate('/spa-booking'),
       },
     ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
@@ -100,9 +98,8 @@ const Banner = () => {
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'Customer') {
@@ -111,9 +108,8 @@ const Banner = () => {
         { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
         { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
       ];
     } else if (role === 'Administrator') {
@@ -122,20 +118,20 @@ const Banner = () => {
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'hotel-service', label: 'Khách sạn thú cưng', path: '/hotel-service', parent: 'Dịch vụ thú cưng' },
-        { key: 'for-dog', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'for-cat', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'booking-list', label: 'QUẢN LÍ BOOKING', path: '/booking-list' },
+        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
+        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
+        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
       ];
     }
 
@@ -178,7 +174,6 @@ const Banner = () => {
               <Menu.Item onClick={() => { navigate('/orders-history') }}>Lịch sử đặt hàng</Menu.Item>
               <Menu.SubMenu title="Lịch sử dịch vụ">
                 <Menu.Item onClick={() => { navigate('/spa-booking') }}>Dịch vụ thú cưng</Menu.Item>
-                <Menu.Item onClick={() => { navigate('/hotel-booking') }}>Dịch vụ khách sạn</Menu.Item>
               </Menu.SubMenu>
               <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>
             </Menu.SubMenu>
@@ -216,10 +211,8 @@ const Banner = () => {
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
-            Pet Service
+            Pet Bro
           </span>
-
-
         </div>
         {isSmallScreen ? (
           <>
