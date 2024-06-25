@@ -170,6 +170,13 @@ const ProductDetail = () => {
                                     <Input disabled={!editMode} />
                                 </Form.Item>
                                 <Form.Item
+                                    name="Quantity"
+                                    label="Số lượng tồn kho"
+                                    rules={[{ required: true, message: 'Hãy nhập số lượng tồn kho!' }]}
+                                >
+                                    <Input disabled={!editMode} />
+                                </Form.Item>
+                                <Form.Item
                                     name="Price"
                                     label="Giá"
                                     rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
@@ -204,6 +211,7 @@ const ProductDetail = () => {
                         ) : (
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
+                                <Paragraph>{`Số lượng tồn kho: ${productData.Quantity}`}</Paragraph>
                                 <Paragraph>{`Giá: ${productData.Price}`}</Paragraph>
                                 <Paragraph>{`Mô tả: ${productData.Description}`}</Paragraph>
                             </div>

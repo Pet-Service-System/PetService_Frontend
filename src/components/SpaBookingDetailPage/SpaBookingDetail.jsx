@@ -77,7 +77,14 @@ const SpaBookingDetail = () => {
           <Text>{spaBooking.PetName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái:</Text> <Text>{spaBooking.Status}</Text>
+          <Text strong>Trạng thái: </Text> 
+          <Text className={
+            spaBooking.Status === 'Completed' ? 'text-green-600' :
+            spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing' ? 'text-orange-400' :
+            'text-red-600'
+          }>
+            {spaBooking.Status}
+          </Text>
         </div>
         <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>

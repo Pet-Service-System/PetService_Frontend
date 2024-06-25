@@ -6,7 +6,6 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
 
 const { Title, Text } = Typography;
-const accountID = JSON.parse(localStorage.getItem('user')).id;
 
 const getOrder = async (id) => {
   const token = localStorage.getItem('token');
@@ -31,6 +30,7 @@ const getOrderDetail = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error('Error fetching order details:', error);
@@ -48,6 +48,8 @@ const OrderHistoryDetail = () => {
   const [comment, setComment] = useState('');
   const [selectedProductID, setSelectedProductID] = useState(null);
   const navigate = useNavigate();
+  const accountID = JSON.parse(localStorage.getItem('user')).id;
+  const role = localStorage.getItem('role')
 
   useEffect(() => {
     fetchOrderDetails(id);
@@ -150,7 +152,10 @@ const OrderHistoryDetail = () => {
       key: 'Price',
       render: (text) => <span className="text-green-600">${text}</span>,
     },
-    {
+  ];
+
+  if (role === 'Customer') {
+    columns.push({
       title: 'Hành động',
       key: 'action',
       render: (text, record) => (
@@ -162,8 +167,8 @@ const OrderHistoryDetail = () => {
           Comment
         </Button>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <div className="p-4 md:p-8 lg:p-12">

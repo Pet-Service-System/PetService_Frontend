@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin, Modal } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import 'tailwindcss/tailwind.css';
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -95,7 +96,6 @@ const SpaBooking = () => {
   
       message.success('Your review has been submitted successfully');
   
-      // Cập nhật lại state của spaBookings sau khi cập nhật thành công
       setSpaBookings(prevBookings => prevBookings.map(booking => {
         if (booking.id === reviewTransactionId) {
           return { ...booking, reviewed: true, feedback: reviewText };
@@ -141,6 +141,15 @@ const SpaBooking = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (text, record) => (
+        <Text className={
+          record.status === 'Completed' ? 'text-green-600' :
+          record.status === 'Pending' || record.status === 'Processing' ? 'text-orange-400' :
+          'text-red-600'
+        }>
+          {record.status}
+        </Text>
+      )
     },
     {
       title: 'Detail',
