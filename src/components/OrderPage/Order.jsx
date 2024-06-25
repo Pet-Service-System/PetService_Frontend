@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Radio, Typography, Alert, Image, Input, Button } from 'antd';
+import { Row, Col, Radio, Typography, Modal, Image, Input, Button, message } from 'antd';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setShoppingCart } from '../../redux/shoppingCart';
 
 const { Title, Text } = Typography;
 
@@ -17,7 +19,9 @@ const Order = () => {
     cartItems: [],
   });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -77,13 +81,20 @@ const Order = () => {
 
   const onApprove = (data, actions) => {
     return actions.order.capture().then(() => {
-      Alert.success('Đơn hàng đã được thanh toán thành công.');
-      // Handle post-payment processing (e.g., save order to database)
+      setSuccessModalVisible(true); 
+      localStorage.removeItem('shoppingCart');
+      dispatch(setShoppingCart([]));
     });
   };
 
-  const onError = () => {
-    Alert.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
+  const closeModal = () => {
+    setSuccessModalVisible(false);
+    navigate('/'); // Sau khi đóng modal, chuyển hướng về trang chủ
+  };
+
+  const onError = (err) => {
+    message.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
+    console.error('Error during PayPal checkout:', err);
   };
 
   return (
@@ -195,8 +206,8 @@ const Order = () => {
                 {isPayPalEnabled && (
                   <PayPalButtons
                     createOrder={createOrder}
-                    onApprove={onApprove}
-                    onError={onError}
+                    onApprove={(data, actions) => onApprove(data, actions)}
+                    onError={(err) => onError(err)}
                   />
                 )}
               </div>
@@ -204,6 +215,19 @@ const Order = () => {
           </Col>
         </Row>
       </div>
+
+      {/* Success Modal */}
+      <Modal
+        title="Thanh toán thành công"
+        visible={successModalVisible}
+        footer={[
+          <Button key="back" type='primary' onClick={closeModal}>
+            Về trang chủ
+          </Button>,
+        ]}
+      >
+        <p><CheckCircleOutlined style={{ color: '#52c41a', fontSize: '24px', marginRight: '10px' }} /> Đơn hàng của bạn đã được thanh toán thành công!</p>
+      </Modal>
     </div>
   );
 };
