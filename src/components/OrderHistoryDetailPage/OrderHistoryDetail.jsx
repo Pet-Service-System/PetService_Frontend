@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, List, Button, Row, Col, Modal, Rate, Input, message } from 'antd';
+import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } from 'antd';
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import 'tailwindcss/tailwind.css';
 
 const { Title, Text } = Typography;
 const accountID = JSON.parse(localStorage.getItem('user')).id;
@@ -37,21 +38,6 @@ const getOrderDetail = async (id) => {
   }
 }
 
-const getComments = async (productId) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/comments/product/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-    throw error;
-  }
-};
-
 const OrderHistoryDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -60,8 +46,8 @@ const OrderHistoryDetail = () => {
   const [showModal, setShowModal] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [selectedProductID, setSelectedProductID] = useState(null);
   const navigate = useNavigate();
-  const [userHasCommented, setUserHasCommented] = useState(false);
 
   useEffect(() => {
     fetchOrderDetails(id);
@@ -74,11 +60,6 @@ const OrderHistoryDetail = () => {
       setOrder(data);
       const detailData = await getOrderDetail(orderId);
       setOrderDetail(detailData);
-
-      const productId = detailData.Products[0].ProductID;
-      const comments = await getComments(productId);
-      const userComment = comments.find(comment => comment.AccountID === accountID);
-      setUserHasCommented(!!userComment);
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
@@ -86,16 +67,32 @@ const OrderHistoryDetail = () => {
     }
   };
 
+  const openModal = (productID) => {
+    setSelectedProductID(productID);
+    setRating(0); // Reset rating
+    setComment(''); // Reset comment
+    setShowModal(true);
+  };
+
   const handleSubmit = async () => {
+    if (rating === 0) {
+      message.warning('Please provide a rating.');
+      return;
+    }
+    if (comment.trim() === '') {
+      message.warning('Please provide a comment.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
         'http://localhost:3001/api/comments/',
         {
-          ProductID: orderDetail.Products[0].ProductID,
+          ProductID: selectedProductID,
           AccountID: accountID,
           Rating: rating,
-          CommentContent: comment,
+          CommentContent: comment.trim(),
         },
         {
           headers: {
@@ -105,9 +102,14 @@ const OrderHistoryDetail = () => {
       );
       console.log('Comment created:', response.data);
       message.success('Comment successfully!');
-      setUserHasCommented(true);
+      fetchOrderDetails(id); // Refresh comments
     } catch (error) {
-      console.error('Error creating comment:', error);
+      if (error.response && error.response.status === 404) {
+        message.error(`You have already commented on this product.`);
+      } else {
+        console.error('Error creating comment:', error);
+        message.error('Failed to create comment.');
+      }
     } finally {
       setShowModal(false);
     }
@@ -116,6 +118,52 @@ const OrderHistoryDetail = () => {
   if (loading || !order) {
     return <Spin size="large" className="flex justify-center items-center h-screen" />;
   }
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'Canceled':
+        return 'text-red-600';
+      case 'Processing':
+      case 'Delivering':
+        return 'text-orange-400';
+      case 'Shipped':
+        return 'text-green-600';
+      default:
+        return '';
+    }
+  };
+
+  const columns = [
+    {
+      title: 'Tên sản phẩm',
+      dataIndex: 'ProductName',
+      key: 'ProductName',
+    },
+    {
+      title: 'Số lượng',
+      dataIndex: 'Quantity',
+      key: 'Quantity',
+    },
+    {
+      title: 'Giá',
+      dataIndex: 'Price',
+      key: 'Price',
+      render: (text) => <span className="text-green-600">${text}</span>,
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (text, record) => (
+        <Button 
+          type="primary" 
+          onClick={() => openModal(record.ProductID)}
+          disabled={order.Status !== 'Shipped'}
+        >
+          Comment
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <div className="p-4 md:p-8 lg:p-12">
@@ -133,7 +181,7 @@ const OrderHistoryDetail = () => {
           <Text strong>Ngày đặt hàng:</Text> <Text>{new Date(order.OrderDate).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái:</Text> <Text>{order.Status}</Text>
+          <Text strong>Trạng thái:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Tên khách hàng:</Text> <Text>{order.CustomerName}</Text>
@@ -151,32 +199,10 @@ const OrderHistoryDetail = () => {
           <Text strong>Chi tiết đơn hàng:</Text>
         </div>
         
-        <List
+        <Table
           dataSource={orderDetail.Products}
-          renderItem={(detail, index) => (
-            <List.Item key={index} className="px-4 py-2">
-              <Row style={{ width: '100%' }}>
-                <Col span={6}>
-                  <Text>{detail.ProductName}</Text>
-                </Col>
-                <Col span={6}>
-                  <Text strong>Số lượng:</Text> <Text>{detail.Quantity}</Text>
-                </Col>
-                <Col span={6}>
-                  <Text strong>Giá:</Text> <Text className="text-green-600">${detail.Price}</Text>
-                </Col>
-                <Col span={6}>
-                  <Button 
-                    type="primary" 
-                    onClick={() => setShowModal(true)} 
-                    disabled={order.Status !== 'Shipped' || userHasCommented}
-                  >
-                    {userHasCommented ? 'Đã đánh giá' : 'Comment'}
-                  </Button>
-                </Col>
-              </Row>
-            </List.Item>
-          )}
+          columns={columns}
+          rowKey="ProductID"
           bordered
         />
 
