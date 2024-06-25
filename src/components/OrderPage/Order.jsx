@@ -13,7 +13,7 @@ const Order = () => {
     address: '',
     phone: '',
     totalAmount: 0,
-    shippingCost: 0,
+    shippingCost: 3,
     cartItems: [],
   });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
@@ -31,18 +31,18 @@ const Order = () => {
     }
 
     const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-    const totalAmount = shoppingCart.reduce((total, item) => total + item.Price * item.quantity, 0);
-    
+    const totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
+
     setOrderDetails((prevOrderDetails) => ({
       ...prevOrderDetails,
       totalAmount: totalAmount,
-      shippingCost: 3, // default shipping cost for nationwide
       cartItems: shoppingCart,
     }));
 
     // Enable PayPal button only when order details are ready
     setIsPayPalEnabled(true);
-  }, [orderDetails, orderDetails.shippingCost, orderDetails.totalAmount]);
+  }, [orderDetails]);
+
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
     let shippingCost = 3;
@@ -78,7 +78,7 @@ const Order = () => {
   const onApprove = (data, actions) => {
     return actions.order.capture().then(() => {
       Alert.success('Đơn hàng đã được thanh toán thành công.');
-      // Sau khi thanh toán thành công, xử lý lưu đơn hàng vào cơ sở dữ liệu ở đây.
+      // Handle post-payment processing (e.g., save order to database)
     });
   };
 
@@ -86,17 +86,17 @@ const Order = () => {
     Alert.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
   };
 
-  return ( orderDetails &&
+  return (
     <div>
       <div className="flex flex-row md:flex-row m-5 px-8">
-          <Button
-              onClick={() => navigate(-1)}
-              className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
-              icon={<ArrowLeftOutlined />}
-              size="large"
-          >
-              Quay về
-          </Button>
+        <Button
+          onClick={() => navigate(-1)}
+          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+          icon={<ArrowLeftOutlined />}
+          size="large"
+        >
+          Quay về
+        </Button>
       </div>
       <div className="flex items-center justify-center bg-gray-100 px-10">
         <Row gutter={[16, 16]} className="w-full">

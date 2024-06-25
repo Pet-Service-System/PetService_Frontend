@@ -71,6 +71,11 @@ const Cart = () => {
     },
   ];
 
+  const handlePayClick = () => {
+    localStorage.setItem('totalAmount', totalAmount.toFixed(2));
+    navigate('/order');
+  }
+
   return (
     <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
       <div className="flex flex-row md:flex-row m-5">
@@ -101,7 +106,7 @@ const Cart = () => {
           <Text className="text-2xl text-green-600 mr-4">
             Tổng tiền: ${totalAmount.toFixed(2)}
           </Text>
-          <Button type="primary" onClick={() => navigate('/order')}>
+          <Button type="primary" onClick={handlePayClick}>
             Thanh toán
           </Button>
         </div>
