@@ -1,42 +1,32 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Spin } from "antd";
-import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Table, Button, Typography, Layout, message, Grid, Spin } from "antd";
 import axios from 'axios';
-import SubMenu from "antd/es/menu/SubMenu";
 
 const { Text } = Typography;
-const { Sider } = Layout;
-const { useBreakpoint } = Grid;
-
-const getHotelBookings = async () => {
-  const user = JSON.parse(localStorage.getItem('user'))
-  const AccountID = user.id
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/Hotel-bookings/account/${AccountID}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log('Fetched hotel bookings:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching hotel bookings:', error);
-    throw error;
-  }
-};
 
 const BookingList = () => {
   const navigate = useNavigate();
   const [hotelBookings, setHotelBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [reviewText, setReviewText] = useState('');
-  const [reviewError, setReviewError] = useState('');
-  const [reviewTransactionId, setReviewTransactionId] = useState(null);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false); // State for loading indicator
-  const screens = useBreakpoint();
+
+  const getHotelBookingHistory = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/Hotel-bookings/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Fetched data:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order history:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     fetchHotelBookings();
@@ -45,7 +35,7 @@ const BookingList = () => {
   const fetchHotelBookings = async () => {
     setLoading(true); // Start loading indicator
     try {
-      const data = await getHotelBookings();
+      const data = await getHotelBookingHistory();
       const formattedData = data.map(booking => ({
         id: booking.BookingDetailID, // Adjust as per your backend response
         date: new Date(booking.CreateDate), // Adjust as per your backend response
@@ -68,21 +58,85 @@ const BookingList = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
 
-  const handleReviewTransaction = (id) => {
-    setReviewTransactionId(id);
-    setReviewText('');
-    setReviewError('');
+  const showConfirm = (hotelID, newStatus) => {
+    confirm({
+      title: 'Are you sure you want to update the hotel booking status?',
+      content: `Change status to "${newStatus}"?`,
+      onOk() {
+        handleUpdateStatus(hotelID, newStatus);
+      },
+      onCancel() {
+        console.log('Cancelled');
+      },
+    });
   };
 
-  const handleSubmitReview = () => {
-    if (reviewText.trim() === '') {
-      setReviewError('Review cannot be empty');
-      return;
+  const handleUpdateStatus = async (hotelID, newStatus) => {
+    const token = localStorage.getItem('token');
+    try {
+      await axios.put(
+        `http://localhost:3001/api/Hotel-bookings/${hotelID}`,
+        { Status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      message.success('hotel booking status updated successfully');
+      fetchOrderHistory(); // Refresh order list after update
+    } catch (error) {
+      console.error('Error updating hotel booking status:', error);
+      message.error('Failed to update hotel booking status');
     }
+  };
 
-    // Placeholder for actual review submission logic
-    message.success('Your review has been submitted successfully');
-    setReviewTransactionId(null); // Close the review form
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'Pending':
+        return { color: 'blue' };
+      case 'Processing':
+        return { color: 'orange' };
+      case 'Completed':
+        return { color: 'green' };
+      case 'Canceled':
+        return { color: 'red' };
+      default:
+        return {};
+    }
+  };
+
+  const renderUpdateButton = (record) => {
+    if (role === 'Sales Staff') {
+      switch (record.status) {
+        case 'Pending':
+          return (
+            <div>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Processing')}>
+                Processing
+              </Button>
+              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
+                Cancel
+              </Button>
+            </div>
+          );
+        case 'Processing':
+          return (
+            <div>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Completed')}>
+                Completed
+              </Button>
+              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
+                Cancel
+              </Button>
+            </div>
+          );
+        default:
+          return null;
+      }
+    } else {
+      return null;
+    }
   };
 
   const columns = [
@@ -116,7 +170,10 @@ const BookingList = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-    },
+      render: (text, record) => (
+        <Text style={getStatusStyle(record.status)}>{record.status}</Text>
+      )
+    },    
     {
       title: 'Detail',
       key: 'detail',
@@ -125,89 +182,14 @@ const BookingList = () => {
       ),
     },
     {
-      title: 'Review',
-      key: 'review',
-      render: (text, record) => (
-        <div>
-          <Button type="primary" onClick={() => handleReviewTransaction(record.id)}>Review</Button>
-          {reviewTransactionId === record.id && (
-            <Form layout="vertical" onFinish={handleSubmitReview}>
-              <Form.Item
-                label="Review"
-                validateStatus={reviewError ? 'error' : ''}
-                help={reviewError}
-              >
-                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">Submit</Button>
-                <Button onClick={() => setReviewTransactionId(null)}>Cancel</Button>
-              </Form.Item>
-            </Form>
-          )}
-        </div>
-      ),
+      title: 'Cập nhật trạng thái',
+      key: 'updateStatus',
+      render: (text, record) => renderUpdateButton(record),
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('user');
-    setRole('Guest');
-    navigate('/');
-    window.location.reload();
-  };
-
   return (
     <Layout style={{ minHeight: '80vh' }}>
-      {!screens.xs && (
-        <Sider width={220}>
-          <div className="logo" />
-          <Menu theme="dark" mode="inline">
-            <Menu.Item
-              key="profile"
-              icon={<UserOutlined />}
-              onClick={() => navigate('/user-profile')}
-            >
-              Thông tin người dùng
-            </Menu.Item>
-            {role === 'Customer' && (
-              <>
-                <Menu.Item
-                  key="pet-list"
-                  icon={<UnorderedListOutlined />}
-                  onClick={() => navigate('/pet-list')}
-                >
-                  Danh sách thú cưng
-                </Menu.Item>
-                <Menu.Item
-                  key="orders-history"
-                  icon={<HistoryOutlined />}
-                  onClick={() => navigate('/orders-history')}
-                >
-                  Lịch sử đặt hàng
-                </Menu.Item>
-                <SubMenu
-                  key="service-history"
-                  icon={<HistoryOutlined />}
-                  title="Lịch sử dịch vụ"
-                >
-                  <Menu.Item key="spa-booking" onClick={() => navigate('/spa-booking')}>
-                    Dịch vụ spa
-                  </Menu.Item>
-                  <Menu.Item key="hotel-booking" onClick={() => navigate('/hotel-booking')}>
-                    Dịch vụ khách sạn
-                  </Menu.Item>
-                </SubMenu>
-              </>
-            )}
-            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Đăng xuất
-            </Menu.Item>
-          </Menu>
-        </Sider>
-      )}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt lịch khách sạn</h2>
