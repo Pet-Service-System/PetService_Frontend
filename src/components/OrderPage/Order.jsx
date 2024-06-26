@@ -5,9 +5,9 @@ import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
-
 const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
@@ -22,7 +22,6 @@ const Order = () => {
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -79,13 +78,55 @@ const Order = () => {
     });
   };
 
-  const onApprove = (data, actions) => {
-    return actions.order.capture().then(() => {
+  const onApprove = async (data, actions) => {
+    try {
+      await actions.order.capture();
       setSuccessModalVisible(true); 
       localStorage.removeItem('shoppingCart');
       dispatch(setShoppingCart([]));
-    });
+      const user = JSON.parse(localStorage.getItem('user'))
+      const AccountID = user.id
+      // Define order data
+      const orderData = {
+        Status: 'Processing',
+        TotalPrice: orderDetails.totalAmount,
+        OrderDate: new Date().toLocaleDateString('en-GB')
+      };
+      // Call the createOrder API using Axios
+      const orderResponse = await axios.post('http://localhost:3001/api/orders', orderData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        }
+      });
+
+      console.log('Order created:', orderResponse.data);
+
+      const orderDetailsData = {
+        OrderID: orderResponse.data.OrderID,
+        CustomerName: orderDetails.fullname,
+        Address: orderDetails.address,
+        Phone: orderDetails.phone,
+        AccountID: AccountID,
+        Products: orderDetails.cartItems.map(item => ({
+          ProductID: item.ProductID,
+          Quantity: item.quantity
+        }))
+      };
+      const detailsResponse = await axios.post('http://localhost:3001/api/order-details', orderDetailsData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header if needed
+        }
+      });
+
+      console.log('Order details created:', detailsResponse.data);
+
+    } catch (error) {
+      console.error('Error during PayPal checkout:', error);
+      // Handle error
+      message.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
+    }
   };
+
 
   const closeModal = () => {
     setSuccessModalVisible(false);
@@ -117,7 +158,7 @@ const Order = () => {
               <Title level={3} className="mb-6">Địa chỉ giao hàng</Title>
               <Text strong>Họ tên:</Text>
               <Input
-                name="fullname"
+                name="CustomerName"
                 value={orderDetails.fullname}
                 onChange={handleInputChange}
                 className="mb-2"
@@ -125,7 +166,7 @@ const Order = () => {
               <br />
               <Text strong>Địa chỉ:</Text>
               <Input
-                name="address"
+                name="Address"
                 value={orderDetails.address}
                 onChange={handleInputChange}
                 className="mb-2"
@@ -133,7 +174,7 @@ const Order = () => {
               <br />
               <Text strong>Số điện thoại:</Text>
               <Input
-                name="phone"
+                name="Phone"
                 value={orderDetails.phone}
                 onChange={handleInputChange}
                 className="mb-2"

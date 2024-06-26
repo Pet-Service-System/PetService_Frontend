@@ -38,6 +38,22 @@ const getOrderDetail = async (id) => {
   }
 }
 
+// Function to fetch product details by ID
+const getProductById = async (productId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:3001/api/products/${productId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // Assuming API returns product details
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    throw error;
+  }
+};
+
 const OrderHistoryDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -62,6 +78,15 @@ const OrderHistoryDetail = () => {
       setOrder(data);
       const detailData = await getOrderDetail(orderId);
       setOrderDetail(detailData);
+  
+      // Fetch product details for each product in order detail
+      const productsWithDetails = await Promise.all(
+        detailData.Products.map(async (product) => {
+          const productDetails = await getProductById(product.ProductID);
+          return { ...product, ...productDetails };
+        })
+      );
+      setOrderDetail({ ...detailData, Products: productsWithDetails });
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
