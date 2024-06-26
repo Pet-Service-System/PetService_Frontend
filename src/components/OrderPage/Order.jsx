@@ -90,6 +90,7 @@ const Order = () => {
       const orderData = {
         Status: 'Processing',
         TotalPrice: orderDetails.totalAmount,
+        AccountID: AccountID,
         OrderDate: new Date().toLocaleDateString('en-GB')
       };
       // Call the createOrder API using Axios
@@ -106,7 +107,6 @@ const Order = () => {
         CustomerName: orderDetails.fullname,
         Address: orderDetails.address,
         Phone: orderDetails.phone,
-        AccountID: AccountID,
         Products: orderDetails.cartItems.map(item => ({
           ProductID: item.ProductID,
           Quantity: item.quantity
