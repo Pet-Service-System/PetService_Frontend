@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Spin, message, Modal } from "antd";
 import axios from 'axios';
+import moment from "moment";
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -34,24 +35,23 @@ const OrderList = () => {
   }, [sortOrder]);
 
   const fetchOrderHistory = async () => {
-    setLoading(true);
+    setLoading(true); // Start loading indicator
     try {
       const data = await getOrderHistory();
       const formattedData = data.map(order => ({
         id: order.OrderID,
         date: order.OrderDate,
-        description: order.Address,
-        amount: order.TotalPrice,
-        status: order.Status
+        status: order.Status,
+        amount: order.TotalPrice
       }));
-      const sortedData = sortOrder === 'desc' 
-        ? formattedData.sort((a, b) => b.date - a.date) 
-        : formattedData.sort((a, b) => a.date - b.date);
-      setOrders(sortedData);
+      const sortedData = sortOrder === 'desc'
+        ? formattedData.sort((a, b) => moment(b.date).diff(a.date))
+        : formattedData.sort((a, b) => moment(a.date).diff(b.date));
+      setOrders(sortedData); // Sắp xếp theo ngày
     } catch (error) {
       console.error('Error fetching order history:', error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading indicator
     }
   };
 
@@ -149,6 +149,9 @@ const OrderList = () => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
+      render: (text, record) => (
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Số tiền',

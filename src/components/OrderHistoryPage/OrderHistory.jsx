@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Menu, Grid, Spin } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import moment from 'moment';
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -48,9 +49,9 @@ const OrderHistory = () => {
         status: order.Status,
         amount: order.TotalPrice
       }));
-      const sortedData = sortOrder === 'desc' 
-        ? formattedData.sort((a, b) => b.date - a.date) 
-        : formattedData.sort((a, b) => a.date - b.date);
+      const sortedData = sortOrder === 'desc'
+        ? formattedData.sort((a, b) => moment(b.date).diff(a.date))
+        : formattedData.sort((a, b) => moment(a.date).diff(b.date));
       setOrders(sortedData); // Sắp xếp theo ngày
     } catch (error) {
       console.error('Error fetching order history:', error);
@@ -83,6 +84,9 @@ const OrderHistory = () => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
+      render: (text, record) => (
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Số tiền',

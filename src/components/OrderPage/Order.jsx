@@ -161,7 +161,7 @@ const Order = () => {
         Status: 'Processing',
         TotalPrice: orderDetails.totalAmount + orderDetails.shippingCost,
         AccountID: JSON.parse(localStorage.getItem('user')).id,
-        OrderDate: new Date().toLocaleDateString('en-GB')
+        OrderDate: new Date(), 
       };
 
       // Call the createOrder API using Axios

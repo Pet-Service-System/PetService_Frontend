@@ -4,6 +4,7 @@ import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } fr
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
+import moment from "moment";
 
 const { Title, Text } = Typography;
 
@@ -226,7 +227,7 @@ const OrderHistoryDetail = () => {
       <Card className="p-6 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
         <Title level={2} className="mb-4 text-center">Chi tiết đơn hàng #{order.OrderID}</Title>
         <div className="mb-4">
-          <Text strong>Ngày đặt hàng:</Text> <Text>{order.OrderDate}</Text>
+          <Text strong>Ngày đặt hàng:</Text> <Text>{moment(order.date).format('DD/MM/YYYY HH:mm')}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Trạng thái:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
