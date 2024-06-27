@@ -78,6 +78,55 @@ const Order = () => {
     }));
   };
 
+  const updateInventoryQuantity = async (orderDetails) => {
+    try {
+      // Iterate over each product in the order details
+      for (const item of orderDetails.cartItems) {
+        // Make an API call to get current inventory quantity
+        const inventoryResponse = await axios.get(`http://localhost:3001/api/products/${item.ProductID}`);
+
+        if (inventoryResponse.status !== 200) {
+          throw new Error(`Failed to fetch inventory for ProductID ${item.ProductID}`);
+        }
+
+        const currentInventory = inventoryResponse.data.Quantity;
+
+        // Validate item.Quantity and item.quantity before proceeding
+        if (typeof item.quantity !== 'number') {
+          throw new Error(`Invalid quantity data for ProductID ${item.ProductID}`);
+        }
+
+        // Check if there is sufficient inventory
+        if (currentInventory < item.quantity) {
+          throw new Error(`Not enough inventory available for ProductID ${item.ProductID}`);
+        }
+
+        // Calculate the new quantity after purchase
+        const newQuantity = currentInventory - item.quantity;
+
+        // Make an API call to update the inventory
+        const response = await axios.patch(`http://localhost:3001/api/products/${item.ProductID}`, {
+          Quantity: newQuantity
+        }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status !== 200) {
+          throw new Error(`Failed to update inventory for ProductID ${item.ProductID}`);
+        }
+
+        console.log(`Inventory updated successfully for ProductID ${item.ProductID}`);
+      }
+    } catch (error) {
+      console.error('Error updating inventory:', error);
+      // Handle error appropriately, e.g., show a message to the user
+      message.error('Đã xảy ra lỗi khi cập nhật số lượng tồn kho.');
+    }
+  };
+
   const createOrder = (data, actions) => {
     return actions.order.create({
       purchase_units: [{
@@ -126,6 +175,8 @@ const Order = () => {
       });
 
       console.log('Order details created:', detailsResponse.data);
+
+      await updateInventoryQuantity(orderDetails);
 
       setTimeout(() => {
         localStorage.removeItem('shoppingCart');

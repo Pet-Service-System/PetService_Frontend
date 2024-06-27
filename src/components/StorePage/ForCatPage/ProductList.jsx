@@ -59,12 +59,12 @@ const ProductList = () => {
   
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('productName', values.ProductName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('quantity', parseInt(values.Quantity, 10));
-      formData.append('petTypeId', petTypeID);
-      formData.append('status', values.Status);
+      formData.append('ProductName', values.ProductName);
+      formData.append('Price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Quantity', parseInt(values.Quantity, 10));
+      formData.append('PetTypeID', petTypeID);
+      formData.append('Status', values.Status);
       if (productImg) {
         formData.append('image', productImg);
       } else {
@@ -78,7 +78,7 @@ const ProductList = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+  
       if (response.status === 201) {
         message.success('Product added successfully', 0.5).then(() => {
           window.location.reload();
@@ -135,25 +135,25 @@ const ProductList = () => {
 
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('productName', values.ProductName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('quantity', parseInt(values.Quantity, 10));
-      formData.append('status', values.Status);
+      formData.append('ProductName', values.ProductName);
+      formData.append('Price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Quantity', parseInt(values.Quantity, 10));
+      formData.append('Status', values.Status);
       if (productImg) {
         formData.append('image', productImg);
       }
       message.warning('Processing...')
-      // for (let [key, value] of formData.entries()) {
-      //   console.log(`${key}: ${value}`);
-      // }
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+      }    
       const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       if (response.status === 200) {
         message.success('Product updated successfully', 0.5).then(() => {
           window.location.reload();
@@ -259,7 +259,7 @@ const ProductList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className='text-center'>Product for cats</Title>
+      <Title level={1} className='text-center'>Product for dogs</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>

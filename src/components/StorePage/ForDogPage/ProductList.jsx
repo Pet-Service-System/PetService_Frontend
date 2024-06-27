@@ -59,12 +59,12 @@ const ProductList = () => {
   
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('productName', values.ProductName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('quantity', parseInt(values.Quantity, 10));
-      formData.append('petTypeId', petTypeID);
-      formData.append('status', values.Status);
+      formData.append('ProductName', values.ProductName);
+      formData.append('Price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Quantity', parseInt(values.Quantity, 10));
+      formData.append('PetTypeID', petTypeID);
+      formData.append('Status', values.Status);
       if (productImg) {
         formData.append('image', productImg);
       } else {
