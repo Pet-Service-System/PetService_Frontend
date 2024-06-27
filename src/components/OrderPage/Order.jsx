@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Row, Col, Radio, Typography, Image, Input, Button, message } from 'antd';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
@@ -22,17 +22,16 @@ const Order = () => {
     phone: '',
   });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
+  const [editMode, setEditMode] = useState(false); // State for edit mode
+  const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem('addressInfo'));
     if (addressInfo) {
-      setCustomerInfo({
-        fullname: addressInfo.fullname,
-        address: addressInfo.address,
-        phone: addressInfo.phone,
-      });
+      setCustomerInfo(addressInfo);
+      setOriginalCustomerInfo(addressInfo); 
     }
   }, []);
 
@@ -66,17 +65,35 @@ const Order = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCustomerInfo({
-      ...customerInfo,
+    setCustomerInfo(prevCustomerInfo => ({
+      ...prevCustomerInfo,
       [name]: value,
-    });
-
-    // Update localStorage
+    }));
+  
+    // Update localStorage immediately with the updated customerInfo
     localStorage.setItem('addressInfo', JSON.stringify({
-      ...customerInfo,
+      ...customerInfo, // Use current state here as setCustomerInfo is async
       [name]: value,
     }));
   };
+  
+
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+  };
+
+  const saveChanges = () => {
+    localStorage.setItem('addressInfo', JSON.stringify(customerInfo));
+    setOriginalCustomerInfo(customerInfo); // Update originalCustomerInfo with current state
+    setEditMode(false);
+    window.location.reload();
+  };
+  
+  const cancelEdit = () => {
+    setCustomerInfo(originalCustomerInfo); // Revert to original state
+    setEditMode(false);
+  };
+  
 
   const updateInventoryQuantity = async (orderDetails) => {
     try {
@@ -157,6 +174,15 @@ const Order = () => {
 
       console.log('Order created:', orderResponse.data);
 
+      const addressInfo = JSON.parse(localStorage.getItem('addressInfo'));
+      if (addressInfo) {
+        setCustomerInfo({
+          fullname: addressInfo.fullname,
+          address: addressInfo.address,
+          phone: addressInfo.phone,
+        });
+      }
+
       const orderDetailsData = {
         OrderID: orderResponse.data.OrderID,
         CustomerName: customerInfo.fullname,
@@ -213,13 +239,32 @@ const Order = () => {
           <Col xs={24} md={16}>
             {/* Delivery Address */}
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">Địa chỉ giao hàng</Title>
+              <div className="flex justify-between items-center mb-6">
+                <Title level={3} className="mb-0">
+                  Địa chỉ giao hàng
+                </Title>
+                {!editMode ? (
+                  <Button onClick={toggleEditMode} icon={<EditOutlined />} type="text">
+                    Sửa
+                  </Button>
+                ) : (
+                  <div>
+                    <Button onClick={saveChanges} icon={<SaveOutlined />} type="primary" className="mr-2">
+                      Lưu
+                    </Button>
+                    <Button onClick={cancelEdit} icon={<CloseOutlined />} type="default">
+                      Hủy
+                    </Button>
+                  </div>
+                )}
+              </div>
               <Text strong>Họ tên:</Text>
               <Input
                 name="fullname"
                 value={customerInfo.fullname}
                 onChange={handleInputChange}
                 className="mb-2"
+                disabled={!editMode} // Disable input if not in edit mode
               />
               <br />
               <Text strong>Địa chỉ:</Text>
@@ -228,6 +273,7 @@ const Order = () => {
                 value={customerInfo.address}
                 onChange={handleInputChange}
                 className="mb-2"
+                disabled={!editMode} // Disable input if not in edit mode
               />
               <br />
               <Text strong>Số điện thoại:</Text>
@@ -236,6 +282,7 @@ const Order = () => {
                 value={customerInfo.phone}
                 onChange={handleInputChange}
                 className="mb-2"
+                disabled={!editMode} // Disable input if not in edit mode
               />
             </div>
             <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">

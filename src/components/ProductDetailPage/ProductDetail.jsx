@@ -63,22 +63,44 @@ const ProductDetail = () => {
         fetchComments();
     }, [id]);
 
-    const handleIncrease = () => setQuantity(quantity + 1);
+    const handleIncrease = () => {
+        if (quantity < productData.Quantity) {
+            setQuantity(quantity + 1);
+        } else {
+            message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
+        }
+    };
+    
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
     const handleOrderNow = () => {
-        console.log('Ordered:', productData, 'Quantity:', quantity);
+        if (productData) {
+            if (quantity > productData.Quantity) {
+                message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
+                return;
+            }
+    
+            const productWithQuantity = { ...productData, quantity };
+            handleAddItem(productWithQuantity);
+            navigate('/order')
+        }
     };
+    
 
     const { handleAddItem } = useShopping();
 
     const handleAddToCart = () => {
         if (productData) {
+            if (quantity > productData.Quantity) {
+                message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
+                return;
+            }
+    
             const productWithQuantity = { ...productData, quantity };
             handleAddItem(productWithQuantity);
+            message.success('Product added to cart successfully');
         }
-        message.success('Product added to cart successfully');
-    };
+    };    
 
     const handleChangeQuantity = (value) => {
         if (!isNaN(value) && value > 0) {

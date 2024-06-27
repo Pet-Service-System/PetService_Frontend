@@ -89,7 +89,7 @@ const OrderHistoryDetail = () => {
             ...product,
             ProductName: productDetails.ProductName,
             Price: productDetails.Price,
-            Quantity: product.Quantity, // Ensure to include Quantity from OrderDetails
+            Quantity: product.Quantity,
           };
         })
       );
