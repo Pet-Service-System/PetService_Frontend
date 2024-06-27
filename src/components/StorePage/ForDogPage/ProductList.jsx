@@ -135,15 +135,18 @@ const ProductList = () => {
 
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('productName', values.ProductName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('quantity', parseInt(values.Quantity, 10));
-      formData.append('status', values.Status);
+      formData.append('ProductName', values.ProductName);
+      formData.append('Price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Quantity', parseInt(values.Quantity, 10));
+      formData.append('Status', values.Status);
       if (productImg) {
         formData.append('image', productImg);
       }
       message.warning('Processing...')
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+      }    
       const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,

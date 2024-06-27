@@ -31,6 +31,7 @@ import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
+import PurchaseSuccessPage from './pages/PurchaseOrderSuccessPage'
 function App() {
   return (
     <>
@@ -49,7 +50,7 @@ function App() {
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
       <Route path='/product-detail/:id' element={<ProdutcDetailPage/>}/>
       <Route path='/pet-list' element={<PetListPage/>}/>
-      <Route path='/orders-history' element={<OrderHistoryPage/>}/>
+      <Route path='/order-history' element={<OrderHistoryPage/>}/>
       <Route path='/spa-service-detail/:id' element={<SpaServiceDetailPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/order' element={<OrderPage/>}/>
@@ -58,10 +59,11 @@ function App() {
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
       <Route path='/pet-booking' element={<PetBooking/>}/>
       <Route path='/spa-booking' element={<SpaBookingPage/>}/>
-      <Route path='/orders-history-detail/:id' element={<OrderHistoryDetail/>}/>
+      <Route path='/order-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
       <Route path='/manage-orders' element={<ManageOrderPage/>}/>
       <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
+      <Route path='/purchase-order-successfully' element={<PurchaseSuccessPage/>}/>
     </Routes>
     </>
   )

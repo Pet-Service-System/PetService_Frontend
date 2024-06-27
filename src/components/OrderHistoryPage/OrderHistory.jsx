@@ -129,7 +129,7 @@ const OrderHistory = () => {
       title: 'Chi tiết',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
   ];
@@ -171,7 +171,7 @@ const OrderHistory = () => {
                 <Menu.Item
                   key="orders-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/orders-history')}
+                  onClick={() => navigate('/order-history')}
                 >
                   Lịch sử đặt hàng
                 </Menu.Item>

@@ -207,7 +207,7 @@ const Banner = () => {
         <div className="flex items-center">
           {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
-            className="text-7xl ml-10 px-10 cursor-pointer text-white"
+            className="text-5xl ml-10 px-10 cursor-pointer text-white"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >

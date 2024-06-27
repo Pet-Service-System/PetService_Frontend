@@ -28,6 +28,13 @@ const LoginForm = () => {
     return () => clearTimeout(timer);
   }, [disableLogin]);
 
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
+
   const validate = () => {
     const newErrors = {};
     if (!email) newErrors.email = 'Email is required';
@@ -50,8 +57,16 @@ const LoginForm = () => {
         localStorage.setItem('role', user.role);
         localStorage.setItem('user', JSON.stringify(user));
 
+        // Save addressInfo to localStorage
+        const addressInfo = {
+          fullname: user.fullname,
+          address: user.address,
+          phone: user.phone,
+        };
+        localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
+
         message.success('Login successful!', 1).then(() => {
-          navigate('/');
+          navigate('/', { replace: true });
         });
         setDisableLogin(true);
       } catch (error) {
@@ -85,8 +100,16 @@ const LoginForm = () => {
           localStorage.setItem('role', data.user.role);
           localStorage.setItem('user', JSON.stringify(data.user));
 
+          // Save addressInfo to localStorage
+          const addressInfo = {
+            fullname: data.user.fullname,
+            address: data.user.address,
+            phone: data.user.phone,
+          };
+          localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
+
           message.success('Login successful!', 1).then(() => {
-            navigate('/');
+            navigate('/', { replace: true });
           });
         } else {
           message.error('Google login failed: Invalid response from server');

@@ -205,9 +205,9 @@ const SpaBooking = () => {
                   Danh sách thú cưng
                 </Menu.Item>
                 <Menu.Item
-                  key="orders-history"
+                  key="order-history"
                   icon={<HistoryOutlined />}
-                  onClick={() => navigate('/orders-history')}
+                  onClick={() => navigate('/order-history')}
                 >
                   Lịch sử đặt hàng
                 </Menu.Item>

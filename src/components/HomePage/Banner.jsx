@@ -83,14 +83,14 @@ const Banner = () => {
     dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
-    navigate('/');
+    navigate('/', {replace: true});
   };
 
   const userMenuItems = [
     { key: 'profile', icon: <UserOutlined />, label: 'Thông tin người dùng', onClick: () => navigate('/user-profile') },
     ...(role === 'Customer' ? [
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
-      { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
+      { key: 'order-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/order-history') },
       {
         key: 'service-history',
         icon: <HistoryOutlined />,
@@ -203,7 +203,7 @@ const Banner = () => {
             <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
               <Menu.Item onClick={() => { navigate('/user-profile') }}>Thông tin người dùng</Menu.Item>
               <Menu.Item onClick={() => { navigate('/pet-list') }}>Danh sách thú cưng</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/orders-history') }}>Lịch sử đặt hàng</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/order-history') }}>Lịch sử đặt hàng</Menu.Item>
               <Menu.SubMenu title="Lịch sử dịch vụ">
                 <Menu.Item onClick={() => { navigate('/spa-booking') }}>Dịch vụ thú cưng</Menu.Item>
               </Menu.SubMenu>
@@ -239,7 +239,7 @@ const Banner = () => {
         <div className="flex items-center">
           {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
-            className="text-7xl ml-10 px-10 cursor-pointer text-white"
+            className="text-5xl ml-10 px-10 cursor-pointer text-white"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >

@@ -1,46 +1,50 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Radio, Typography, Modal, Image, Input, Button, message } from 'antd';
+import { Row, Col, Radio, Typography, Image, Input, Button, message } from 'antd';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
+
 const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
-    fullname: '',
-    address: '',
-    phone: '',
     totalAmount: 0,
     shippingCost: 3,
     cartItems: [],
   });
+  const [customerInfo, setCustomerInfo] = useState({
+    fullname: '',
+    address: '',
+    phone: '',
+  });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setOrderDetails((prevOrderDetails) => ({
-        ...prevOrderDetails,
-        fullname: user.fullname,
-        address: user.address,
-        phone: user.phone,
-      }));
-    }
 
+  useEffect(() => {
+    const addressInfo = JSON.parse(localStorage.getItem('addressInfo'));
+    if (addressInfo) {
+      setCustomerInfo({
+        fullname: addressInfo.fullname,
+        address: addressInfo.address,
+        phone: addressInfo.phone,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
     const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     const totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
 
-    setOrderDetails((prevOrderDetails) => ({
-      ...prevOrderDetails,
+    setOrderDetails({
+      ...orderDetails,
       totalAmount: totalAmount,
       cartItems: shoppingCart,
-    }));
+    });
 
     // Enable PayPal button only when order details are ready
     setIsPayPalEnabled(true);
@@ -54,18 +58,24 @@ const Order = () => {
     }
 
     setSelectedShippingMethod(shippingMethod);
-    setOrderDetails((prevOrderDetails) => ({
-      ...prevOrderDetails,
+    setOrderDetails({
+      ...orderDetails,
       shippingCost: shippingCost,
-    }));
+    });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setOrderDetails({
-      ...orderDetails,
+    setCustomerInfo({
+      ...customerInfo,
       [name]: value,
     });
+
+    // Update localStorage
+    localStorage.setItem('addressInfo', JSON.stringify({
+      ...customerInfo,
+      [name]: value,
+    }));
   };
 
   const createOrder = (data, actions) => {
@@ -81,22 +91,18 @@ const Order = () => {
   const onApprove = async (data, actions) => {
     try {
       await actions.order.capture();
-      setSuccessModalVisible(true); 
-      localStorage.removeItem('shoppingCart');
-      dispatch(setShoppingCart([]));
-      const user = JSON.parse(localStorage.getItem('user'))
-      const AccountID = user.id
       // Define order data
       const orderData = {
         Status: 'Processing',
         TotalPrice: orderDetails.totalAmount,
-        AccountID: AccountID,
+        AccountID: JSON.parse(localStorage.getItem('user')).id,
         OrderDate: new Date().toLocaleDateString('en-GB')
       };
+
       // Call the createOrder API using Axios
       const orderResponse = await axios.post('http://localhost:3001/api/orders', orderData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}` 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
@@ -104,14 +110,15 @@ const Order = () => {
 
       const orderDetailsData = {
         OrderID: orderResponse.data.OrderID,
-        CustomerName: orderDetails.fullname,
-        Address: orderDetails.address,
-        Phone: orderDetails.phone,
+        CustomerName: customerInfo.fullname,
+        Address: customerInfo.address,
+        Phone: customerInfo.phone,
         Products: orderDetails.cartItems.map(item => ({
           ProductID: item.ProductID,
           Quantity: item.quantity
         }))
       };
+
       const detailsResponse = await axios.post('http://localhost:3001/api/order-details', orderDetailsData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header if needed
@@ -120,17 +127,17 @@ const Order = () => {
 
       console.log('Order details created:', detailsResponse.data);
 
+      setTimeout(() => {
+        localStorage.removeItem('shoppingCart');
+        dispatch(setShoppingCart([]));
+        navigate('/purchase-order-successfully', { replace: true });
+      }, 1000);
+
     } catch (error) {
       console.error('Error during PayPal checkout:', error);
       // Handle error
       message.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
     }
-  };
-
-
-  const closeModal = () => {
-    setSuccessModalVisible(false);
-    navigate('/'); // Sau khi đóng modal, chuyển hướng về trang chủ
   };
 
   const onError = (err) => {
@@ -158,24 +165,24 @@ const Order = () => {
               <Title level={3} className="mb-6">Địa chỉ giao hàng</Title>
               <Text strong>Họ tên:</Text>
               <Input
-                name="CustomerName"
-                value={orderDetails.fullname}
+                name="fullname"
+                value={customerInfo.fullname}
                 onChange={handleInputChange}
                 className="mb-2"
               />
               <br />
               <Text strong>Địa chỉ:</Text>
               <Input
-                name="Address"
-                value={orderDetails.address}
+                name="address"
+                value={customerInfo.address}
                 onChange={handleInputChange}
                 className="mb-2"
               />
               <br />
               <Text strong>Số điện thoại:</Text>
               <Input
-                name="Phone"
-                value={orderDetails.phone}
+                name="phone"
+                value={customerInfo.phone}
                 onChange={handleInputChange}
                 className="mb-2"
               />
@@ -256,19 +263,6 @@ const Order = () => {
           </Col>
         </Row>
       </div>
-
-      {/* Success Modal */}
-      <Modal
-        title="Thanh toán thành công"
-        visible={successModalVisible}
-        footer={[
-          <Button key="back" type='primary' onClick={closeModal}>
-            Về trang chủ
-          </Button>,
-        ]}
-      >
-        <p><CheckCircleOutlined style={{ color: '#52c41a', fontSize: '24px', marginRight: '10px' }} /> Đơn hàng của bạn đã được thanh toán thành công!</p>
-      </Modal>
     </div>
   );
 };
