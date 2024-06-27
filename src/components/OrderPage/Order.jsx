@@ -13,7 +13,7 @@ const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
-    shippingCost: 3,
+    shippingCost: 2,
     cartItems: [],
   });
   const [customerInfo, setCustomerInfo] = useState({
@@ -143,7 +143,7 @@ const Order = () => {
       // Define order data
       const orderData = {
         Status: 'Processing',
-        TotalPrice: orderDetails.totalAmount,
+        TotalPrice: orderDetails.totalAmount + orderDetails.shippingCost,
         AccountID: JSON.parse(localStorage.getItem('user')).id,
         OrderDate: new Date().toLocaleDateString('en-GB')
       };

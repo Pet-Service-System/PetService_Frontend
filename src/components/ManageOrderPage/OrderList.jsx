@@ -39,7 +39,7 @@ const OrderList = () => {
       const data = await getOrderHistory();
       const formattedData = data.map(order => ({
         id: order.OrderID,
-        date: new Date(order.OrderDate),
+        date: order.OrderDate,
         description: order.Address,
         amount: order.TotalPrice,
         status: order.Status
@@ -149,9 +149,6 @@ const OrderList = () => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
-      render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
-      )
     },
     {
       title: 'Mô tả',

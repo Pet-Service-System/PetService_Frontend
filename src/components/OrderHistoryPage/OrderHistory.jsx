@@ -45,7 +45,8 @@ const OrderHistory = () => {
       const formattedData = data.map(order => ({
         id: order.OrderID,
         date: order.OrderDate,
-        status: order.Status
+        status: order.Status,
+        amount: order.TotalPrice
       }));
       const sortedData = sortOrder === 'desc' 
         ? formattedData.sort((a, b) => b.date - a.date) 
@@ -82,6 +83,14 @@ const OrderHistory = () => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
+    },
+    {
+      title: 'Số tiền',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record) => (
+        <Text>${record.amount}</Text>
+      )
     },
     {
       title: 'Trạng thái',

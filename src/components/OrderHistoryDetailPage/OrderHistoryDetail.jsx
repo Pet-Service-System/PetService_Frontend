@@ -75,25 +75,33 @@ const OrderHistoryDetail = () => {
   const fetchOrderDetails = async (orderId) => {
     setLoading(true);
     try {
-      const data = await getOrder(orderId);
-      setOrder(data);
-      const detailData = await getOrderDetail(orderId);
-      setOrderDetail(detailData);
+      const orderData = await getOrder(orderId);
+      setOrder(orderData);
+  
+      const orderDetailData = await getOrderDetail(orderId);
+      setOrderDetail(orderDetailData);
   
       // Fetch product details for each product in order detail
       const productsWithDetails = await Promise.all(
-        detailData.Products.map(async (product) => {
+        orderDetailData.Products.map(async (product) => {
           const productDetails = await getProductById(product.ProductID);
-          return { ...product, ...productDetails };
+          return {
+            ...product,
+            ProductName: productDetails.ProductName,
+            Price: productDetails.Price,
+            Quantity: product.Quantity, // Ensure to include Quantity from OrderDetails
+          };
         })
       );
-      setOrderDetail({ ...detailData, Products: productsWithDetails });
+  
+      setOrderDetail({ ...orderDetailData, Products: productsWithDetails });
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const openModal = (productID) => {
     setSelectedProductID(productID);
@@ -174,6 +182,7 @@ const OrderHistoryDetail = () => {
       title: 'Số lượng',
       dataIndex: 'Quantity',
       key: 'Quantity',
+      render: (text, record) => <span>{record.Quantity}</span>,
     },
     {
       title: 'Giá',
@@ -225,6 +234,9 @@ const OrderHistoryDetail = () => {
         </div>
         <div className="mb-4">
           <Text strong>Địa chỉ:</Text> <Text>{orderDetail.Address}</Text>
+        </div>
+        <div className="mb-4">
+          <Text strong>Phí ship: $2</Text>
         </div>
         <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
