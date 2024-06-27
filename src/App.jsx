@@ -25,7 +25,6 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
 import ProdutcDetailPage from './pages/ProdutcDetailPage'
-import PetBooking from './pages/PetBooking'
 import SpaBookingPage from './pages/SpaBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
@@ -57,7 +56,6 @@ function App() {
       <Route path='/manage-accounts' element={<ManageAccountPage/>}/>
       <Route path='/reset-password/:accountId/:token' element={<ResetPasswordPage/>}/>
       <Route path='/staff-schedule' element={<SchedulePage/>}/>
-      <Route path='/pet-booking' element={<PetBooking/>}/>
       <Route path='/spa-booking' element={<SpaBookingPage/>}/>
       <Route path='/order-history-detail/:id' element={<OrderHistoryDetail/>}/>
       <Route path='/spa-booking-detail/:id' element={<SpaBookingDetailPage/>}/>
