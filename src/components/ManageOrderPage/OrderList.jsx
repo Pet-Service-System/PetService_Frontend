@@ -151,11 +151,6 @@ const OrderList = () => {
       key: 'date',
     },
     {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
       title: 'Số tiền',
       dataIndex: 'amount',
       key: 'amount',
@@ -175,7 +170,7 @@ const OrderList = () => {
       title: 'Chi tiết',
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
     {

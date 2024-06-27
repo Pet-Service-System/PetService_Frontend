@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } from 'antd';
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
 
@@ -177,6 +177,11 @@ const OrderHistoryDetail = () => {
       title: 'Tên sản phẩm',
       dataIndex: 'ProductName',
       key: 'ProductName',
+      render: (text, record) => (
+        <Link className="text-blue-500 hover:text-blue-800" to={`/product-detail/${record.ProductID}`}>
+          {text}
+        </Link>
+      ),
     },
     {
       title: 'Số lượng',

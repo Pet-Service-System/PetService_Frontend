@@ -14,7 +14,7 @@ const Order = () => {
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
     shippingCost: 2,
-    cartItems: [],
+    cartItems: JSON.parse(localStorage.getItem('shoppingCart')) || [], // Load cartItems from localStorage
   });
   const [customerInfo, setCustomerInfo] = useState({
     fullname: '',
@@ -36,22 +36,18 @@ const Order = () => {
   }, []);
 
   useEffect(() => {
-    const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     const totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
-
-    setOrderDetails({
-      ...orderDetails,
+    setOrderDetails((prevOrderDetails) => ({
+      ...prevOrderDetails,
       totalAmount: totalAmount,
-      cartItems: shoppingCart,
-    });
-
-    // Enable PayPal button only when order details are ready
+    }));
+  
     setIsPayPalEnabled(true);
-  }, [orderDetails]);
+  }, []); 
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
-    let shippingCost = 3;
+    let shippingCost = 2;
     if (shippingMethod === 'local') {
       shippingCost = 0;
     }
@@ -156,6 +152,9 @@ const Order = () => {
 
   const onApprove = async (data, actions) => {
     try {
+      if (orderDetails.cartItems.length === 0) {
+        throw new Error('Không có sản phẩm trong đơn hàng.');
+      }
       await actions.order.capture();
       // Define order data
       const orderData = {
@@ -193,7 +192,7 @@ const Order = () => {
           Quantity: item.quantity
         }))
       };
-
+      
       const detailsResponse = await axios.post('http://localhost:3001/api/order-details', orderDetailsData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header if needed
