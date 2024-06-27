@@ -18,7 +18,6 @@ const OrderHistory = () => {
   const screens = useBreakpoint();
   const [user] = useState(JSON.parse(localStorage.getItem('user')))
   const AccountID = user.id
-
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -45,9 +44,7 @@ const OrderHistory = () => {
       const data = await getOrderHistory();
       const formattedData = data.map(order => ({
         id: order.OrderID,
-        date: new Date(order.OrderDate),
-        description: order.Address,
-        amount: order.TotalPrice,
+        date: order.OrderDate,
         status: order.Status
       }));
       const sortedData = sortOrder === 'desc' 
@@ -85,22 +82,6 @@ const OrderHistory = () => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
-      render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
-      )
-    },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Số tiền',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record) => (
-        <Text>${record.amount}</Text>
-      )
     },
     {
       title: 'Trạng thái',

@@ -76,7 +76,7 @@ const SpaServiceDetail = () => {
 
     const handleBookingNow = () => {
         console.log('Booked:', serviceData);
-        navigate(`/pet-booking`);
+        navigate(`/booking`);
     };
 
     if (!serviceData) {

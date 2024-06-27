@@ -63,6 +63,7 @@ const OrderHistoryDetail = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [selectedProductID, setSelectedProductID] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State for submit status
   const navigate = useNavigate();
   const accountID = JSON.parse(localStorage.getItem('user')).id;
   const role = localStorage.getItem('role')
@@ -111,6 +112,8 @@ const OrderHistoryDetail = () => {
       return;
     }
 
+    setIsSubmitting(true); // Start submitting
+    message.warning('Processing...')
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
@@ -138,6 +141,7 @@ const OrderHistoryDetail = () => {
         message.error('Failed to create comment.');
       }
     } finally {
+      setIsSubmitting(false); // End submitting
       setShowModal(false);
     }
   };
@@ -187,7 +191,7 @@ const OrderHistoryDetail = () => {
         <Button 
           type="primary" 
           onClick={() => openModal(record.ProductID)}
-          disabled={order.Status !== 'Shipped'}
+          disabled={order.Status !== 'Shipped' || isSubmitting} // Disable when not shipped or submitting
         >
           Comment
         </Button>
@@ -208,19 +212,19 @@ const OrderHistoryDetail = () => {
       <Card className="p-6 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
         <Title level={2} className="mb-4 text-center">Chi tiết đơn hàng #{order.OrderID}</Title>
         <div className="mb-4">
-          <Text strong>Ngày đặt hàng:</Text> <Text>{new Date(order.OrderDate).toLocaleDateString()}</Text>
+          <Text strong>Ngày đặt hàng:</Text> <Text>{order.OrderDate}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Trạng thái:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên khách hàng:</Text> <Text>{order.CustomerName}</Text>
+          <Text strong>Tên khách hàng:</Text> <Text>{orderDetail.CustomerName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Số điện thoại:</Text> <Text>{order.Phone}</Text>
+          <Text strong>Số điện thoại:</Text> <Text>{orderDetail.Phone}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Địa chỉ:</Text> <Text>{order.Address}</Text>
+          <Text strong>Địa chỉ:</Text> <Text>{orderDetail.Address}</Text>
         </div>
         <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
@@ -244,7 +248,7 @@ const OrderHistoryDetail = () => {
             <Button key="cancel" onClick={() => setShowModal(false)}>
               Hủy
             </Button>,
-            <Button key="submit" type="primary" onClick={handleSubmit}>
+            <Button key="submit" type="primary" onClick={handleSubmit} disabled={isSubmitting}>
               Đánh giá
             </Button>,
           ]}
