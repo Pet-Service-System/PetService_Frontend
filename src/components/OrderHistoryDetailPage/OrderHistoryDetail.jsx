@@ -2,11 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
 import moment from "moment";
 
 const { Title, Text } = Typography;
+const { confirm } = Modal;
 
 const getOrder = async (id) => {
   const token = localStorage.getItem('token');
@@ -111,18 +112,104 @@ const OrderHistoryDetail = () => {
     setShowModal(true);
   };
 
+  const handleCancelOrder = async () => {
+    confirm({
+      title: 'Xác nhận hủy đơn hàng',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Bạn có chắc chắn muốn hủy đơn hàng này?',
+      okText: 'Đồng ý',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          const token = localStorage.getItem('token');
+          // Make API call to update order status to 'Canceled'
+          const response = await axios.put(
+            `http://localhost:3001/api/orders/${order.OrderID}`,
+            { Status: 'Canceled' },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+      
+          if (response.status !== 200) {
+            throw new Error(`Failed to cancel order ${order.OrderID}`);
+          }
+      
+          // Update inventory quantities for each product in order detail
+          await updateInventoryQuantities(orderDetail.Products);
+      
+          // Fetch updated order details
+          fetchOrderDetails(order.OrderID);
+      
+          // Show success message
+          message.success('Đơn hàng đã được hủy thành công.');
+        } catch (error) {
+          console.error('Error cancelling order:', error);
+          message.error('Đã xảy ra lỗi khi hủy đơn hàng.');
+        }
+      },
+    });
+  };
+
+  // Function to update inventory quantities for products
+const updateInventoryQuantities = async (products) => {
+  try {
+    // Iterate over each product in the order detail
+    for (const product of products) {
+      const productId = product.ProductID;
+      const quantity = product.Quantity;
+
+      // Make API call to get current inventory quantity
+      const inventoryResponse = await axios.get(`http://localhost:3001/api/products/${productId}`);
+
+      if (inventoryResponse.status !== 200) {
+        throw new Error(`Failed to fetch inventory for ProductID ${productId}`);
+      }
+
+      const currentInventory = inventoryResponse.data.Quantity;
+
+      // Calculate new inventory quantity after cancellation
+      const newQuantity = currentInventory + quantity;
+
+      // Make API call to update the inventory
+      const updateResponse = await axios.patch(
+        `http://localhost:3001/api/products/${productId}`,
+        { Quantity: newQuantity },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (updateResponse.status !== 200) {
+        throw new Error(`Failed to update inventory for ProductID ${productId}`);
+      }
+
+      console.log(`Inventory updated successfully for ProductID ${productId}`);
+    }
+  } catch (error) {
+    console.error('Error updating inventory:', error);
+    message.error('Đã xảy ra lỗi khi cập nhật số lượng tồn kho.');
+  }
+};
+
+
   const handleSubmit = async () => {
     if (rating === 0) {
-      message.warning('Please provide a rating.');
+      message.warning('Vui lòng đánh giá.');
       return;
     }
     if (comment.trim() === '') {
-      message.warning('Please provide a comment.');
+      message.warning('Vui lòng để lại nhận xét.');
       return;
     }
 
     setIsSubmitting(true); // Start submitting
-    message.warning('Processing...')
+    message.warning('Đang xử lý...')
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
@@ -139,15 +226,15 @@ const OrderHistoryDetail = () => {
           },
         }
       );
-      console.log('Comment created:', response.data);
-      message.success('Comment successfully!');
+      console.log('Bình luận thành công:', response.data);
+      message.success('Bình luận thành công!');
       fetchOrderDetails(id); // Refresh comments
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        message.error(`You have already commented on this product.`);
+        message.error(`Bạn đã đánh giá sản phẩm này.`);
       } else {
-        console.error('Error creating comment:', error);
-        message.error('Failed to create comment.');
+        console.error('Lỗi khi tạo bình luận:', error);
+        message.error('Không thể tạo bình luận.');
       }
     } finally {
       setIsSubmitting(false); // End submitting
@@ -208,7 +295,7 @@ const OrderHistoryDetail = () => {
           onClick={() => openModal(record.ProductID)}
           disabled={order.Status !== 'Shipped' || isSubmitting} // Disable when not shipped or submitting
         >
-          Comment
+          Đánh giá
         </Button>
       ),
     });
@@ -257,6 +344,12 @@ const OrderHistoryDetail = () => {
           rowKey="ProductID"
           bordered
         />
+        {/* Render the cancel button conditionally */}
+        {role === 'Customer' && order.Status === 'Processing' && (
+          <Button danger className="float-end" onClick={handleCancelOrder} disabled={isSubmitting}>
+            Hủy đơn hàng
+          </Button>
+        )}
 
         <Modal
           title="Đánh giá đơn hàng"
