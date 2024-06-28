@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -17,6 +18,7 @@ const ProductList = () => {
   const [form] = Form.useForm();
   const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -45,15 +47,15 @@ const ProductList = () => {
   const handleCancelAdd = () => {
     setAddMode(false);
     form.resetFields();
-    setProductImg(""); // Reset image state
+    setProductImg("");
   };
 
   const handleSaveAdd = async () => {
     try {
-      setSaving(true); // Start saving
+      setSaving(true);
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('authorization_token_not_found'));
         return;
       }
   
@@ -68,10 +70,10 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       } else {
-        message.error('Please upload the product image!');
+        message.error(t('upload_product_image'));
         return;
       }
-      message.warning('Processing...')
+      message.warning(t('processing'));
       const response = await axios.post('http://localhost:3001/api/products', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -80,29 +82,29 @@ const ProductList = () => {
       });
   
       if (response.status === 201) {
-        message.success('Product added successfully', 0.5).then(() => {
+        message.success(t('product_added_successfully'), 0.5).then(() => {
           window.location.reload();
         });
       } else {
-        message.error('Failed to add product: Unexpected server response');
+        message.error(t('failed_to_add_product'));
       }
     } catch (error) {
       console.error('Error adding product:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error('Unauthorized. Please log in.');
+          message.error(t('unauthorized'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`Error adding product: ${error.response.data.message}`);
+          message.error(`${t('error_adding_product')}: ${error.response.data.message}`);
         } else {
-          message.error('Error adding product');
+          message.error(t('error_adding_product'));
         }
       } else if (error.request) {
-        message.error('Error adding product: Network or server issue');
+        message.error(t('network_or_server_issue'));
       } else {
-        message.error(`Error adding product: ${error.message}`);
+        message.error(`${t('error_adding_product')}: ${error.message}`);
       }
     } finally {
-      setSaving(false); // End saving
+      setSaving(false);
     }
   };
 
@@ -115,21 +117,21 @@ const ProductList = () => {
       Quantity: record.Quantity,
       Status: record.Status,
     });
-    setProductImg(""); // Reset image state
+    setProductImg("");
   };
 
   const handleCancelEdit = () => {
     setEditMode(null);
     form.resetFields();
-    setProductImg(""); // Reset image state
+    setProductImg("");
   };
 
   const handleSaveEdit = async () => {
     try {
-      setSaving(true); // Start saving
+      setSaving(true);
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('authorization_token_not_found'));
         return;
       }
 
@@ -143,7 +145,7 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       }
-      message.warning('Processing...')
+      message.warning(t('processing'));
       const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -152,29 +154,29 @@ const ProductList = () => {
       });
 
       if (response.status === 200) {
-        message.success('Product updated successfully', 0.5).then(() => {
+        message.success(t('product_updated_successfully'), 0.5).then(() => {
           window.location.reload();
         });
       } else {
-        message.error('Failed to update product: Unexpected server response');
+        message.error(t('failed_to_update_product'));
       }
     } catch (error) {
       console.error('Error updating product:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error('Unauthorized. Please log in.');
+          message.error(t('unauthorized'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`Error updating product: ${error.response.data.message}`);
+          message.error(`${t('error_updating_product')}: ${error.response.data.message}`);
         } else {
-          message.error('Error updating product');
+          message.error(t('error_updating_product'));
         }
       } else if (error.request) {
-        message.error('Error updating product: Network or server issue');
+        message.error(t('network_or_server_issue'));
       } else {
-        message.error(`Error updating product: ${error.message}`);
+        message.error(`${t('error_updating_product')}: ${error.message}`);
       }
     } finally {
-      setSaving(false); // End saving
+      setSaving(false);
     }
   };
 
@@ -186,7 +188,7 @@ const ProductList = () => {
 
   const columns = [
     {
-      title: 'Product ID',
+      title: t('product_id'),
       dataIndex: 'ProductID',
       key: 'ProductID',
       render: (text, record) => (
@@ -196,7 +198,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Product Name',
+      title: t('product_name'),
       dataIndex: 'ProductName',
       key: 'ProductName',
       render: (text, record) => (
@@ -206,7 +208,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Price',
+      title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => (
@@ -214,12 +216,12 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Description',
+      title: t('description'),
       dataIndex: 'Description',
       key: 'Description',
     },
     {
-      title: 'Image URL',
+      title: t('image_url'),
       dataIndex: 'ImageURL',
       key: 'ImageURL',
       render: (text, record) => (
@@ -227,7 +229,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'Status',
       key: 'Status',
       render: (text) => (
@@ -237,17 +239,17 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Quantity',
+      title: t('quantity'),
       dataIndex: 'Quantity',
       key: 'Quantity',
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (_, record) => (
         userRole === 'Store Manager' && (
           <div>
-            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
+            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>{t('edit')}</Button>
           </div>
         )
       ),
@@ -256,7 +258,7 @@ const ProductList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className='text-center'>Product for dogs</Title>
+      <Title level={1} className='text-center'>{t('product_for_dogs')}</Title>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -269,7 +271,7 @@ const ProductList = () => {
               scroll={{ x: 'max-content' }}
             />
             <div className="flex justify-end mt-4">
-              <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={loading}>{t('add_product')}</Button>
             </div>
           </>
         ) : (
@@ -307,13 +309,13 @@ const ProductList = () => {
       </Form>
 
       <Modal
-        title={editMode ? "Edit Product" : "Add New Product"}
+        title={editMode ? t('edit_product') : t('add_new_product')}
         visible={addMode || editMode !== null}
         onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
-            {editMode ? "Save" : "Add"}
+            {editMode ? t('save') : t('add')}
           </Button>,
         ]}
         style={{ textAlign: 'center' }}
@@ -321,44 +323,44 @@ const ProductList = () => {
         <Form form={form} className='text-left'>
           <Form.Item
             name="ProductName"
-            rules={[{ required: true, message: 'Please enter the product name!' }]}
+            rules={[{ required: true, message: t('enter_product_name') }]}
           >
-            <Input placeholder="Product Name" />
+            <Input placeholder={t('product_name')} />
           </Form.Item>
           <Form.Item
             name="Price"
-            rules={[{ required: true, message: 'Please enter the product price!' }]}
+            rules={[{ required: true, message: t('enter_product_price') }]}
           >
-            <Input placeholder="Price" />
+            <Input placeholder={t('price')} />
           </Form.Item>
           <Form.Item
             name="Description"
-            rules={[{ required: true, message: 'Please enter the product description' }]}
+            rules={[{ required: true, message: t('enter_product_description') }]}
           >
-            <Input placeholder="Description" />
+            <Input placeholder={t('description')} />
           </Form.Item>
           <Form.Item
             name="Image"
-            rules={[{ required: true, message: 'Please upload the product image!' }]}
+            rules={[{ required: true, message: t('upload_product_image') }]}
           >
             <Input type="file" onChange={handleProductImageUpload} />
             {productImg && (
-              <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} />
+              <Image src={URL.createObjectURL(productImg)} alt={t('product_preview')} style={{ width: '100px', marginTop: '10px' }} />
             )}
           </Form.Item>
           <Form.Item
             name="Quantity"
-            rules={[{ required: true, message: 'Please enter the product quantity' }]}
+            rules={[{ required: true, message: t('enter_product_quantity') }]}
           >
-            <Input placeholder="Quantity" />
+            <Input placeholder={t('quantity')} />
           </Form.Item>
           <Form.Item
             name="Status"
-            rules={[{ required: true, message: 'Please select the product status' }]}
+            rules={[{ required: true, message: t('select_product_status') }]}
           >
-            <Select placeholder="Status">
-              <Option value="Available">Available</Option>
-              <Option value="Unavailable">Unavailable</Option>
+            <Select placeholder={t('status')}>
+              <Option value="Available">{t('available')}</Option>
+              <Option value="Unavailable">{t('unavailable')}</Option>
             </Select>
           </Form.Item>
         </Form>

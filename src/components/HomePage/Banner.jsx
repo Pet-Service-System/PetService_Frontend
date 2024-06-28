@@ -8,6 +8,10 @@ import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import '../../assets/fonts/fonts.css';
 
+import { Menu as AntdMenu, Dropdown } from 'antd';
+import { GlobalOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+
 const { Header } = Layout;
 
 const Banner = () => {
@@ -21,6 +25,13 @@ const Banner = () => {
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
   const dispatch = useDispatch()
+
+  const { t } = useTranslation();
+
+  // Function to handle language change
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -49,7 +60,7 @@ const Banner = () => {
           setUser(null);
           navigate('/login');
           // Inform the user
-          alert('Your session has expired. Please log in again.');
+          alert(t('session_expired_alert'));
         }
       }
     } catch (error) {
@@ -83,22 +94,22 @@ const Banner = () => {
     dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   const userMenuItems = [
-    { key: 'profile', icon: <UserOutlined />, label: 'Thông tin người dùng', onClick: () => navigate('/user-profile') },
+    { key: 'profile', icon: <UserOutlined />, label: t('user_information'), onClick: () => navigate('/user-profile') },
     ...(role === 'Customer' ? [
-      { key: 'pet-list', icon: <UnorderedListOutlined />, label: 'Danh sách thú cưng', onClick: () => navigate('/pet-list') },
-      { key: 'orders-history', icon: <HistoryOutlined />, label: 'Lịch sử đặt hàng', onClick: () => navigate('/orders-history') },
+      { key: 'pet-list', icon: <UnorderedListOutlined />, label: t('list_of_pets'), onClick: () => navigate('/pet-list') },
+      { key: 'order-history', icon: <HistoryOutlined />, label: t('order_history'), onClick: () => navigate('/order-history') },
       {
         key: 'service-history',
         icon: <HistoryOutlined />,
-        label: 'Lịch sử dịch vụ',
+        label: t('service_history'),
         onClick: () => navigate('/spa-booking'),
       },
     ] : []),
-    { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', onClick: handleLogout }
+    { key: 'logout', icon: <LogoutOutlined />, label: t('log_out'), onClick: handleLogout }
   ];
 
   const renderUserMenu = () => (
@@ -122,48 +133,52 @@ const Banner = () => {
   );
 
   const renderMenuItems = (isVertical) => {
+    const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
+
+
     let menuItems = [];
 
     if (role === 'Guest') {
       menuItems = [
-        { key: 'home', label: 'TRANG CHỦ', path: '/' },
-        { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
-        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+        { key: 'home', label: t('HOME'), path: '/' },
+        { key: 'about', label: t('INTRODUCTION'), path: '/about' },
+        { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
+        { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
+        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'contact', label: t('CONTACT'), path: '/contact' },
       ];
     } else if (role === 'Customer') {
       menuItems = [
-        { key: 'home', label: 'TRANG CHỦ', path: '/' },
-        { key: 'about', label: 'GIỚI THIỆU', path: '/about' },
-        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
-        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'contact', label: 'LIÊN HỆ', path: '/contact' },
+        { key: 'home', label: t('HOME'), path: '/' },
+        { key: 'about', label: t('INTRODUCTION'), path: '/about' },
+        { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
+        { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
+        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'contact', label: t('CONTACT'), path: '/contact' },
       ];
     } else if (role === 'Administrator') {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
         { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
-        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
-        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
-        { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
+        { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
+        { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
+        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
+        { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
         { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
-        { key: 'dog-service', label: 'Dành cho chó', path: '/services-for-dog', parent: 'Dịch vụ thú cưng' },
-        { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
-        { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
-        { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
-        { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
+        { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
+        { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
+        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
+        { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
       ];
     }
 
@@ -181,6 +196,12 @@ const Banner = () => {
       return acc;
     }, []);
 
+    const changeLanguage = (lng) => {
+      i18n.changeLanguage(lng);
+    };
+
+    const currentLanguage = i18n.language;
+
     return (
       <Menu mode={isVertical ? "vertical" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} disabledOverflow={true}>
         {verticalMenu.map(item => (
@@ -195,24 +216,24 @@ const Banner = () => {
           )
         ))}
         {role === 'Guest' && isVertical && (
-          <Menu.Item key="login" onClick={handleLoginClick}>ĐĂNG NHẬP</Menu.Item>
+          <Menu.Item key="login" onClick={handleLoginClick}>{t('LOG_IN')}</Menu.Item>
         )}
         {role === 'Customer' && isVertical && (
           <>
-            <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
-            <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
-              <Menu.Item onClick={() => { navigate('/user-profile') }}>Thông tin người dùng</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/pet-list') }}>Danh sách thú cưng</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/orders-history') }}>Lịch sử đặt hàng</Menu.Item>
+            <Menu.Item key="cart" onClick={() => navigate('/cart')}>{t('CART')}</Menu.Item>
+            <Menu.SubMenu key="user-profile" title={t('ACCOUNT')}>
+              <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/pet-list') }}>{t('list_of_pets')}</Menu.Item>
+              <Menu.Item onClick={() => { navigate('/order-history') }}>{t('order_history')}</Menu.Item>
               <Menu.SubMenu title="Lịch sử dịch vụ">
-                <Menu.Item onClick={() => { navigate('/spa-booking') }}>Dịch vụ thú cưng</Menu.Item>
+                <Menu.Item onClick={() => { navigate('/spa-booking') }}>{t('pet_service')}</Menu.Item>
               </Menu.SubMenu>
-              <Menu.Item onClick={handleLogout}>Đăng xuất</Menu.Item>
+              <Menu.Item onClick={handleLogout}>{t('log_out')}</Menu.Item>
             </Menu.SubMenu>
           </>
         )}
         {role === 'Administrator' && isVertical && (
-          <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
+          <Menu.SubMenu key="user-profile" title={t('ACCOUNT')}>
             {userMenuItems.map(item => (
               <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
                 {item.label}
@@ -221,7 +242,7 @@ const Banner = () => {
           </Menu.SubMenu>
         )}
         {['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role) && isVertical && (
-          <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
+          <Menu.SubMenu key="user-profile" title={t('ACCOUNT')}>
             {userMenuItems.map(item => (
               <Menu.Item key={item.key} icon={item.icon} onClick={item.onClick}>
                 {item.label}
@@ -229,6 +250,25 @@ const Banner = () => {
             ))}
           </Menu.SubMenu>
         )}
+        <Menu.Item key="language" className="language-menu">
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="en" onClick={() => changeLanguage('en')}>
+                  English
+                </Menu.Item>
+                <Menu.Item key="vn" onClick={() => changeLanguage('vn')}>
+                  Tiếng Việt
+                </Menu.Item>
+              </Menu>
+            }
+            trigger={['click']}
+          >
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+              <GlobalOutlined /> {currentLanguage === 'en' ? 'English' : 'Tiếng Việt'}
+            </a>
+          </Dropdown>
+        </Menu.Item>
       </Menu>
     );
   };
@@ -239,7 +279,7 @@ const Banner = () => {
         <div className="flex items-center">
           {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
-            className="text-7xl ml-10 px-10 cursor-pointer text-white"
+            className="text-5xl ml-10 px-10 cursor-pointer text-white"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >
@@ -257,7 +297,7 @@ const Banner = () => {
           <div className="flex items-center">
             {renderMenuItems(false)}
             {role === 'Guest' ? (
-              <Button type="primary" onClick={handleLoginClick} className="ml-4 relative">ĐĂNG NHẬP</Button>
+              <Button type="primary" onClick={handleLoginClick} className="ml-4 relative">{t('LOG_IN')}</Button>
             ) : (
               <div className="flex items-center ml-4">
                 {role === 'Customer' && (
@@ -274,6 +314,25 @@ const Banner = () => {
                         <span className="text-black">{user.fullname}</span>
                       </Button>
                     </Popover>
+                    <Menu.Item key="language" className="language-menu">
+                      <Dropdown
+                        overlay={
+                          <Menu>
+                            <Menu.Item key="en" onClick={() => changeLanguage('en')}>
+                              English
+                            </Menu.Item>
+                            <Menu.Item key="vn" onClick={() => changeLanguage('vn')}>
+                              Tiếng Việt
+                            </Menu.Item>
+                          </Menu>
+                        }
+                        trigger={['click']}
+                      >
+                        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                          <GlobalOutlined /> {currentLanguage === 'en' ? 'English' : 'Tiếng Việt'}
+                        </a>
+                      </Dropdown>
+                    </Menu.Item>
                   </>
                 )}
               </div>

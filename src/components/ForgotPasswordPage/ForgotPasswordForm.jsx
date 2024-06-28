@@ -2,6 +2,7 @@ import { useState} from 'react';
 import { Button, Form, Input, Typography, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 
@@ -10,6 +11,7 @@ const ForgotPasswordForm = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Gửi yêu cầu
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const validate = () => {
     const newErrors = {};
@@ -46,7 +48,7 @@ const ForgotPasswordForm = () => {
     <Row justify="center" style={{ minHeight: '59vh', alignItems: 'center' }}>
       <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10'>
         <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
-          <Title level={3} className="text-blue-500 text-center mb-6">Quên mật khẩu</Title>
+          <Title level={3} className="text-blue-500 text-center mb-6">{t('forgot_password')}</Title>
           <Form onFinish={handleSubmit} layout="vertical">
             <Form.Item
               label="Email"
@@ -68,7 +70,7 @@ const ForgotPasswordForm = () => {
             </Form.Item>
           </Form>
           <div className="text-center mt-4">
-            <Button type="link" onClick={() => navigate('/login')}>Quay lại đăng nhập</Button>
+            <Button type="link" onClick={() => navigate('/login')}>{t('Quay lại đăng nhập')}</Button>
           </div>
         </div>
       </Col>

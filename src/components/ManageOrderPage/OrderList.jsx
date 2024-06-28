@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Spin, message, Modal } from "antd";
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -12,6 +13,7 @@ const OrderList = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
@@ -44,8 +46,8 @@ const OrderList = () => {
         amount: order.TotalPrice,
         status: order.Status
       }));
-      const sortedData = sortOrder === 'desc' 
-        ? formattedData.sort((a, b) => b.date - a.date) 
+      const sortedData = sortOrder === 'desc'
+        ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
       setOrders(sortedData);
     } catch (error) {
@@ -61,7 +63,7 @@ const OrderList = () => {
 
   const showConfirm = (orderId, newStatus) => {
     confirm({
-      title: 'Are you sure you want to update the order status?',
+      title: t('inform_update'),
       content: `Change status to "${newStatus}"?`,
       onOk() {
         handleUpdateStatus(orderId, newStatus);
@@ -76,19 +78,19 @@ const OrderList = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `http://localhost:3001/api/orders/${orderId}`, 
-        { Status: newStatus }, 
+        `http://localhost:3001/api/orders/${orderId}`,
+        { Status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      message.success('Order status updated successfully');
+      message.success(t('updated_successfully'));
       fetchOrderHistory(); // Refresh order list after update
     } catch (error) {
       console.error('Error updating order status:', error);
-      message.error('Failed to update order status');
+      message.error(t('failed_updated'));
     }
   };
 
@@ -113,10 +115,10 @@ const OrderList = () => {
           return (
             <div>
               <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
-                Delivering
+                {t('delivering')}
               </Button>
               <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
-                Cancel
+                {t('cancel')}
               </Button>
             </div>
           );
@@ -124,10 +126,10 @@ const OrderList = () => {
           return (
             <div>
               <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
-                Shipped
+                {t('delivered')}
               </Button>
               <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
-                Cancel
+                {t('cancel')}
               </Button>
             </div>
           );
@@ -146,7 +148,7 @@ const OrderList = () => {
       key: 'id',
     },
     {
-      title: 'Ngày',
+      title: t('date'),
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -154,12 +156,12 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Mô tả',
+      title: t('description'),
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: 'Số tiền',
+      title: t('amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
@@ -167,7 +169,7 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Trạng thái',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
@@ -175,14 +177,14 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Chi tiết',
+      title: t('detail'),
       key: 'detail',
       render: (text, record) => (
         <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>Chi tiết</Button>
       ),
     },
     {
-      title: 'Cập nhật trạng thái',
+      title: t('update_status'),
       key: 'updateStatus',
       render: (text, record) => renderUpdateButton(record),
     },
@@ -194,7 +196,7 @@ const OrderList = () => {
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
           <Button onClick={handleSortOrder} className="mb-4">
-            Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
+            {t('sort_by_date')}: {sortOrder === 'desc' ? t('nearest') : t('farthest')}
           </Button>
           <Spin spinning={loading}>
             <Table

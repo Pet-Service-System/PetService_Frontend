@@ -143,7 +143,7 @@ const AccountList = () => {
 
   return (
     <div className="p-4 sm:p-8">
-      <Title level={2}>Account List</Title>
+      <Title level={2}>Danh sách tài khoản</Title>
       <Form form={form}>
         <Table
           dataSource={loading ? [] : accountData}
@@ -162,7 +162,7 @@ const AccountList = () => {
         visible={isModalVisible}
         onCancel={handleCancelEdit}
         footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="cancel" onClick={handleCancelEdit}>Hủy</Button>,
           <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
         ]}
       >
@@ -170,31 +170,31 @@ const AccountList = () => {
           {/* Fields */}
           <Form.Item
             name="fullname"
-            rules={[{ required: true, message: 'Please enter the fullname!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('fullname') + '!' }]}
           >
             <Input placeholder="Fullname" />
           </Form.Item>
           <Form.Item
             name="email"
-            rules={[{ required: true, message: 'Please enter the email!' }]}
+            rules={[{ required: true, message: t('please_enter') + 'email' + '!'}]}
           >
             <Input placeholder="Email" />
           </Form.Item>
           <Form.Item
             name="phone"
-            rules={[{ required: true, message: 'Please enter the phone!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('phone') + '!'}]}
           >
             <Input placeholder="Phone" />
           </Form.Item>
           <Form.Item
             name="address"
-            rules={[{ required: true, message: 'Please enter the address!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('adress') + '!' }]}
           >
             <Input placeholder="Address" />
           </Form.Item>
           <Form.Item
             name="role"
-            rules={[{ required: true, message: 'Please select the role!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('role') + '!' }]}
           >
             <Select placeholder="Select Role">
               {/* Options for roles */}
@@ -207,11 +207,11 @@ const AccountList = () => {
           </Form.Item>
           <Form.Item
             name="status"
-            rules={[{ required: true, message: 'Please select the status!' }]}
+            rules={[{ required: true, message: t('please_select_the_status') }]}
           >
             <Select placeholder="Select Status">
-              <Option value={1}>Active</Option>
-              <Option value={0}>Inactive</Option>
+              <Option value={1}>{t('active')}</Option>
+              <Option value={0}>{t('inactive')}</Option>
             </Select>
           </Form.Item>
         </Form>

@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Select, Button, Input } from 'antd';
 import { getPetService, getHotels, getHotelById } from '../../apis/ApiService'; // Import getHotelById from ApiService
+import { useTranslation } from 'react-i18next';
+
 
 const { Option } = Select;
+
+
 
 const BookingForPet = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -11,6 +15,7 @@ const BookingForPet = () => {
   const [price, setPrice] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Add a state variable for authentication status
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check authentication status (you can replace this with your actual authentication check)
@@ -61,7 +66,7 @@ const BookingForPet = () => {
       {isAuthenticated ? ( // Conditionally render the form if authenticated
         <>
           <div className="text-2xl py-4 px-6 bg-gray-900 text-white text-center font-bold uppercase">
-            Service Booking
+            {t('book_service')}
           </div>
           <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="w-full md:w-1/2 p-4 flex justify-center items-center">
@@ -76,32 +81,32 @@ const BookingForPet = () => {
                   layout="vertical"
                 >
                   <Form.Item
-                    label="Pet"
+                    label={t('pet')}
                     name="pet"
-                    rules={[{ required: true, message: 'Please select your pet!' }]}
+                    rules={[{ required: true, message: t('pl_choose_pet') }]}
                   >
                     <Select placeholder="Choose your pet">
-                      <Option value="dog">Dog</Option>
-                      <Option value="cat">Cat</Option>
-                      <Option value="rabbit">Rabbit</Option>
+                      <Option value="dog">{t('dog')}</Option>
+                      <Option value="cat">{t('cat')}</Option>
+                      <Option value="rabbit">{t('rabbit')}</Option>
                     </Select>
                   </Form.Item>
                   <Form.Item
-                    label="Hotel Type"
+                    label={t('hotel_type')}
                     name="hotelType"
-                    rules={[{ required: true, message: 'Please select your hotel type!' }]}
+                    rules={[{ required: true, message: t('choose_hotel') }]}
                   >
-                    <Select placeholder="Choose your hotel type" onChange={handleHotelTypeChange}>
+                    <Select placeholder={t('choose_hotel')} onChange={handleHotelTypeChange}>
                       {hotels.map(hotel => (
                         <Option key={hotel._id} value={hotel._id}>{hotel.HotelType}</Option>
                       ))}
                     </Select>
                   </Form.Item>
                   <Form.Item
-                    label="Price"
+                    label={t('price')}
                     name="price"
                   >
-                    <Input value={price} readOnly placeholder="Price" />
+                    <Input value={price} readOnly placeholder={t('price')} />
                   </Form.Item>
                   <div className="flex items-center justify-center mb-4">
                     <Button
@@ -109,7 +114,7 @@ const BookingForPet = () => {
                       htmlType="submit"
                       className="bg-gray-900 text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
                     >
-                      Book
+                      {t('book')}
                     </Button>
                   </div>
                 </Form>
@@ -119,7 +124,7 @@ const BookingForPet = () => {
         </>
       ) : (
         <div className="text-2xl py-4 px-6 bg-gray-900 text-white text-center font-bold uppercase">
-          Please log in to book a service.
+          {t('pl_log_in')}
         </div>
       )}
     </div>

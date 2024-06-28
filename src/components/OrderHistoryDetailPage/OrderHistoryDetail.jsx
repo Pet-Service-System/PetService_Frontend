@@ -4,11 +4,15 @@ import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } fr
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
+
+
 const getOrder = async (id) => {
   const token = localStorage.getItem('token');
+  const { t } = useTranslation();
   try {
     const response = await axios.get(`http://localhost:3001/api/orders/${id}`, {
       headers: {
@@ -78,7 +82,7 @@ const OrderHistoryDetail = () => {
       setOrder(data);
       const detailData = await getOrderDetail(orderId);
       setOrderDetail(detailData);
-  
+
       // Fetch product details for each product in order detail
       const productsWithDetails = await Promise.all(
         detailData.Products.map(async (product) => {
@@ -103,11 +107,11 @@ const OrderHistoryDetail = () => {
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      message.warning('Please provide a rating.');
+      message.warning(t('pl_rate'));
       return;
     }
     if (comment.trim() === '') {
-      message.warning('Please provide a comment.');
+      message.warning(t('pl_commnet'));
       return;
     }
 
@@ -128,14 +132,14 @@ const OrderHistoryDetail = () => {
         }
       );
       console.log('Comment created:', response.data);
-      message.success('Comment successfully!');
+      message.success(t('comment_success'));
       fetchOrderDetails(id); // Refresh comments
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        message.error(`You have already commented on this product.`);
+        message.error(t('already_comment'));
       } else {
         console.error('Error creating comment:', error);
-        message.error('Failed to create comment.');
+        message.error(t('comment_fail'));
       }
     } finally {
       setShowModal(false);
@@ -162,17 +166,17 @@ const OrderHistoryDetail = () => {
 
   const columns = [
     {
-      title: 'Tên sản phẩm',
+      title: t('product_name'),
       dataIndex: 'ProductName',
       key: 'ProductName',
     },
     {
-      title: 'Số lượng',
+      title: t('quantity'),
       dataIndex: 'Quantity',
       key: 'Quantity',
     },
     {
-      title: 'Giá',
+      title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => <span className="text-green-600">${text}</span>,
@@ -181,15 +185,15 @@ const OrderHistoryDetail = () => {
 
   if (role === 'Customer') {
     columns.push({
-      title: 'Hành động',
+      title: t('actions'),
       key: 'action',
       render: (text, record) => (
-        <Button 
-          type="primary" 
+        <Button
+          type="primary"
           onClick={() => openModal(record.ProductID)}
           disabled={order.Status !== 'Shipped'}
         >
-          Comment
+          {t('comment')}
         </Button>
       ),
     });
@@ -203,32 +207,32 @@ const OrderHistoryDetail = () => {
         icon={<ArrowLeftOutlined />}
         size="large"
       >
-        Quay về
+       {t('back')}
       </Button>
       <Card className="p-6 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
-        <Title level={2} className="mb-4 text-center">Chi tiết đơn hàng #{order.OrderID}</Title>
+        <Title level={2} className="mb-4 text-center">{t('order_detail')} #{order.OrderID}</Title>
         <div className="mb-4">
-          <Text strong>Ngày đặt hàng:</Text> <Text>{new Date(order.OrderDate).toLocaleDateString()}</Text>
+          <Text strong>{t('order_date')}:</Text> <Text>{new Date(order.OrderDate).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
+          <Text strong>{t('status')}:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên khách hàng:</Text> <Text>{order.CustomerName}</Text>
+          <Text strong>{t('customer_name')}:</Text> <Text>{order.CustomerName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Số điện thoại:</Text> <Text>{order.Phone}</Text>
+          <Text strong>{t('phone')}:</Text> <Text>{order.Phone}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Địa chỉ:</Text> <Text>{order.Address}</Text>
+          <Text strong>{t('adress')}:</Text> <Text>{order.Address}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
+          <Text strong>{t('total_amount')}:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Chi tiết đơn hàng:</Text>
+          <Text strong>{t('order_detail')}:</Text>
         </div>
-        
+
         <Table
           dataSource={orderDetail.Products}
           columns={columns}
@@ -237,21 +241,21 @@ const OrderHistoryDetail = () => {
         />
 
         <Modal
-          title="Đánh giá đơn hàng"
+          title={t('rate_order')}
           visible={showModal}
           onCancel={() => setShowModal(false)}
           footer={[
             <Button key="cancel" onClick={() => setShowModal(false)}>
-              Hủy
+              {t('cancel')}
             </Button>,
             <Button key="submit" type="primary" onClick={handleSubmit}>
-              Đánh giá
+              {t('rate')}
             </Button>,
           ]}
         >
           <Rate onChange={(value) => setRating(value)} value={rating} />
           <Input.TextArea
-            placeholder="Nhập nhận xét của bạn..."
+            placeholder={t('enter_your_comment')}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={4}

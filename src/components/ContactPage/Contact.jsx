@@ -3,20 +3,23 @@ import { FaHouseChimney } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
 import { FaPhoneAlt } from "react-icons/fa";
 import { Form, Input, Button, Row, Col, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph } = Typography;
 
 const Contact = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-gray-100 px-4 md:px-20 lg:px-40">
       <div className="container mx-auto">
-        <Title level={2} className="text-red-500 text-center font-semibold mb-8 mt-10">Liên hệ</Title>
+        <Title level={2} className="text-red-500 text-center font-semibold mb-8 mt-10">{t('contact')}</Title>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <div className="address-row flex items-center">
               <FaHouseChimney className='icon w-12 h-12 md:w-20 md:h-20' />
               <div className="address-right ml-4">
-                <Title level={5} className="font-semibold">Visit Us</Title>
+                <Title level={5} className="font-semibold">{t('visit_us_at')}</Title>
                 <Paragraph>Pet Service Quận 7</Paragraph>
               </div>
             </div>
@@ -25,7 +28,7 @@ const Contact = () => {
             <div className="address-row flex items-center">
               <IoMdMail className='icon w-12 h-12 md:w-20 md:h-20' />
               <div className="address-right ml-4">
-                <Title level={5} className="font-semibold">Mail Us</Title>
+                <Title level={5} className="font-semibold">{t('email_us_at')}</Title>
                 <Paragraph>
                   <a href="mailto:petservicemanagement@gmail.com">petservicesswp391@gmail.com</a>
                 </Paragraph>
@@ -36,7 +39,7 @@ const Contact = () => {
             <div className="address-row flex items-center">
               <FaPhoneAlt className='icon w-12 h-12 md:w-20 md:h-20' />
               <div className="address-right ml-4">
-                <Title level={5} className="font-semibold">Call Us</Title>
+                <Title level={5} className="font-semibold">{t('contact_us_at')}</Title>
                 <Paragraph>(+00) 123 234</Paragraph>
               </div>
             </div>
@@ -73,7 +76,7 @@ const Contact = () => {
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit" className="w-full">
-                  Submit
+                {t('send')}
                 </Button>
               </Form.Item>
             </Col>

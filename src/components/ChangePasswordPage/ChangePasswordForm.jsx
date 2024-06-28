@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 
@@ -13,6 +14,7 @@ const ChangePasswordForm = () => {
   const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Đổi mật khẩu
   const [disableChangePassword, setDisableChangePassword] = useState(false); // State để điều khiển việc vô hiệu hóa nút Đổi mật khẩu
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     let timer;
@@ -83,7 +85,7 @@ const ChangePasswordForm = () => {
     <div className="max-w-3xl mx-auto p-12 bg-white rounded-lg py-20">
       <div className="max-w-4xl p-8 bg-white rounded-lg shadow-md">
         <Title level={2} className="text-center mb-6">
-          Đổi mật khẩu
+          {t('change_password')}
         </Title>
         <Form onFinish={handleSubmit} layout="vertical">
           <Form.Item
@@ -128,7 +130,7 @@ const ChangePasswordForm = () => {
                 {disableChangePassword ? 'Đang đổi mật khẩu...' : 'Đổi mật khẩu'}
               </Button>
               <Button onClick={handleCancel}>
-                Hủy
+                {t('cancel')}
               </Button>
             </div>
           </Form.Item>
