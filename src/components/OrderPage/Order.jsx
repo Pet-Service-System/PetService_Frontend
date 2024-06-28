@@ -187,7 +187,7 @@ const Order = () => {
         CustomerName: customerInfo.fullname,
         Address: customerInfo.address,
         Phone: customerInfo.phone,
-        Products: orderDetails.cartItems.map(item => ({
+        Items: orderDetails.cartItems.map(item => ({
           ProductID: item.ProductID,
           Quantity: item.quantity
         }))
@@ -207,7 +207,7 @@ const Order = () => {
         localStorage.removeItem('shoppingCart');
         dispatch(setShoppingCart([]));
         navigate('/purchase-order-successfully', { replace: true });
-      }, 1000);
+      }, 700);
 
     } catch (error) {
       console.error('Error during PayPal checkout:', error);

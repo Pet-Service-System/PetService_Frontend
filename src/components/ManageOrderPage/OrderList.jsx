@@ -111,25 +111,15 @@ const OrderList = () => {
       switch (record.status) {
         case 'Processing':
           return (
-            <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
-                Delivering
-              </Button>
-              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
-                Cancel
-              </Button>
-            </div>
+            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
+              Delivering
+            </Button>
           );
         case 'Delivering':
           return (
-            <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
-                Shipped
-              </Button>
-              <Button danger className="w-36" onClick={() => showConfirm(record.id, 'Canceled')}>
-                Cancel
-              </Button>
-            </div>
+            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
+              Shipped
+            </Button>
           );
         default:
           return null;
