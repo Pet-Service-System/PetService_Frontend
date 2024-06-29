@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification } from 'antd';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 const { Title, Paragraph } = Typography;
@@ -218,7 +218,14 @@ const SpaServiceDetail = () => {
 
             console.log(responseBookingDetail.data)
 
-            message.success('Booking successful');
+            // Show success notification
+            notification.success({
+                message: 'Booking successful',
+                icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+                description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
+                onClick: () => navigate('/spa-booking'), 
+            });
+            
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
         } catch (error) {
