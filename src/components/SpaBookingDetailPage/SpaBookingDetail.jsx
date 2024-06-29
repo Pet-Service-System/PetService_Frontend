@@ -169,9 +169,9 @@ const SpaBookingDetail = () => {
             {spaBooking.Status}
           </Text>
         </div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
-        </div>
+        </div> */}
         <div className="mb-4">
           <Text strong>Dịch vụ đã đặt:</Text>
         </div>

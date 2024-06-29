@@ -149,7 +149,7 @@ const SpaBooking = () => {
       key: 'actions',
       render: (text, record) => renderActions(record),
     },
-  ];
+  ].filter(col => col.key !== 'actions' || role === 'Sales Staff');
 
   const showUpdateStatusModal = (id, status) => {
     setSelectedBookingId(id);

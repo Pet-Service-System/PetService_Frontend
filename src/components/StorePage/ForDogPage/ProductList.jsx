@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const { Option } = Select;
 const { Title } = Typography;
+const { TextArea } = Input;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
@@ -292,10 +293,12 @@ const ProductList = () => {
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleProductClick(product.ProductID)}
                 >
-                  <img 
+                  <Image 
                     alt={product.ProductName} 
                     src={product.ImageURL} 
+                    preview={false}
                     className="rounded-t-lg w-full h-44 object-cover" 
+                    style={{ width: '100%', height: '250px' }}
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>
@@ -338,7 +341,7 @@ const ProductList = () => {
             name="Description"
             rules={[{ required: true, message: 'Please enter the product description' }]}
           >
-            <Input placeholder="Description" />
+           <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
           </Form.Item>
           <Form.Item
             name="Image"

@@ -4,7 +4,8 @@ import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, m
 import axios from 'axios';
 
 const { Option } = Select;
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
+const { TextArea } = Input;
 
 const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -60,7 +61,7 @@ const SpaServiceList = () => {
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append('ServiceName', values.ServiceName);
-      formData.append('Price', parseFloat(values.Price));
+      // formData.append('Price', parseFloat(values.Price));
       formData.append('Description', values.Description);
       formData.append('PetTypeID', petTypeID);
       formData.append('Status', values.Status);
@@ -112,7 +113,7 @@ const SpaServiceList = () => {
     setEditMode(record.ServiceID);
     form.setFieldsValue({
       ServiceName: record.ServiceName,
-      Price: record.Price,
+      // Price: record.Price,
       Description: record.Description,
       Status: record.Status,
     });
@@ -136,10 +137,10 @@ const SpaServiceList = () => {
 
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('serviceName', values.ServiceName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('status', values.Status);
+      formData.append('ServiceName', values.ServiceName);
+      // formData.append('price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Status', values.Status);
       if (serviceImg) {
         formData.append('image', serviceImg);
       }
@@ -208,18 +209,24 @@ const SpaServiceList = () => {
         </div>
       ),
     },
-    {
-      title: 'Price',
-      dataIndex: 'Price',
-      key: 'Price',
-      render: (text) => (
-        <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
-      ),
-    },
+    // {
+    //   title: 'Price',
+    //   dataIndex: 'Price',
+    //   key: 'Price',
+    //   render: (text) => (
+    //     <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
+    //   ),
+    // },
     {
       title: 'Description',
       dataIndex: 'Description',
       key: 'Description',
+      ellipsis: true, // Enable ellipsis if description is too long
+      render: (text) => (
+        <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 1, expandable: true, symbol: 'more' }}>
+          {text}
+        </Paragraph>
+      ),
     },
     {
       title: 'Image URL',
@@ -286,15 +293,16 @@ const SpaServiceList = () => {
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleServiceClick(service.ServiceID)}
                 >
-                  <img 
+                  <Image 
                     alt={service.ServiceName} 
                     src={service.ImageURL} 
+                    preview={false}
                     className="rounded-t-lg w-full h-44 object-cover" 
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p>
-                    <p className="text-gray-500 mt-2">{service.Description}</p>
+                    {/* <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p> */}
+                    {/* <p className="text-gray-500 mt-2">{service.Description}</p> */}
                   </div>
                 </Card>
               ))
@@ -322,17 +330,17 @@ const SpaServiceList = () => {
           >
             <Input placeholder="Service Name" />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="Price"
             rules={[{ required: true, message: 'Please enter the service price!' }]}
           >
             <Input placeholder="Price" />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="Description"
             rules={[{ required: true, message: 'Please enter the service description' }]}
           >
-            <Input placeholder="Description" />
+            <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
           </Form.Item>
           <Form.Item
             name="Image"
