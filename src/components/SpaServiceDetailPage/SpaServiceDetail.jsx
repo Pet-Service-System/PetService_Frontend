@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, Typography, message, Skeleton, Select } from 'antd';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import moment from 'moment';
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
@@ -11,8 +12,34 @@ const SpaServiceDetail = () => {
     const [serviceData, setServiceData] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
+    const [bookingForm] = Form.useForm();
+    const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
+    const [pets, setPets] = useState([]);
+    const [loading, setLoading] = useState(false);
     const userRole = localStorage.getItem('role') || 'Guest';
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accountID = user.id;
+    const [selectedPet, setSelectedPet] = useState(null);
+    const currentDateTime = moment();
+    const availableTimes = [
+        "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", 
+        "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", 
+        "15:00", "15:30", "16:00", "16:30"
+      ];
+
+    const handlePetSelectChange = (value) => {
+        const selectedPet = pets.find(pet => pet.PetID === value);
+        setSelectedPet(selectedPet);
+        bookingForm.setFieldsValue({
+            PetName: selectedPet.PetName,
+            PetGender: selectedPet.Gender,
+            PetStatus: selectedPet.Status,
+            PetWeight: selectedPet.Weight, 
+            PetAge: selectedPet.Age,
+            PetTypeID: selectedPet.PetTypeID, 
+        });
+    };
 
     const fetchServiceDetail = async () => {
         try {
@@ -25,9 +52,32 @@ const SpaServiceDetail = () => {
         }
     };
 
+    const fetchPets = async () => {
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            if (!token || !accountID) {
+                console.error('Token or account ID not found in localStorage');
+                return;
+            }
+
+            const response = await axios.get(`http://localhost:3001/api/pets/account/${accountID}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setPets(response.data);
+        } catch (error) {
+            console.error('Error fetching pets:', error);
+            message.error('Failed to fetch pets');
+        }
+        setLoading(false);
+    };
+
     useEffect(() => {
         fetchServiceDetail();
-    }, [id]);
+        fetchPets();
+    }, [id, accountID]);
 
     const handleEditService = () => {
         setEditMode(true);
@@ -38,7 +88,7 @@ const SpaServiceDetail = () => {
         await fetchServiceDetail(); // Reload service data from the database
     };
 
-    const handleSaveEdit = async (id) => {
+    const handleSaveEdit = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -75,9 +125,70 @@ const SpaServiceDetail = () => {
     };
 
     const handleBookingNow = () => {
-        console.log('Booked:', serviceData);
-        navigate(`/booking`);
+        setIsBookingModalVisible(true);
     };
+
+    const handleBookingCancel = () => {
+        setIsBookingModalVisible(false);
+        bookingForm.resetFields();
+    };
+
+    const handleBookingSubmit = async () => {
+        try {
+            const values = await bookingForm.validateFields();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                message.error('Authorization token not found. Please log in.');
+                return;
+            }
+            const bookingDate = values.BookingDate;
+            const bookingTime = values.BookingTime;
+            
+            // Đảm bảo rằng bookingDate và bookingTime đều có định dạng đúng
+            const bookingDateTime = moment(`${bookingDate.format('YYYY-MM-DD')} ${bookingTime}`, 'YYYY-MM-DD HH:mm');
+            const currentDateTime= moment().format('YYYY-MM-DD HH:mm');
+            // console.log(currentDateTime)
+            const diffHours = bookingDateTime.diff(currentDateTime, 'hours');
+            // Kiểm tra nếu khoảng cách thời gian đặt lịch từ thời điểm hiện tại ít hơn 3 tiếng
+            if (diffHours < 3) {
+                message.error('Bạn chỉ có thể đặt lịch từ 3 tiếng trở đi từ thời điểm hiện tại.');
+                return;
+            }
+
+            const booking = {
+                Status: 'Pending',
+                CreateDate: new Date(),
+                TotalPrice: serviceData.Price,
+                AccountID: accountID
+            }
+
+            console.log(booking)
+    
+            const bookingDetail = {
+                ...values,
+                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingTime: bookingTime,
+                ServiceID: id,
+                Feedback: "",
+            };
+
+            console.log(bookingDetail)
+    
+            await axios.post(`http://localhost:3001/api/bookings`, bookingDetail, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            message.success('Booking successful');
+            setIsBookingModalVisible(false);
+            bookingForm.resetFields();
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            message.error('Error creating booking');
+        }
+    };
+    
 
     if (!serviceData) {
         return <Skeleton active />;
@@ -144,14 +255,14 @@ const SpaServiceDetail = () => {
                     ) : (
                         <div>
                             <Title level={3}>{serviceData.ServiceName}</Title>
-                            <Paragraph>{`Giá: ${serviceData.Price}`}</Paragraph>
+                            <Paragraph className="text-green-600 text-4xl">${serviceData.Price}</Paragraph>
                             <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
                         </div>
                     )}
 
                     {userRole === 'Guest' || userRole === 'Customer' ? (
                         <>
-                            <div className='flex space-x-4 justify-end'>
+                            <div className="flex space-x-4 justify-end">
                                 <Button
                                     type="primary"
                                     onClick={handleBookingNow}
@@ -167,7 +278,7 @@ const SpaServiceDetail = () => {
                     ) : userRole === 'Store Manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
+                                <Button type="primary" onClick={handleSaveEdit}>Lưu</Button>
                                 <Button onClick={handleCancelEdit}>Hủy</Button>
                             </div>
                         ) : (
@@ -178,6 +289,168 @@ const SpaServiceDetail = () => {
                     ) : null}
                 </div>
             </div>
+
+            {/* Booking Modal */}
+            <Modal
+                title="Đặt lịch"
+                visible={isBookingModalVisible}
+                onCancel={handleBookingCancel}
+                onOk={handleBookingSubmit}
+                okText="Đặt lịch ngay"
+                cancelText="Hủy"
+                width={800} // Set modal width
+            >
+                <Form form={bookingForm} layout="vertical">
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="CustomerName"
+                                label="Tên khách hàng"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên khách hàng!' }]}
+                            >
+                                <Input placeholder="Nhập tên"/>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="Phone"
+                                label="Số điện thoại"
+                                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                            >
+                                <Input placeholder="Nhập số điện thoại"/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="BookingDate"
+                                label="Ngày đặt"
+                                rules={[{ required: true, message: 'Vui lòng chọn ngày đặt!' }]}
+                            >
+                                <DatePicker
+                                    style={{ width: '100%' }}
+                                    disabledDate={(current) => {
+                                        // Disable tất cả các ngày trước ngày hiện tại
+                                        if (current && current < currentDateTime.startOf('day')) {
+                                        return true;
+                                        }
+                                        // Nếu ngày được chọn là ngày hiện tại, kiểm tra cả thời gian
+                                        if (current && current.isSame(currentDateTime, 'day')) {
+                                        return current < currentDateTime;
+                                        }
+                                        return false;
+                                    }}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                        <Form.Item
+                                name="BookingTime"
+                                label="Khung giờ"
+                                rules={[{ required: true, message: 'Vui lòng chọn khung giờ!' }]}
+                            >
+                                <Select
+                                    style={{ width: '100%' }}
+                                    placeholder="Chọn khung giờ"
+                                >
+                                    {availableTimes.map(time => {
+                                        return <Select.Option key={time} value={time}>{time}</Select.Option>;
+                                    })}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                    <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetID"
+                                label="Chọn thú cưng"
+                                rules={[{ required: true, message: 'Vui lòng chọn thú cưng!' }]}
+                            >
+                                <Select placeholder="Chọn thú cưng" onChange={handlePetSelectChange}>
+                                    {pets.map((pet) => (
+                                        <Option key={pet.PetID} value={pet.PetID}>
+                                            {pet.PetName}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item name="ServiceID" label="Service ID" initialValue={id} hidden>
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetName"
+                                label="Tên thú cưng"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetGender"
+                                label="Giới tính"
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính thú cưng!' }]}
+                            >
+                                <Select placeholder="Chọn giới tính">
+                                    <Option value="Đực">Đực</Option>
+                                    <Option value="Cái">Cái</Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetStatus"
+                                label="Trạng thái"
+                                rules={[{ required: true, message: 'Vui lòng nhập trạng thái thú cưng!' }]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetWeight"
+                                label="Cân nặng"
+                                rules={[{ required: true, message: 'Vui lòng nhập cân nặng thú cưng!' }]}
+                            >
+                                <Input type="number"/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetAge"
+                                label="Tuổi"
+                                rules={[{ required: true, message: 'Vui lòng nhập tuổi thú cưng!' }]}
+                            >
+                                <Input type="number"/>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetTypeID"
+                                label="Loại thú cưng"
+                                rules={[{ required: true, message: 'Vui lòng nhập loại thú cưng!' }]}
+                            >
+                                <Select placeholder="Chọn loại động vật">
+                                    <Option value="PT001">Đực</Option>
+                                    <Option value="PT002">Cái</Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
         </div>
     );
 };

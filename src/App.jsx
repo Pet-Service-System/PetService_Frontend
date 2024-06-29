@@ -31,6 +31,7 @@ import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
 import PurchaseSuccessPage from './pages/PurchaseOrderSuccessPage'
+import BookingPage from './pages/BookingPage'
 function App() {
   return (
     <>
@@ -62,6 +63,7 @@ function App() {
       <Route path='/manage-orders' element={<ManageOrderPage/>}/>
       <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
       <Route path='/purchase-order-successfully' element={<PurchaseSuccessPage/>}/>
+      <Route path='/booking' element={<BookingPage/>}/>
     </Routes>
     </>
   )

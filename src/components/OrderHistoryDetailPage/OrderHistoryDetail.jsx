@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message } from 'antd';
+import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message, Image } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
@@ -92,6 +92,7 @@ const OrderHistoryDetail = () => {
             ProductName: productDetails.ProductName,
             Price: productDetails.Price,
             Quantity: product.Quantity,
+            ImageURL: productDetails.ImageURL
           };
         })
       );
@@ -262,6 +263,16 @@ const OrderHistoryDetail = () => {
 
   const columns = [
     {
+      title: 'Hình ảnh',
+      dataIndex: 'ImageURL',
+      key: 'ImageURL',
+      render: (text, record) => (
+        <div className="flex items-center">
+          <Image src={record.ImageURL} alt={record.ProductName} width={80} />
+        </div>
+      ),
+    },
+    {
       title: 'Tên sản phẩm',
       dataIndex: 'ProductName',
       key: 'ProductName',
@@ -329,7 +340,7 @@ const OrderHistoryDetail = () => {
           <Text strong>Địa chỉ:</Text> <Text>{orderDetail.Address}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Phí ship: $2</Text>
+          <Text strong>Phí ship: </Text> <Text>$2</Text>
         </div>
         <div className="mb-4">
           <Text strong>Tổng giá:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>

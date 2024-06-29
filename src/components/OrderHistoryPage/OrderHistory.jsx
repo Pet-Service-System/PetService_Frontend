@@ -93,7 +93,7 @@ const OrderHistory = () => {
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
-        <Text>${record.amount}</Text>
+        <Text className="text-green-600">${record.amount}</Text>
       )
     },
     {

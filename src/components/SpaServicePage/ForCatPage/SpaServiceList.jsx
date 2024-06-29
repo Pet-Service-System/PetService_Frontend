@@ -292,9 +292,9 @@ const SpaServiceList = () => {
                     className="rounded-t-lg w-full h-44 object-cover" 
                   />
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold">{service.ServiceName}</h3>
-                    <p className="text-gray-600 mt-2">${service.Price.toFixed(2)}</p>
-                    <p className="text-gray-700 mt-2">{service.Description}</p>
+                    <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
+                    <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p>
+                    <p className="text-gray-500 mt-2">{service.Description}</p>
                   </div>
                 </Card>
               ))

@@ -5,6 +5,7 @@ import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List
 import useShopping from '../../hook/useShopping';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
+
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
@@ -73,7 +74,7 @@ const ProductDetail = () => {
     
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
-    const handleOrderNow = () => {
+    const handleOrderNow = async () => {
         if (productData) {
             if (quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
@@ -81,7 +82,9 @@ const ProductDetail = () => {
             }
     
             const productWithQuantity = { ...productData, quantity };
-            handleAddItem(productWithQuantity);
+            await handleAddItem(productWithQuantity);
+            const totalAmount = productData.Price
+            localStorage.setItem('totalAmount', totalAmount.toFixed(2));
             navigate('/order')
         }
     };
@@ -233,8 +236,8 @@ const ProductDetail = () => {
                         ) : (
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
-                                <Paragraph>{`Số lượng tồn kho: ${productData.Quantity}`}</Paragraph>
-                                <Paragraph>{`Giá: ${productData.Price}`}</Paragraph>
+                                <Paragraph>{`Số lượng còn lại: ${productData.Quantity}`}</Paragraph>
+                                <Paragraph className="text-green-600 text-4xl">${productData.Price}</Paragraph>
                                 <Paragraph>{`Mô tả: ${productData.Description}`}</Paragraph>
                             </div>
                         )}
@@ -255,18 +258,18 @@ const ProductDetail = () => {
                                 <div className="flex space-x-4 justify-end">
                                     <Button type="primary" 
                                             onClick={handleAddToCart}
-                                            disabled={productData.Status === 'Unavailable'}
+                                            disabled={(productData.Status === 'Unavailable' || productData.Quantity ===0)}
                                     >
                                         Thêm vào giỏ hàng
                                     </Button>
                                     <Button type="primary" 
                                             onClick={handleOrderNow}
-                                            disabled={productData.Status === 'Unavailable'}
+                                            disabled={(productData.Status === 'Unavailable' || productData.Quantity ===0)}
                                     >
                                         Đặt ngay
                                     </Button>
                                 </div>
-                                {productData.Status === 'Unavailable' && (
+                                {(productData.Status === 'Unavailable' || productData.Quantity ===0) && (
                                     <p className="text-red-500 text-right">Sản phẩm hiện đang tạm ngừng kinh doanh hoặc đã hết hàng.</p>
                                 )}
                             </>

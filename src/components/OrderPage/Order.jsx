@@ -34,7 +34,6 @@ const Order = () => {
       setOriginalCustomerInfo(addressInfo); 
     }
   }, []);
-
   useEffect(() => {
     const totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
     setOrderDetails((prevOrderDetails) => ({
@@ -220,7 +219,7 @@ const Order = () => {
     message.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
     console.error('Error during PayPal checkout:', err);
   };
-
+  
   return (
     <div>
       <div className="flex flex-row md:flex-row m-5 px-8">
