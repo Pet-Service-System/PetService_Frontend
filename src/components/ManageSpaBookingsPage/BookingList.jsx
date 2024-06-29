@@ -7,7 +7,6 @@ import axios from 'axios';
 const { Text } = Typography;
 
 const getSpaBookings = async () => {
-  const user = JSON.parse(localStorage.getItem('user'));
   const token = localStorage.getItem('token');
   try {
     const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
@@ -43,10 +42,9 @@ const SpaBooking = () => {
     try {
       const data = await getSpaBookings();
       const formattedData = data.map(booking => ({
-        id: booking.BookingDetailID,
+        id: booking.BookingID,
         date: new Date(booking.CreateDate),
-        description: booking.PetName,
-        amount: booking.TotalPrice,
+        TotalPrice: booking.TotalPrice,
         status: booking.Status,
         reviewed: booking.Reviewed,
       }));
@@ -112,26 +110,24 @@ const SpaBooking = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      render: (text, record) => (
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.id}</Button>
+      ),
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
-      )
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record) => (
-        <Text>${record.amount}</Text>
+        <Text>
+          {new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric'
+          }).format(record.date)}
+        </Text>
       )
     },
     {
@@ -139,15 +135,14 @@ const SpaBooking = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Text className={` ${getStatusColor(record.status)}`}>{record.status}</Text>
-      ),
-    },
-    {
-      title: 'Detail',
-      key: 'detail',
-      render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>Detail</Button>
-      ),
+        <Text className={
+          record.status === 'Completed' ? 'text-green-600' :
+          record.status === 'Pending' || record.status === 'Processing' ? 'text-orange-400' :
+          'text-red-600'
+        }>
+          {record.status}
+        </Text>
+      )
     },
     {
       title: 'Actions',
@@ -160,21 +155,6 @@ const SpaBooking = () => {
     setSelectedBookingId(id);
     setPendingStatus(status);
     setUpdateStatusModalVisible(true);
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Pending':
-        return 'text-yellow-500';
-      case 'Processing':
-        return 'text-yellow-500';
-      case 'Completed':
-        return 'text-green-500';
-      case 'Canceled':
-        return 'text-red-500';
-      default:
-        return '';
-    }
   };
 
   return (

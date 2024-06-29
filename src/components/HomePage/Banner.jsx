@@ -152,7 +152,7 @@ const Banner = () => {
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
         { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
         { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-spa-booking', label: 'Đặt lịch dịch vụ', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
         { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
@@ -162,7 +162,7 @@ const Banner = () => {
         { key: 'cat-service', label: 'Dành cho mèo', path: '/services-for-cat', parent: 'Dịch vụ thú cưng' },
         { key: 'dog-product', label: 'Dành cho chó', path: '/products-for-dog', parent: 'CỬA HÀNG' },
         { key: 'cat-product', label: 'Dành cho mèo', path: '/products-for-cat', parent: 'CỬA HÀNG' },
-        { key: 'manage-spa-booking', label: 'Spa Booking', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
+        { key: 'manage-spa-booking', label: 'Đặt lịch dịch vụ', path: '/manage-spa-bookings', parent: 'QUẢN LÝ' },
         { key: 'manage-order', label: 'Đơn hàng', path: '/manage-orders', parent: 'QUẢN LÝ' },
       ];
     }

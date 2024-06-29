@@ -111,9 +111,14 @@ const OrderList = () => {
       switch (record.status) {
         case 'Processing':
           return (
-            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
-              Delivering
-            </Button>
+            <div>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
+                Delivering
+              </Button>
+              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')}>
+                Cancel
+              </Button>
+            </div>
           );
         case 'Delivering':
           return (

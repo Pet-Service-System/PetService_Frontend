@@ -208,6 +208,7 @@ const SpaServiceDetail = () => {
                 BookingTime: bookingTime,
                 ServiceID: id,
                 Feedback: "",
+                isReview: false,
             };
 
             const responseBookingDetail = await axios.post(`http://localhost:3001/api/spa-booking-details`, bookingDetail, {

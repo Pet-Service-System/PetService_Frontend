@@ -33,7 +33,9 @@ const SpaBooking = () => {
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
-  const [reviewTransactionId, setReviewTransactionId] = useState(null);
+  const [bookingID, setBookingID] = useState(null);
+  const [bookingDetailID, setBookingDetailID] = useState(null); // Moved to useState
+
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const screens = useBreakpoint();
@@ -47,17 +49,21 @@ const SpaBooking = () => {
     try {
       const data = await getSpaBookings();
       const formattedData = data.map(booking => ({
-        id: booking.BookingDetailID,
+        id: booking.BookingID,
         date: new Date(booking.CreateDate),
-        description: booking.PetID,
-        amount: booking.TotalPrice,
+        TotalPrice: booking.TotalPrice,
         status: booking.Status,
-        reviewed: booking.Reviewed,
+        isReviewed: booking.isReviewed // Thêm trường isReviewed vào đối tượng booking
       }));
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
       setSpaBookings(sortedData);
+      
+      // Load booking detail ID for the first booking if available
+      if (formattedData.length > 0) {
+        await getSpaBookingDetailID(formattedData[0].id);
+      }
     } catch (error) {
       console.error('Error fetching spa bookings:', error);
     } finally {
@@ -69,24 +75,49 @@ const SpaBooking = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
 
-  const handleReviewTransaction = (id) => {
-    setReviewTransactionId(id);
+  const handleReviewTransaction = async (id, isReviewed) => {
+    // Kiểm tra xem đã được đánh giá hay chưa
+    if (isReviewed) {
+      message.info('Bạn đã đánh giá dịch vụ này rồi.');
+      return;
+    }
+
+    setBookingID(id);
     setIsReviewing(true);
     setReviewText('');
     setReviewError('');
+
+    // Load booking detail ID when reviewing
+    await getSpaBookingDetailID(id);
   };
+
+  const getSpaBookingDetailID = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setBookingDetailID(response.data.BookingDetailsID);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking detail:', error);
+      throw error;
+    }
+  }
 
   const handleSubmitReview = async () => {
     if (reviewText.trim() === '') {
       setReviewError('Review cannot be empty');
       return;
     }
-  
+    
     const token = localStorage.getItem('token');
     try {
-        await axios.put(
-        `http://localhost:3001/api/Spa-bookings/submit-review/${reviewTransactionId}`, 
-        { feedback: reviewText }, 
+      await axios.put(
+        `http://localhost:3001/api/spa-booking-details/${bookingDetailID}`, 
+        { Feedback: reviewText }, 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -97,8 +128,8 @@ const SpaBooking = () => {
       message.success('Your review has been submitted successfully');
   
       setSpaBookings(prevBookings => prevBookings.map(booking => {
-        if (booking.id === reviewTransactionId) {
-          return { ...booking, reviewed: true, feedback: reviewText };
+        if (booking.id === bookingID) {
+          return { ...booking, isReviewed: true }; // Cập nhật trạng thái isReviewed khi đã đánh giá
         }
         return booking;
       }));
@@ -115,26 +146,24 @@ const SpaBooking = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      render: (text, record) => (
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.id}</Button>
+      ),
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>{new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(record.date)}</Text>
-      )
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record) => (
-        <Text>${record.amount}</Text>
+        <Text>
+          {new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric'
+          }).format(record.date)}
+        </Text>
       )
     },
     {
@@ -152,20 +181,13 @@ const SpaBooking = () => {
       )
     },
     {
-      title: 'Detail',
-      key: 'detail',
-      render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>Detail</Button>
-      ),
-    },
-    {
       title: 'Review',
       key: 'review',
       render: (text, record) => (
         <Button
           type="primary"
-          onClick={() => handleReviewTransaction(record.id)}
-          disabled={record.status !== 'Completed' || record.reviewed}
+          onClick={() => handleReviewTransaction(record.id, record.isReviewed)} // Truyền trạng thái isReviewed vào hàm
+          disabled={record.status !== 'Completed' || record.isReviewed}
         >
           Review
         </Button>
