@@ -14,14 +14,18 @@ const SpaServiceDetail = () => {
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const [bookingForm] = Form.useForm();
+    const [addPetForm] = Form.useForm();
     const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
     const [pets, setPets] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [operationLoading, setOperationLoading] = useState(false);
     const userRole = localStorage.getItem('role') || 'Guest';
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
     const accountID = user.id;
     const [selectedPet, setSelectedPet] = useState(null);
+    const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    const genders = ['Đực', 'Cái'];
     const currentDateTime = moment();
     const availableTimes = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", 
@@ -130,6 +134,35 @@ const SpaServiceDetail = () => {
         setIsBookingModalVisible(true);
     };
 
+    const handleAddPet = async () => {
+        setOperationLoading(true);
+        try {
+            const values = await addPetForm.validateFields();
+            const token = localStorage.getItem('token');
+
+            const newPet = { ...values, AccountID: accountID };
+
+            const response = await axios.post(
+                'http://localhost:3001/api/pets',
+                newPet,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setPets((prevPets) => [...prevPets, response.data]);
+            setIsAddModalVisible(false);
+            addPetForm.resetFields();
+            message.success('Pet added successfully');
+            fetchPets();
+        } catch (info) {
+            console.log('Validate Failed:', info);
+        }
+        setOperationLoading(false);
+    };
+
     const handleBookingCancel = () => {
         setIsBookingModalVisible(false);
         bookingForm.resetFields();
@@ -184,6 +217,7 @@ const SpaServiceDetail = () => {
             });
 
             console.log(responseBookingDetail.data)
+
             message.success('Booking successful');
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
@@ -191,6 +225,11 @@ const SpaServiceDetail = () => {
             console.error('Error creating booking:', error);
             message.error('Error creating booking');
         }
+    };
+
+    const showAddPetModal = () => {
+        setIsAddModalVisible(true);
+        addPetForm.resetFields(); // Reset fields when the modal is shown
     };
 
     if (!serviceData) {
@@ -369,12 +408,25 @@ const SpaServiceDetail = () => {
                                 label="Chọn thú cưng"
                                 rules={[{ required: true, message: 'Vui lòng chọn thú cưng!' }]}
                             >
-                                <Select placeholder="Chọn thú cưng" onChange={handlePetSelectChange}>
+                                <Select
+                                    placeholder="Chọn thú cưng"
+                                    onChange={(value) => {
+                                        if (value === "add_new_pet") {
+                                            showAddPetModal();
+                                        } else {
+                                            handlePetSelectChange(value);
+                                        }
+                                    }}
+                                    className="relative rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                >
                                     {pets.map((pet) => (
-                                        <Option key={pet.PetID} value={pet.PetID}>
+                                        <Option key={pet.PetID} value={pet.PetID} className="text-gray-900">
                                             {pet.PetName}
                                         </Option>
                                     ))}
+                                    <Option value="add_new_pet">
+                                        <span className="text-gray-400">Thêm thú cưng</span>
+                                    </Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -450,6 +502,54 @@ const SpaServiceDetail = () => {
                             </Form.Item>
                         </Col>
                     </Row>
+                </Form>
+                {/* <Button type="primary" onClick={showAddPetModal} loading={operationLoading}>
+                    Thêm thú cưng
+                </Button> */}
+            </Modal>
+
+            {/* Add Pet */}
+            <Modal
+                title="Thêm thú cưng"
+                visible={isAddModalVisible}
+                onCancel={() => setIsAddModalVisible(false)}
+                footer={[
+                <Button key="back" onClick={() => setIsAddModalVisible(false)}>
+                    Hủy
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
+                    Thêm
+                </Button>,
+                ]}
+            >
+                <Form form={addPetForm} layout="vertical">
+                <Form.Item name="PetName" rules={[{ required: true, message: 'Tên không được để trống' }]}>
+                    <Input placeholder="Tên" />
+                </Form.Item>
+                <Form.Item name="PetTypeID" rules={[{ required: true, message: 'Loại thú cưng không được để trống' }]}>
+                    <Select placeholder="Chọn loại thú cưng">
+                    <Option value="PT001">Chó</Option>
+                    <Option value="PT002">Mèo</Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item name="Gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
+                    <Select placeholder="Chọn giới tính">
+                    {genders.map((gender, index) => (
+                        <Option key={index} value={gender}>
+                        {gender}
+                        </Option>
+                    ))}
+                    </Select>
+                </Form.Item>
+                <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
+                    <Input placeholder="Trạng thái" />
+                </Form.Item>
+                <Form.Item name="Weight" rules={[{ required: true, message: 'Cân nặng không được để trống' }]}>
+                    <Input placeholder="Cân nặng" type="number" />
+                </Form.Item>
+                <Form.Item name="Age" rules={[{ required: true, message: 'Tuổi không được để trống' }]}>
+                    <Input placeholder="Tuổi" type="number" />
+                </Form.Item>
                 </Form>
             </Modal>
         </div>
