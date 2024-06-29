@@ -3,11 +3,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, message, Spin, Modal } from "antd";
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
+
+
+
 const getSpaBookings = async () => {
   const token = localStorage.getItem('token');
+  
   try {
     const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
       headers: {
@@ -27,6 +32,7 @@ const SpaBooking = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   // State for status update modal
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
@@ -75,12 +81,12 @@ const SpaBooking = () => {
           },
         }
       );
-      message.success(`Booking status updated successfully to "${pendingStatus}"`);
+      message.success(t('booking_success_update_to') `"${pendingStatus}"`);
       setUpdateStatusModalVisible(false);
       fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
       console.error('Error updating booking status:', error);
-      message.error('Failed to update booking status');
+      message.error(t('fail_update_status'));
     }
   };
 
@@ -89,15 +95,15 @@ const SpaBooking = () => {
       if (record.status === 'Pending') {
         return (
           <>
-            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>Processing</Button>
-            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>Cancel</Button>
+            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>Đang xử lý</Button>
+            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
       } else if (record.status === 'Processing') {
         return (
           <>
-            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>Completed</Button>
-            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>Cancel</Button>
+            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>Hoàn thành</Button>
+            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
       }
@@ -115,7 +121,7 @@ const SpaBooking = () => {
       ),
     },
     {
-      title: 'Date',
+      title: t('date'),
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -131,7 +137,7 @@ const SpaBooking = () => {
       )
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
@@ -145,7 +151,7 @@ const SpaBooking = () => {
       )
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (text, record) => renderActions(record),
     },
@@ -161,9 +167,9 @@ const SpaBooking = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Spa Service Booking History</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">{t('spa_history_order')}</h2>
           <Button onClick={handleSortOrder} className="mb-4">
-            Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+            {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
           </Button>
           <Spin spinning={loading}>
             <Table
@@ -178,11 +184,11 @@ const SpaBooking = () => {
             visible={updateStatusModalVisible}
             onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[
-              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)}>Cancel</Button>,
-              <Button key="submit" type="primary" onClick={handleUpdateStatus}>Confirm</Button>,
+              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)}>{t('cancel')}</Button>,
+              <Button key="submit" type="primary" onClick={handleUpdateStatus}>{t('confirm')}</Button>,
             ]}
           >
-            <p>Are you sure you want to update the status to "{pendingStatus}"?</p>
+            <p>{t('ask_update')} "{pendingStatus}"?</p>
           </Modal>
         </div>
       </Layout>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Image } from 'antd';
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
@@ -58,6 +59,7 @@ const SpaBookingDetail = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchSpaBooking = async () => {
@@ -110,70 +112,70 @@ const SpaBookingDetail = () => {
         icon={<ArrowLeftOutlined />}
         size="large"
       >
-        Quay về
+        {t('back')}
       </Button>
       <Card className="p-10 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
         <Title level={2} className="mb-4 text-center">
-          Chi tiết đặt dịch vụ Spa #{spaBooking.BookingID}
+          {t('spa_booking_detail_title')} #{spaBooking.BookingID}
         </Title>
         <div className="mb-4">
-          <Text strong>Ngày tạo:</Text> <Text>{new Date(spaBooking.CreateDate).toLocaleDateString()}</Text>
+          <Text strong>{t('create_date')}:</Text> <Text>{new Date(spaBooking.CreateDate).toLocaleDateString()}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên khách hàng: </Text>
+          <Text strong>{t('customer_name')}: </Text>
           <Text>{spaBookingDetail.CustomerName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>SĐT: </Text>
+          <Text strong>{t('phone_number')}: </Text>
           <Text>{spaBookingDetail.Phone}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên thú cưng: </Text>
+          <Text strong>{t('pet_name')}: </Text>
           <Text>{spaBookingDetail.PetName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Giới tính thú cưng: </Text>
+          <Text strong>{t('pet_gender')}: </Text>
           <Text>{spaBookingDetail.PetGender}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái thú cưng: </Text>
+          <Text strong>{t('pet_status')}: </Text>
           <Text>{spaBookingDetail.PetStatus}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Loại thú cưng: </Text>
+          <Text strong>{t('pet_type')}: </Text>
           <Text>{petTypeName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Cân nặng thú cưng: </Text>
+          <Text strong>{t('pet_weight')}: </Text>
           <Text>{spaBookingDetail.PetWeight} kg</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tuổi thú cưng: </Text>
-          <Text>{spaBookingDetail.PetAge} tuổi</Text>
+          <Text strong>{t('pet_age')}: </Text>
+          <Text>{spaBookingDetail.PetAge} {t('years_old')}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Ngày đặt lịch: </Text>
+          <Text strong>{t('book_date')}: </Text>
           <Text>{spaBookingDetail.BookingDate}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Thời gian đặt lịch: </Text>
+          <Text strong>{t('book_time')}: </Text>
           <Text>{spaBookingDetail.BookingTime}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái: </Text> 
+          <Text strong>{t('status')}: </Text>
           <Text className={
             spaBooking.Status === 'Completed' ? 'text-green-600' :
-            spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing' ? 'text-orange-400' :
-            'text-red-600'
+              spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing' ? 'text-orange-400' :
+                'text-red-600'
           }>
-            {spaBooking.Status}
+            {t(spaBooking.Status.toLowerCase())}
           </Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
+          <Text strong>{t('total_price')}:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Dịch vụ đã đặt:</Text>
+          <Text strong>{t('booked_services')}:</Text>
         </div>
         <Table
           dataSource={serviceData ? [serviceData] : []} 
@@ -182,7 +184,7 @@ const SpaBookingDetail = () => {
         />
         {spaBookingDetail.Feedback && (
           <div className="mt-4">
-            <Text strong>Đánh giá: </Text>
+            <Text strong>{t('rate')}: </Text>
             <Text>{spaBookingDetail.Feedback}</Text>
           </div>
         )}

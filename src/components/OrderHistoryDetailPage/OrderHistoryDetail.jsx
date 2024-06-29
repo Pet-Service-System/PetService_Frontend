@@ -5,12 +5,14 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
 import moment from "moment";
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
 
 const getOrder = async (id) => {
   const token = localStorage.getItem('token');
+  const { t } = useTranslation();
   try {
     const response = await axios.get(`http://localhost:3001/api/orders/${id}`, {
       headers: {
@@ -115,11 +117,11 @@ const OrderHistoryDetail = () => {
 
   const handleCancelOrder = async () => {
     confirm({
-      title: 'Xác nhận hủy đơn hàng',
+      title: t('cofirm_cancel_order'),
       icon: <ExclamationCircleOutlined />,
-      content: 'Bạn có chắc chắn muốn hủy đơn hàng này?',
-      okText: 'Đồng ý',
-      cancelText: 'Hủy',
+      content: t('are_you_sure_cancel_order'),
+      okText: t('agree'),
+      cancelText: t('cancel'),
       onOk: async () => {
         try {
           const token = localStorage.getItem('token');
@@ -145,10 +147,10 @@ const OrderHistoryDetail = () => {
           fetchOrderDetails(order.OrderID);
       
           // Show success message
-          message.success('Đơn hàng đã được hủy thành công.');
+          message.success(t('success_cancel_order'));
         } catch (error) {
           console.error('Error cancelling order:', error);
-          message.error('Đã xảy ra lỗi khi hủy đơn hàng.');
+          message.error(t('error_occur_cancel_order'));
         }
       },
     });
@@ -194,18 +196,18 @@ const OrderHistoryDetail = () => {
       }
     } catch (error) {
       console.error('Error updating inventory:', error);
-      message.error('Đã xảy ra lỗi khi cập nhật số lượng tồn kho.');
+      message.error(t('error_occur_update_product_quantity'));
     }
   };
 
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      message.warning('Vui lòng đánh giá.');
+      message.warning(t('pl_rate'));
       return;
     }
     if (comment.trim() === '') {
-      message.warning('Vui lòng để lại nhận xét.');
+      message.warning(t('pl_commnet'));
       return;
     }
 
@@ -227,15 +229,15 @@ const OrderHistoryDetail = () => {
           },
         }
       );
-      console.log('Bình luận thành công:', response.data);
-      message.success('Bình luận thành công!');
+      console.log('Comment created:', response.data);
+      message.success(t('comment_success'));
       fetchOrderDetails(id); // Refresh comments
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        message.error(`Bạn đã đánh giá sản phẩm này.`);
+        message.error(t('already_comment'));
       } else {
-        console.error('Lỗi khi tạo bình luận:', error);
-        message.error('Không thể tạo bình luận.');
+        console.error('Error creating comment:', error);
+        message.error(t('comment_fail'));
       }
     } finally {
       setIsSubmitting(false); // End submitting
@@ -263,7 +265,7 @@ const OrderHistoryDetail = () => {
 
   const columns = [
     {
-      title: 'Hình ảnh',
+      title: t('image'),
       dataIndex: 'ImageURL',
       key: 'ImageURL',
       render: (text, record) => (
@@ -273,7 +275,7 @@ const OrderHistoryDetail = () => {
       ),
     },
     {
-      title: 'Tên sản phẩm',
+      title: t('product_name'),
       dataIndex: 'ProductName',
       key: 'ProductName',
       render: (text, record) => (
@@ -283,13 +285,13 @@ const OrderHistoryDetail = () => {
       ),
     },
     {
-      title: 'Số lượng',
+      title: t('quantity'),
       dataIndex: 'Quantity',
       key: 'Quantity',
       render: (text, record) => <span>{record.Quantity}</span>,
     },
     {
-      title: 'Giá',
+      title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => <span className="text-green-600">${text}</span>,
@@ -298,15 +300,15 @@ const OrderHistoryDetail = () => {
 
   if (role === 'Customer') {
     columns.push({
-      title: 'Hành động',
+      title: t('actions'),
       key: 'action',
       render: (text, record) => (
-        <Button 
-          type="primary" 
+        <Button
+          type="primary"
           onClick={() => openModal(record.ProductID)}
           disabled={order.Status !== 'Shipped' || isSubmitting} // Disable when not shipped or submitting
         >
-          Đánh giá
+          {t('comment')}
         </Button>
       ),
     });
@@ -320,35 +322,35 @@ const OrderHistoryDetail = () => {
         icon={<ArrowLeftOutlined />}
         size="large"
       >
-        Quay về
+       {t('back')}
       </Button>
       <Card className="p-6 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
-        <Title level={2} className="mb-4 text-center">Chi tiết đơn hàng #{order.OrderID}</Title>
+        <Title level={2} className="mb-4 text-center">{t('order_detail')} #{order.OrderID}</Title>
         <div className="mb-4">
-          <Text strong>Ngày đặt hàng:</Text> <Text>{moment(order.date).format('DD/MM/YYYY HH:mm')}</Text>
+          <Text strong>{t('order_date')}:</Text> <Text>{moment(order.date).format('DD/MM/YYYY HH:mm')}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Trạng thái:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
+          <Text strong>{t('status')}:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tên khách hàng:</Text> <Text>{orderDetail.CustomerName}</Text>
+          <Text strong>{t('customer_name')}:</Text> <Text>{orderDetail.CustomerName}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Số điện thoại:</Text> <Text>{orderDetail.Phone}</Text>
+          <Text strong>{t('phone_number')}:</Text> <Text>{orderDetail.Phone}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Địa chỉ:</Text> <Text>{orderDetail.Address}</Text>
+          <Text strong>{t('address')}:</Text> <Text>{orderDetail.Address}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Phí ship: </Text> <Text>$2</Text>
+          <Text strong>{t('shipping_fee')}: </Text> <Text>$2</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
+          <Text strong>{t('total_amount')}:</Text> <Text className="text-green-600">${order.TotalPrice}</Text>
         </div>
         <div className="mb-4">
-          <Text strong>Chi tiết đơn hàng:</Text>
+          <Text strong>{t('order_detail')}:</Text>
         </div>
-        
+
         <Table
           dataSource={orderDetail.Items}
           columns={columns}
@@ -358,26 +360,26 @@ const OrderHistoryDetail = () => {
         {/* Render the cancel button conditionally */}
         {(role === 'Customer' || role === 'Sales Staff') && order.Status === 'Processing' && (
           <Button danger className="float-end" onClick={handleCancelOrder} disabled={isSubmitting}>
-            Hủy đơn hàng
+            {t('cancel_order')}
           </Button>
         )}
 
         <Modal
-          title="Đánh giá đơn hàng"
+          title={t('rate_order')}
           visible={showModal}
           onCancel={() => setShowModal(false)}
           footer={[
             <Button key="cancel" onClick={() => setShowModal(false)}>
-              Hủy
+              {t('cancel')}
             </Button>,
-            <Button key="submit" type="primary" onClick={handleSubmit} disabled={isSubmitting}>
-              Đánh giá
+            <Button key="submit" type="primary" onClick={handleSubmit}>
+              {t('rate')}
             </Button>,
           ]}
         >
           <Rate onChange={(value) => setRating(value)} value={rating} />
           <Input.TextArea
-            placeholder="Nhập nhận xét của bạn..."
+            placeholder={t('enter_your_comment')}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows={4}

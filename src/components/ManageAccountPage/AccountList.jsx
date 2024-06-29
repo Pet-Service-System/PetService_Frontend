@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -12,6 +13,7 @@ const AccountList = () => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false); // State to track save button loading
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -78,22 +80,22 @@ const AccountList = () => {
         },
       });
 
-      message.success('Account updated successfully', 0.5).then(() => {
+      message.success(t('account_updated_successfully'), 0.5).then(() => {
         window.location.reload(); // Reload the page after successful update
       });
     } catch (error) {
-      console.error('Error updating account:', error);
+      console.error(t('error_updating_account'), error);
       if (error.response && error.response.status === 401) {
-        message.error('Unauthorized. Please log in.');
+        message.error(t('unauthorized'));
       } else {
-        message.error('Error updating account');
+        message.error(t('account_updated_successfully'));
       }
     } 
   };
 
   const columns = [
     {
-      title: 'Fullname',
+      title: t('fullname'),
       dataIndex: 'fullname',
       key: 'fullname',
     },
@@ -103,22 +105,22 @@ const AccountList = () => {
       key: 'email',
     },
     {
-      title: 'Phone',
+      title: t('phone'),
       dataIndex: 'phone',
       key: 'phone',
     },
     {
-      title: 'Address',
+      title: t('address'),
       dataIndex: 'address',
       key: 'address',
     },
     {
-      title: 'Role',
+      title: t('role'),
       dataIndex: 'role',
       key: 'role',
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -128,12 +130,12 @@ const AccountList = () => {
       ), // Display 'Active' or 'Inactive'
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (_, record) => (
         // Check if the role is "Administrator" and disable the edit button accordingly
         record.role === 'Administrator' ? (
-          <Button type="primary" disabled>Edit</Button>
+          <Button type="primary" disabled>{t('edit')}</Button>
         ) : (
           <Button type="primary" onClick={() => handleEditClick(record)}>Edit</Button>
         )
@@ -143,7 +145,7 @@ const AccountList = () => {
 
   return (
     <div className="p-4 sm:p-8">
-      <Title level={2}>Account List</Title>
+      <Title level={2}>{t('account_list')}</Title>
       <Form form={form}>
         <Table
           dataSource={loading ? [] : accountData}
@@ -162,7 +164,7 @@ const AccountList = () => {
         visible={isModalVisible}
         onCancel={handleCancelEdit}
         footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="cancel" onClick={handleCancelEdit}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
         ]}
       >
@@ -170,31 +172,31 @@ const AccountList = () => {
           {/* Fields */}
           <Form.Item
             name="fullname"
-            rules={[{ required: true, message: 'Please enter the fullname!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('fullname') + '!' }]}
           >
             <Input placeholder="Fullname" />
           </Form.Item>
           <Form.Item
             name="email"
-            rules={[{ required: true, message: 'Please enter the email!' }]}
+            rules={[{ required: true, message: t('please_enter') + 'email' + '!'}]}
           >
             <Input placeholder="Email" />
           </Form.Item>
           <Form.Item
             name="phone"
-            rules={[{ required: true, message: 'Please enter the phone!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('phone') + '!'}]}
           >
             <Input placeholder="Phone" />
           </Form.Item>
           <Form.Item
             name="address"
-            rules={[{ required: true, message: 'Please enter the address!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('adress') + '!' }]}
           >
             <Input placeholder="Address" />
           </Form.Item>
           <Form.Item
             name="role"
-            rules={[{ required: true, message: 'Please select the role!' }]}
+            rules={[{ required: true, message: t('please_enter') + t('role') + '!' }]}
           >
             <Select placeholder="Select Role">
               {/* Options for roles */}
@@ -207,11 +209,11 @@ const AccountList = () => {
           </Form.Item>
           <Form.Item
             name="status"
-            rules={[{ required: true, message: 'Please select the status!' }]}
+            rules={[{ required: true, message: t('please_select_the_status') }]}
           >
             <Select placeholder="Select Status">
-              <Option value={1}>Active</Option>
-              <Option value={0}>Inactive</Option>
+              <Option value={1}>{t('active')}</Option>
+              <Option value={0}>{t('inactive')}</Option>
             </Select>
           </Form.Item>
         </Form>

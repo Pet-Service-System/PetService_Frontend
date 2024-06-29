@@ -4,10 +4,14 @@ import { Table, Button, Typography, Layout, Menu, Grid, Spin } from "antd";
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
+
 
 const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
+
+
 
 const OrderHistory = () => {
   const navigate = useNavigate();
@@ -17,8 +21,10 @@ const OrderHistory = () => {
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false); // State for loading indicator
   const screens = useBreakpoint();
-  const [user] = useState(JSON.parse(localStorage.getItem('user')))
+  const [user] = useState(JSON.parse(localStorage.getItem('user')));
   const AccountID = user.id
+  const { t } = useTranslation();
+
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -52,7 +58,7 @@ const OrderHistory = () => {
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => moment(b.date).diff(a.date))
         : formattedData.sort((a, b) => moment(a.date).diff(b.date));
-      setOrders(sortedData); // Sắp xếp theo ngày
+      setOrders(sortedData); // {t('sort_by_date')}
     } catch (error) {
       console.error('Error fetching order history:', error);
     } finally {
@@ -81,7 +87,7 @@ const OrderHistory = () => {
       key: 'id',
     },
     {
-      title: 'Ngày',
+      title: t('date'),
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -89,7 +95,7 @@ const OrderHistory = () => {
       ),
     },
     {
-      title: 'Số tiền',
+      title: t('amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
@@ -97,7 +103,7 @@ const OrderHistory = () => {
       )
     },
     {
-      title: 'Trạng thái',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => {
@@ -120,7 +126,7 @@ const OrderHistory = () => {
       }
     },
     {
-      title: 'Chi tiết',
+      title: t('detail'),
       key: 'detail',
       render: (text, record) => (
         <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
@@ -151,7 +157,7 @@ const OrderHistory = () => {
               icon={<UserOutlined />}
               onClick={() => navigate('/user-profile')}
             >
-              Thông tin người dùng
+              {t('user_information')}
             </Menu.Item>
             {role === 'Customer' && (
               <>
@@ -160,33 +166,33 @@ const OrderHistory = () => {
                   icon={<UnorderedListOutlined />}
                   onClick={() => navigate('/pet-list')}
                 >
-                  Danh sách thú cưng
+                  {t('list_of_pets')}
                 </Menu.Item>
                 <Menu.Item
                   key="orders-history"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate('/order-history')}
                 >
-                  Lịch sử đặt hàng
+                  {t('order_history')}
                 </Menu.Item>
                 <Menu.Item key="spa-booking" 
                            onClick={() => navigate('/spa-booking')}
                            icon={<HistoryOutlined />}>
-                    Lịch sử dịch vụ
+                    {t('service_history')}
                 </Menu.Item>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Đăng xuất
+              {t('log_out')}
             </Menu.Item>
           </Menu>
         </Sider>
       )}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Lịch sử đặt hàng</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">{t('order_history')}</h2>
           <Button onClick={handleSortOrder} className="mb-4">
-            Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
+            {t('sort_by_date')}: {sortOrder === 'desc' ? t('nearest') : t('farthest')}
           </Button>
           <Spin spinning={loading}>
             <Table
