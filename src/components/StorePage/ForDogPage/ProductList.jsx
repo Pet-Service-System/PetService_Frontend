@@ -4,7 +4,7 @@ import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, m
 import axios from 'axios';
 
 const { Option } = Select;
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const ProductList = () => {
@@ -221,6 +221,12 @@ const ProductList = () => {
       title: 'Description',
       dataIndex: 'Description',
       key: 'Description',
+      ellipsis: true, // Enable ellipsis if description is too long
+      render: (text) => (
+        <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 1, expandable: true, symbol: 'more' }}>
+          {text}
+        </Paragraph>
+      ),
     },
     {
       title: 'Image URL',
@@ -324,49 +330,61 @@ const ProductList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form} className='text-left'>
-          <Form.Item
-            name="ProductName"
-            rules={[{ required: true, message: 'Please enter the product name!' }]}
-          >
-            <Input placeholder="Product Name" />
-          </Form.Item>
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the product price!' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item>
-          <Form.Item
-            name="Description"
-            rules={[{ required: true, message: 'Please enter the product description' }]}
-          >
-           <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
-          </Form.Item>
-          <Form.Item
-            name="Image"
-            rules={[{ required: true, message: 'Please upload the product image!' }]}
-          >
-            <Input type="file" onChange={handleProductImageUpload} />
-            {productImg && (
-              <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} />
-            )}
-          </Form.Item>
-          <Form.Item
-            name="Quantity"
-            rules={[{ required: true, message: 'Please enter the product quantity' }]}
-          >
-            <Input placeholder="Quantity" />
-          </Form.Item>
-          <Form.Item
-            name="Status"
-            rules={[{ required: true, message: 'Please select the product status' }]}
-          >
-            <Select placeholder="Status">
-              <Option value="Available">Available</Option>
-              <Option value="Unavailable">Unavailable</Option>
-            </Select>
-          </Form.Item>
+        <Form form={form} className="text-left" layout='vertical'>
+            <Form.Item
+              name="ProductName"
+              label="Product Name"
+              rules={[{ required: true, message: 'Please enter the product name!' }]}
+              className="mb-4"
+            >
+              <Input placeholder="Product Name" className="w-full p-2 border border-gray-300 rounded" />
+            </Form.Item>
+            <Form.Item
+              name="Price"
+              label="Price"
+              rules={[{ required: true, message: 'Please enter the product price!' }]}
+              className="mb-4"
+            >
+              <Input placeholder="Price" className="w-full p-2 border border-gray-300 rounded" />
+            </Form.Item>
+            <Form.Item
+              name="Description"
+              label="Description"
+              rules={[{ required: true, message: 'Please enter the product description' }]}
+              className="mb-4"
+            >
+              <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
+            </Form.Item>
+            <Form.Item
+              name="Image"
+              label="Image"
+              rules={[{ required: true, message: 'Please upload the product image!' }]}
+              className="mb-4"
+            >
+              <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
+              {productImg && (
+                <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
+              )}
+            </Form.Item>
+            <Form.Item
+              name="Quantity"
+              label="Quantity"
+              rules={[{ required: true, message: 'Please enter the product quantity' }]}
+              className="mb-4"
+            >
+              <Input type='number' placeholder="Quantity" className="w-full p-2 border border-gray-300 rounded" />
+            </Form.Item>
+            <Form.Item
+              name="Status"
+              label="Status"
+              rules={[{ required: true, message: 'Please select the product status' }]}
+              className="mb-4"
+            >
+              <Select placeholder="Status">
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
         </Form>
       </Modal>
     </div>

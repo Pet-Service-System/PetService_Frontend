@@ -132,6 +132,10 @@ const SpaServiceDetail = () => {
     };
 
     const handleBookingNow = () => {
+        if (!localStorage.getItem('user')) {
+            showLoginModal();
+            return;
+        }
         setIsBookingModalVisible(true);
     };
 
@@ -169,6 +173,30 @@ const SpaServiceDetail = () => {
         bookingForm.resetFields();
     };
 
+    const showLoginModal = () => {
+        Modal.info({
+            title: 'Thông báo',
+            content: (
+                <div>
+                    <p>Vui lòng đăng nhập hoặc đăng ký để mua hàng.</p>
+                    <div className="flex justify-end">
+                        <Button type="primary" onClick={() => {
+                            navigate('/login');
+                            Modal.destroyAll();
+                        }}>Đăng nhập</Button>
+                        <Button onClick={() => {
+                            navigate('/register');
+                            Modal.destroyAll(); 
+                        }} className="ml-2">Đăng ký</Button>
+                    </div>
+                </div>
+            ),
+            closable: true, 
+            maskClosable: true, 
+            footer: null,
+        });
+    };
+
     const handleBookingSubmit = async () => {
         try {
             const values = await bookingForm.validateFields();
@@ -183,7 +211,7 @@ const SpaServiceDetail = () => {
                 message.error('Loại thú cưng không phù hợp với loại dịch vụ.');
                 return;
             }
-            
+
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
 

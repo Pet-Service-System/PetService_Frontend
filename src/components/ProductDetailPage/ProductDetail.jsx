@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate } from 'antd';
+import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate, Modal } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
+const { TextArea } = Input
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -74,7 +75,11 @@ const ProductDetail = () => {
     
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
-    const handleOrderNow = async () => {
+    const handleOrderNow = () => {
+        if (!localStorage.getItem('user')) {
+            showLoginModal();
+            return;
+        }
         if (productData) {
             if (quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
@@ -82,17 +87,20 @@ const ProductDetail = () => {
             }
     
             const productWithQuantity = { ...productData, quantity };
-            await handleAddItem(productWithQuantity);
-            const totalAmount = productData.Price
+            handleAddItem(productWithQuantity);
+            const totalAmount = productData.Price;
             localStorage.setItem('totalAmount', totalAmount.toFixed(2));
-            navigate('/order')
+            navigate('/order');
         }
     };
-    
 
     const { handleAddItem } = useShopping();
 
     const handleAddToCart = () => {
+        if (!localStorage.getItem('user')) {
+            showLoginModal();
+            return;
+        }
         if (productData) {
             if (quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
@@ -103,7 +111,31 @@ const ProductDetail = () => {
             handleAddItem(productWithQuantity);
             message.success('Product added to cart successfully');
         }
-    };    
+    };
+
+    const showLoginModal = () => {
+        Modal.info({
+            title: 'Thông báo',
+            content: (
+                <div>
+                    <p>Vui lòng đăng nhập hoặc đăng ký để mua hàng.</p>
+                    <div className="flex justify-end">
+                        <Button type="primary" onClick={() => {
+                            navigate('/login');
+                            Modal.destroyAll();
+                        }}>Đăng nhập</Button>
+                        <Button onClick={() => {
+                            navigate('/register');
+                            Modal.destroyAll(); 
+                        }} className="ml-2">Đăng ký</Button>
+                    </div>
+                </div>
+            ),
+            closable: true, 
+            maskClosable: true, 
+            footer: null,
+        });
+    };
 
     const handleChangeQuantity = (value) => {
         if (!isNaN(value) && value > 0) {
@@ -132,6 +164,7 @@ const ProductDetail = () => {
             const updatedProduct = {
                 ProductName: values.ProductName,
                 Price: parseFloat(values.Price),
+                Quantity: values.Quantity,
                 Description: values.Description,
                 ImageURL: values.ImageURL,
                 Status: values.Status
@@ -143,9 +176,9 @@ const ProductDetail = () => {
                 },
             });
 
-            message.success('Product updated successfully', 0.5).then(() => {
-                window.location.reload();
-            });
+            message.success('Product updated successfully')
+            fetchProductDetail();
+            setEditMode(false)
         } catch (error) {
             console.error('Error updating product:', error);
             if (error.response && error.response.status === 401) {
@@ -199,7 +232,7 @@ const ProductDetail = () => {
                                     label="Số lượng tồn kho"
                                     rules={[{ required: true, message: 'Hãy nhập số lượng tồn kho!' }]}
                                 >
-                                    <Input disabled={!editMode} />
+                                    <Input type='number' disabled={!editMode} placeholder='Quantity'/>
                                 </Form.Item>
                                 <Form.Item
                                     name="Price"
@@ -213,7 +246,7 @@ const ProductDetail = () => {
                                     label="Mô tả"
                                     rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
                                 >
-                                    <Input disabled={!editMode} />
+                                    <TextArea disabled={!editMode} rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
                                 </Form.Item>
                                 <Form.Item
                                     name="ImageURL"

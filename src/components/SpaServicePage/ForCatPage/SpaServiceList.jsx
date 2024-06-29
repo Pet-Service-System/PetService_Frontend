@@ -19,19 +19,19 @@ const SpaServiceList = () => {
   const [serviceImg, setServiceImg] = useState(""); // For image upload
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/api/services');
-        const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
-        setServiceData(filteredServices);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/services');
+      const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
+      setServiceData(filteredServices);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchServices();
   }, [petTypeID]);
 
@@ -83,9 +83,8 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 201) {
-        message.success('Service added successfully', 0.5).then(() => {
-          window.location.reload();
-        });
+        message.success('Service added successfully')
+        fetchServices();
       } else {
         message.error('Failed to add service: Unexpected server response');
       }
@@ -323,37 +322,39 @@ const SpaServiceList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form} className="text-left">
+        <Form form={form} className="text-left" layout='vertical'>
           <Form.Item
             name="ServiceName"
+            label="Service Name"
             rules={[{ required: true, message: 'Please enter the service name!' }]}
+            className="mb-4"
           >
-            <Input placeholder="Service Name" />
+            <Input placeholder="Service Name" className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
-          {/* <Form.Item
-            name="Price"
-            rules={[{ required: true, message: 'Please enter the service price!' }]}
-          >
-            <Input placeholder="Price" />
-          </Form.Item> */}
           <Form.Item
             name="Description"
+            label="Description"
             rules={[{ required: true, message: 'Please enter the service description' }]}
+            className="mb-4"
           >
-            <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
+            <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
+            label="Image"
             rules={[{ required: true, message: 'Please upload the service image!' }]}
+            className="mb-4"
           >
-            <Input type="file" onChange={handleServiceImageUpload} />
+            <Input type="file" onChange={handleServiceImageUpload} className="w-full p-2 border border-gray-300 rounded" />
             {serviceImg && (
-              <Image src={URL.createObjectURL(serviceImg)} alt="Service Preview" style={{ width: '100px', marginTop: '10px' }} />
+              <Image src={URL.createObjectURL(serviceImg)} alt="Service Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
             )}
           </Form.Item>
           <Form.Item
             name="Status"
+            label="Status"
             rules={[{ required: true, message: 'Please select the service status' }]}
+            className="mb-4"
           >
             <Select placeholder="Select Status">
               <Option value="Available">Available</Option>
@@ -361,6 +362,7 @@ const SpaServiceList = () => {
             </Select>
           </Form.Item>
         </Form>
+
       </Modal>
     </div>
   );
