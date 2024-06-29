@@ -8,9 +8,10 @@ import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import '../../assets/fonts/fonts.css';
 
-import { Menu as AntdMenu, Dropdown } from 'antd';
+import { Dropdown } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+
 
 const { Header } = Layout;
 
@@ -24,14 +25,8 @@ const Banner = () => {
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
   const { t } = useTranslation();
-
-  // Function to handle language change
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-  };
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -161,8 +156,8 @@ const Banner = () => {
       ];
     } else if (role === 'Administrator') {
       menuItems = [
-        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
-        { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
+        { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
+        { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -172,7 +167,7 @@ const Banner = () => {
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
-        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
+        { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -198,6 +193,7 @@ const Banner = () => {
 
     const changeLanguage = (lng) => {
       i18n.changeLanguage(lng);
+      localStorage.setItem('language', lng);
     };
 
     const currentLanguage = i18n.language;
@@ -314,25 +310,6 @@ const Banner = () => {
                         <span className="text-black">{user.fullname}</span>
                       </Button>
                     </Popover>
-                    <Menu.Item key="language" className="language-menu">
-                      <Dropdown
-                        overlay={
-                          <Menu>
-                            <Menu.Item key="en" onClick={() => changeLanguage('en')}>
-                              English
-                            </Menu.Item>
-                            <Menu.Item key="vn" onClick={() => changeLanguage('vn')}>
-                              Tiếng Việt
-                            </Menu.Item>
-                          </Menu>
-                        }
-                        trigger={['click']}
-                      >
-                        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                          <GlobalOutlined /> {currentLanguage === 'en' ? 'English' : 'Tiếng Việt'}
-                        </a>
-                      </Dropdown>
-                    </Menu.Item>
                   </>
                 )}
               </div>

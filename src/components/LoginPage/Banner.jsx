@@ -116,8 +116,8 @@ const Banner = () => {
       ];
     } else if (role === 'Administrator') {
       menuItems = [
-        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
-        { key: 'manage-accounts', label: 'QUẢN LÍ TÀI KHOẢN', path: '/manage-accounts' },
+        { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
+        { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -127,7 +127,7 @@ const Banner = () => {
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
-        { key: 'schedule', label: 'LỊCH', path: '/staff-schedule' },
+        { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },

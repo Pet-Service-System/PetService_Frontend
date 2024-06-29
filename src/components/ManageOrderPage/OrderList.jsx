@@ -180,7 +180,7 @@ const OrderList = () => {
       title: t('detail'),
       key: 'detail',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>Chi tiết</Button>
+        <Button type="link" onClick={() => navigate(`/orders-history-detail/${record.id}`)}>{t('detail')}</Button>
       ),
     },
     {
@@ -194,7 +194,7 @@ const OrderList = () => {
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">{t('ordered_list')}</h2>
           <Button onClick={handleSortOrder} className="mb-4">
             {t('sort_by_date')}: {sortOrder === 'desc' ? t('nearest') : t('farthest')}
           </Button>
