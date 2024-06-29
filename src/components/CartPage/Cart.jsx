@@ -30,7 +30,7 @@ const Cart = () => {
       render: (text, record, index) => index + 1,
     },
     {
-      title: 'Sản phẩm',
+      title: t('product'),
       dataIndex: 'ProductName',
       key: 'ProductName',
       render: (text, record) => (
@@ -41,13 +41,13 @@ const Cart = () => {
       ),
     },
     {
-      title: 'Giá',
+      title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => typeof text === 'number' ? `$${text.toFixed(2)}` : '',
     },
     {
-      title: 'Số lượng',
+      title: t('quantity'),
       dataIndex: 'quantity',
       key: 'Quantity',
       render: (text, record) => (
@@ -60,7 +60,7 @@ const Cart = () => {
       ),
     },
     {
-      title: 'Thao tác',
+      title: t('action'),
       key: 'action',
       render: (text, record) => (
         <Button

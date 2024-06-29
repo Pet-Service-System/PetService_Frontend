@@ -29,11 +29,11 @@ const ChangePasswordForm = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!currentPassword.trim()) newErrors.currentPassword = 'Current password is required';
-    if (!newPassword.trim()) newErrors.newPassword = 'New password is required';
-    if (!confirmPassword.trim()) newErrors.confirmPassword = 'Confirm password is required';
-    if (newPassword === currentPassword) newErrors.newPassword = 'New password must be different from current password';
-    if (newPassword !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    if (!currentPassword.trim()) newErrors.currentPassword = t('current_password_is_required');
+    if (!newPassword.trim()) newErrors.newPassword = t('new_password_is_required');
+    if (!confirmPassword.trim()) newErrors.confirmPassword = t('confirm_password_is_required');
+    if (newPassword === currentPassword) newErrors.newPassword = t('new_password_must_be_different');
+    if (newPassword !== confirmPassword) newErrors.confirmPassword = t('passwords_do_not_match');
     return newErrors;
   };
 
@@ -55,7 +55,7 @@ const ChangePasswordForm = () => {
         });
         console.log('Password changed successfully', response.data);
         // Hiển thị thông báo thành công và mở modal
-        message.success('Đổi mật khẩu thành công!', 1).then(() => {
+        message.success(t('password_changed_successfully'), 1).then(() => {
           navigate('/user-profile');
         });
         setDisableChangePassword(true); // Bắt đầu quá trình vô hiệu hóa nút Đổi mật khẩu
@@ -64,7 +64,7 @@ const ChangePasswordForm = () => {
         if (error.response) {
           message.error(error.response.data.message);
         } else {
-          message.error('An error occurred');
+          message.error(t('an_error_occurred'));
         }
         setDisableChangePassword(true); // Bắt đầu quá trình vô hiệu hóa nút Đổi mật khẩu
       } finally {
@@ -89,10 +89,10 @@ const ChangePasswordForm = () => {
         </Title>
         <Form onFinish={handleSubmit} layout="vertical">
           <Form.Item
-            label="Mật khẩu hiện tại"
+            label={t('current_password')}
             validateStatus={errors.currentPassword ? 'error' : ''}
             help={errors.currentPassword}
-            rules={[{ required: true, message: 'Current password is required' }]}
+            rules={[{ required: true, message: t('current_password_is_required') }]}
           >
             <Input.Password
               name="currentPassword"
@@ -101,10 +101,10 @@ const ChangePasswordForm = () => {
             />
           </Form.Item>
           <Form.Item
-            label="Mật khẩu mới"
+            label={t('new_password')}
             validateStatus={errors.newPassword ? 'error' : ''}
             help={errors.newPassword}
-            rules={[{ required: true, message: 'New password is required' }]}
+            rules={[{ required: true, message: t('new_password_is_required') }]}
           >
             <Input.Password
               name="newPassword"
@@ -113,10 +113,10 @@ const ChangePasswordForm = () => {
             />
           </Form.Item>
           <Form.Item
-            label="Xác nhận mật khẩu mới"
+            label={t('confirm_new_password')}
             validateStatus={errors.confirmPassword ? 'error' : ''}
             help={errors.confirmPassword}
-            rules={[{ required: true, message: 'Please confirm your new password' }]}
+            rules={[{ required: true, message: t('confirm_password_is_required') }]}
           >
             <Input.Password
               name="confirmPassword"
@@ -127,7 +127,7 @@ const ChangePasswordForm = () => {
           <Form.Item>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button type="primary" htmlType="submit" className="mr-2" disabled={isLoading || disableChangePassword}>
-                {disableChangePassword ? 'Đang đổi mật khẩu...' : 'Đổi mật khẩu'}
+                {disableChangePassword ? t('changing_password') : t('change_password')}
               </Button>
               <Button onClick={handleCancel}>
                 {t('cancel')}

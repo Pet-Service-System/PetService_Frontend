@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -12,6 +13,7 @@ const AccountList = () => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false); // State to track save button loading
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchAccounts = async () => {
