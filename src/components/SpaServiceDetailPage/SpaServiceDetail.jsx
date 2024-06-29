@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import moment from 'moment';
+
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
@@ -26,12 +27,13 @@ const SpaServiceDetail = () => {
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", 
         "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", 
         "15:00", "15:30", "16:00", "16:30"
-      ];
+    ];
 
     const handlePetSelectChange = (value) => {
         const selectedPet = pets.find(pet => pet.PetID === value);
         setSelectedPet(selectedPet);
         bookingForm.setFieldsValue({
+            PetID: selectedPet.PetID,
             PetName: selectedPet.PetName,
             PetGender: selectedPet.Gender,
             PetStatus: selectedPet.Status,
@@ -143,13 +145,11 @@ const SpaServiceDetail = () => {
             }
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
-            
-            // Đảm bảo rằng bookingDate và bookingTime đều có định dạng đúng
+
             const bookingDateTime = moment(`${bookingDate.format('YYYY-MM-DD')} ${bookingTime}`, 'YYYY-MM-DD HH:mm');
-            const currentDateTime= moment().format('YYYY-MM-DD HH:mm');
-            // console.log(currentDateTime)
+            const currentDateTime = moment();
             const diffHours = bookingDateTime.diff(currentDateTime, 'hours');
-            // Kiểm tra nếu khoảng cách thời gian đặt lịch từ thời điểm hiện tại ít hơn 3 tiếng
+
             if (diffHours < 3) {
                 message.error('Bạn chỉ có thể đặt lịch từ 3 tiếng trở đi từ thời điểm hiện tại.');
                 return;
@@ -162,9 +162,14 @@ const SpaServiceDetail = () => {
                 AccountID: accountID
             }
 
-            console.log(booking)
-    
+            const responseBooking = await axios.post(`http://localhost:3001/api/Spa-bookings`, booking, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
             const bookingDetail = {
+                BookingID: responseBooking.data.BookingID,
                 ...values,
                 BookingDate: bookingDate.format('YYYY-MM-DD'),
                 BookingTime: bookingTime,
@@ -172,14 +177,13 @@ const SpaServiceDetail = () => {
                 Feedback: "",
             };
 
-            console.log(bookingDetail)
-    
-            await axios.post(`http://localhost:3001/api/bookings`, bookingDetail, {
+            const responseBookingDetail = await axios.post(`http://localhost:3001/api/spa-booking-details`, bookingDetail, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-    
+
+            console.log(responseBookingDetail.data)
             message.success('Booking successful');
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
@@ -188,7 +192,6 @@ const SpaServiceDetail = () => {
             message.error('Error creating booking');
         }
     };
-    
 
     if (!serviceData) {
         return <Skeleton active />;
@@ -331,13 +334,11 @@ const SpaServiceDetail = () => {
                                 <DatePicker
                                     style={{ width: '100%' }}
                                     disabledDate={(current) => {
-                                        // Disable tất cả các ngày trước ngày hiện tại
                                         if (current && current < currentDateTime.startOf('day')) {
-                                        return true;
+                                            return true;
                                         }
-                                        // Nếu ngày được chọn là ngày hiện tại, kiểm tra cả thời gian
                                         if (current && current.isSame(currentDateTime, 'day')) {
-                                        return current < currentDateTime;
+                                            return current < currentDateTime;
                                         }
                                         return false;
                                     }}
@@ -345,7 +346,7 @@ const SpaServiceDetail = () => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
-                        <Form.Item
+                            <Form.Item
                                 name="BookingTime"
                                 label="Khung giờ"
                                 rules={[{ required: true, message: 'Vui lòng chọn khung giờ!' }]}
@@ -362,7 +363,7 @@ const SpaServiceDetail = () => {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                    <Col xs={24} sm={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetID"
                                 label="Chọn thú cưng"
@@ -443,8 +444,8 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: 'Vui lòng nhập loại thú cưng!' }]}
                             >
                                 <Select placeholder="Chọn loại động vật">
-                                    <Option value="PT001">Đực</Option>
-                                    <Option value="PT002">Cái</Option>
+                                    <Option value="PT001">Chó</Option>
+                                    <Option value="PT002">Mèo</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
