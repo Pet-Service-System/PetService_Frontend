@@ -5,7 +5,8 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
+const { TextArea } = Input;
 
 const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -20,19 +21,19 @@ const SpaServiceList = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/api/services');
-        const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
-        setServiceData(filteredServices);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/services');
+      const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
+      setServiceData(filteredServices);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchServices();
   }, [petTypeID]);
 
@@ -62,7 +63,7 @@ const SpaServiceList = () => {
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append('ServiceName', values.ServiceName);
-      formData.append('Price', parseFloat(values.Price));
+      // formData.append('Price', parseFloat(values.Price));
       formData.append('Description', values.Description);
       formData.append('PetTypeID', petTypeID);
       formData.append('Status', values.Status);
@@ -84,9 +85,8 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('service_added_successfully'), 0.5).then(() => {
-          window.location.reload();
-        });
+        message.successt('service_added_successfully')
+        fetchServices();
       } else {
         message.error(t('failed_to_add_service'));
       }
@@ -114,7 +114,7 @@ const SpaServiceList = () => {
     setEditMode(record.ServiceID);
     form.setFieldsValue({
       ServiceName: record.ServiceName,
-      Price: record.Price,
+      // Price: record.Price,
       Description: record.Description,
       Status: record.Status,
     });
@@ -138,10 +138,10 @@ const SpaServiceList = () => {
 
       const values = await form.validateFields();
       const formData = new FormData();
-      formData.append('service_name', values.ServiceName);
-      formData.append('price', parseFloat(values.Price));
-      formData.append('description', values.Description);
-      formData.append('status', values.Status);
+      formData.append('ServiceName', values.ServiceName);
+      // formData.append('price', parseFloat(values.Price));
+      formData.append('Description', values.Description);
+      formData.append('Status', values.Status);
       if (serviceImg) {
         formData.append('image', serviceImg);
       }
@@ -210,18 +210,24 @@ const SpaServiceList = () => {
         </div>
       ),
     },
-    {
-      title: t('price'),
-      dataIndex: 'Price',
-      key: 'Price',
-      render: (text) => (
-        <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
-      ),
-    },
+    // {
+    //   title: t('price'),
+    //   dataIndex: 'Price',
+    //   key: 'Price',
+    //   render: (text) => (
+    //     <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
+    //   ),
+    // },
     {
       title: t('description'),
       dataIndex: 'Description',
       key: 'Description',
+      ellipsis: true, // Enable ellipsis if description is too long
+      render: (text) => (
+        <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 1, expandable: true, symbol: 'more' }}>
+          {text}
+        </Paragraph>
+      ),
     },
     {
       title: t('image_url'),
@@ -288,15 +294,16 @@ const SpaServiceList = () => {
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleServiceClick(service.ServiceID)}
                 >
-                  <img 
+                  <Image 
                     alt={service.ServiceName} 
                     src={service.ImageURL} 
+                    preview={false}
                     className="rounded-t-lg w-full h-44 object-cover" 
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p>
-                    <p className="text-gray-500 mt-2">{service.Description}</p>
+                    {/* <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p> */}
+                    {/* <p className="text-gray-500 mt-2">{service.Description}</p> */}
                   </div>
                 </Card>
               ))
@@ -317,37 +324,39 @@ const SpaServiceList = () => {
         ]}
         style={{ textAlign: 'center' }}
       >
-        <Form form={form} className="text-left">
+        <Form form={form} className="text-left" layout='vertical'>
           <Form.Item
             name="ServiceName"
+            label={t('service_name')}
             rules={[{ required: true, message: t('please_enter_service_name') }]}
+            className="mb-4"
           >
-            <Input placeholder={t('service_name')} />
-          </Form.Item>
-          <Form.Item
-            name="Price"
-            rules={[{ required: true, message: t('please_enter_service_price') }]}
-          >
-            <Input placeholder={t('price')} />
+            <Input placeholder="Service Name" className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Description"
+            label={t('description')}
             rules={[{ required: true, message: t('please_enter_service_description') }]}
+            className="mb-4"
           >
-            <Input placeholder={t('description')} />
+            <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
+            label={t('image')}
             rules={[{ required: true, message: t('please_upload_service_image') }]}
+            className="mb-4"
           >
-            <Input type="file" onChange={handleServiceImageUpload} />
+            <Input type="file" onChange={handleServiceImageUpload} className="w-full p-2 border border-gray-300 rounded" />
             {serviceImg && (
-              <Image src={URL.createObjectURL(serviceImg)} alt={t('service_preview')} style={{ width: '100px', marginTop: '10px' }} />
+              <Image src={URL.createObjectURL(serviceImg)} alt={t('service_preview')} style={{ width: '100px', marginTop: '10px' }} className="block" />
             )}
           </Form.Item>
           <Form.Item
             name="Status"
+            label="Status"
             rules={[{ required: true, message: t('please_select_service_status') }]}
+            className="mb-4"
           >
             <Select placeholder={t('select_status')}>
               <Option value="Available">{t('available')}</Option>
@@ -355,6 +364,7 @@ const SpaServiceList = () => {
             </Select>
           </Form.Item>
         </Form>
+
       </Modal>
     </div>
   );

@@ -8,6 +8,7 @@ import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
+const { TextArea } = Input
 
 
 const SpaServiceDetail = () => {
@@ -25,7 +26,7 @@ const SpaServiceDetail = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const user = JSON.parse(localStorage.getItem('user'));
-    const accountID = user.id;
+    const accountID = user?.id;
     const [selectedPet, setSelectedPet] = useState(null);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
@@ -108,7 +109,7 @@ const SpaServiceDetail = () => {
             const values = await form.validateFields(); // Validate form fields
             const updatedService = {
                 ServiceName: values.ServiceName,
-                Price: parseFloat(values.Price),
+                // Price: parseFloat(values.Price),
                 Description: values.Description,
                 ImageURL: values.ImageURL,
                 Status: values.Status,
@@ -134,6 +135,10 @@ const SpaServiceDetail = () => {
     };
 
     const handleBookingNow = () => {
+        if (!localStorage.getItem('user')) {
+            showLoginModal();
+            return;
+        }
         setIsBookingModalVisible(true);
     };
 
@@ -171,6 +176,30 @@ const SpaServiceDetail = () => {
         bookingForm.resetFields();
     };
 
+    const showLoginModal = () => {
+        Modal.info({
+            title: 'Thông báo',
+            content: (
+                <div>
+                    <p>Vui lòng đăng nhập hoặc đăng ký để mua hàng.</p>
+                    <div className="flex justify-end">
+                        <Button type="primary" onClick={() => {
+                            navigate('/login');
+                            Modal.destroyAll();
+                        }}>Đăng nhập</Button>
+                        <Button onClick={() => {
+                            navigate('/register');
+                            Modal.destroyAll(); 
+                        }} className="ml-2">Đăng ký</Button>
+                    </div>
+                </div>
+            ),
+            closable: true, 
+            maskClosable: true, 
+            footer: null,
+        });
+    };
+
     const handleBookingSubmit = async () => {
         try {
             const values = await bookingForm.validateFields();
@@ -179,6 +208,13 @@ const SpaServiceDetail = () => {
                 message.error(t('authorization_token_not_found'));
                 return;
             }
+
+            // Validate PetTypeID
+            if (values.PetTypeID !== serviceData.PetTypeID) {
+                message.error('Loại thú cưng không phù hợp với loại dịch vụ.');
+                return;
+            }
+
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
 
@@ -194,7 +230,7 @@ const SpaServiceDetail = () => {
             const booking = {
                 Status: 'Pending',
                 CreateDate: new Date(),
-                TotalPrice: serviceData.Price,
+                // TotalPrice: serviceData.Price,
                 AccountID: accountID
             }
 
@@ -273,19 +309,19 @@ const SpaServiceDetail = () => {
                             >
                                 <Input disabled={!editMode} />
                             </Form.Item>
-                            <Form.Item
+                            {/* <Form.Item
                                 name="Price"
                                 label="Giá"
                                 rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
                             >
                                 <Input type="number" disabled={!editMode} />
-                            </Form.Item>
+                            </Form.Item> */}
                             <Form.Item
                                 name="Description"
                                 label="Mô tả"
                                 rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
                             >
-                                <Input disabled={!editMode} />
+                                <TextArea disabled={!editMode} rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
                             </Form.Item>
                             <Form.Item
                                 name="ImageURL"
@@ -308,8 +344,10 @@ const SpaServiceDetail = () => {
                     ) : (
                         <div>
                             <Title level={3}>{serviceData.ServiceName}</Title>
-                            <Paragraph className="text-green-600 text-4xl">${serviceData.Price}</Paragraph>
-                            <Paragraph>{`Mô tả: ${serviceData.Description}`}</Paragraph>
+                            {/* <Paragraph className="text-green-600 text-4xl">${serviceData.Price}</Paragraph> */}
+                            <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 5, expandable: true, symbol: 'more' }}>
+                                {`Mô tả: ${serviceData.Description}`}
+                            </Paragraph>
                         </div>
                     )}
 
@@ -454,7 +492,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_name')}
                                 rules={[{ required: true, message: t('plz_enter_pet_name') }]}
                             >
-                                <Input />
+                                <Input placeholder='Nhập tên thú cưng'/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -477,7 +515,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_status')}
                                 rules={[{ required: true, message: t('plz_enter_pet_status') }]}
                             >
-                                <Input />
+                                <Input placeholder='Nhập trạng thái thú cưng'/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -486,7 +524,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_weight')}
                                 rules={[{ required: true, message: t('plz_enter_pet_weight') }]}
                             >
-                                <Input type="number" />
+                                <Input placeholder={t('enter_pet_weight')} type="number"/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -497,7 +535,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_age')}
                                 rules={[{ required: true, message: t('plz_enter_pet_age') }]}
                             >
-                                <Input type="number" />
+                                <Input placeholder={t('enter_pet_age')} type="number"/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate } from 'antd';
+import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate, Modal } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
+const { TextArea } = Input
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -77,7 +78,11 @@ const ProductDetail = () => {
     
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
-    const handleOrderNow = async () => {
+    const handleOrderNow = () => {
+        if (!localStorage.getItem('user')) {
+            showLoginModal();
+            return;
+        }
         if (productData) {
             if (quantity > productData.Quantity) {
                 message.error(t('quantity_requested_exceeds_quantity_in_stock'));
@@ -85,17 +90,20 @@ const ProductDetail = () => {
             }
     
             const productWithQuantity = { ...productData, quantity };
-            await handleAddItem(productWithQuantity);
-            const totalAmount = productData.Price
+            handleAddItem(productWithQuantity);
+            const totalAmount = productData.Price;
             localStorage.setItem('totalAmount', totalAmount.toFixed(2));
-            navigate('/order')
+            navigate('/order');
         }
     };
-    
 
     const { handleAddItem } = useShopping();
 
     const handleAddToCart = () => {
+        if (!localStorage.getItem('user')) {
+            showLoginModal();
+            return;
+        }
         if (productData) {
             if (quantity > productData.Quantity) {
                 message.error(t('quantity_requested_exceeds_quantity_in_stock'));
@@ -106,7 +114,31 @@ const ProductDetail = () => {
             handleAddItem(productWithQuantity);
             message.success(t('product_added_to_cart_successfully'));
         }
-    };    
+    };
+
+    const showLoginModal = () => {
+        Modal.info({
+            title: 'Thông báo',
+            content: (
+                <div>
+                    <p>Vui lòng đăng nhập hoặc đăng ký để mua hàng.</p>
+                    <div className="flex justify-end">
+                        <Button type="primary" onClick={() => {
+                            navigate('/login');
+                            Modal.destroyAll();
+                        }}>Đăng nhập</Button>
+                        <Button onClick={() => {
+                            navigate('/register');
+                            Modal.destroyAll(); 
+                        }} className="ml-2">Đăng ký</Button>
+                    </div>
+                </div>
+            ),
+            closable: true, 
+            maskClosable: true, 
+            footer: null,
+        });
+    };
 
     const handleChangeQuantity = (value) => {
         if (!isNaN(value) && value > 0) {
@@ -135,6 +167,7 @@ const ProductDetail = () => {
             const updatedProduct = {
                 ProductName: values.ProductName,
                 Price: parseFloat(values.Price),
+                Quantity: values.Quantity,
                 Description: values.Description,
                 ImageURL: values.ImageURL,
                 Status: values.Status
@@ -145,10 +178,9 @@ const ProductDetail = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-
-            message.success(t('product_updated_successfully'), 0.5).then(() => {
-                window.location.reload();
-            });
+            message.success(t('product_updated_successfully')
+            fetchProductDetail();
+            setEditMode(false)
         } catch (error) {
             console.error('Error updating product:', error);
             if (error.response && error.response.status === 401) {
@@ -203,7 +235,7 @@ const ProductDetail = () => {
                                     label={t('quantity')}
                                     rules={[{ required: true, message: t('please_enter_quantity') }]}
                                 >
-                                    <Input disabled={!editMode} />
+                                    <Input type='number' disabled={!editMode} placeholder='Quantity'/>
                                 </Form.Item>
                                 <Form.Item
                                     name="Price"
@@ -217,7 +249,7 @@ const ProductDetail = () => {
                                     label={t('description')}
                                     rules={[{ required: true, message: t('please_enter_description') }]}
                                 >
-                                    <Input disabled={!editMode} />
+                                    <TextArea disabled={!editMode} rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
                                 </Form.Item>
                                 <Form.Item
                                     name="ImageURL"
