@@ -6,6 +6,7 @@ import axios from 'axios';
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
+const { Search } = Input;
 
 const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -18,6 +19,8 @@ const SpaServiceList = () => {
   const [form] = Form.useForm();
   const [serviceImg, setServiceImg] = useState(""); // For image upload
   const navigate = useNavigate();
+  const [filteredServices, setfilteredServices] = useState([]); // State for filtered data
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   const fetchServices = async () => {
     try {
@@ -31,9 +34,17 @@ const SpaServiceList = () => {
     }
   };
 
+
   useEffect(() => {
     fetchServices();
   }, [petTypeID]);
+
+  useEffect(() => {
+    const filteredData = serviceData.filter(service =>
+      service.ServiceName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setfilteredServices(filteredData);
+  }, [searchQuery, serviceData]);
 
   const handleServiceClick = (id) => {
     navigate(`/spa-service-detail/${id}`);
@@ -257,14 +268,24 @@ const SpaServiceList = () => {
       ),
     },
   ];
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
+
   return (
     <div className="p-10">
       <Title level={1} className="text-center">Services for Cats</Title>
+      <Search
+        placeholder="Search by service name"
+        onChange={(e) => handleSearch(e.target.value)}
+        style={{ marginBottom: 16, width: 300 }}
+      />
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
             <Table
-              dataSource={serviceData}
+              dataSource={filteredServices}
               columns={columns}
               rowKey="ServiceID"
               loading={loading}
@@ -285,18 +306,18 @@ const SpaServiceList = () => {
                 </Card>
               ))
             ) : (
-              serviceData.map(service => (
+              filteredServices.map(service => (
                 <Card
                   key={service.ServiceID}
                   hoverable
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleServiceClick(service.ServiceID)}
                 >
-                  <Image 
-                    alt={service.ServiceName} 
-                    src={service.ImageURL} 
+                  <Image
+                    alt={service.ServiceName}
+                    src={service.ImageURL}
                     preview={false}
-                    className="rounded-t-lg w-full h-44 object-cover" 
+                    className="rounded-t-lg w-full h-44 object-cover"
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
