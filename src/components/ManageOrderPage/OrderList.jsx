@@ -6,6 +6,7 @@ import moment from "moment";
 
 const { Text } = Typography;
 const { confirm } = Modal;
+const { Search } = Input
 
 const OrderList = () => {
   const navigate = useNavigate();
@@ -206,6 +207,7 @@ const OrderList = () => {
   ].filter(col => col.key !== 'updateStatus' || role === 'Sales Staff'); // Filter out 'updateStatus' column if not Sales Staff
 
   const filteredOrders = orders.filter(order => 
+    order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     order.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -214,15 +216,16 @@ const OrderList = () => {
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
-          <Input
-            placeholder="Tìm kiếm số điện thoại"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-4"
-          />
-          <Button onClick={handleSortOrder} className="mb-4">
-            Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
-          </Button>
+          <Layout className="flex flex-row justify-between">
+            <Button onClick={handleSortOrder} className="mb-4">
+              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+            </Button>
+            <Search
+              placeholder="Search by customer name or phone"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ marginBottom: 16, width: 300 }}
+            />
+          </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}

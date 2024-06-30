@@ -1,11 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input } from "antd";
 import axios from 'axios';
 import moment from "moment";
 
 const { Text } = Typography;
+const { Search } = Input;
 
 const getSpaBookings = async () => {
   const token = localStorage.getItem('token');
@@ -40,6 +41,7 @@ const getSpaBookingDetail = async (id) => {
 const SpaBooking = () => {
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
+  const [filteredSpaBookings, setFilteredSpaBookings] = useState([]); // State for filtered data
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
@@ -48,10 +50,22 @@ const SpaBooking = () => {
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState('');
+  
+  // State for search query
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchSpaBookings();
   }, [sortOrder]);
+
+  useEffect(() => {
+    // Filter spaBookings based on searchQuery
+    const filteredData = spaBookings.filter(booking =>
+      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.phone.includes(searchQuery)
+    );
+    setFilteredSpaBookings(filteredData);
+  }, [searchQuery, spaBookings]);
 
   const fetchSpaBookings = async () => {
     setLoading(true);
@@ -69,7 +83,6 @@ const SpaBooking = () => {
           phone: detail.Phone,
         };
       }));
-      console.log(formattedData)
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
@@ -181,18 +194,29 @@ const SpaBooking = () => {
     setUpdateStatusModalVisible(true);
   };
 
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Spa Service Booking History</h2>
+          <Layout className="flex flex-row justify-between">
           <Button onClick={handleSortOrder} className="mb-4">
             Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
           </Button>
+          <Search
+            placeholder="Search by customer name or phone"
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ marginBottom: 16, width: 300 }}
+          />
+          </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={spaBookings}
+              dataSource={filteredSpaBookings} // Render filtered data
               rowKey="id"
               scroll={{ x: '100%' }}
             />
