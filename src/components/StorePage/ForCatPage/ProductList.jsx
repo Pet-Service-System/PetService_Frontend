@@ -345,7 +345,7 @@ const ProductList = () => {
               rules={[{ required: true, message: 'Please enter the product price!' }]}
               className="mb-4"
             >
-              <Input placeholder="Price" className="w-full p-2 border border-gray-300 rounded" />
+              <Input type='number' placeholder="Price" className="w-full p-2 border border-gray-300 rounded" />
             </Form.Item>
             <Form.Item
               name="Description"

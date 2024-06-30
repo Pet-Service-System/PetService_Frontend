@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Image } from 'antd';
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -99,6 +99,11 @@ const SpaBookingDetail = () => {
     {
       title: 'Tên dịch vụ',
       dataIndex: 'ServiceName',
+      render: (text, record) => (
+        <Link className="text-blue-500 hover:text-blue-800" to={`/spa-service-detail/${record.ServiceID}`}>
+          {text}
+        </Link>
+      ),
     },
   ];
 

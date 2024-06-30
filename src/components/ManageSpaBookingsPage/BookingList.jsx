@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal, Input } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker } from "antd";
 import axios from 'axios';
 import moment from "moment";
 
@@ -41,31 +41,35 @@ const getSpaBookingDetail = async (id) => {
 const SpaBooking = () => {
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
-  const [filteredSpaBookings, setFilteredSpaBookings] = useState([]); // State for filtered data
+  const [filteredSpaBookings, setFilteredSpaBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
-
-  // State for status update modal
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState('');
-  
-  // State for search query
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
 
   useEffect(() => {
     fetchSpaBookings();
   }, [sortOrder]);
 
   useEffect(() => {
-    // Filter spaBookings based on searchQuery
-    const filteredData = spaBookings.filter(booking =>
+    // Filter spaBookings based on searchQuery and selectedDate
+    let filteredData = spaBookings.filter(booking =>
       booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       booking.phone.includes(searchQuery)
     );
+
+    if (selectedDate) {
+      filteredData = filteredData.filter(booking =>
+        moment(booking.date).isSame(selectedDate, 'day')
+      );
+    }
+
     setFilteredSpaBookings(filteredData);
-  }, [searchQuery, spaBookings]);
+  }, [searchQuery, spaBookings, selectedDate]);
 
   const fetchSpaBookings = async () => {
     setLoading(true);
@@ -198,25 +202,37 @@ const SpaBooking = () => {
     setSearchQuery(value);
   };
 
+  const handleDateChange = (date) => {
+    if (date) {
+      setSelectedDate(date.toDate());
+    } else {
+      setSelectedDate(null);
+    }
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Spa Service Booking History</h2>
-          <Layout className="flex flex-row justify-between">
-          <Button onClick={handleSortOrder} className="mb-4">
-            Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
-          </Button>
-          <Search
-            placeholder="Search by customer name or phone"
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ marginBottom: 16, width: 300 }}
-          />
+          <Layout className="flex flex-row justify-between mb-4">
+            <Button onClick={handleSortOrder}>
+              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+            </Button>
+            <DatePicker
+              onChange={handleDateChange}
+              style={{ width: 200 }}
+            />
+            <Search
+              placeholder="Search by customer name or phone"
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 300 }}
+            />
           </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={filteredSpaBookings} // Render filtered data
+              dataSource={filteredSpaBookings}
               rowKey="id"
               scroll={{ x: '100%' }}
             />

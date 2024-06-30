@@ -118,9 +118,9 @@ const SpaServiceDetail = () => {
                 },
             });
 
-            message.success('Service updated successfully', 0.5).then(() => {
-                window.location.reload(); // Reload the page after successful update
-            });
+            message.success('Service updated successfully')
+            setEditMode(false)
+            fetchServiceDetail();
         } catch (error) {
             console.error('Error updating service:', error);
             if (error.response && error.response.status === 401) {
@@ -210,6 +210,7 @@ const SpaServiceDetail = () => {
             // Validate PetTypeID
             if (values.PetTypeID !== serviceData.PetTypeID) {
                 message.error('Loại thú cưng không phù hợp với loại dịch vụ.');
+                setOperationLoading(false);
                 return;
             }
 
@@ -228,6 +229,8 @@ const SpaServiceDetail = () => {
             const booking = {
                 Status: 'Pending',
                 CreateDate: new Date(),
+                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingTime: bookingTime,
                 // TotalPrice: serviceData.Price,
                 AccountID: accountID
             }
@@ -270,7 +273,9 @@ const SpaServiceDetail = () => {
         } catch (error) {
             console.error('Error creating booking:', error);
             message.error('Error creating booking');
+            setOperationLoading(false);
         }
+        setOperationLoading(false);
     };
 
     const showAddPetModal = () => {

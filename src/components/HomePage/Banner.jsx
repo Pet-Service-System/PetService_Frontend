@@ -247,7 +247,7 @@ const Banner = () => {
         {isSmallScreen ? (
           <>
             <Button type="primary" icon={<MenuOutlined />} onClick={() => setIsDrawerVisible(true)} />
-            <Drawer title="Menu" placement="right" closable onClose={closeMenu} visible={isDrawerVisible}>
+            <Drawer title="Menu" placement="top" closable onClose={closeMenu} visible={isDrawerVisible}>
               {renderMenuItems(true)}
             </Drawer>
           </>
@@ -269,7 +269,7 @@ const Banner = () => {
                   <>
                     <Popover content={renderUserMenu()} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>
                       <Button shape="round" className="ml-4 py-2 px-4">
-                        <span className="text-black">{user.fullname}</span>
+                        <span className="text-black">{user?.fullname}</span>
                       </Button>
                     </Popover>
                   </>
