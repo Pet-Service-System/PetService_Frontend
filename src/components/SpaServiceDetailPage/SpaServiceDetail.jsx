@@ -228,6 +228,8 @@ const SpaServiceDetail = () => {
             const booking = {
                 Status: 'Pending',
                 CreateDate: new Date(),
+                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingTime: bookingTime,
                 // TotalPrice: serviceData.Price,
                 AccountID: accountID
             }
