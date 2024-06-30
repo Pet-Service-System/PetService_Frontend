@@ -357,5 +357,8 @@
     "not_null_pet_gender" : "Gender cannot be empty",
     "not_null_pet_status" : "Status cannot be empty",
     "not_null_pet_weight" : "Weight cannot be empty",
-    "not_null_pet_age" : "Age cannot be empty"
+    "not_null_pet_age" : "Age cannot be empty",
+    "contact_info" : "Contact Info",
+    "spa_service_booking_history" : "Spa Service Booking History",
+    "search_by_customer_name_or_phone" : "Search by customer name or phone"
 }

@@ -79,7 +79,7 @@
     "confirm": "Xác nhận",
     "order_detail": "Chi tiết đơn hàng",
     "order_date": "Ngày đặt hàng",
-    "customer_name": "Tên khách hàng",
+    "title: t('amount'),": "Tên khách hàng",
     "product_name": "Tên sản phẩm",
     "quantity": "Số lượng",
     "price": "Giá",
@@ -365,5 +365,8 @@
     "not_null_pet_gender" : "Giới tính không được để trống",
     "not_null_pet_status" : "Trạng thái không được để trống",
     "not_null_pet_weight" : "Cân nặng không được để trống",
-    "not_null_pet_age" : "Tuổi không được để trống"
+    "not_null_pet_age" : "Tuổi không được để trống",
+    "contact_info" : "Thông tin liên hệ",
+    "spa_service_booking_history" : "Lịch sử đặt dịch vụ spa",
+    "search_by_customer_name_or_phone" : "Tìm kiếm theo tên khách hàng hoặc số điện thoại"
 }

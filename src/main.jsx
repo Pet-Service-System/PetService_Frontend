@@ -7,6 +7,8 @@ import { Provider } from 'react-redux';
 import store from './redux/store.js';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
+import './i18n.js'; // Import the i18n configuration
+
 const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
