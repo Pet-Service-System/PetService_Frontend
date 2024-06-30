@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, Spin, message, Modal, Input } from "antd";
+import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker } from "antd";
 import axios from 'axios';
 import moment from "moment";
 
@@ -15,8 +15,9 @@ const OrderList = () => {
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
   const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
-
+  const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -77,6 +78,22 @@ const OrderList = () => {
   useEffect(() => {
     fetchOrderHistory();
   }, [sortOrder]);
+
+  useEffect(() => {
+    // Filter spaBookings based on searchQuery and selectedDate
+    let filteredData = orders.filter(booking =>
+      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.phone.includes(searchQuery)
+    );
+
+    if (selectedDate) {
+      filteredData = filteredData.filter(booking =>
+        moment(booking.date).isSame(selectedDate, 'day')
+      );
+    }
+
+    setFilteredOrderByDate(filteredData);
+  }, [searchQuery, orders, selectedDate]);
 
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
@@ -216,25 +233,41 @@ const OrderList = () => {
     order.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleDateChange = (date) => {
+    if (date) {
+      setSelectedDate(date.toDate());
+    } else {
+      setSelectedDate(null);
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
+
   return (
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
-          <Layout className="flex flex-row justify-between">
-            <Button onClick={handleSortOrder} className="mb-4">
+          <Layout className="flex flex-row justify-between mb-4">
+            <Button onClick={handleSortOrder}>
               Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
             </Button>
+            <DatePicker
+              onChange={handleDateChange}
+              style={{ width: 200 }}
+            />
             <Search
               placeholder="Search by customer name or phone"
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ marginBottom: 16, width: 300 }}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 300 }}
             />
           </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={filteredOrders}
+              dataSource={filteredOrderByDate}
               scroll={{ x: 'max-content' }}
               rowKey="id"
             />
