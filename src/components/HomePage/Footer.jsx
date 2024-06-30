@@ -20,8 +20,13 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="text-lg md:text-xl font-semibold mb-4">Địa chỉ</h3>
-                <ul className="space-y-2">
+                <ul className="space-y-2 mb-4">
                   <li className="text-base md:text-lg lg:text-xl">Địa chỉ: 217 Lâm Văn Bền, Phường Bình Thuận, Quận 7, TPHCM</li>
+                </ul>
+                <h3 className="text-lg md:text-xl font-semibold mb-4">Thông tin liên hệ:</h3>
+                <ul className="space-y-2 mb-4">
+                  <li className="text-base md:text-lg lg:text-xl">Email: petservicesswp391@gmail.com</li>
+                  <li className="text-base md:text-lg lg:text-xl">Số điện thoại: (+00) 123 234</li>
                 </ul>
               </div>
             </div>

@@ -5,7 +5,6 @@ import "./styles/bootstrap.css"
 import "./styles/flexslider.css"
 import "./styles/style.css"
 import AboutPage from './pages/AboutPage'
-import ContactPage from './pages/ContactPage'
 import ProductForDogPage from './pages/ProductForDogPage'
 import ProductForCatPage from './pages/ProductForCatPage'
 import ServiceForDogPage from './pages/ServiceForDogPage'
@@ -37,7 +36,6 @@ function App() {
     <Routes>
       <Route path='/' element={<HomePage/>}/>
       <Route path='/about' element={<AboutPage/>}/>
-      <Route path='/contact' element={<ContactPage/>}/>
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, Spin, message, Modal } from "antd";
+import { Table, Button, Typography, Layout, Spin, message, Modal, Input } from "antd";
 import axios from 'axios';
 import moment from "moment";
 
@@ -13,6 +13,7 @@ const OrderList = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
@@ -22,17 +23,31 @@ const OrderList = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('Fetched data:', response.data);
-      return response.data;
+
+      const orders = response.data;
+
+      // Fetch order details for each order
+      const orderDetailsPromises = orders.map(order =>
+        axios.get(`http://localhost:3001/api/order-details/order/${order.OrderID}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      );
+
+      const orderDetailsResponses = await Promise.all(orderDetailsPromises);
+      const ordersWithDetails = orders.map((order, index) => ({
+        ...order,
+        CustomerName: orderDetailsResponses[index].data.CustomerName,
+        Phone: orderDetailsResponses[index].data.Phone,
+      }));
+
+      return ordersWithDetails;
     } catch (error) {
       console.error('Error fetching order history:', error);
       throw error;
     }
   };
-
-  useEffect(() => {
-    fetchOrderHistory();
-  }, [sortOrder]);
 
   const fetchOrderHistory = async () => {
     setLoading(true); // Start loading indicator
@@ -42,7 +57,9 @@ const OrderList = () => {
         id: order.OrderID,
         date: order.OrderDate,
         status: order.Status,
-        amount: order.TotalPrice
+        amount: order.TotalPrice,
+        customerName: order.CustomerName,
+        phone: order.Phone
       }));
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => moment(b.date).diff(a.date))
@@ -54,6 +71,10 @@ const OrderList = () => {
       setLoading(false); // Stop loading indicator
     }
   };
+
+  useEffect(() => {
+    fetchOrderHistory();
+  }, [sortOrder]);
 
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
@@ -139,6 +160,9 @@ const OrderList = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      render: (text, record) => (
+        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>{record.id}</Button>
+      ),
     },
     {
       title: 'Ngày',
@@ -147,6 +171,16 @@ const OrderList = () => {
       render: (text, record) => (
         <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
       ),
+    },
+    {
+      title: 'Tên khách hàng',
+      dataIndex: 'customerName',
+      key: 'customerName',
+    },
+    {
+      title: 'Số điện thoại',
+      dataIndex: 'phone',
+      key: 'phone',
     },
     {
       title: 'Số tiền',
@@ -165,31 +199,34 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Chi tiết',
-      key: 'detail',
-      render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
-      ),
-    },
-    {
       title: 'Cập nhật trạng thái',
       key: 'updateStatus',
       render: (text, record) => renderUpdateButton(record),
     },
   ].filter(col => col.key !== 'updateStatus' || role === 'Sales Staff'); // Filter out 'updateStatus' column if not Sales Staff
 
+  const filteredOrders = orders.filter(order => 
+    order.phone.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
+          <Input
+            placeholder="Tìm kiếm số điện thoại"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mb-4"
+          />
           <Button onClick={handleSortOrder} className="mb-4">
             Sắp xếp theo ngày: {sortOrder === 'desc' ? 'Gần nhất' : 'Xa nhất'}
           </Button>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={orders}
+              dataSource={filteredOrders}
               scroll={{ x: 'max-content' }}
               rowKey="id"
             />

@@ -4,6 +4,7 @@ import { Table, Button, Typography, Form, Input, Layout, Menu, message, Grid, Sp
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
+import moment from "moment";
 
 const { Text } = Typography;
 const { Sider } = Layout;
@@ -155,16 +156,8 @@ const SpaBooking = () => {
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>
-          {new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric'
-          }).format(record.date)}
-        </Text>
-      )
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Status',

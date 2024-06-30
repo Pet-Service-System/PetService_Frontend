@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, message, Spin, Modal } from "antd";
 import axios from 'axios';
+import moment from "moment";
 
 const { Text } = Typography;
 
@@ -17,6 +18,21 @@ const getSpaBookings = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching spa bookings:', error);
+    throw error;
+  }
+};
+
+const getSpaBookingDetail = async (id) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching spa booking detail:', error);
     throw error;
   }
 };
@@ -41,13 +57,19 @@ const SpaBooking = () => {
     setLoading(true);
     try {
       const data = await getSpaBookings();
-      const formattedData = data.map(booking => ({
-        id: booking.BookingID,
-        date: new Date(booking.CreateDate),
-        TotalPrice: booking.TotalPrice,
-        status: booking.Status,
-        reviewed: booking.Reviewed,
+      const formattedData = await Promise.all(data.map(async (booking) => {
+        const detail = await getSpaBookingDetail(booking.BookingID);
+        return {
+          id: booking.BookingID,
+          date: new Date(booking.CreateDate),
+          TotalPrice: booking.TotalPrice,
+          status: booking.Status,
+          reviewed: booking.Reviewed,
+          customerName: detail.CustomerName,
+          phone: detail.Phone,
+        };
       }));
+      console.log(formattedData)
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
@@ -119,16 +141,8 @@ const SpaBooking = () => {
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>
-          {new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric'
-          }).format(record.date)}
-        </Text>
-      )
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+      ),
     },
     {
       title: 'Status',
@@ -143,6 +157,16 @@ const SpaBooking = () => {
           {record.status}
         </Text>
       )
+    },
+    {
+      title: 'Customer Name',
+      dataIndex: 'customerName',
+      key: 'customerName',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
     },
     {
       title: 'Actions',

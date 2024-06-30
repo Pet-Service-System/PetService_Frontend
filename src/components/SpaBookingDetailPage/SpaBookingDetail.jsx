@@ -117,7 +117,19 @@ const SpaBookingDetail = () => {
           Chi tiết đặt dịch vụ Spa #{spaBooking.BookingID}
         </Title>
         <div className="mb-4">
-          <Text strong>Ngày tạo:</Text> <Text>{new Date(spaBooking.CreateDate).toLocaleDateString()}</Text>
+          <Text strong>Ngày tạo: </Text> 
+          <Text>
+              {new Date(spaBooking.CreateDate).toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })}{' '}
+              {new Date(spaBooking.CreateDate).toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              })}
+          </Text>
         </div>
         <div className="mb-4">
           <Text strong>Tên khách hàng: </Text>

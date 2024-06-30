@@ -75,7 +75,7 @@ const ProductDetail = () => {
     
     const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
-    const handleOrderNow = () => {
+    const handleOrderNow = async () => {
         if (!localStorage.getItem('user')) {
             showLoginModal();
             return;
@@ -87,7 +87,7 @@ const ProductDetail = () => {
             }
     
             const productWithQuantity = { ...productData, quantity };
-            handleAddItem(productWithQuantity);
+            await handleAddItem(productWithQuantity);
             const totalAmount = productData.Price;
             localStorage.setItem('totalAmount', totalAmount.toFixed(2));
             navigate('/order');

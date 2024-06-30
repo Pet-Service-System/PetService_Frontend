@@ -79,6 +79,9 @@ const OrderHistory = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      render: (text, record) => (
+        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>{record.id}</Button>
+      ),
     },
     {
       title: 'Ngày',
@@ -118,13 +121,6 @@ const OrderHistory = () => {
         }
         return <Text className={colorClass}>{record.status}</Text>;
       }
-    },
-    {
-      title: 'Chi tiết',
-      key: 'detail',
-      render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>Chi tiết</Button>
-      ),
     },
   ];
 

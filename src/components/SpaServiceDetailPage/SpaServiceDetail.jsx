@@ -199,6 +199,7 @@ const SpaServiceDetail = () => {
 
     const handleBookingSubmit = async () => {
         try {
+            setOperationLoading(true);
             const values = await bookingForm.validateFields();
             const token = localStorage.getItem('token');
             if (!token) {
@@ -265,6 +266,7 @@ const SpaServiceDetail = () => {
             
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
+            setOperationLoading(false);
         } catch (error) {
             console.error('Error creating booking:', error);
             message.error('Error creating booking');
@@ -387,6 +389,7 @@ const SpaServiceDetail = () => {
                 okText="Đặt lịch ngay"
                 cancelText="Hủy"
                 width={800} // Set modal width
+                confirmLoading={operationLoading}
             >
                 <Form form={bookingForm} layout="vertical">
                     <Row gutter={16}>
@@ -440,9 +443,9 @@ const SpaServiceDetail = () => {
                                     style={{ width: '100%' }}
                                     placeholder="Chọn khung giờ"
                                 >
-                                    {availableTimes.map(time => {
-                                        return <Select.Option key={time} value={time}>{time}</Select.Option>;
-                                    })}
+                                    {availableTimes.map(time => (
+                                        <Select.Option key={time} value={time}>{time}</Select.Option>
+                                    ))}
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -451,7 +454,7 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetID"
-                                label="Chọn thú cưng"
+                                label="Thú cưng"
                                 rules={[{ required: true, message: 'Vui lòng chọn thú cưng!' }]}
                             >
                                 <Select
@@ -463,76 +466,16 @@ const SpaServiceDetail = () => {
                                             handlePetSelectChange(value);
                                         }
                                     }}
-                                    className="relative rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >
                                     {pets.map((pet) => (
-                                        <Option key={pet.PetID} value={pet.PetID} className="text-gray-900">
+                                        <Option key={pet.PetID} value={pet.PetID}>
                                             {pet.PetName}
                                         </Option>
                                     ))}
                                     <Option value="add_new_pet">
-                                        <span className="text-gray-400">Thêm thú cưng</span>
+                                        <span>Thêm thú cưng</span>
                                     </Option>
                                 </Select>
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} sm={12}>
-                            <Form.Item name="ServiceID" label="Service ID" initialValue={id} hidden>
-                                <Input />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                name="PetName"
-                                label="Tên thú cưng"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
-                            >
-                                <Input placeholder='Nhập tên thú cưng'/>
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                name="PetGender"
-                                label="Giới tính"
-                                rules={[{ required: true, message: 'Vui lòng chọn giới tính thú cưng!' }]}
-                            >
-                                <Select placeholder="Chọn giới tính">
-                                    <Option value="Đực">Đực</Option>
-                                    <Option value="Cái">Cái</Option>
-                                </Select>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                name="PetStatus"
-                                label="Trạng thái"
-                                rules={[{ required: true, message: 'Vui lòng nhập trạng thái thú cưng!' }]}
-                            >
-                                <Input placeholder='Nhập trạng thái thú cưng'/>
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                name="PetWeight"
-                                label="Cân nặng"
-                                rules={[{ required: true, message: 'Vui lòng nhập cân nặng thú cưng!' }]}
-                            >
-                                <Input placeholder='Nhập cân nặng động vật' type="number"/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item
-                                name="PetAge"
-                                label="Tuổi"
-                                rules={[{ required: true, message: 'Vui lòng nhập tuổi thú cưng!' }]}
-                            >
-                                <Input placeholder='Nhập tuổi động vật' type="number"/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -548,7 +491,69 @@ const SpaServiceDetail = () => {
                             </Form.Item>
                         </Col>
                     </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetGender"
+                                label="Giới tính"
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính thú cưng!' }]}
+                            >
+                                <Select placeholder="Chọn giới tính">
+                                    <Option value="Đực">Đực</Option>
+                                    <Option value="Cái">Cái</Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetStatus"
+                                label="Trạng thái"
+                                rules={[{ required: true, message: 'Vui lòng nhập trạng thái thú cưng!' }]}
+                            >
+                                <Input placeholder='Nhập trạng thái thú cưng'/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetWeight"
+                                label="Cân nặng"
+                                rules={[{ required: true, message: 'Vui lòng nhập cân nặng thú cưng!' }]}
+                            >
+                                <Input placeholder='Nhập cân nặng động vật' type="number"/>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetAge"
+                                label="Tuổi"
+                                rules={[{ required: true, message: 'Vui lòng nhập tuổi thú cưng!' }]}
+                            >
+                                <Input placeholder='Nhập tuổi động vật' type="number"/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                            <Form.Item name="ServiceID" label="Service ID" initialValue={id} style={{ display: 'none' }}>
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="PetName"
+                                label="Tên thú cưng"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
+                                style={{ display: 'none' }}
+                            >
+                                <Input placeholder='Nhập tên thú cưng'/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
                 </Form>
+
+
                 {/* <Button type="primary" onClick={showAddPetModal} loading={operationLoading}>
                     Thêm thú cưng
                 </Button> */}
@@ -559,6 +564,7 @@ const SpaServiceDetail = () => {
                 title="Thêm thú cưng"
                 visible={isAddModalVisible}
                 onCancel={() => setIsAddModalVisible(false)}
+                confirmLoading={operationLoading}
                 footer={[
                 <Button key="back" onClick={() => setIsAddModalVisible(false)}>
                     Hủy

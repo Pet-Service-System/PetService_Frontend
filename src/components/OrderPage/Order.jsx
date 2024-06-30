@@ -347,7 +347,7 @@ const Order = () => {
               </div>
               <div className="text-right">
                 {/* PayPal Buttons */}
-                {isPayPalEnabled && (
+                {(isPayPalEnabled && !editMode) &&  (
                   <PayPalButtons
                     createOrder={createOrder}
                     onApprove={(data, actions) => onApprove(data, actions)}
