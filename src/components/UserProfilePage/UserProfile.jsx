@@ -22,19 +22,19 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const screens = useBreakpoint();
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true);
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (!storedUser) {
-        navigate('/');
-      } else {
-        setUser(storedUser);
-        setFormData({ ...storedUser });
-      }
-      setLoading(false);
-    };
+  const fetchUserData = async () => {
+    setLoading(true);
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!storedUser) {
+      navigate('/');
+    } else {
+      setUser(storedUser);
+      setFormData({ ...storedUser });
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchUserData();
   }, []);
 
@@ -70,9 +70,8 @@ const UserProfile = () => {
       setUser(updatedData);
       setIsEditMode(false);
       setErrors({});
-      message.success('Thông tin đã được cập nhật', 1).then(() => {
-        window.location.reload()
-      })
+      message.success('Thông tin đã được cập nhật')
+      fetchUserData();
     } catch (error) {
       console.error('Failed to update account:', error);
       message.error('Cập nhật thông tin thất bại. Vui lòng thử lại.');

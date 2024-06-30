@@ -281,11 +281,13 @@ const ProductList = () => {
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>Product for dogs</Title>
-      <Search
-        placeholder="Search by product name"
-        onChange={(e) => handleSearch(e.target.value)}
-        style={{ marginBottom: 16, width: 300 }}
-      />
+      <div className="flex flex-row justify-end">
+        <Search
+          placeholder="Search by product name"
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ marginBottom: 16, width: 300 }}
+        />
+      </div>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>

@@ -195,6 +195,7 @@ const SpaBookingDetail = () => {
         <Table
           dataSource={serviceData ? [serviceData] : []} 
           columns={columns}
+          scroll={{ x: 'max-content' }}
           pagination={false} 
         />
         {spaBookingDetail.Feedback && (

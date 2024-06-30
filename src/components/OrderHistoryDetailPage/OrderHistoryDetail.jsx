@@ -353,6 +353,7 @@ const OrderHistoryDetail = () => {
           dataSource={orderDetail.Items}
           columns={columns}
           rowKey="ProductID"
+          scroll={{ x: 'max-content' }}
           bordered
         />
         {/* Render the cancel button conditionally */}
