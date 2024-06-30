@@ -7,6 +7,8 @@ import SubMenu from 'antd/es/menu/SubMenu';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import '../../assets/fonts/fonts.css';
+import axios from 'axios';
+
 
 const { Header } = Layout;
 
@@ -78,12 +80,34 @@ const Banner = () => {
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };
   const clickTitle = () => navigate('/');
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const accountID = user.id;
+    const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
+    console.log('User ID:', accountID);
+    console.log('Cart Items:', cartItems);
+  
+    if (cartItems.length > 0) {
+      try {
+        const response = await axios.post('http://localhost:3001/api/cart', {
+          AccountID: accountID, // Use accountID variable instead of undefined response.AccountID
+          Items: cartItems, // Pass the parsed cartItems directly
+        }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        console.log('Cart saved successfully:', response.data);
+      } catch (error) {
+        console.error('Error saving cart:', error);
+        // Handle specific error scenarios if needed
+      }
+    }
+  
     localStorage.clear();
     dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
-    navigate('/', {replace: true});
+    navigate('/', { replace: true });
   };
 
   const userMenuItems = [
