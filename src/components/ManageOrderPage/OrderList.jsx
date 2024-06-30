@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, Spin, message, Modal, Input } from "antd";
 import axios from 'axios';
 import moment from "moment";
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -83,7 +84,7 @@ const OrderList = () => {
 
   const showConfirm = (orderId, newStatus) => {
     confirm({
-      title: 'Are you sure you want to update the order status?',
+      title: t('inform_update'),
       content: `Change status to "${newStatus}"?`,
       onOk() {
         handleUpdateStatus(orderId, newStatus);
@@ -98,19 +99,19 @@ const OrderList = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `http://localhost:3001/api/orders/${orderId}`, 
-        { Status: newStatus }, 
+        `http://localhost:3001/api/orders/${orderId}`,
+        { Status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      message.success('Order status updated successfully');
+      message.success(t('updated_successfully'));
       fetchOrderHistory(); // Refresh order list after update
     } catch (error) {
       console.error('Error updating order status:', error);
-      message.error('Failed to update order status');
+      message.error(t('failed_updated'));
     }
   };
 
@@ -135,17 +136,17 @@ const OrderList = () => {
           return (
             <div>
               <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
-                Delivering
+                {t('delivering')}
               </Button>
               <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')}>
-                Cancel
+                {t('cancel')}
               </Button>
             </div>
           );
         case 'Delivering':
           return (
             <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
-              Shipped
+              {t('delivered')}
             </Button>
           );
         default:
@@ -166,7 +167,7 @@ const OrderList = () => {
       ),
     },
     {
-      title: 'Ngày',
+      title: t('date'),
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
@@ -174,17 +175,17 @@ const OrderList = () => {
       ),
     },
     {
-      title: 'Tên khách hàng',
+      title: t('customer_name'),
       dataIndex: 'customerName',
       key: 'customerName',
     },
     {
-      title: 'Số điện thoại',
+      title: t('phone'),
       dataIndex: 'phone',
       key: 'phone',
     },
     {
-      title: 'Số tiền',
+      title: t('amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => (
@@ -192,7 +193,7 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Trạng thái',
+      title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
@@ -200,13 +201,13 @@ const OrderList = () => {
       )
     },
     {
-      title: 'Cập nhật trạng thái',
+      title: t('update_status'),
       key: 'updateStatus',
       render: (text, record) => renderUpdateButton(record),
     },
   ].filter(col => col.key !== 'updateStatus' || role === 'Sales Staff'); // Filter out 'updateStatus' column if not Sales Staff
 
-  const filteredOrders = orders.filter(order => 
+  const filteredOrders = orders.filter(order =>
     order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     order.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -215,10 +216,10 @@ const OrderList = () => {
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
+          <h2 className="text-5xl text-center font-semibold mb-4">{t('ordered_list')}</h2>
           <Layout className="flex flex-row justify-between">
             <Button onClick={handleSortOrder} className="mb-4">
-              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+              {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
             <Search
               placeholder="Search by customer name or phone"
