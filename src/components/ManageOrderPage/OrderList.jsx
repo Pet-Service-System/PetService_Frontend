@@ -15,6 +15,7 @@ const OrderList = () => {
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
 
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
@@ -85,6 +86,7 @@ const OrderList = () => {
     confirm({
       title: 'Are you sure you want to update the order status?',
       content: `Change status to "${newStatus}"?`,
+      confirmLoading: confirmLoading, // Pass confirmLoading state to modal
       onOk() {
         handleUpdateStatus(orderId, newStatus);
       },
@@ -95,6 +97,7 @@ const OrderList = () => {
   };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
+    setConfirmLoading(true); // Set confirm loading state to true
     const token = localStorage.getItem('token');
     try {
       await axios.put(
@@ -111,6 +114,8 @@ const OrderList = () => {
     } catch (error) {
       console.error('Error updating order status:', error);
       message.error('Failed to update order status');
+    } finally {
+      setConfirmLoading(false); // Reset confirm loading state
     }
   };
 
@@ -134,17 +139,17 @@ const OrderList = () => {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
                 Delivering
               </Button>
-              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')}>
+              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
                 Cancel
               </Button>
             </div>
           );
         case 'Delivering':
           return (
-            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
+            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')} disabled={confirmLoading}>
               Shipped
             </Button>
           );

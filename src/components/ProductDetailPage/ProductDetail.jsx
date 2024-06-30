@@ -16,6 +16,7 @@ const ProductDetail = () => {
     const [comments, setComments] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const navigate = useNavigate();
@@ -169,7 +170,7 @@ const ProductDetail = () => {
                 ImageURL: values.ImageURL,
                 Status: values.Status
             };
-
+            setSaving(true)
             await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -178,6 +179,7 @@ const ProductDetail = () => {
 
             message.success('Product updated successfully')
             fetchProductDetail();
+            setSaving(false)
             setEditMode(false)
         } catch (error) {
             console.error('Error updating product:', error);
@@ -186,6 +188,7 @@ const ProductDetail = () => {
             } else {
                 message.error('Error updating product');
             }
+            setSaving(false)
         }
     };
 
@@ -309,8 +312,8 @@ const ProductDetail = () => {
                         ) : userRole === 'Store Manager' ? (
                             editMode ? (
                                 <div className="flex space-x-4 justify-end">
-                                    <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
-                                    <Button onClick={handleCancelEdit}>Hủy</Button>
+                                    <Button type="primary" disabled={saving} onClick={() => handleSaveEdit(id)}>Lưu</Button>
+                                    <Button onClick={handleCancelEdit} disabled={saving}>Hủy</Button>
                                 </div>
                             ) : (
                                 <div className="flex space-x-4 justify-end">

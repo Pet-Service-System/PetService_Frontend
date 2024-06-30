@@ -20,6 +20,7 @@ const UserProfile = () => {
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const screens = useBreakpoint();
   const fetchUserData = async () => {
@@ -59,6 +60,7 @@ const UserProfile = () => {
         message.error('Authorization token not found. Please log in.');
         return;
       }
+      setSaving(true)
       await axios.patch(`http://localhost:3001/api/accounts/${user.id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -68,6 +70,7 @@ const UserProfile = () => {
       // Update user info and localStorage
       localStorage.setItem('user', JSON.stringify(updatedData));
       setUser(updatedData);
+      setSaving(false)
       setIsEditMode(false);
       setErrors({});
       message.success('Thông tin đã được cập nhật')
@@ -75,6 +78,7 @@ const UserProfile = () => {
     } catch (error) {
       console.error('Failed to update account:', error);
       message.error('Cập nhật thông tin thất bại. Vui lòng thử lại.');
+      setSaving(false)
     }
   };
 
@@ -202,8 +206,8 @@ const UserProfile = () => {
                   />
                 </Form.Item>
                 <div className="flex justify-between mt-6">
-                  <Button type="primary" onClick={handleSave} className="mr-2">Lưu</Button>
-                  <Button type="default" onClick={handleCancel}>Hủy</Button>
+                  <Button type="primary" onClick={handleSave} className="mr-2" disabled={saving}>Lưu</Button>
+                  <Button type="default" onClick={handleCancel} disabled={saving}>Hủy</Button>
                 </div>
               </Form>
             ) : (

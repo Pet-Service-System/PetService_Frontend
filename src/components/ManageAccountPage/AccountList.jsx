@@ -259,7 +259,7 @@ const AccountList = () => {
         visible={isModalVisible}
         onCancel={handleCancelEdit}
         footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>Cancel</Button>,
+          <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>Cancel</Button>,
           <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
         ]}
       >

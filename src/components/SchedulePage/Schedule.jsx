@@ -10,6 +10,7 @@ const Schedule = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [users, setUsers] = useState([]);
+  const [saving, setSaving] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [roleOfEmp, setRoleOfEmp] = useState('');
   const [roleOfUser] = useState(localStorage.getItem('role'));
@@ -181,7 +182,7 @@ const Schedule = () => {
       const { day, timeSlot, fullname } = values;
       const [start_time, end_time] = timeSlot.split(' - ');
       const accountId = selectedUser ? selectedUser.AccountID : null;
-
+      setSaving(true)
       await axios.post(
         'http://localhost:3001/api/schedules/assign',
         {
@@ -206,6 +207,7 @@ const Schedule = () => {
       });
       message.success('Lập lịch cho nhân viên thành công.');
       setSchedules(response.data);
+      setSaving(false)
       setIsModalVisible(false);
       form.resetFields();
     } catch (error) {
@@ -215,6 +217,7 @@ const Schedule = () => {
       } else {
         message.error('Error scheduling employee');
       }
+      setSaving(false)
     }
   };
 
@@ -276,7 +279,7 @@ const Schedule = () => {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" className="float-right">
+            <Button type="primary" htmlType="submit" className="float-right" disabled={saving}>
               Submit
             </Button>
           </Form.Item>

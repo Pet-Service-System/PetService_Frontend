@@ -41,6 +41,7 @@ const getSpaBookingDetail = async (id) => {
 const SpaBooking = () => {
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
+  const [saving, setSaving] = useState(false);
   const [filteredSpaBookings, setFilteredSpaBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
   const [role] = useState(localStorage.getItem('role') || 'Guest');
@@ -105,6 +106,7 @@ const SpaBooking = () => {
   const handleUpdateStatus = async () => {
     try {
       const token = localStorage.getItem('token');
+      setSaving(true)
       await axios.put(
         `http://localhost:3001/api/Spa-bookings/${selectedBookingId}`,
         { Status: pendingStatus },
@@ -115,11 +117,13 @@ const SpaBooking = () => {
         }
       );
       message.success(`Booking status updated successfully to "${pendingStatus}"`);
+      setSaving(false)
       setUpdateStatusModalVisible(false);
       fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
       console.error('Error updating booking status:', error);
       message.error('Failed to update booking status');
+      setSaving(false)
     }
   };
 
@@ -242,8 +246,8 @@ const SpaBooking = () => {
             visible={updateStatusModalVisible}
             onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[
-              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)}>Cancel</Button>,
-              <Button key="submit" type="primary" onClick={handleUpdateStatus}>Confirm</Button>,
+              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)} disabled={saving}>Cancel</Button>,
+              <Button key="submit" type="primary" onClick={handleUpdateStatus} disabled={saving}>Confirm</Button>,
             ]}
           >
             <p>Are you sure you want to update the status to "{pendingStatus}"?</p>
