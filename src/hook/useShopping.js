@@ -27,8 +27,8 @@ const useShopping = () => {
     dispatch(updateItem(item));
   };
 
-  const handleUpdateQuantity = (id, quantity) => {
-    dispatch(updateQuantity({ ProductID: id, quantity }));
+  const handleUpdateQuantity = (id, Quantity) => {
+    dispatch(updateQuantity({ ProductID: id, Quantity }));
   };
 
   const handleRemoveItem = (id) => {

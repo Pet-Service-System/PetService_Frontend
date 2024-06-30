@@ -5,16 +5,20 @@ import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePic
 import axios from 'axios';
 import moment from "moment";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 const { Search } = Input;
 
-const getSpaBookings = async () => {
+const getSpaBookings = async (bookingDate, dateCreated) => {
   const token = localStorage.getItem('token');
   try {
     const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params: {
+        bookingDate: bookingDate ? moment(bookingDate).format('YYYY-MM-DD') : undefined,
+        dateCreated: dateCreated ? moment(dateCreated).format('YYYY-MM-DD') : undefined,
+      }
     });
     return response.data;
   } catch (error) {
@@ -50,11 +54,12 @@ const SpaBooking = () => {
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
+  const [selectedBookingDate, setSelectedBookingDate] = useState(null); // State for selected booking date filter
+  const [selectedDateCreated, setSelectedDateCreated] = useState(null); // State for selected date created filter
 
   useEffect(() => {
     fetchSpaBookings();
-  }, [sortOrder]);
+  }, [sortOrder, selectedBookingDate, selectedDateCreated]);
 
   useEffect(() => {
     // Filter spaBookings based on searchQuery and selectedDate
@@ -63,19 +68,25 @@ const SpaBooking = () => {
       booking.phone.includes(searchQuery)
     );
 
-    if (selectedDate) {
+    if (selectedBookingDate) {
       filteredData = filteredData.filter(booking =>
-        moment(booking.date).isSame(selectedDate, 'day')
+        moment(booking.bookingDate).isSame(selectedBookingDate, 'day')
+      );
+    }
+
+    if (selectedDateCreated) {
+      filteredData = filteredData.filter(booking =>
+        moment(booking.date).isSame(selectedDateCreated, 'day')
       );
     }
 
     setFilteredSpaBookings(filteredData);
-  }, [searchQuery, spaBookings, selectedDate]);
+  }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated]);
 
   const fetchSpaBookings = async () => {
     setLoading(true);
     try {
-      const data = await getSpaBookings();
+      const data = await getSpaBookings(selectedBookingDate, selectedDateCreated);
       const formattedData = await Promise.all(data.map(async (booking) => {
         const detail = await getSpaBookingDetail(booking.BookingID);
         return {
@@ -86,6 +97,7 @@ const SpaBooking = () => {
           reviewed: booking.Reviewed,
           customerName: detail.CustomerName,
           phone: detail.Phone,
+          bookingDate: detail.BookingDate ? new Date(detail.BookingDate) : null,
         };
       }));
       const sortedData = sortOrder === 'desc'
@@ -162,7 +174,15 @@ const SpaBooking = () => {
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
+        <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text>
+      ),
+    },
+    {
+      title: 'Booking Date',
+      dataIndex: 'bookingDate',
+      key: 'bookingDate',
+      render: (text, record) => (
+        <Text>{record.bookingDate ? moment(record.bookingDate).format('DD/MM/YYYY') : '-'}</Text>
       ),
     },
     {
@@ -206,11 +226,19 @@ const SpaBooking = () => {
     setSearchQuery(value);
   };
 
-  const handleDateChange = (date) => {
+  const handleBookingDateChange = (date) => {
     if (date) {
-      setSelectedDate(date.toDate());
+      setSelectedBookingDate(date.toDate());
     } else {
-      setSelectedDate(null);
+      setSelectedBookingDate(null);
+    }
+  };
+
+  const handleDateCreatedChange = (date) => {
+    if (date) {
+      setSelectedDateCreated(date.toDate());
+    } else {
+      setSelectedDateCreated(null);
     }
   };
 
@@ -218,15 +246,25 @@ const SpaBooking = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Spa Service Booking History</h2>
-          <Layout className="flex flex-row justify-between mb-4">
-            <Button onClick={handleSortOrder}>
+          <Title className="text-5xl text-center font-semibold">Danh sách dịch vụ</Title>
+          <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4">
+            <Button onClick={handleSortOrder} style={{ width: 170 }}>
               Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
             </Button>
-            <DatePicker
-              onChange={handleDateChange}
-              style={{ width: 200 }}
-            />
+            <div>
+              <Text>Lọc theo ngày đặt lịch: </Text>
+              <DatePicker
+                onChange={handleBookingDateChange}
+                style={{ width: 200, marginRight: 12 }}
+              />
+            </div>
+            <div>
+              <Text>Lọc theo ngày tạo lịch: </Text>
+              <DatePicker
+                onChange={handleDateCreatedChange}
+                style={{ width: 200, marginRight: 12 }}
+              />
+            </div>
             <Search
               placeholder="Search by customer name or phone"
               onChange={(e) => handleSearch(e.target.value)}

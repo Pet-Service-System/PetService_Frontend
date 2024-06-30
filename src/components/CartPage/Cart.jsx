@@ -12,7 +12,7 @@ const Cart = () => {
 
   // Calculate total amount whenever shoppingCart changes
   const totalAmount = shoppingCart.reduce((total, item) => {
-    return total + item.Price * item.quantity;
+    return total + item.Price * item.Quantity;
   }, 0);
 
   // Save shoppingCart to localStorage whenever it changes
@@ -46,12 +46,12 @@ const Cart = () => {
     },
     {
       title: 'Số lượng',
-      dataIndex: 'quantity',
+      dataIndex: 'Quantity',
       key: 'Quantity',
       render: (text, record) => (
         <InputNumber
           min={1}
-          value={text}
+          value={text} // Ensure this is the correct value for each item's quantity
           onChange={(value) => handleUpdateQuantity(record.ProductID, value)}
           className="w-24"
         />
@@ -77,7 +77,7 @@ const Cart = () => {
   }
 
   return (
-    <div>
+    <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
       <div className="flex flex-row md:flex-row m-5">
           <Button
               onClick={() => navigate(-1)}
@@ -88,31 +88,29 @@ const Cart = () => {
               Quay về
           </Button>
       </div>
-      <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
-        <Title className="text-center" level={2}>Shopping Cart</Title>
-        <Card className="shadow-lg rounded-lg p-10">
-          {shoppingCart.length > 0 ? (
-            <Table
-              dataSource={shoppingCart}
-              columns={columns}
-              rowKey="ProductID"
-              pagination={false}
-            />
-          ) : (
-            <Text className="text-center text-2xl text-gray-500">Giỏ của bạn đang trống.</Text>
-          )}
-        </Card>
-        {shoppingCart.length > 0 && (
-          <div className="mt-8 flex justify-end items-center">
-            <Text className="text-2xl text-green-600 mr-4">
-              Tổng tiền: ${totalAmount.toFixed(2)}
-            </Text>
-            <Button type="primary" onClick={handlePayClick}>
-              Thanh toán
-            </Button>
-          </div>
+      <Title className="text-center" level={2}>Shopping Cart</Title>
+      <Card className="shadow-lg rounded-lg p-10">
+        {shoppingCart.length > 0 ? (
+          <Table
+            dataSource={shoppingCart}
+            columns={columns}
+            rowKey="ProductID"
+            pagination={false}
+          />
+        ) : (
+          <Text className="text-center text-2xl text-gray-500">Giỏ của bạn đang trống.</Text>
         )}
-      </div>
+      </Card>
+      {shoppingCart.length > 0 && (
+        <div className="mt-8 flex justify-end items-center">
+          <Text className="text-2xl text-green-600 mr-4">
+            Tổng tiền: ${totalAmount.toFixed(2)}
+          </Text>
+          <Button type="primary" onClick={handlePayClick}>
+            Thanh toán
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

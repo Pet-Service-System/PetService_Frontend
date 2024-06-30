@@ -4,7 +4,7 @@ import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePic
 import axios from 'axios';
 import moment from "moment";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 const { confirm } = Modal;
 const { Search } = Input
 
@@ -228,11 +228,6 @@ const OrderList = () => {
     },
   ].filter(col => col.key !== 'updateStatus' || role === 'Sales Staff'); // Filter out 'updateStatus' column if not Sales Staff
 
-  const filteredOrders = orders.filter(order => 
-    order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.phone.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const handleDateChange = (date) => {
     if (date) {
       setSelectedDate(date.toDate());
@@ -249,15 +244,18 @@ const OrderList = () => {
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">Danh sách đặt hàng</h2>
-          <Layout className="flex flex-row justify-between mb-4">
-            <Button onClick={handleSortOrder}>
+          <Title className="text-5xl text-center font-semibold">Danh sách đặt hàng</Title>
+          <Layout className="flex lg:flex-row sm:flex-col justify-between mb-4 mt-10">
+            <Button onClick={handleSortOrder} style={{ width: 170 }}>
               Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
             </Button>
-            <DatePicker
-              onChange={handleDateChange}
-              style={{ width: 200 }}
-            />
+            <div>
+              <Text>Lọc theo ngày tạo đơn: </Text>
+              <DatePicker
+                onChange={handleDateChange}
+                style={{ width: 200 }}
+              />
+            </div>
             <Search
               placeholder="Search by customer name or phone"
               onChange={(e) => handleSearch(e.target.value)}

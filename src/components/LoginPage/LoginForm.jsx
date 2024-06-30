@@ -65,7 +65,6 @@ const LoginForm = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('role', user.role);
         localStorage.setItem('user', JSON.stringify(user));
-
         // Save addressInfo to localStorage
         const addressInfo = {
           fullname: user.fullname,
@@ -73,7 +72,11 @@ const LoginForm = () => {
           phone: user.phone,
         };
         localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
-
+        const cartResponse = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
+        });
+        console.log(cartResponse.data)
+        const { Items } = cartResponse.data;
+        localStorage.setItem('shoppingCart', JSON.stringify(Items));
         message.success('Login successful!', 1).then(() => {
           navigate('/', { replace: true });
         });
@@ -91,41 +94,48 @@ const LoginForm = () => {
     }
   };
 
-  const handleGoogleLoginSuccess = (response) => {
+  const handleGoogleLoginSuccess = async (response) => {
     const { credential } = response;
-    fetch('http://localhost:3001/api/auth/google', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: credential }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.token && data.user) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('role', data.user.role);
-          localStorage.setItem('user', JSON.stringify(data.user));
-
-          // Save addressInfo to localStorage
-          const addressInfo = {
-            fullname: data.user.fullname,
-            address: data.user.address,
-            phone: data.user.phone,
-          };
-          localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
-
-          message.success('Login successful!', 1).then(() => {
-            navigate('/', { replace: true });
-          });
-        } else {
-          message.error('Google login failed: Invalid response from server');
-        }
-      })
-      .catch((error) => {
-        message.error('Google login failed');
-        console.error('Google login error:', error);
+    try {
+      const authResponse = await fetch('http://localhost:3001/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: credential }),
       });
+      const data = await authResponse.json();
+      if (data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.user.role);
+        localStorage.setItem('user', JSON.stringify(data.user));
+  
+        // Save addressInfo to localStorage
+        const addressInfo = {
+          fullname: data.user.fullname,
+          address: data.user.address,
+          phone: data.user.phone,
+        };
+        localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
+        
+        const cartResponse = await axios.get(`http://localhost:3001/api/cart/${data.user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+          },
+        });
+        const { Items } = cartResponse.data;
+        localStorage.setItem('shoppingCart', JSON.stringify(Items));
+  
+        message.success('Login successful!', 1).then(() => {
+          navigate('/', { replace: true });
+        });
+      } else {
+        message.error('Google login failed: Invalid response from server');
+      }
+    } catch (error) {
+      message.error('Google login failed');
+      console.error('Google login error:', error);
+    }
   };
 
   const handleGoogleLoginFailure = (error) => {

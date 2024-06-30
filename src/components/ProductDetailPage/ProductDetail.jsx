@@ -14,9 +14,8 @@ const ProductDetail = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
     const [comments, setComments] = useState([]);
-    const [quantity, setQuantity] = useState(1);
+    const [Quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const navigate = useNavigate();
@@ -67,14 +66,14 @@ const ProductDetail = () => {
     }, [id]);
 
     const handleIncrease = () => {
-        if (quantity < productData.Quantity) {
-            setQuantity(quantity + 1);
+        if (Quantity < productData.Quantity) {
+            setQuantity(Quantity + 1);
         } else {
             message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
         }
     };
     
-    const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
+    const handleDecrease = () => setQuantity(Quantity > 1 ? Quantity - 1 : 1);
 
     const handleOrderNow = async () => {
         if (!localStorage.getItem('user')) {
@@ -82,12 +81,12 @@ const ProductDetail = () => {
             return;
         }
         if (productData) {
-            if (quantity > productData.Quantity) {
+            if (Quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
                 return;
             }
     
-            const productWithQuantity = { ...productData, quantity };
+            const productWithQuantity = { ...productData, Quantity };
             await handleAddItem(productWithQuantity);
             const totalAmount = productData.Price;
             localStorage.setItem('totalAmount', totalAmount.toFixed(2));
@@ -103,12 +102,12 @@ const ProductDetail = () => {
             return;
         }
         if (productData) {
-            if (quantity > productData.Quantity) {
+            if (Quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
                 return;
             }
     
-            const productWithQuantity = { ...productData, quantity };
+            const productWithQuantity = { ...productData, Quantity };
             handleAddItem(productWithQuantity);
             message.success('Product added to cart successfully');
         }
@@ -170,7 +169,7 @@ const ProductDetail = () => {
                 ImageURL: values.ImageURL,
                 Status: values.Status
             };
-            setSaving(true)
+
             await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -179,7 +178,6 @@ const ProductDetail = () => {
 
             message.success('Product updated successfully')
             fetchProductDetail();
-            setSaving(false)
             setEditMode(false)
         } catch (error) {
             console.error('Error updating product:', error);
@@ -188,7 +186,6 @@ const ProductDetail = () => {
             } else {
                 message.error('Error updating product');
             }
-            setSaving(false)
         }
     };
 
@@ -283,7 +280,7 @@ const ProductDetail = () => {
                                 <div className="flex items-center mb-6 p-14">
                                     <Button onClick={handleDecrease}>-</Button>
                                     <Input
-                                        value={quantity}
+                                        value={Quantity}
                                         onChange={(e) => handleChangeQuantity(e.target.value)}
                                         className="mx-3 text-lg w-24 text-center"
                                         type="number"
@@ -312,8 +309,8 @@ const ProductDetail = () => {
                         ) : userRole === 'Store Manager' ? (
                             editMode ? (
                                 <div className="flex space-x-4 justify-end">
-                                    <Button type="primary" disabled={saving} onClick={() => handleSaveEdit(id)}>Lưu</Button>
-                                    <Button onClick={handleCancelEdit} disabled={saving}>Hủy</Button>
+                                    <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
+                                    <Button onClick={handleCancelEdit}>Hủy</Button>
                                 </div>
                             ) : (
                                 <div className="flex space-x-4 justify-end">

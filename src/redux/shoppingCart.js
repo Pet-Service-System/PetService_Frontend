@@ -10,33 +10,33 @@ const shoppingSlice = createSlice({
       return action.payload;
     },
     addItem: (state, action) => {
-      const { ProductID, ProductName, Price, ImageURL, quantity } = action.payload;
+      const { ProductID, ProductName, Price, ImageURL, Quantity } = action.payload;
       const existingItem = state.find(item => item.ProductID === ProductID);
       if (existingItem) {
-        existingItem.quantity += quantity;
+        existingItem.Quantity += Quantity;
       } else {
         state.push({
           ProductID,
           ImageURL,
           ProductName,
           Price,
-          quantity,
+          Quantity,
         });
       }
     },
     updateQuantity: (state, action) => {
-      const { ProductID, quantity } = action.payload;
+      const { ProductID, Quantity } = action.payload;
       const existingItem = state.find(item => item.ProductID === ProductID);
       if (existingItem) {
-        existingItem.quantity = quantity;
+        existingItem.Quantity = Quantity;
       }
     },
     updateItem: (state, action) => {
-      const { ProductID, ProductName, quantity } = action.payload;
+      const { ProductID, ProductName, Quantity } = action.payload;
       const existingItem = state.find(item => item.ProductID === ProductID);
       if (existingItem) {
         existingItem.ProductName = ProductName;
-        existingItem.quantity = quantity;
+        existingItem.Quantity = Quantity;
       }
     },
     removeItem: (state, action) => {
