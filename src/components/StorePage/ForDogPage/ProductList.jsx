@@ -6,6 +6,7 @@ import axios from 'axios';
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
+const { Search } = Input;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
@@ -18,6 +19,8 @@ const ProductList = () => {
   const [form] = Form.useForm();
   const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
+  const [filteredProducts, setfilteredProducts] = useState([]); // State for filtered data
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,6 +37,13 @@ const ProductList = () => {
 
     fetchProducts();
   }, [petTypeID]);
+
+  useEffect(() => {
+    const filteredData = productData.filter(product =>
+      product.ProductName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setfilteredProducts(filteredData);
+  }, [searchQuery, productData]);
 
   const handleProductClick = (id) => {
     navigate(`/product-detail/${id}`);
@@ -264,14 +274,23 @@ const ProductList = () => {
     },
   ];
 
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
+
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>Product for dogs</Title>
+      <Search
+        placeholder="Search by product name"
+        onChange={(e) => handleSearch(e.target.value)}
+        style={{ marginBottom: 16, width: 300 }}
+      />
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
             <Table
-              dataSource={productData}
+              dataSource={filteredProducts}
               columns={columns}
               rowKey="ProductID"
               loading={loading}
@@ -292,7 +311,7 @@ const ProductList = () => {
                 </Card>
               ))
             ) : (
-              productData.map(product => (
+              filteredProducts.map(product => (
                 <Card
                   key={product.ProductID}
                   hoverable
