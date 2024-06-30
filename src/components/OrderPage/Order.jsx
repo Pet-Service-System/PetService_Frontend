@@ -104,17 +104,17 @@ const Order = () => {
         const currentInventory = inventoryResponse.data.Quantity;
 
         // Validate item.Quantity and item.quantity before proceeding
-        if (typeof item.quantity !== 'number') {
+        if (typeof item.Quantity !== 'number') {
           throw new Error(`Invalid quantity data for ProductID ${item.ProductID}`);
         }
 
         // Check if there is sufficient inventory
-        if (currentInventory < item.quantity) {
+        if (currentInventory < item.Quantity) {
           throw new Error(`Not enough inventory available for ProductID ${item.ProductID}`);
         }
 
         // Calculate the new quantity after purchase
-        const newQuantity = currentInventory - item.quantity;
+        const newQuantity = currentInventory - item.Quantity;
 
         // Make an API call to update the inventory
         const response = await axios.patch(`http://localhost:3001/api/products/${item.ProductID}`, {
@@ -188,7 +188,7 @@ const Order = () => {
         Phone: customerInfo.phone,
         Items: orderDetails.cartItems.map(item => ({
           ProductID: item.ProductID,
-          Quantity: item.quantity
+          Quantity: item.Quantity
         }))
       };
       
@@ -286,7 +286,7 @@ const Order = () => {
             <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">
               <Title level={3} className="mb-6">Danh sách sản phẩm</Title>
               {orderDetails.cartItems.map((item, index) => {
-                const totalPrice = (item.Price * item.quantity).toFixed(2);
+                const totalPrice = (item.Price * item.Quantity).toFixed(2);
                 return (
                   <Row key={index} className="mb-4" gutter={[16, 16]}>
                     <Col span={4}>
@@ -300,7 +300,7 @@ const Order = () => {
                       <Text strong>{item.ProductName}</Text>
                     </Col>
                     <Col span={4}>
-                      Số lượng: <Text>{item.quantity}</Text>
+                      Số lượng: <Text>{item.Quantity}</Text>
                     </Col>
                     <Col span={4}>
                       Đơn giá: <Text>${item.Price.toFixed(2)}</Text>

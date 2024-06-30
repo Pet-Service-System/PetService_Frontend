@@ -15,7 +15,6 @@ const { Title } = Typography;
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [disableLogin, setDisableLogin] = useState(false);
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ const LoginForm = () => {
     if (disableLogin) {
       timer = setTimeout(() => {
         setDisableLogin(false);
-      }, 2000);
+      }, 1000);
     }
     return () => clearTimeout(timer);
   }, [disableLogin]);
@@ -41,11 +40,21 @@ const LoginForm = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email is invalid';
+    }
+  
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+  
     return newErrors;
   };
-
+  
   const handleSubmit = async () => {
     if (disableLogin) return;
     const validationErrors = validate();
@@ -60,7 +69,6 @@ const LoginForm = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('role', user.role);
         localStorage.setItem('user', JSON.stringify(user));
-
         // Save addressInfo to localStorage
         const addressInfo = {
           fullname: user.fullname,
@@ -68,8 +76,12 @@ const LoginForm = () => {
           phone: user.phone,
         };
         localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
-
-        message.success(t('login_successful'), 1).then(() => {
+        const cartResponse = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
+        });
+        console.log(cartResponse.data)
+        const { Items } = cartResponse.data;
+        localStorage.setItem('shoppingCart', JSON.stringify(Items));
+        message.success('Login successful!', 1).then(() => {
           navigate('/', { replace: true });
         });
         setDisableLogin(true);
@@ -83,46 +95,51 @@ const LoginForm = () => {
       } finally {
         setIsLoading(false);
       }
-    } else {
-      setErrors(validationErrors);
     }
   };
 
-  const handleGoogleLoginSuccess = (response) => {
+  const handleGoogleLoginSuccess = async (response) => {
     const { credential } = response;
-    fetch('http://localhost:3001/api/auth/google', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: credential }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.token && data.user) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('role', data.user.role);
-          localStorage.setItem('user', JSON.stringify(data.user));
-
-          // Save addressInfo to localStorage
-          const addressInfo = {
-            fullname: data.user.fullname,
-            address: data.user.address,
-            phone: data.user.phone,
-          };
-          localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
-
-          message.success(t('login_successful'), 1).then(() => {
-            navigate('/', { replace: true });
-          });
-        } else {
-          message.error('Google login failed: Invalid response from server');
-        }
-      })
-      .catch((error) => {
-        message.error('Google login failed');
-        console.error('Google login error:', error);
+    try {
+      const authResponse = await fetch('http://localhost:3001/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: credential }),
       });
+      const data = await authResponse.json();
+      if (data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.user.role);
+        localStorage.setItem('user', JSON.stringify(data.user));
+  
+        // Save addressInfo to localStorage
+        const addressInfo = {
+          fullname: data.user.fullname,
+          address: data.user.address,
+          phone: data.user.phone,
+        };
+        localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
+        
+        const cartResponse = await axios.get(`http://localhost:3001/api/cart/${data.user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+          },
+        });
+        const { Items } = cartResponse.data;
+        localStorage.setItem('shoppingCart', JSON.stringify(Items));
+  
+        message.success('Login successful!', 1).then(() => {
+          navigate('/', { replace: true });
+        });
+      } else {
+        message.error('Google login failed: Invalid response from server');
+      }
+    } catch (error) {
+      message.error('Google login failed');
+      console.error('Google login error:', error);
+    }
   };
 
   const handleGoogleLoginFailure = (error) => {
@@ -137,11 +154,14 @@ const LoginForm = () => {
           <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
             <Title level={3} className="text-blue-500 text-center">{t('log_in')}</Title>
             <Form onFinish={handleSubmit} layout="vertical">
-              <Form.Item
+            <Form.Item
                 label="Email"
                 name="email"
-                validateStatus={errors.email && 'error'}
-                help={errors.email}
+                validateTrigger="onSubmit"
+                rules={[
+                  { required: true, message: 'Please enter your email' },
+                  { type: 'email', message: 'Please enter a valid email' }
+                ]}
               >
                 <Input
                   type="email"
@@ -154,8 +174,11 @@ const LoginForm = () => {
               <Form.Item
                 label={t('password')}
                 name="password"
-                validateStatus={errors.password && 'error'}
-                help={errors.password}
+                validateTrigger="onSubmit"
+                rules={[
+                  { required: true, message: 'Please enter your password' },
+                  { min: 8, message: 'Password must be at least 8 characters' }
+                ]}
               >
                 <Input.Password
                   value={password}

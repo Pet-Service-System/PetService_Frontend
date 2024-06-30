@@ -15,7 +15,7 @@ const Cart = () => {
 
   // Calculate total amount whenever shoppingCart changes
   const totalAmount = shoppingCart.reduce((total, item) => {
-    return total + item.Price * item.quantity;
+    return total + item.Price * item.Quantity;
   }, 0);
 
   // Save shoppingCart to localStorage whenever it changes
@@ -49,12 +49,12 @@ const Cart = () => {
     },
     {
       title: t('quantity'),
-      dataIndex: 'quantity',
+      dataIndex: 'Quantity',
       key: 'Quantity',
       render: (text, record) => (
         <InputNumber
           min={1}
-          value={text}
+          value={text} // Ensure this is the correct value for each item's quantity
           onChange={(value) => handleUpdateQuantity(record.ProductID, value)}
           className="w-24"
         />

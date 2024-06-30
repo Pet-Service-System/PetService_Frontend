@@ -28,6 +28,7 @@ const SpaServiceDetail = () => {
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
     const currentDateTime = moment();
+    const [saving, setSaving] = useState(false);
     const availableTimes = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", 
         "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", 
@@ -111,16 +112,17 @@ const SpaServiceDetail = () => {
                 ImageURL: values.ImageURL,
                 Status: values.Status
             };
-
+            setSaving(true)
             await axios.patch(`http://localhost:3001/api/services/${id}`, updatedService, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
 
-            message.success('Service updated successfully', 0.5).then(() => {
-                window.location.reload(); // Reload the page after successful update
-            });
+            message.success('Service updated successfully')
+            setSaving(false)
+            setEditMode(false)
+            fetchServiceDetail();
         } catch (error) {
             console.error('Error updating service:', error);
             if (error.response && error.response.status === 401) {
@@ -128,6 +130,7 @@ const SpaServiceDetail = () => {
             } else {
                 message.error('Error updating service');
             }
+            setSaving(false)
         }
     };
 
@@ -210,6 +213,7 @@ const SpaServiceDetail = () => {
             // Validate PetTypeID
             if (values.PetTypeID !== serviceData.PetTypeID) {
                 message.error('Loại thú cưng không phù hợp với loại dịch vụ.');
+                setOperationLoading(false);
                 return;
             }
 
@@ -272,7 +276,9 @@ const SpaServiceDetail = () => {
         } catch (error) {
             console.error('Error creating booking:', error);
             message.error('Error creating booking');
+            setOperationLoading(false);
         }
+        setOperationLoading(false);
     };
 
     const showAddPetModal = () => {
@@ -370,8 +376,8 @@ const SpaServiceDetail = () => {
                     ) : userRole === 'Store Manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleSaveEdit}>Lưu</Button>
-                                <Button onClick={handleCancelEdit}>Hủy</Button>
+                                <Button type="primary" onClick={handleSaveEdit} disabled={saving}>Lưu</Button>
+                                <Button onClick={handleCancelEdit} disabled={saving}>Hủy</Button>
                             </div>
                         ) : (
                             <div className="flex space-x-4 justify-end">
@@ -523,7 +529,7 @@ const SpaServiceDetail = () => {
                                 label="Cân nặng"
                                 rules={[{ required: true, message: 'Vui lòng nhập cân nặng thú cưng!' }]}
                             >
-                                <Input placeholder='Nhập cân nặng động vật' type="number"/>
+                                <Input suffix="kg" placeholder='Nhập cân nặng động vật' type="number"/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -532,7 +538,7 @@ const SpaServiceDetail = () => {
                                 label="Tuổi"
                                 rules={[{ required: true, message: 'Vui lòng nhập tuổi thú cưng!' }]}
                             >
-                                <Input placeholder='Nhập tuổi động vật' type="number"/>
+                                <Input suffix="tuổi" placeholder='Nhập tuổi động vật' type="number"/>
                             </Form.Item>
                         </Col>
                     </Row>

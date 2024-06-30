@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, Spin, message, Modal, Input } from "antd";
+import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 const { confirm } = Modal;
 const { Search } = Input
 
@@ -16,7 +16,9 @@ const OrderList = () => {
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
+  const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
+  const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -78,6 +80,22 @@ const OrderList = () => {
     fetchOrderHistory();
   }, [sortOrder]);
 
+  useEffect(() => {
+    // Filter spaBookings based on searchQuery and selectedDate
+    let filteredData = orders.filter(booking =>
+      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.phone.includes(searchQuery)
+    );
+
+    if (selectedDate) {
+      filteredData = filteredData.filter(booking =>
+        moment(booking.date).isSame(selectedDate, 'day')
+      );
+    }
+
+    setFilteredOrderByDate(filteredData);
+  }, [searchQuery, orders, selectedDate]);
+
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
   };
@@ -86,6 +104,7 @@ const OrderList = () => {
     confirm({
       title: t('inform_update'),
       content: `Change status to "${newStatus}"?`,
+      confirmLoading: confirmLoading, // Pass confirmLoading state to modal
       onOk() {
         handleUpdateStatus(orderId, newStatus);
       },
@@ -96,6 +115,7 @@ const OrderList = () => {
   };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
+    setConfirmLoading(true); // Set confirm loading state to true
     const token = localStorage.getItem('token');
     try {
       await axios.put(
@@ -111,7 +131,9 @@ const OrderList = () => {
       fetchOrderHistory(); // Refresh order list after update
     } catch (error) {
       console.error('Error updating order status:', error);
-      message.error(t('failed_updated'));
+      message.error('Failed to update order status');
+    } finally {
+      setConfirmLoading(false); // Reset confirm loading state
     }
   };
 
@@ -135,17 +157,17 @@ const OrderList = () => {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')}>
+              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
                 {t('delivering')}
               </Button>
-              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')}>
+              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
                 {t('cancel')}
               </Button>
             </div>
           );
         case 'Delivering':
           return (
-            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')}>
+            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')} disabled={confirmLoading}>
               {t('delivered')}
             </Button>
           );
@@ -207,30 +229,44 @@ const OrderList = () => {
     },
   ].filter(col => col.key !== 'updateStatus' || role === 'Sales Staff'); // Filter out 'updateStatus' column if not Sales Staff
 
-  const filteredOrders = orders.filter(order =>
-    order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.phone.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleDateChange = (date) => {
+    if (date) {
+      setSelectedDate(date.toDate());
+    } else {
+      setSelectedDate(null);
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <h2 className="text-5xl text-center font-semibold mb-4">{t('ordered_list')}</h2>
-          <Layout className="flex flex-row justify-between">
-            <Button onClick={handleSortOrder} className="mb-4">
+          <Title className="text-5xl text-center font-semibold">{t('ordered_list')}</Title>
+          <Layout className="flex lg:flex-row sm:flex-col justify-between mb-4 mt-10">
+            <Button onClick={handleSortOrder} style={{ width: 170 }}>
               {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
+            <div>
+              <Text>Lọc theo ngày tạo đơn: </Text>
+              <DatePicker
+                onChange={handleDateChange}
+                style={{ width: 200 }}
+              />
+            </div>
             <Search
               placeholder="Search by customer name or phone"
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ marginBottom: 16, width: 300 }}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 300 }}
             />
           </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={filteredOrders}
+              dataSource={filteredOrderByDate}
               scroll={{ x: 'max-content' }}
               rowKey="id"
             />

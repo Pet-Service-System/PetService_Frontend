@@ -281,11 +281,13 @@ const ProductList = () => {
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>Product for cats</Title>
-      <Search
-        placeholder="Search by product name"
-        onChange={(e) => handleSearch(e.target.value)}
-        style={{ marginBottom: 16, width: 300 }}
-      />
+      <div className="flex flex-row justify-end">
+        <Search
+          placeholder="Search by product name"
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ marginBottom: 16, width: 300 }}
+        />
+      </div>
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -364,7 +366,7 @@ const ProductList = () => {
               rules={[{ required: true, message: 'Please enter the product price!' }]}
               className="mb-4"
             >
-              <Input placeholder="Price" className="w-full p-2 border border-gray-300 rounded" />
+              <Input type='number' placeholder="Price" className="w-full p-2 border border-gray-300 rounded" />
             </Form.Item>
             <Form.Item
               name="Description"

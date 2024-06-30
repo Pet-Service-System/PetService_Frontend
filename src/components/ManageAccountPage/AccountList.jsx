@@ -14,6 +14,9 @@ const AccountList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false); // State to track save button loading
   const { t } = useTranslation();
+  const [searchText, setSearchText] = useState(''); // State for search query
+  const [filterRole, setFilterRole] = useState(null); // State for role filter
+  const [filterStatus, setFilterStatus] = useState(null); // State for status filter
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -90,7 +93,21 @@ const AccountList = () => {
       } else {
         message.error(t('account_updated_successfully'));
       }
-    } 
+    } finally {
+      setSaveLoading(false); // Reset save loading state
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearchText(value); // Update search text state
+  };
+
+  const handleRoleFilter = (value) => {
+    setFilterRole(value); // Update role filter state
+  };
+
+  const handleStatusFilter = (value) => {
+    setFilterStatus(value); // Update status filter state
   };
 
   const columns = [
@@ -118,16 +135,21 @@ const AccountList = () => {
       title: t('role'),
       dataIndex: 'role',
       key: 'role',
+      filteredValue: filterRole ? [filterRole] : null,
+      onFilter: (value, record) => record.role.includes(value),
+      render: (text) => text,
     },
     {
       title: t('status'),
       dataIndex: 'status',
       key: 'status',
+      filteredValue: filterStatus !== null && filterStatus !== undefined ? [filterStatus.toString()] : null, // Kiểm tra filterStatus trước khi sử dụng
+      onFilter: (value, record) => filterStatus === null || filterStatus === undefined || record.status === parseInt(value), // Xử lý trường hợp filterStatus không tồn tại
       render: (status) => (
         <span style={{ color: status === 1 ? 'green' : 'red' }}>
           {status === 1 ? 'Active' : 'Inactive'}
         </span>
-      ), // Display 'Active' or 'Inactive'
+      ),
     },
     {
       title: t('actions'),
@@ -143,28 +165,103 @@ const AccountList = () => {
     },
   ];
 
+  // Filter data based on search query
+  let filteredData = accountData.filter(account =>
+    account.fullname.toLowerCase().includes(searchText.toLowerCase()) ||
+    account.email.toLowerCase().includes(searchText.toLowerCase()) ||
+    account.phone.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // Apply role filter if selected
+  if (filterRole) {
+    filteredData = filteredData.filter(account => account.role === filterRole);
+  }
+
+  // Apply status filter if selected
+  if (filterStatus !== null && filterStatus !== undefined) {
+    filteredData = filteredData.filter(account => account.status === filterStatus);
+  }
+
   return (
     <div className="p-4 sm:p-8">
-      <Title level={2}>{t('account_list')}</Title>
-      <Form form={form}>
-        <Table
-          dataSource={loading ? [] : accountData}
-          columns={columns}
-          bordered
-          rowKey="account_id"
-          pagination={false}
-          loading={loading}
-          scroll={{ x: 'max-content' }}
+      <Title level={2} className="text-center">Account List</Title>
+      <div className='flex flex-row justify-end items-center'>
+        <Input.Search
+            placeholder="Search by fullname, email, or phone"
+            allowClear
+            onChange={(e) => handleSearch(e.target.value)} // Handle search on change
+            style={{ width: 250, marginRight: 8 }} // Adjust width as per your requirement
+          />
+        <Select
+            placeholder="Filter by Role"
+            allowClear
+            style={{ width: 130, marginRight: 8 }}
+            onChange={handleRoleFilter}
+          >
+            <Option value="Customer">Customer</Option>
+            <Option value="Sales Staff">Sales Staff</Option>
+            <Option value="Caretaker Staff">Caretaker Staff</Option>
+            <Option value="Store Manager">Store Manager</Option>
+            <Option value="Administrator">Administrator</Option>
+          </Select>
+          <Select
+            placeholder="Filter by Status"
+            allowClear
+            style={{ width: 135 }}
+            onChange={handleStatusFilter}
+          >
+            <Option value={1}>Active</Option>
+            <Option value={0}>Inactive</Option>
+          </Select>
+      </div>
+      {/* <div className='flex flex-row justify-between items-center mb-4'>
+        <Input.Search
+          placeholder="Search by fullname, email, or phone"
+          allowClear
+          onChange={(e) => handleSearch(e.target.value)} // Handle search on change
+          style={{ width: 250 }} // Adjust width as per your requirement
         />
-        {loading && <Skeleton active />}
-      </Form>
+      <div>
+          <Select
+            placeholder="Filter by Role"
+            allowClear
+            style={{ width: 150, marginRight: 8 }}
+            onChange={handleRoleFilter}
+          >
+            <Option value="Customer">Customer</Option>
+            <Option value="Sales Staff">Sales Staff</Option>
+            <Option value="Caretaker Staff">Caretaker Staff</Option>
+            <Option value="Store Manager">Store Manager</Option>
+            <Option value="Administrator">Administrator</Option>
+          </Select>
+          <Select
+            placeholder="Filter by Status"
+            allowClear
+            style={{ width: 150 }}
+            onChange={handleStatusFilter}
+          >
+            <Option value={1}>Active</Option>
+            <Option value={0}>Inactive</Option>
+          </Select>
+        </div>
+      </div> */}
+      <Table
+        dataSource={loading ? [] : filteredData}
+        columns={columns}
+        bordered
+        rowKey="account_id"
+        pagination={false}
+        loading={loading}
+        scroll={{ x: 'max-content' }}
+      />
+      {loading && <Skeleton active />}
 
       <Modal
         title="Edit Account"
         visible={isModalVisible}
         onCancel={handleCancelEdit}
         footer={[
-          <Button key="cancel" onClick={handleCancelEdit}>{t('cancel')}</Button>,
+          <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
         ]}
       >

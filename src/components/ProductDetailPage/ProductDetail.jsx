@@ -14,7 +14,7 @@ const ProductDetail = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
     const [comments, setComments] = useState([]);
-    const [quantity, setQuantity] = useState(1);
+    const [Quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
@@ -66,14 +66,14 @@ const ProductDetail = () => {
     }, [id]);
 
     const handleIncrease = () => {
-        if (quantity < productData.Quantity) {
-            setQuantity(quantity + 1);
+        if (Quantity < productData.Quantity) {
+            setQuantity(Quantity + 1);
         } else {
             message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
         }
     };
     
-    const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
+    const handleDecrease = () => setQuantity(Quantity > 1 ? Quantity - 1 : 1);
 
     const handleOrderNow = async () => {
         if (!localStorage.getItem('user')) {
@@ -81,12 +81,12 @@ const ProductDetail = () => {
             return;
         }
         if (productData) {
-            if (quantity > productData.Quantity) {
+            if (Quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
                 return;
             }
     
-            const productWithQuantity = { ...productData, quantity };
+            const productWithQuantity = { ...productData, Quantity };
             await handleAddItem(productWithQuantity);
             const totalAmount = productData.Price;
             localStorage.setItem('totalAmount', totalAmount.toFixed(2));
@@ -102,12 +102,12 @@ const ProductDetail = () => {
             return;
         }
         if (productData) {
-            if (quantity > productData.Quantity) {
+            if (Quantity > productData.Quantity) {
                 message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
                 return;
             }
     
-            const productWithQuantity = { ...productData, quantity };
+            const productWithQuantity = { ...productData, Quantity };
             handleAddItem(productWithQuantity);
             message.success('Product added to cart successfully');
         }
@@ -280,7 +280,7 @@ const ProductDetail = () => {
                                 <div className="flex items-center mb-6 p-14">
                                     <Button onClick={handleDecrease}>-</Button>
                                     <Input
-                                        value={quantity}
+                                        value={Quantity}
                                         onChange={(e) => handleChangeQuantity(e.target.value)}
                                         className="mx-3 text-lg w-24 text-center"
                                         type="number"
