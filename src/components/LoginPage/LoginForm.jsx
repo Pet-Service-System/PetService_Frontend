@@ -12,7 +12,6 @@ const { Title } = Typography;
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [disableLogin, setDisableLogin] = useState(false);
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ const LoginForm = () => {
     if (disableLogin) {
       timer = setTimeout(() => {
         setDisableLogin(false);
-      }, 2000);
+      }, 1000);
     }
     return () => clearTimeout(timer);
   }, [disableLogin]);
@@ -37,11 +36,21 @@ const LoginForm = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email is invalid';
+    }
+  
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+  
     return newErrors;
   };
-
+  
   const handleSubmit = async () => {
     if (disableLogin) return;
     const validationErrors = validate();
@@ -79,8 +88,6 @@ const LoginForm = () => {
       } finally {
         setIsLoading(false);
       }
-    } else {
-      setErrors(validationErrors);
     }
   };
 
@@ -133,11 +140,14 @@ const LoginForm = () => {
           <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
             <Title level={3} className="text-blue-500 text-center">Login</Title>
             <Form onFinish={handleSubmit} layout="vertical">
-              <Form.Item
+            <Form.Item
                 label="Email"
                 name="email"
-                validateStatus={errors.email && 'error'}
-                help={errors.email}
+                validateTrigger="onSubmit"
+                rules={[
+                  { required: true, message: 'Please enter your email' },
+                  { type: 'email', message: 'Please enter a valid email' }
+                ]}
               >
                 <Input
                   type="email"
@@ -150,8 +160,11 @@ const LoginForm = () => {
               <Form.Item
                 label="Password"
                 name="password"
-                validateStatus={errors.password && 'error'}
-                help={errors.password}
+                validateTrigger="onSubmit"
+                rules={[
+                  { required: true, message: 'Please enter your password' },
+                  { min: 8, message: 'Password must be at least 8 characters' }
+                ]}
               >
                 <Input.Password
                   value={password}

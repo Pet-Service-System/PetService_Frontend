@@ -13,7 +13,11 @@ const ForgotPasswordForm = () => {
   
   const validate = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email là bắt buộc';
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email is invalid';
+    }
     return newErrors;
   };
   const validationErrors = validate();

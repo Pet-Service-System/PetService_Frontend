@@ -1,4 +1,4 @@
-import { Button, Form, Input, Typography, Row, Col, message } from 'antd'; // Import message từ antd
+import { Button, Form, Input, Typography, Row, Col, message } from 'antd';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,34 +13,28 @@ const RegisterForm = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Đăng ký
-  const [disableRegister, setDisableRegister] = useState(false); // State để điều khiển việc vô hiệu hóa nút Đăng ký
+  const [isLoading, setIsLoading] = useState(false);
+  const [disableRegister, setDisableRegister] = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
     const newErrors = {};
-    if (!fullname) newErrors.fullname = 'Fullname is required';
-    //Validate Information
-    // if (!formData.fullname) {
-    //   newErrors.fullname = 'Họ và tên là bắt buộc';
-    // } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
-    //   newErrors.fullname = 'Họ và tên không được chứa ký tự đặc biệt';
-    // }
-    if (!email) newErrors.email = 'Email is required';
-    // if (!formData.email) {
-    //   newErrors.email = 'Email là bắt buộc';
-    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    //   newErrors.email = 'Email không hợp lệ';
-    // }
-    if (!password) newErrors.password = 'Password is required';
-    if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
-    if (!phoneNumber) newErrors.phoneNumber = 'Phone number is required';
-    // if (!formData.phoneNumber) {
-    //   newErrors.phone = 'Số điện thoại là bắt buộc';
-    // } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
-    //   newErrors.phone = 'Số điện thoại phải chứa đúng 10 chữ số';
-    // }
-    if (!address) newErrors.address = 'Address is required';
+    if (!fullname) newErrors.fullname = 'Họ và tên là bắt buộc';
+    if (!email) newErrors.email = 'Email là bắt buộc';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Email không hợp lệ';
+    }
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
+    if (password !== confirmPassword) newErrors.confirmPassword = 'Mật khẩu không khớp';
+    if (!phoneNumber) newErrors.phoneNumber = 'Số điện thoại là bắt buộc';
+    else if (!/^\d{10}$/.test(phoneNumber)) {
+      newErrors.phoneNumber = 'Số điện thoại phải có 10 chữ số';
+    }
+    if (!address) newErrors.address = 'Địa chỉ là bắt buộc';
     return newErrors;
   };
 
@@ -56,37 +50,36 @@ const RegisterForm = () => {
   }, [disableRegister]);
 
   const handleSubmit = async () => {
-    if (disableRegister) return; // Nếu đang trong quá trình vô hiệu hóa, không thực hiện gì
+    if (disableRegister) return;
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
-        setIsLoading(true); // Vô hiệu hóa nút Đăng ký
+        setIsLoading(true);
         const response = await axios.post('http://localhost:3001/api/auth/register', {
-          fullname: fullname,
-          password: password,
-          email: email,
+          fullname,
+          password,
+          email,
           phone: phoneNumber,
-          address: address,
-          status: 'active', // Assuming default status is 'active'
-          role: 'Customer', // Assuming default role is 'customer'
+          address,
+          status: 'active',
+          role: 'Customer',
         });
 
-        // Hiển thị thông báo thành công và chuyển trang sau 2 giây
-        message.success('Registration successful', 2).then(() => {
+        message.success('Đăng ký thành công', 2).then(() => {
           navigate('/login');
         });
         setDisableRegister(true);
-        console.log('Registration successful', response.data);
+        console.log('Đăng ký thành công', response.data);
       } catch (error) {
         if (error.response) {
           message.error(error.response.data.message);
         } else {
-          message.error('An error occurred');
+          message.error('Đã xảy ra lỗi');
         }
-        setDisableRegister(true); // Bắt đầu quá trình vô hiệu hóa nút Đăng ký
+        setDisableRegister(true);
       } finally {
-        setIsLoading(false); // Enable lại nút Đăng ký
+        setIsLoading(false);
       }
     } else {
       setErrors(validationErrors);
@@ -95,15 +88,16 @@ const RegisterForm = () => {
 
   return (
     <Row justify="center" style={{ minHeight: '100vh', alignItems: 'center' }}>
-      <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10 py-10'>
+      <Col xs={24} sm={20} md={16} lg={12} xl={8} className="px-10 py-10">
         <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
-          <Title level={3} className="text-blue-500 text-center mb-4">Đăng kí</Title>
+          <Title level={3} className="text-blue-500 text-center mb-4">Đăng ký</Title>
           <Form onFinish={handleSubmit} layout="vertical">
             <Form.Item
               label="Họ và tên"
               name="fullname"
               validateStatus={errors.fullname && 'error'}
               help={errors.fullname}
+              rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
             >
               <Input
                 value={fullname}
@@ -114,6 +108,7 @@ const RegisterForm = () => {
             <Form.Item
               label="Email"
               name="email"
+              rules={[{ required: true, message: 'Email là bắt buộc' }]}
               validateStatus={errors.email && 'error'}
               help={errors.email}
             >
@@ -121,8 +116,6 @@ const RegisterForm = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                name="email"
-                autoComplete="email"
               />
             </Form.Item>
             <Form.Item
@@ -130,6 +123,7 @@ const RegisterForm = () => {
               name="password"
               validateStatus={errors.password && 'error'}
               help={errors.password}
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
             >
               <Input.Password
                 value={password}
@@ -142,6 +136,7 @@ const RegisterForm = () => {
               name="confirmPassword"
               validateStatus={errors.confirmPassword && 'error'}
               help={errors.confirmPassword}
+              rules={[{ required: true, message: 'Vui lòng xác nhận mật khẩu' }]}
             >
               <Input.Password
                 value={confirmPassword}
@@ -154,6 +149,7 @@ const RegisterForm = () => {
               name="phoneNumber"
               validateStatus={errors.phoneNumber && 'error'}
               help={errors.phoneNumber}
+              rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
             >
               <Input
                 value={phoneNumber}
@@ -166,6 +162,7 @@ const RegisterForm = () => {
               name="address"
               validateStatus={errors.address && 'error'}
               help={errors.address}
+              rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
             >
               <Input
                 value={address}
@@ -176,7 +173,7 @@ const RegisterForm = () => {
             <Form.Item>
               <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableRegister}>
                 {disableRegister ? 'Đang đăng ký...' : 'Đăng ký'}
-              </Button> {/* Sử dụng disableLogin để vô hiệu hóa nút */}
+              </Button>
             </Form.Item>
           </Form>
           <div className="text-center mt-4">
