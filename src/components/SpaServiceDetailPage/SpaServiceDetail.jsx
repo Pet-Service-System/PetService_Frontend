@@ -529,7 +529,7 @@ const SpaServiceDetail = () => {
                                 label="Cân nặng"
                                 rules={[{ required: true, message: 'Vui lòng nhập cân nặng thú cưng!' }]}
                             >
-                                <Input placeholder='Nhập cân nặng động vật' type="number"/>
+                                <Input suffix="kg" placeholder='Nhập cân nặng động vật' type="number"/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -538,7 +538,7 @@ const SpaServiceDetail = () => {
                                 label="Tuổi"
                                 rules={[{ required: true, message: 'Vui lòng nhập tuổi thú cưng!' }]}
                             >
-                                <Input placeholder='Nhập tuổi động vật' type="number"/>
+                                <Input suffix="tuổi" placeholder='Nhập tuổi động vật' type="number"/>
                             </Form.Item>
                         </Col>
                     </Row>
