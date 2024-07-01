@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal, Spin, Grid } from 'antd';
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios'; // Import axios for making API calls
+import { useTranslation } from 'react-i18next';
+
+
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
@@ -24,6 +27,7 @@ const PetList = () => {
   const user = JSON.parse(localStorage.getItem('user'));
   const accountID = user.id;
   const screens = useBreakpoint();
+  const { t } = useTranslation();
 
   const fetchPets = async () => {
     setLoading(true);
@@ -59,7 +63,7 @@ const PetList = () => {
     });
     setIsEditModalVisible(true);
   };
-  
+
   const handleSavePet = async () => {
     setOperationLoading(true);
     try {
@@ -70,13 +74,13 @@ const PetList = () => {
         ...values,
       };
       console.log('Updating pet with data:', petUpdateData);
-  
+
       await axios.patch(`http://localhost:3001/api/pets/${editPetId}`, petUpdateData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       setPets((prevPets) =>
         prevPets.map((pet) => (pet.PetID === editPetId ? { ...pet, ...values } : pet))
       );
@@ -101,7 +105,7 @@ const PetList = () => {
   const handleCancelDelete = () => {
     setConfirmDeletePetId(null); // Reset confirm delete pet id
   };
-  
+
   const handleDeleteButtonClick = (id) => {
     setConfirmDeletePetId(id);
   };
@@ -133,7 +137,7 @@ const PetList = () => {
       const token = localStorage.getItem('token');
 
       const newPet = { ...values, AccountID: accountID };
-      console.log(newPet); 
+      console.log(newPet);
 
       const response = await axios.post(
         'http://localhost:3001/api/pets',
@@ -157,27 +161,27 @@ const PetList = () => {
   };
 
   const columns = [
-    { title: 'Tên', dataIndex: 'PetName', key: 'PetName' },
+    { title: t('name'), dataIndex: 'PetName', key: 'PetName' },
     {
-      title: 'Loại thú cưng',
+      title: t('pet_type'),
       dataIndex: 'PetTypeID',
       key: 'PetTypeID',
-      render: (text) => (text === 'PT001' ? 'Chó' : text === 'PT002' ? 'Mèo' : text),
+      render: (text) => (text === 'PT001' ? t('dog') : text === 'PT002' ? t('cat') : text),
     },
-    { title: 'Giới tính', dataIndex: 'Gender', key: 'Gender' },
-    { title: 'Trạng thái', dataIndex: 'Status', key: 'Status' },
-    { title: 'Cân nặng', dataIndex: 'Weight', key: 'Weight' },
-    { title: 'Tuổi', dataIndex: 'Age', key: 'Age' },
+    { title: t('gender'), dataIndex: 'Gender', key: 'Gender' },
+    { title: t('status'), dataIndex: 'Status', key: 'Status' },
+    { title: t('weight'), dataIndex: 'Weight', key: 'Weight' },
+    { title: t('age'), dataIndex: 'Age', key: 'Age' },
     {
-      title: 'Hành động',
+      title: t('actions'),
       key: 'action',
       render: (_, record) => (
         <>
           <Button type="primary" onClick={() => handleUpdatePet(record)} className="mr-2" loading={operationLoading}>
-            Cập nhật
+            {t('update')}
           </Button>
           <Button danger onClick={() => handleDeleteButtonClick(record.PetID)} loading={operationLoading}>
-            Xóa
+            {t('delete')}
           </Button>
         </>
       ),
@@ -189,8 +193,8 @@ const PetList = () => {
     localStorage.removeItem('role');
     localStorage.removeItem('account_id');
     localStorage.removeItem('fullname');
-    localStorage.removeItem('email'); 
-    localStorage.removeItem('user'); 
+    localStorage.removeItem('email');
+    localStorage.removeItem('user');
     setRole('Guest');
     navigate('/');
     window.location.reload();
@@ -207,7 +211,7 @@ const PetList = () => {
               icon={<UserOutlined />}
               onClick={() => navigate('/user-profile')}
             >
-              Thông tin người dùng
+              {t('user_information')}
             </Menu.Item>
             {role === 'Customer' && (
               <>
@@ -216,24 +220,24 @@ const PetList = () => {
                   icon={<UnorderedListOutlined />}
                   onClick={() => navigate('/pet-list')}
                 >
-                  Danh sách thú cưng
+                  {t('list_of_pets')}
                 </Menu.Item>
                 <Menu.Item
                   key="order-history"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate('/order-history')}
                 >
-                  Lịch sử đặt hàng
+                  {t('order_history')}
                 </Menu.Item>
-                <Menu.Item key="spa-booking" 
-                           onClick={() => navigate('/spa-booking')}
-                           icon={<HistoryOutlined />}>
-                    Lịch sử dịch vụ
+                <Menu.Item key="spa-booking"
+                  onClick={() => navigate('/spa-booking')}
+                  icon={<HistoryOutlined />}>
+                  {t('service_history')}
                 </Menu.Item>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Đăng xuất
+              {t('log_out')}
             </Menu.Item>
           </Menu>
         </Sider>
@@ -242,7 +246,7 @@ const PetList = () => {
         <Content className="m-4 p-6 bg-white">
           <div className="flex flex-col items-center">
             <Title level={2} className="my-4">
-              Danh sách thú cưng
+              {t('list_of_pets')}
             </Title>
             {loading ? (
               <Spin size="large" />
@@ -253,36 +257,36 @@ const PetList = () => {
             )}
             <div className="flex justify-end w-full mt-4">
               <Button type="primary" onClick={() => setIsAddModalVisible(true)} loading={operationLoading}>
-                Thêm thú cưng
+                {t('add_pet')}
               </Button>
             </div>
           </div>
           {/* Add Pet */}
           <Modal
-            title="Thêm thú cưng"
+            title={t('add_pet')}
             visible={isAddModalVisible}
             onCancel={() => setIsAddModalVisible(false)}
             footer={[
               <Button key="back" onClick={() => setIsAddModalVisible(false)}>
-                Hủy
+                {t('cancel')}
               </Button>,
               <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
-                Thêm
+                {t('add')}
               </Button>,
             ]}
           >
             <Form form={form} layout="vertical">
-              <Form.Item name="PetName" rules={[{ required: true, message: 'Tên không được để trống' }]}>
-                <Input placeholder="Tên" />
+              <Form.Item name="PetName" rules={[{ required: true, message: t('name') + t('can_not_blank') }]}>
+                <Input placeholder={t('name')} />
               </Form.Item>
-              <Form.Item name="PetTypeID" rules={[{ required: true, message: 'Loại thú cưng không được để trống' }]}>
-                <Select placeholder="Chọn loại thú cưng">
-                  <Option value="PT001">Chó</Option>
-                  <Option value="PT002">Mèo</Option>
+              <Form.Item name="PetTypeID" rules={[{ required: true, message: t('pet_type') + t('can_not_blank') }]}>
+                <Select placeholder={t('choose_pet_type')}>
+                  <Option value="PT001">{t('dog')}</Option>
+                  <Option value="PT002">{t('cat')}</Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="Gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
-                <Select placeholder="Chọn giới tính">
+              <Form.Item name="Gender" rules={[{ required: true, message: t('gender') + t('can_not_blank') }]}>
+                <Select placeholder={t('choose_gender')}>
                   {genders.map((gender, index) => (
                     <Option key={index} value={gender}>
                       {gender}
@@ -290,38 +294,38 @@ const PetList = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
-                <Input placeholder="Trạng thái" />
+              <Form.Item name="Status" rules={[{ required: true, message: t('status') + t('can_not_blank') }]}>
+                <Input placeholder={t('status')} />
               </Form.Item>
-              <Form.Item name="Weight" rules={[{ required: true, message: 'Cân nặng không được để trống' }]}>
-                <Input suffix="kg" placeholder="Cân nặng" type="number" />
+              <Form.Item name="Weight" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
+                <Input placeholder={t('weight')} type="number" />
               </Form.Item>
-              <Form.Item name="Age" rules={[{ required: true, message: 'Tuổi không được để trống' }]}>
-                <Input suffix="tuổi" placeholder="Tuổi" type="number" />
+              <Form.Item name="Age" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
+                <Input placeholder={t('age')} type="number" />
               </Form.Item>
             </Form>
           </Modal>
 
           <Modal
-            title="Xác nhận xóa thú cưng"
+            title={t('cofirm_delete')}
             visible={confirmDeletePetId !== null}
             onOk={handleConfirmDelete}
             onCancel={handleCancelDelete}
             confirmLoading={operationLoading}
           >
-            <p>Bạn có chắc chắn muốn xóa thú cưng này?</p>
+            <p>{t('delete_pet_ask')}</p>
           </Modal>
 
           <Modal
-            title="Cập nhật thú cưng"
+            title={t('pet_update')}
             visible={isEditModalVisible}
             onCancel={() => setIsEditModalVisible(false)}
             footer={[
               <Button key="back" onClick={() => setIsEditModalVisible(false)}>
-                Hủy
+                {t('cancel')}
               </Button>,
               <Button key="submit" type="primary" onClick={handleSavePet} loading={operationLoading}>
-                Lưu
+                {t('save')}
               </Button>,
             ]}
           >
@@ -329,17 +333,17 @@ const PetList = () => {
               <Form.Item name="PetID" hidden>
                 <Input type="hidden" />
               </Form.Item>
-              <Form.Item name="PetName" rules={[{ required: true, message: 'Tên không được để trống' }]}>
-                <Input placeholder="Tên" />
+              <Form.Item name="PetName" rules={[{ required: true, message: t('name') + t('can_not_blank') }]}>
+                <Input placeholder={t('name')} />
               </Form.Item>
-              <Form.Item name="PetTypeID" rules={[{ required: true, message: 'Loại thú cưng không được để trống' }]}>
-                <Select placeholder="Chọn loại thú cưng">
-                  <Option value="PT001">Chó</Option>
-                  <Option value="PT002">Mèo</Option>
+              <Form.Item name="PetTypeID" rules={[{ required: true, message: t('pet_type') + t('can_not_blank') }]}>
+                <Select placeholder={t('choose_pet_type')}>
+                  <Option value="PT001">{t('dog')}</Option>
+                  <Option value="PT002">{t('cat')}</Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="Gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
-                <Select placeholder="Chọn giới tính">
+              <Form.Item name="Gender" rules={[{ required: true, message: t('gender') + t('can_not_blank') }]}>
+                <Select placeholder={t('choose_gender')}>
                   {genders.map((gender, index) => (
                     <Option key={index} value={gender}>
                       {gender}
@@ -347,14 +351,14 @@ const PetList = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
-                <Input placeholder="Trạng thái" />
+              <Form.Item name="Status" rules={[{ required: true, message: t('status') + t('can_not_blank') }]}>
+                <Input placeholder={t('status')} />
               </Form.Item>
-              <Form.Item name="Weight" rules={[{ required: true, message: 'Cân nặng không được để trống' }]}>
-                <Input suffix="kg" placeholder="Cân nặng" type="number" />
+              <Form.Item name="Weight" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
+                <Input placeholder={t('weight')} type="number" />
               </Form.Item>
-              <Form.Item name="Age" rules={[{ required: true, message: 'Tuổi không được để trống' }]}>
-                <Input suffix="tuổi" placeholder="Tuổi" type="number" />
+              <Form.Item name="Age" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
+                <Input placeholder={t('age')} type="number" />
               </Form.Item>
             </Form>
           </Modal>

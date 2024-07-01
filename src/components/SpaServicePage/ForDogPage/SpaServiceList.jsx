@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
@@ -21,6 +22,7 @@ const SpaServiceList = () => {
   const navigate = useNavigate();
   const [filteredServices, setfilteredServices] = useState([]); // State for filtered data
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -65,7 +67,7 @@ const SpaServiceList = () => {
       setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('auth_error'));
         return;
       }
 
@@ -79,10 +81,10 @@ const SpaServiceList = () => {
       if (serviceImg) {
         formData.append('image', serviceImg);
       } else {
-        message.error('Please upload the service image!');
+        message.error(t('image_error'));
         return;
       }
-      message.warning('Processing...');
+      message.warning(t('processing'));
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
@@ -94,26 +96,26 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 201) {
-        message.success('Service added successfully', 0.5).then(() => {
+        message.success(t('add_success')).then(() => {
           window.location.reload();
         });
       } else {
-        message.error('Failed to add service: Unexpected server response');
+        message.error(t('add_fail'));
       }
     } catch (error) {
       console.error('Error adding service:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error('Unauthorized. Please log in.');
+          message.error(t('unauthorized'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`Error adding service: ${error.response.data.message}`);
+          message.error(`${t('add_error')}: ${error.response.data.message}`);
         } else {
-          message.error('Error adding service');
+          message.error(t('add_error'));
         }
       } else if (error.request) {
-        message.error('Error adding service: Network or server issue');
+        message.error(t('network_error'));
       } else {
-        message.error(`Error adding service: ${error.message}`);
+        message.error(`${t('add_error')}: ${error.message}`);
       }
     } finally {
       setSaving(false); // End saving
@@ -142,7 +144,7 @@ const SpaServiceList = () => {
       setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('auth_error'));
         return;
       }
 
@@ -158,7 +160,7 @@ const SpaServiceList = () => {
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
-      message.warning('Processing...');
+      message.warning(t('processing'));
       const response = await axios.patch(`http://localhost:3001/api/services/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -167,26 +169,26 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 200) {
-        message.success('Service updated successfully', 0.5).then(() => {
+        message.success(t('update_success')).then(() => {
           window.location.reload();
         });
       } else {
-        message.error('Failed to update service: Unexpected server response');
+        message.error(t('update_fail'));
       }
     } catch (error) {
       console.error('Error updating service:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error('Unauthorized. Please log in.');
+          message.error(t('unauthorized'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`Error updating service: ${error.response.data.message}`);
+          message.error(`${t('update_error')}: ${error.response.data.message}`);
         } else {
-          message.error('Error updating service');
+          message.error(t('update_error'));
         }
       } else if (error.request) {
-        message.error('Error updating service: Network or server issue');
+        message.error(t('network_error'));
       } else {
-        message.error(`Error updating service: ${error.message}`);
+        message.error(`${t('update_error')}: ${error.message}`);
       }
     } finally {
       setSaving(false); // End saving
@@ -203,7 +205,7 @@ const SpaServiceList = () => {
 
   const columns = [
     {
-      title: 'Service ID',
+      title: t('service_id'),
       dataIndex: 'ServiceID',
       key: 'ServiceID',
       render: (text, record) => (
@@ -213,7 +215,7 @@ const SpaServiceList = () => {
       ),
     },
     {
-      title: 'Service Name',
+      title: t('service_name'),
       dataIndex: 'ServiceName',
       key: 'ServiceName',
       render: (text, record) => (
@@ -231,7 +233,7 @@ const SpaServiceList = () => {
     //   ),
     // },
     {
-      title: 'Description',
+      title: t('description'),
       dataIndex: 'Description',
       key: 'Description',
       ellipsis: true, // Enable ellipsis if description is too long
@@ -242,7 +244,7 @@ const SpaServiceList = () => {
       ),
     },
     {
-      title: 'Image URL',
+      title: t('image_url'),
       dataIndex: 'ImageURL',
       key: 'ImageURL',
       render: (text, record) => (
@@ -250,7 +252,7 @@ const SpaServiceList = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'Status',
       key: 'Status',
       render: (text) => (
@@ -260,7 +262,7 @@ const SpaServiceList = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (_, record) => (
         userRole === 'Store Manager' && (
@@ -278,10 +280,10 @@ const SpaServiceList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className="text-center">Services for Dogs</Title>
+      <Title level={1} className="text-center">{t('service_for_dog')}</Title>
       <div className="flex flex-row justify-end">
         <Search
-          placeholder="Search by service name"
+          placeholder={t('search_by_service_name')}
           onChange={(e) => handleSearch(e.target.value)}
           style={{ marginBottom: 16, width: 300 }}
         />
@@ -351,24 +353,24 @@ const SpaServiceList = () => {
         <Form form={form} className="text-left" layout='vertical'>
           <Form.Item
             name="ServiceName"
-            label="Service Name"
-            rules={[{ required: true, message: 'Please enter the service name!' }]}
+            label={t('service_name')}
+            rules={[{ required: true, message: t('enter_service_name') }]}
             className="mb-4"
           >
-            <Input placeholder="Service Name" className="w-full p-2 border border-gray-300 rounded" />
+            <Input placeholder={t('ervice_name')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Description"
-            label="Description"
-            rules={[{ required: true, message: 'Please enter the service description' }]}
+            label={t('description')}
+            rules={[{ required: true, message: t('enter_service_description') }]}
             className="mb-4"
           >
-            <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
+            <TextArea rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
-            label="Image"
-            rules={[{ required: true, message: 'Please upload the service image!' }]}
+            label={t('image')}
+            rules={[{ required: true, message: t('upload_service_image') }]}
             className="mb-4"
           >
             <Input type="file" onChange={handleServiceImageUpload} className="w-full p-2 border border-gray-300 rounded" />
@@ -378,13 +380,13 @@ const SpaServiceList = () => {
           </Form.Item>
           <Form.Item
             name="Status"
-            label="Status"
-            rules={[{ required: true, message: 'Please select the service status' }]}
+            label={t('status')}
+            rules={[{ required: true, message: t('select_service_status') }]}
             className="mb-4"
-          >
-            <Select placeholder="Select Status">
-              <Option value="Available">Available</Option>
-              <Option value="Unavailable">Unavailable</Option>
+         >
+            <Select placeholder={t('select_status')}>
+              <Option value="Available">{t('available')}</Option>
+              <Option value="Unavailable">{t('unavailable')}</Option>
             </Select>
           </Form.Item>
         </Form>

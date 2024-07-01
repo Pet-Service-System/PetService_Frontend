@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
@@ -30,10 +31,11 @@ const SpaServiceDetail = () => {
     const currentDateTime = moment();
     const [saving, setSaving] = useState(false);
     const availableTimes = [
-        "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", 
-        "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", 
+        "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+        "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
         "15:00", "15:30", "16:00", "16:30"
     ];
+    const { t } = useTranslation();
 
     const handlePetSelectChange = (value) => {
         const selectedPet = pets.find(pet => pet.PetID === value);
@@ -43,9 +45,9 @@ const SpaServiceDetail = () => {
             PetName: selectedPet.PetName,
             PetGender: selectedPet.Gender,
             PetStatus: selectedPet.Status,
-            PetWeight: selectedPet.Weight, 
+            PetWeight: selectedPet.Weight,
             PetAge: selectedPet.Age,
-            PetTypeID: selectedPet.PetTypeID, 
+            PetTypeID: selectedPet.PetTypeID,
         });
     };
 
@@ -56,7 +58,7 @@ const SpaServiceDetail = () => {
             form.setFieldsValue(response.data); // Set initial form values
         } catch (error) {
             console.error('Error fetching service detail:', error);
-            message.error('Error fetching service detail');
+            message.error(t('error_fetching_service_detail'));
         }
     };
 
@@ -100,7 +102,7 @@ const SpaServiceDetail = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                message.error('Authorization token not found. Please log in.');
+                message.error(t('authorization_token_not_found'));
                 return;
             }
 
@@ -119,7 +121,7 @@ const SpaServiceDetail = () => {
                 },
             });
 
-            message.success('Service updated successfully')
+            message.success(t('update_success'))
             setSaving(false)
             setEditMode(false)
             fetchServiceDetail();
@@ -128,7 +130,7 @@ const SpaServiceDetail = () => {
             if (error.response && error.response.status === 401) {
                 message.error('Unauthorized. Please log in.');
             } else {
-                message.error('Error updating service');
+                message.error(t('update_error'));
             }
             setSaving(false)
         }
@@ -163,7 +165,7 @@ const SpaServiceDetail = () => {
             setPets((prevPets) => [...prevPets, response.data]);
             setIsAddModalVisible(false);
             addPetForm.resetFields();
-            message.success('Pet added successfully');
+            message.success(t('pet_added_successfully'));
             fetchPets();
         } catch (info) {
             console.log('Validate Failed:', info);
@@ -181,21 +183,21 @@ const SpaServiceDetail = () => {
             title: 'Thông báo',
             content: (
                 <div>
-                    <p>Vui lòng đăng nhập hoặc đăng ký để mua hàng.</p>
+                    <p>{t('plz_login_or_register_to_buy')}</p>
                     <div className="flex justify-end">
                         <Button type="primary" onClick={() => {
                             navigate('/login');
                             Modal.destroyAll();
-                        }}>Đăng nhập</Button>
+                        }}>{t('log_in')}</Button>
                         <Button onClick={() => {
                             navigate('/register');
-                            Modal.destroyAll(); 
-                        }} className="ml-2">Đăng ký</Button>
+                            Modal.destroyAll();
+                        }} className="ml-2">{t('register')}</Button>
                     </div>
                 </div>
             ),
-            closable: true, 
-            maskClosable: true, 
+            closable: true,
+            maskClosable: true,
             footer: null,
         });
     };
@@ -206,13 +208,13 @@ const SpaServiceDetail = () => {
             const values = await bookingForm.validateFields();
             const token = localStorage.getItem('token');
             if (!token) {
-                message.error('Authorization token not found. Please log in.');
+                message.error(t('authorization_token_not_found'));
                 return;
             }
 
             // Validate PetTypeID
             if (values.PetTypeID !== serviceData.PetTypeID) {
-                message.error('Loại thú cưng không phù hợp với loại dịch vụ.');
+                message.error(t('pet_type_not_suitable_with_service'));
                 setOperationLoading(false);
                 return;
             }
@@ -225,7 +227,7 @@ const SpaServiceDetail = () => {
             const diffHours = bookingDateTime.diff(currentDateTime, 'hours');
 
             if (diffHours < 3) {
-                message.error('Bạn chỉ có thể đặt lịch từ 3 tiếng trở đi từ thời điểm hiện tại.');
+                message.error(t('3_hours_rule'));
                 return;
             }
 
@@ -264,18 +266,18 @@ const SpaServiceDetail = () => {
 
             // Show success notification
             notification.success({
-                message: 'Booking successful',
+                message: t('booking_success'),
                 icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
                 description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
-                onClick: () => navigate('/spa-booking'), 
+                onClick: () => navigate('/spa-booking'),
             });
-            
+
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
             setOperationLoading(false);
         } catch (error) {
             console.error('Error creating booking:', error);
-            message.error('Error creating booking');
+            message.error(t('error_create_booking'));
             setOperationLoading(false);
         }
         setOperationLoading(false);
@@ -299,7 +301,7 @@ const SpaServiceDetail = () => {
                     icon={<ArrowLeftOutlined />}
                     size="large"
                 >
-                    Quay về
+                    {t('back')}
                 </Button>
             </div>
             <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
@@ -311,8 +313,8 @@ const SpaServiceDetail = () => {
                         <Form form={form} layout="vertical">
                             <Form.Item
                                 name="ServiceName"
-                                label="Tên dịch vụ"
-                                rules={[{ required: true, message: 'Hãy nhập tên dịch vụ!' }]}
+                                label={t('service_name')}
+                                rules={[{ required: true, message: t('enter_service_name') }]}
                             >
                                 <Input disabled={!editMode} />
                             </Form.Item>
@@ -325,26 +327,26 @@ const SpaServiceDetail = () => {
                             </Form.Item> */}
                             <Form.Item
                                 name="Description"
-                                label="Mô tả"
-                                rules={[{ required: true, message: 'Hãy nhập mô tả dịch vụ!' }]}
+                                label={t('description')}
+                                rules={[{ required: true, message:  t('enter_service_description') }]}
                             >
-                                <TextArea disabled={!editMode} rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
+                                <TextArea disabled={!editMode} rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} />
                             </Form.Item>
                             <Form.Item
                                 name="ImageURL"
-                                label="Hình ảnh"
-                                rules={[{ required: true, message: 'Hãy tải hình ảnh dịch vụ!' }]}
+                                label={t('image')}
+                                rules={[{ required: true, message: t('upload_image') }]}
                             >
                                 <Input disabled={!editMode} />
                             </Form.Item>
                             <Form.Item
                                 name="Status"
-                                label="Status"
-                                rules={[{ required: true, message: 'Please select the service status!' }]}
+                                label={t('status')}
+                                rules={[{ required: true, message: t('please_select_status') }]}
                             >
-                                <Select placeholder="Select Status" disabled={!editMode}>
-                                    <Option value="Available">Available</Option>
-                                    <Option value="Unavailable">Unavailable</Option>
+                                <Select placeholder={t('select_status')} disabled={!editMode}>
+                                    <Option value="Available">{t('available')}</Option>
+                                    <Option value="Unavailable">{t('unavailable')}</Option>
                                 </Select>
                             </Form.Item>
                         </Form>
@@ -366,22 +368,22 @@ const SpaServiceDetail = () => {
                                     onClick={handleBookingNow}
                                     disabled={serviceData.Status === 'Unavailable'}
                                 >
-                                    Booking Now
+                                    {t('booking_now')}
                                 </Button>
                             </div>
                             {serviceData.Status === 'Unavailable' && (
-                                <p className="text-red-500 text-right">Dịch vụ tạm ngưng.</p>
+                                <p className="text-red-500 text-right">{t('service_unavailable')}</p>
                             )}
                         </>
                     ) : userRole === 'Store Manager' ? (
                         editMode ? (
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleSaveEdit} disabled={saving}>Lưu</Button>
-                                <Button onClick={handleCancelEdit} disabled={saving}>Hủy</Button>
+                                <Button type="primary" onClick={handleSaveEdit} disabled={saving}>{t('save')}</Button>
+                                <Button onClick={handleCancelEdit} disabled={saving}>{t('cancel')}</Button>
                             </div>
                         ) : (
                             <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleEditService}>Sửa</Button>
+                                <Button type="primary" onClick={handleEditService}>{t('edit')}</Button>
                             </div>
                         )
                     ) : null}
@@ -404,19 +406,19 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="CustomerName"
-                                label="Tên khách hàng"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên khách hàng!' }]}
+                                label={t('customer_name')}
+                                rules={[{ required: true, message: t('unavailaplz_enter_customer_nameble') }]}
                             >
-                                <Input placeholder="Nhập tên"/>
+                                <Input placeholder={t('enter_name')} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="Phone"
-                                label="Số điện thoại"
-                                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                                label={t('phone')}
+                                rules={[{ required: true, message: t('plz_enter_phone_number') }]}
                             >
-                                <Input placeholder="Nhập số điện thoại"/>
+                                <Input placeholder={t('enter_phone')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -424,8 +426,8 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="BookingDate"
-                                label="Ngày đặt"
-                                rules={[{ required: true, message: 'Vui lòng chọn ngày đặt!' }]}
+                                label={t('booking_date')}
+                                rules={[{ required: true, message: t('plz_choose_booking_date') }]}
                             >
                                 <DatePicker
                                     style={{ width: '100%' }}
@@ -444,12 +446,12 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="BookingTime"
-                                label="Khung giờ"
-                                rules={[{ required: true, message: 'Vui lòng chọn khung giờ!' }]}
+                                label={t('booking_time')}
+                                rules={[{ required: true, message: t('plz_choose_booking_time') }]}
                             >
                                 <Select
                                     style={{ width: '100%' }}
-                                    placeholder="Chọn khung giờ"
+                                    placeholder={t('choose_booking_time')}
                                 >
                                     {availableTimes.map(time => (
                                         <Select.Option key={time} value={time}>{time}</Select.Option>
@@ -462,11 +464,11 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetID"
-                                label="Thú cưng"
-                                rules={[{ required: true, message: 'Vui lòng chọn thú cưng!' }]}
+                                label={t('pet')}
+                                rules={[{ required: true, message: t('plz_choose_pet') }]}
                             >
                                 <Select
-                                    placeholder="Chọn thú cưng"
+                                    placeholder={t('choose_pet')}
                                     onChange={(value) => {
                                         if (value === "add_new_pet") {
                                             showAddPetModal();
@@ -481,7 +483,7 @@ const SpaServiceDetail = () => {
                                         </Option>
                                     ))}
                                     <Option value="add_new_pet">
-                                        <span>Thêm thú cưng</span>
+                                        <span>{t('add_pet')}</span>
                                     </Option>
                                 </Select>
                             </Form.Item>
@@ -489,12 +491,12 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetTypeID"
-                                label="Loại thú cưng"
-                                rules={[{ required: true, message: 'Vui lòng nhập loại thú cưng!' }]}
+                                label={t('pet_type')}
+                                rules={[{ required: true, message: t('plz_enter_pet_type') }]}
                             >
-                                <Select placeholder="Chọn loại động vật">
-                                    <Option value="PT001">Chó</Option>
-                                    <Option value="PT002">Mèo</Option>
+                                <Select placeholder={t('choose_pet_type')}>
+                                    <Option value="PT001">{t('dog')}</Option>
+                                    <Option value="PT002">{t('cat')}</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -503,22 +505,22 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetGender"
-                                label="Giới tính"
-                                rules={[{ required: true, message: 'Vui lòng chọn giới tính thú cưng!' }]}
+                                label={t('pet_gender')}
+                                rules={[{ required: true, message: t('plz_enter_pet_gender')}]}
                             >
-                                <Select placeholder="Chọn giới tính">
-                                    <Option value="Đực">Đực</Option>
-                                    <Option value="Cái">Cái</Option>
+                                <Select placeholder={t('choose_gender')}>
+                                    <Option value="Đực">{t('male')}</Option>
+                                    <Option value="Cái">{t('female')}</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetStatus"
-                                label="Trạng thái"
-                                rules={[{ required: true, message: 'Vui lòng nhập trạng thái thú cưng!' }]}
+                                label={t('pet_status')}
+                                rules={[{ required: true, message: t('plz_enter_pet_status') }]}
                             >
-                                <Input placeholder='Nhập trạng thái thú cưng'/>
+                                <Input placeholder={t('enter_pet_status')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -526,36 +528,36 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetWeight"
-                                label="Cân nặng"
-                                rules={[{ required: true, message: 'Vui lòng nhập cân nặng thú cưng!' }]}
+                                label={t('pet_weight')}
+                                rules={[{ required: true, message: t('plz_enter_pet_weight') }]}
                             >
-                                <Input suffix="kg" placeholder='Nhập cân nặng động vật' type="number"/>
+                                <Input suffix="kg" placeholder={t('enter_pet_weight')} type="number" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetAge"
-                                label="Tuổi"
-                                rules={[{ required: true, message: 'Vui lòng nhập tuổi thú cưng!' }]}
+                                label={t('pet_age')}
+                                rules={[{ required: true, message: t('plz_enter_pet_age') }]}
                             >
-                                <Input suffix="tuổi" placeholder='Nhập tuổi động vật' type="number"/>
+                                <Input suffix="tuổi" placeholder={t('enter_pet_weight')} type="number" />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
-                            <Form.Item name="ServiceID" label="Service ID" initialValue={id} style={{ display: 'none' }}>
+                            <Form.Item name="ServiceID" label={t('service_id')} initialValue={id} style={{ display: 'none' }}>
                                 <Input />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetName"
-                                label="Tên thú cưng"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên thú cưng!' }]}
+                                label={t('pet_name')}
+                                rules={[{ required: true, message: t('plz_enter_pet_name') }]}
                                 style={{ display: 'none' }}
                             >
-                                <Input placeholder='Nhập tên thú cưng'/>
+                                <Input placeholder={t('enter_pet_name')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -574,42 +576,42 @@ const SpaServiceDetail = () => {
                 onCancel={() => setIsAddModalVisible(false)}
                 confirmLoading={operationLoading}
                 footer={[
-                <Button key="back" onClick={() => setIsAddModalVisible(false)}>
-                    Hủy
-                </Button>,
-                <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
-                    Thêm
-                </Button>,
+                    <Button key="back" onClick={() => setIsAddModalVisible(false)}>
+                        {t('cancel')}
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
+                        {t('add')}
+                    </Button>,
                 ]}
             >
                 <Form form={addPetForm} layout="vertical">
-                <Form.Item name="PetName" rules={[{ required: true, message: 'Tên không được để trống' }]}>
-                    <Input placeholder="Tên" />
-                </Form.Item>
-                <Form.Item name="PetTypeID" rules={[{ required: true, message: 'Loại thú cưng không được để trống' }]}>
-                    <Select placeholder="Chọn loại thú cưng">
-                    <Option value="PT001">Chó</Option>
-                    <Option value="PT002">Mèo</Option>
-                    </Select>
-                </Form.Item>
-                <Form.Item name="Gender" rules={[{ required: true, message: 'Giới tính không được để trống' }]}>
-                    <Select placeholder="Chọn giới tính">
-                    {genders.map((gender, index) => (
-                        <Option key={index} value={gender}>
-                        {gender}
-                        </Option>
-                    ))}
-                    </Select>
-                </Form.Item>
-                <Form.Item name="Status" rules={[{ required: true, message: 'Trạng thái không được để trống' }]}>
-                    <Input placeholder="Trạng thái" />
-                </Form.Item>
-                <Form.Item name="Weight" rules={[{ required: true, message: 'Cân nặng không được để trống' }]}>
-                    <Input placeholder="Cân nặng" type="number" />
-                </Form.Item>
-                <Form.Item name="Age" rules={[{ required: true, message: 'Tuổi không được để trống' }]}>
-                    <Input placeholder="Tuổi" type="number" />
-                </Form.Item>
+                    <Form.Item name="PetName" rules={[{ required: true, message: t('not_null_pet_name') }]}>
+                        <Input placeholder={t('pet_name')} />
+                    </Form.Item>
+                    <Form.Item name="PetTypeID" rules={[{ required: true, message: t('not_null_pet_type') }]}>
+                        <Select placeholder={t('choose_pet_type')}>
+                            <Option value="PT001">{t('dog')}</Option>
+                            <Option value="PT002">{t('cat')}</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="Gender" rules={[{ required: true, message: t('not_null_pet_gender') }]}>
+                        <Select placeholder={t('choose_gender')}>
+                            {genders.map((gender, index) => (
+                                <Option key={index} value={gender}>
+                                    {gender}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item name="Status" rules={[{ required: true, message: t('not_null_pet_status') }]}>
+                        <Input placeholder={t('pet_status')} />
+                    </Form.Item>
+                    <Form.Item name="Weight" rules={[{ required: true, message: t('not_null_pet_weight') }]}>
+                        <Input placeholder={t('pet_weight')} type="number" />
+                    </Form.Item>
+                    <Form.Item name="Age" rules={[{ required: true, message: t('not_null_pet_age') }]}>
+                        <Input placeholder={t('pet_age')} type="number" />
+                    </Form.Item>
                 </Form>
             </Modal>
         </div>
