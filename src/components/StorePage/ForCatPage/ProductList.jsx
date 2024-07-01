@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
@@ -21,6 +22,7 @@ const ProductList = () => {
   const navigate = useNavigate();
   const [filteredProducts, setfilteredProducts] = useState([]); // State for filtered data
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -64,10 +66,10 @@ const ProductList = () => {
       setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('authorization_token_not_found'));
         return;
       }
-  
+
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append('ProductName', values.ProductName);
@@ -79,38 +81,38 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       } else {
-        message.error('Please upload the product image!');
+        message.error(t('please_upload_product_image'));
         return;
       }
-      message.warning('Processing...')
+      message.warning(t('processing'));
       const response = await axios.post('http://localhost:3001/api/products', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       if (response.status === 201) {
-        message.success('Product added successfully', 0.5).then(() => {
+        message.success(t('product_added_successfully'), 0.5).then(() => {
           window.location.reload();
         });
       } else {
-        message.error('Failed to add product: Unexpected server response');
+        message.error(t('failed_to_add_product'));
       }
     } catch (error) {
       console.error('Error adding product:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error('Unauthorized. Please log in.');
+          message.error(t('unauthorized_please_log_in'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`Error adding product: ${error.response.data.message}`);
+          message.error(`${t('error_adding_product')}: ${error.response.data.message}`);
         } else {
-          message.error('Error adding product');
+          message.error(t('error_adding_product'));
         }
       } else if (error.request) {
-        message.error('Error adding product: Network or server issue');
+        message.error(t('error_adding_product_network_or_server_issue'));
       } else {
-        message.error(`Error adding product: ${error.message}`);
+        message.error(`${t('error_adding_product')}: ${error.message}`);
       }
     } finally {
       setSaving(false); // End saving
@@ -140,7 +142,7 @@ const ProductList = () => {
       setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('authorization_token_not_found'));
         return;
       }
 
@@ -154,10 +156,10 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       }
-      message.warning('Processing...')
+      message.warning(t('processing'))
       for (let pair of formData.entries()) {
         console.log(pair[0] + ', ' + pair[1]);
-      }    
+      }
       const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -166,26 +168,26 @@ const ProductList = () => {
       });
 
       if (response.status === 200) {
-        message.success('Product updated successfully', 0.5).then(() => {
+        message.success(t('product_updated_successfully'), 0.5).then(() => {
           window.location.reload();
         });
       } else {
-        message.error('Failed to update product: Unexpected server response');
+        message.error(t('failed_to_update_product'));
       }
     } catch (error) {
       console.error('Error updating product:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error('Unauthorized. Please log in.');
+          message.error(t('unauthorized_please_log_in'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`Error updating product: ${error.response.data.message}`);
+          message.error(`${t('error_updating_product')}: ${error.response.data.message}`);
         } else {
-          message.error('Error updating product');
+          message.error(t('error_updating_product'));
         }
       } else if (error.request) {
-        message.error('Error updating product: Network or server issue');
+        message.error(t('error_updating_product_network_or_server_issue'));
       } else {
-        message.error(`Error updating product: ${error.message}`);
+        message.error(`${t('error_updating_product')}: ${error.message}`);
       }
     } finally {
       setSaving(false); // End saving
@@ -200,7 +202,7 @@ const ProductList = () => {
 
   const columns = [
     {
-      title: 'Product ID',
+      title: t('product_id'),
       dataIndex: 'ProductID',
       key: 'ProductID',
       render: (text, record) => (
@@ -210,7 +212,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Product Name',
+      title: t('product_name'),
       dataIndex: 'ProductName',
       key: 'ProductName',
       render: (text, record) => (
@@ -220,7 +222,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Price',
+      title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => (
@@ -228,7 +230,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Description',
+      title: t('description'),
       dataIndex: 'Description',
       key: 'Description',
       ellipsis: true, // Enable ellipsis if description is too long
@@ -239,7 +241,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Image URL',
+      title: t('image_url'),
       dataIndex: 'ImageURL',
       key: 'ImageURL',
       render: (text, record) => (
@@ -247,7 +249,7 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Status',
+      title: t('status'),
       dataIndex: 'Status',
       key: 'Status',
       render: (text) => (
@@ -257,17 +259,17 @@ const ProductList = () => {
       ),
     },
     {
-      title: 'Quantity',
+      title: t('quantity'),
       dataIndex: 'Quantity',
       key: 'Quantity',
     },
     {
-      title: 'Actions',
+      title: t('actions'),
       key: 'actions',
       render: (_, record) => (
         userRole === 'Store Manager' && (
           <div>
-            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
+            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>{t('edit')}</Button>
           </div>
         )
       ),
@@ -280,10 +282,10 @@ const ProductList = () => {
 
   return (
     <div className="p-10">
-      <Title level={1} className='text-center'>Product for cats</Title>
+      <Title level={1} className='text-center'>{t('product_for_cat')}</Title>
       <div className="flex flex-row justify-end">
         <Search
-          placeholder="Search by product name"
+          placeholder={t('search_by_product_name')}
           onChange={(e) => handleSearch(e.target.value)}
           style={{ marginBottom: 16, width: 300 }}
         />
@@ -300,7 +302,7 @@ const ProductList = () => {
               scroll={{ x: 'max-content' }}
             />
             <div className="flex justify-end mt-4">
-              <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Product</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={loading}>{t('add_product')}</Button>
             </div>
           </>
         ) : (
@@ -320,11 +322,11 @@ const ProductList = () => {
                   className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
                   onClick={() => handleProductClick(product.ProductID)}
                 >
-                  <Image 
-                    alt={product.ProductName} 
-                    src={product.ImageURL} 
+                  <Image
+                    alt={product.ProductName}
+                    src={product.ImageURL}
                     preview={false}
-                    className="rounded-t-lg w-full h-44 object-cover" 
+                    className="rounded-t-lg w-full h-44 object-cover"
                     style={{ width: '100%', height: '250px' }}
                   />
                   <div className="p-4">
@@ -340,72 +342,72 @@ const ProductList = () => {
       </Form>
 
       <Modal
-        title={editMode ? "Edit Product" : "Add New Product"}
+        title={editMode ? t('edit_product') : t('add_new_product')}
         visible={addMode || editMode !== null}
         onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
-            {editMode ? "Save" : "Add"}
+            {editMode ? t('save') : t('add')}
           </Button>,
         ]}
         style={{ textAlign: 'center' }}
       >
         <Form form={form} className="text-left" layout='vertical'>
-            <Form.Item
-              name="ProductName"
-              label="Product Name"
-              rules={[{ required: true, message: 'Please enter the product name!' }]}
-              className="mb-4"
-            >
-              <Input placeholder="Product Name" className="w-full p-2 border border-gray-300 rounded" />
-            </Form.Item>
-            <Form.Item
-              name="Price"
-              label="Price"
-              rules={[{ required: true, message: 'Please enter the product price!' }]}
-              className="mb-4"
-            >
-              <Input type='number' placeholder="Price" className="w-full p-2 border border-gray-300 rounded" />
-            </Form.Item>
-            <Form.Item
-              name="Description"
-              label="Description"
-              rules={[{ required: true, message: 'Please enter the product description' }]}
-              className="mb-4"
-            >
-              <TextArea rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
-            </Form.Item>
-            <Form.Item
-              name="Image"
-              label="Image"
-              rules={[{ required: true, message: 'Please upload the product image!' }]}
-              className="mb-4"
-            >
-              <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
-              {productImg && (
-                <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
-              )}
-            </Form.Item>
-            <Form.Item
-              name="Quantity"
-              label="Quantity"
-              rules={[{ required: true, message: 'Please enter the product quantity' }]}
-              className="mb-4"
-            >
-              <Input type='number' placeholder="Quantity" className="w-full p-2 border border-gray-300 rounded" />
-            </Form.Item>
-            <Form.Item
-              name="Status"
-              label="Status"
-              rules={[{ required: true, message: 'Please select the product status' }]}
-              className="mb-4"
-            >
-              <Select placeholder="Status">
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
-              </Select>
-            </Form.Item>
+          <Form.Item
+            name="ProductName"
+            label={t('product_name')}
+            rules={[{ required: true, message: t('please_enter_product_name') }]}
+            className="mb-4"
+          >
+            <Input placeholder={t('product_name')} className="w-full p-2 border border-gray-300 rounded" />
+          </Form.Item>
+          <Form.Item
+            name="Price"
+            label={t('price')}
+            rules={[{ required: true, message: t('please_enter_price') }]}
+            className="mb-4"
+          >
+            <Input type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
+          </Form.Item>
+          <Form.Item
+            name="Description"
+            label={t('description')}
+            rules={[{ required: true, message: t('please_enter_description') }]}
+            className="mb-4"
+          >
+            <TextArea rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
+          </Form.Item>
+          <Form.Item
+            name="Image"
+            label={t('image')}
+            rules={[{ required: true, message: t('please_upload_image') }]}
+            className="mb-4"
+          >
+            <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
+            {productImg && (
+              <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
+            )}
+          </Form.Item>
+          <Form.Item
+            name="Quantity"
+            label={t('quantity')}
+            rules={[{ required: true, message: t('enter_product_quantity') }]}
+            className="mb-4"
+          >
+            <Input type='number' placeholder={t('quantity')} className="w-full p-2 border border-gray-300 rounded" />
+          </Form.Item>
+          <Form.Item
+            name="Status"
+            label={t('status')}
+            rules={[{ required: true, message: t('select_product_status') }]}
+            className="mb-4"
+          >
+            <Select placeholder={t('status')}>
+              <Option value="Available">{t('available')}</Option>
+              <Option value="Unavailable">{t('unavailable')}</Option>
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
     </div>

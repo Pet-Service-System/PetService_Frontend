@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate, Modal } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 
 const { Title, Paragraph } = Typography;
@@ -20,6 +21,7 @@ const ProductDetail = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const userRole = localStorage.getItem('role') || 'Guest';
+    const { t } = useTranslation();
 
     const fetchProductDetail = async () => {
         try {
@@ -29,7 +31,7 @@ const ProductDetail = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error fetching product detail:', error);
-            message.error('Error fetching product detail');
+            message.error(t('error_fetching_product_detail'));
             setLoading(false);
         }
     };
@@ -59,7 +61,7 @@ const ProductDetail = () => {
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    };    
+    };
     useEffect(() => {
         fetchProductDetail();
         fetchComments();
@@ -69,10 +71,10 @@ const ProductDetail = () => {
         if (Quantity < productData.Quantity) {
             setQuantity(Quantity + 1);
         } else {
-            message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
+            message.error(t('quantity_out_of_inventory'));
         }
     };
-    
+
     const handleDecrease = () => setQuantity(Quantity > 1 ? Quantity - 1 : 1);
 
     const handleOrderNow = async () => {
@@ -82,10 +84,10 @@ const ProductDetail = () => {
         }
         if (productData) {
             if (Quantity > productData.Quantity) {
-                message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
+                message.error(t('quantity_out_of_inventory'));
                 return;
             }
-    
+
             const productWithQuantity = { ...productData, Quantity };
             await handleAddItem(productWithQuantity);
             const totalAmount = productData.Price;
@@ -103,13 +105,13 @@ const ProductDetail = () => {
         }
         if (productData) {
             if (Quantity > productData.Quantity) {
-                message.error('Số lượng yêu cầu vượt quá số lượng tồn kho');
+                message.error(t('quantity_out_of_inventory'));
                 return;
             }
-    
+
             const productWithQuantity = { ...productData, Quantity };
             handleAddItem(productWithQuantity);
-            message.success('Product added to cart successfully');
+            message.success(t('product_added_to_cart_successfully'));
         }
     };
 
@@ -118,21 +120,21 @@ const ProductDetail = () => {
             title: 'Thông báo',
             content: (
                 <div>
-                    <p>Vui lòng đăng nhập hoặc đăng ký để mua hàng.</p>
+                    <p>{t('plz_login_or_register_to_buy')}</p>
                     <div className="flex justify-end">
                         <Button type="primary" onClick={() => {
                             navigate('/login');
                             Modal.destroyAll();
-                        }}>Đăng nhập</Button>
+                        }}>{t('log_in')}</Button>
                         <Button onClick={() => {
                             navigate('/register');
-                            Modal.destroyAll(); 
-                        }} className="ml-2">Đăng ký</Button>
+                            Modal.destroyAll();
+                        }} className="ml-2">{t('register')}</Button>
                     </div>
                 </div>
             ),
-            closable: true, 
-            maskClosable: true, 
+            closable: true,
+            maskClosable: true,
             footer: null,
         });
     };
@@ -156,7 +158,7 @@ const ProductDetail = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                message.error('Authorization token not found. Please log in.');
+                message.error(t('authorization_token_not_found'));
                 return;
             }
 
@@ -182,9 +184,9 @@ const ProductDetail = () => {
         } catch (error) {
             console.error('Error updating product:', error);
             if (error.response && error.response.status === 401) {
-                message.error('Unauthorized. Please log in.');
+                message.error(t('unauthorized'));
             } else {
-                message.error('Error updating product');
+                message.error(t('error_updating_product'));
             }
         }
     };
@@ -210,7 +212,7 @@ const ProductDetail = () => {
                         icon={<ArrowLeftOutlined />}
                         size="large"
                     >
-                        Quay về
+                        {t('back')}
                     </Button>
                 </div>
                 <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
@@ -222,56 +224,56 @@ const ProductDetail = () => {
                             <Form form={form} layout="vertical">
                                 <Form.Item
                                     name="ProductName"
-                                    label="Tên sản phẩm"
-                                    rules={[{ required: true, message: 'Hãy nhập tên sản phẩm!' }]}
+                                    label={t('product_name')}
+                                    rules={[{ required: true, message: t('please_enter_product_name') }]}
                                 >
                                     <Input disabled={!editMode} />
                                 </Form.Item>
                                 <Form.Item
                                     name="Quantity"
-                                    label="Số lượng tồn kho"
-                                    rules={[{ required: true, message: 'Hãy nhập số lượng tồn kho!' }]}
+                                    label={t('quantity')}
+                                    rules={[{ required: true, message: t('please_enter_quantity') }]}
                                 >
-                                    <Input type='number' disabled={!editMode} placeholder='Quantity'/>
+                                    <Input type='number' disabled={!editMode} placeholder= {t('quantity')} />
                                 </Form.Item>
                                 <Form.Item
                                     name="Price"
-                                    label="Giá"
-                                    rules={[{ required: true, message: 'Hãy nhập giá sản phẩm!' }]}
+                                    label={t('price')}
+                                    rules={[{ required: true, message: t('please_enter_price') }]}
                                 >
                                     <Input type="number" disabled={!editMode} />
                                 </Form.Item>
                                 <Form.Item
                                     name="Description"
-                                    label="Mô tả"
-                                    rules={[{ required: true, message: 'Hãy nhập mô tả sản phẩm!' }]}
+                                    label={t('description')}
+                                    rules={[{ required: true, message: t('please_enter_description') }]}
                                 >
-                                    <TextArea disabled={!editMode} rows={10} placeholder="Description" style={{ whiteSpace: 'pre-wrap' }} />
+                                    <TextArea disabled={!editMode} rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} />
                                 </Form.Item>
                                 <Form.Item
                                     name="ImageURL"
-                                    label="Hình ảnh"
-                                    rules={[{ required: true, message: 'Hãy tải hình ảnh sản phẩm!' }]}
+                                    label={t('image')}
+                                    rules={[{ required: true, message: t('please_upload_image') }]}
                                 >
                                     <Input disabled={!editMode} />
                                 </Form.Item>
                                 <Form.Item
                                     name="Status"
-                                    label="Status"
-                                    rules={[{ required: true, message: 'Please select the service status!' }]}
+                                    label={t('status')}
+                                    rules={[{ required: true, message: t('please_select_status') }]}
                                 >
-                                    <Select placeholder="Select Status" disabled={!editMode}>
-                                        <Option value="Available">Available</Option>
-                                        <Option value="Unavailable">Unavailable</Option>
+                                    <Select placeholder={t('select_status')} disabled={!editMode}>
+                                        <Option value="Available">{t('available')}</Option>
+                                        <Option value="Unavailable">{t('unavailable')}</Option>
                                     </Select>
                                 </Form.Item>
                             </Form>
                         ) : (
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
-                                <Paragraph>{`Số lượng còn lại: ${productData.Quantity}`}</Paragraph>
+                                <Paragraph>{`${t('quantity_in_stock')}: ${productData.Quantity}`}</Paragraph>
                                 <Paragraph className="text-green-600 text-4xl">${productData.Price}</Paragraph>
-                                <Paragraph>{`Mô tả: ${productData.Description}`}</Paragraph>
+                                <Paragraph>{`${t('description')}: ${productData.Description}`}</Paragraph>
                             </div>
                         )}
 
@@ -280,7 +282,7 @@ const ProductDetail = () => {
                                 <div className="flex items-center mb-6 p-14">
                                     <Button onClick={handleDecrease}>-</Button>
                                     <Input
-                                        value={Quantity}
+                                        value={quantity}
                                         onChange={(e) => handleChangeQuantity(e.target.value)}
                                         className="mx-3 text-lg w-24 text-center"
                                         type="number"
@@ -289,44 +291,44 @@ const ProductDetail = () => {
                                     <Button onClick={handleIncrease}>+</Button>
                                 </div>
                                 <div className="flex space-x-4 justify-end">
-                                    <Button type="primary" 
-                                            onClick={handleAddToCart}
-                                            disabled={(productData.Status === 'Unavailable' || productData.Quantity ===0)}
+                                    <Button type="primary"
+                                        onClick={handleAddToCart}
+                                        disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
                                     >
-                                        Thêm vào giỏ hàng
+                                        {t('add_to_cart')}
                                     </Button>
-                                    <Button type="primary" 
-                                            onClick={handleOrderNow}
-                                            disabled={(productData.Status === 'Unavailable' || productData.Quantity ===0)}
+                                    <Button type="primary"
+                                        onClick={handleOrderNow}
+                                        disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
                                     >
-                                        Đặt ngay
+                                        {t('order_now')}
                                     </Button>
                                 </div>
-                                {(productData.Status === 'Unavailable' || productData.Quantity ===0) && (
-                                    <p className="text-red-500 text-right">Sản phẩm hiện đang tạm ngừng kinh doanh hoặc đã hết hàng.</p>
+                                {(productData.Status === 'Unavailable' || productData.Quantity === 0) && (
+                                    <p className="text-red-500 text-right">{t('product_unavailable')}</p>
                                 )}
                             </>
                         ) : userRole === 'Store Manager' ? (
                             editMode ? (
                                 <div className="flex space-x-4 justify-end">
-                                    <Button type="primary" onClick={() => handleSaveEdit(id)}>Lưu</Button>
-                                    <Button onClick={handleCancelEdit}>Hủy</Button>
+                                    <Button type="primary" onClick={() => handleSaveEdit(id)}>{t('save')}</Button>
+                                    <Button onClick={handleCancelEdit}>{t('cancel')}</Button>
                                 </div>
                             ) : (
                                 <div className="flex space-x-4 justify-end">
-                                    <Button type="primary" onClick={handleEditProduct}>Sửa</Button>
+                                    <Button type="primary" onClick={handleEditProduct}>{t('edit')}</Button>
                                 </div>
                             )
                         ) : null}
                     </div>
                 </div>
                 <div className="m-5 px-4 md:px-32">
-                    <Title level={4}>Đánh giá sản phẩm</Title>
+                    <Title level={4}>{t('product_reviews')}</Title>
                     {comments.length > 0 && (
                         <div>
                             <Rate disabled allowHalf value={calculateAverageRating(comments)} />
                             <span style={{ marginLeft: '10px' }}>
-                                {comments.length} {comments.length === 1 ? 'review' : 'reviews'}
+                                {comments.length} {comments.length === 1 ? t('review') : t('reviews')}
                             </span>
                         </div>
                     )}

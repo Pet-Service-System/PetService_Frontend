@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+
+
 
 const { Title, Text } = Typography;
 
@@ -26,12 +29,13 @@ const Order = () => {
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem('addressInfo'));
     if (addressInfo) {
       setCustomerInfo(addressInfo);
-      setOriginalCustomerInfo(addressInfo); 
+      setOriginalCustomerInfo(addressInfo);
     }
   }, []);
   useEffect(() => {
@@ -40,9 +44,9 @@ const Order = () => {
       ...prevOrderDetails,
       totalAmount: totalAmount,
     }));
-  
+
     setIsPayPalEnabled(true);
-  }, []); 
+  }, []);
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
@@ -64,14 +68,14 @@ const Order = () => {
       ...prevCustomerInfo,
       [name]: value,
     }));
-  
+
     // Update localStorage immediately with the updated customerInfo
     localStorage.setItem('addressInfo', JSON.stringify({
       ...customerInfo, // Use current state here as setCustomerInfo is async
       [name]: value,
     }));
   };
-  
+
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
@@ -83,12 +87,12 @@ const Order = () => {
     setEditMode(false);
     window.location.reload();
   };
-  
+
   const cancelEdit = () => {
     setCustomerInfo(originalCustomerInfo); // Revert to original state
     setEditMode(false);
   };
-  
+
 
   const updateInventoryQuantity = async (orderDetails) => {
     try {
@@ -152,7 +156,7 @@ const Order = () => {
   const onApprove = async (data, actions) => {
     try {
       if (orderDetails.cartItems.length === 0) {
-        throw new Error('Không có sản phẩm trong đơn hàng.');
+        throw new Error(t('no_product_in_order'));
       }
       await actions.order.capture();
       // Define order data
@@ -160,7 +164,7 @@ const Order = () => {
         Status: 'Processing',
         TotalPrice: orderDetails.totalAmount + orderDetails.shippingCost,
         AccountID: JSON.parse(localStorage.getItem('user')).id,
-        OrderDate: new Date(), 
+        OrderDate: new Date(),
       };
 
       // Call the createOrder API using Axios
@@ -191,7 +195,7 @@ const Order = () => {
           Quantity: item.Quantity
         }))
       };
-      
+
       const detailsResponse = await axios.post('http://localhost:3001/api/order-details', orderDetailsData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header if needed
@@ -219,7 +223,7 @@ const Order = () => {
     message.error('Đã xảy ra lỗi trong quá trình thanh toán với PayPal.');
     console.error('Error during PayPal checkout:', err);
   };
-  
+
   return (
     <div>
       <div className="flex flex-row md:flex-row m-5 px-8">
@@ -229,7 +233,7 @@ const Order = () => {
           icon={<ArrowLeftOutlined />}
           size="large"
         >
-          Quay về
+          {t('back')}
         </Button>
       </div>
       <div className="flex items-center justify-center bg-gray-100 px-10">
@@ -239,24 +243,24 @@ const Order = () => {
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <div className="flex justify-between items-center mb-6">
                 <Title level={3} className="mb-0">
-                  Địa chỉ giao hàng
+                  {t('delivery_address')}
                 </Title>
                 {!editMode ? (
                   <Button onClick={toggleEditMode} icon={<EditOutlined />} type="text">
-                    Sửa
+                    {t('edit')}
                   </Button>
                 ) : (
                   <div>
                     <Button onClick={saveChanges} icon={<SaveOutlined />} type="primary" className="mr-2">
-                      Lưu
+                    {t('save')}
                     </Button>
                     <Button onClick={cancelEdit} icon={<CloseOutlined />} type="default">
-                      Hủy
+                    {t('cancel')}
                     </Button>
                   </div>
                 )}
               </div>
-              <Text strong>Họ tên:</Text>
+              <Text strong>{t('fullname')}:</Text>
               <Input
                 name="fullname"
                 value={customerInfo.fullname}
@@ -265,7 +269,7 @@ const Order = () => {
                 disabled={!editMode} // Disable input if not in edit mode
               />
               <br />
-              <Text strong>Địa chỉ:</Text>
+              <Text strong>{t('adress')}:</Text>
               <Input
                 name="address"
                 value={customerInfo.address}
@@ -274,7 +278,7 @@ const Order = () => {
                 disabled={!editMode} // Disable input if not in edit mode
               />
               <br />
-              <Text strong>Số điện thoại:</Text>
+              <Text strong>{t('phone')}:</Text>
               <Input
                 name="phone"
                 value={customerInfo.phone}
@@ -284,29 +288,29 @@ const Order = () => {
               />
             </div>
             <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">
-              <Title level={3} className="mb-6">Danh sách sản phẩm</Title>
+              <Title level={3} className="mb-6">{t('list_of_product')}</Title>
               {orderDetails.cartItems.map((item, index) => {
                 const totalPrice = (item.Price * item.Quantity).toFixed(2);
                 return (
                   <Row key={index} className="mb-4" gutter={[16, 16]}>
                     <Col span={4}>
-                      <Image 
-                        src={item.ImageURL} 
-                        alt={item.ProductName} 
-                        className="w-16 h-16 object-cover rounded" 
+                      <Image
+                        src={item.ImageURL}
+                        alt={item.ProductName}
+                        className="w-16 h-16 object-cover rounded"
                       />
                     </Col>
                     <Col span={4}>
                       <Text strong>{item.ProductName}</Text>
                     </Col>
                     <Col span={4}>
-                      Số lượng: <Text>{item.Quantity}</Text>
+                    {t('quantity')}: <Text>{item.Quantity}</Text>
                     </Col>
                     <Col span={4}>
-                      Đơn giá: <Text>${item.Price.toFixed(2)}</Text>
+                      {t('unit_price')}: <Text>${item.Price.toFixed(2)}</Text>
                     </Col>
                     <Col span={4}>
-                      Tổng: <Text className='text-green-600'>${totalPrice}</Text>
+                      {t('total')}: <Text className='text-green-600'>${totalPrice}</Text>
                     </Col>
                   </Row>
                 );
@@ -317,29 +321,29 @@ const Order = () => {
           <Col xs={24} md={8}>
             {/* Shipping Method */}
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">Phương thức vận chuyển</Title>
+              <Title level={3} className="mb-6">{t('shipping_method')}</Title>
               <Radio.Group
                 value={selectedShippingMethod}
                 onChange={handleShippingChange}
               >
-                <Radio value="nationwide" className="font-medium block mb-2">Phí vận chuyển Toàn Quốc ($3)</Radio>
+                <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ($3)</Radio>
               </Radio.Group>
             </div>
 
             {/* Total Amount */}
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">Tổng tiền</Title>
+              <Title level={3} className="mb-6">{t('total_amount')}</Title>
               <div className="mb-4">
                 <div className="flex justify-between mb-2">
-                  <Text strong>Thành tiền:</Text>
+                  <Text strong>{t('total_2')}:</Text>
                   <Text>${orderDetails.totalAmount.toFixed(2)}</Text>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <Text strong>Phí vận chuyển:</Text>
+                  <Text strong>{t('shipping_fee')}:</Text>
                   <Text>${orderDetails.shippingCost.toFixed(2)}</Text>
                 </div>
                 <div className="flex justify-between">
-                  <Text strong>Tổng số:</Text>
+                  <Text strong>{t('total_3')}:</Text>
                   <Text className="text-2xl text-green-600">
                     ${(orderDetails.totalAmount + orderDetails.shippingCost).toFixed(2)}
                   </Text>
@@ -347,7 +351,7 @@ const Order = () => {
               </div>
               <div className="text-right">
                 {/* PayPal Buttons */}
-                {(isPayPalEnabled && !editMode) &&  (
+                {(isPayPalEnabled && !editMode) && (
                   <PayPalButtons
                     createOrder={createOrder}
                     onApprove={(data, actions) => onApprove(data, actions)}

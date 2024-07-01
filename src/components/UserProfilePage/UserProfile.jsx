@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Typography, Button, Form, Input, message, Grid, Skeleton } from 'antd';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import {
   UserOutlined,
   UnorderedListOutlined,
@@ -34,6 +35,7 @@ const UserProfile = () => {
     }
     setLoading(false);
   };
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchUserData();
@@ -73,11 +75,11 @@ const UserProfile = () => {
       setSaving(false)
       setIsEditMode(false);
       setErrors({});
-      message.success('Thông tin đã được cập nhật')
+      message.success(t('information_updated'))
       fetchUserData();
     } catch (error) {
       console.error('Failed to update account:', error);
-      message.error('Cập nhật thông tin thất bại. Vui lòng thử lại.');
+      message.error(t('updated_fail_try_again'));
       setSaving(false)
     }
   };
@@ -85,17 +87,17 @@ const UserProfile = () => {
   const handleSave = () => {
     let newErrors = {};
     if (!formData.fullname) {
-      newErrors.fullname = 'Họ và tên là bắt buộc';
+      newErrors.fullname = t('fullname_required');
     } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
-      newErrors.fullname = 'Họ và tên không được chứa ký tự đặc biệt';
+      newErrors.fullname = t('no_special_character');
     }
 
     if (!formData.phone) {
-      newErrors.phone = 'Số điện thoại là bắt buộc';
+      newErrors.phone = t('phone_number_required');
     } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = 'Số điện thoại phải chứa đúng 10 chữ số';
+      newErrors.phone = t('phone_must_have_10_numbers');
     }
-    if (!formData.address) newErrors.address = 'Địa chỉ là bắt buộc';
+    if (!formData.address) newErrors.address = t('address_required');
 
     if (Object.keys(newErrors).length === 0) {
       updateUserAccount(formData);
@@ -136,7 +138,7 @@ const UserProfile = () => {
               icon={<UserOutlined />}
               onClick={() => navigate('/user-profile')}
             >
-              Thông tin người dùng
+              {t('user_information')}
             </Menu.Item>
             {role === 'Customer' && (
               <>
@@ -145,24 +147,24 @@ const UserProfile = () => {
                   icon={<UnorderedListOutlined />}
                   onClick={() => navigate('/pet-list')}
                 >
-                  Danh sách thú cưng
+                  {t('list_of_pets')}
                 </Menu.Item>
                 <Menu.Item
                   key="order-history"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate('/order-history')}
                 >
-                  Lịch sử đặt hàng
+                  {t('order_history')}
                 </Menu.Item>
-                <Menu.Item key="spa-booking" 
-                           onClick={() => navigate('/spa-booking')}
-                           icon={<HistoryOutlined />}>
-                    Lịch sử dịch vụ
+                <Menu.Item key="spa-booking"
+                  onClick={() => navigate('/spa-booking')}
+                  icon={<HistoryOutlined />}>
+                  {t('service_history')}
                 </Menu.Item>
               </>
             )}
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              Đăng xuất
+              {t('log_out')}
             </Menu.Item>
           </Menu>
         </Sider>
@@ -171,13 +173,13 @@ const UserProfile = () => {
         <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
           <div className="bg-white p-8 rounded-lg shadow-md">
             <Title level={2} className="text-center">
-              Thông tin người dùng
+              {t('user_information')}
             </Title>
             {loading ? (
               <Skeleton active />
             ) : isEditMode ? (
               <Form layout="vertical">
-                <Form.Item label="Họ và tên" validateStatus={errors.fullname && "error"} help={errors.fullname}>
+                <Form.Item label={t('fullname_2')} validateStatus={errors.fullname && "error"} help={errors.fullname}>
                   <Input
                     name="fullname"
                     value={formData.fullname}
@@ -191,14 +193,14 @@ const UserProfile = () => {
                     disabled
                   />
                 </Form.Item>
-                <Form.Item label="Số điện thoại" validateStatus={errors.phone && "error"} help={errors.phone}>
+                <Form.Item label={t('phone')} validateStatus={errors.phone && "error"} help={errors.phone}>
                   <Input
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
                   />
                 </Form.Item>
-                <Form.Item label="Địa chỉ" validateStatus={errors.address && "error"} help={errors.address}>
+                <Form.Item label={t('adress')} validateStatus={errors.address && "error"} help={errors.address}>
                   <Input
                     name="address"
                     value={formData.address}
@@ -206,23 +208,23 @@ const UserProfile = () => {
                   />
                 </Form.Item>
                 <div className="flex justify-between mt-6">
-                  <Button type="primary" onClick={handleSave} className="mr-2" disabled={saving}>Lưu</Button>
-                  <Button type="default" onClick={handleCancel} disabled={saving}>Hủy</Button>
+                  <Button type="primary" onClick={handleSave} className="mr-2">{t('save')}</Button>
+                  <Button type="default" onClick={handleCancel}>{t('cancel')}</Button>
                 </div>
               </Form>
             ) : (
               <>
-                <Title level={5}>Họ và tên</Title>
+                <Title level={5}>{t('fullname_2')}</Title>
                 <p className="bg-gray-200 p-2 rounded-md">{user.fullname}</p>
                 <Title level={5}>Email</Title>
                 <p className="bg-gray-200 p-2 rounded-md">{user.email}</p>
-                <Title level={5}>Số điện thoại</Title>
+                <Title level={5}>{t('phone')}</Title>
                 <p className="bg-gray-200 p-2 rounded-md">{user.phone}</p>
-                <Title level={5}>Địa chỉ</Title>
+                <Title level={5}>{t('adress')}</Title>
                 <p className="bg-gray-200 p-2 rounded-md">{user.address}</p>
                 <div className="flex justify-between mt-6">
-                  <Button type="primary" onClick={handleUpdateInfo} className="mr-2">Cập nhật thông tin</Button>
-                  <Button type="default" onClick={handleChangePassword}>Đổi mật khẩu</Button>
+                  <Button type="primary" onClick={handleUpdateInfo} className="mr-2">{t('update_information')}</Button>
+                  <Button type="default" onClick={handleChangePassword}>{t('change_password')}</Button>
                 </div>
               </>
             )}
