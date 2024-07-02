@@ -252,27 +252,27 @@ const SpaBooking = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
-          <Title className="text-5xl text-center font-semibold">Danh sách dịch vụ</Title>
+          <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
           <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4">
             <Button onClick={handleSortOrder} style={{ width: 170 }}>
-              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+            {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
             <div>
-              <Text>Lọc theo ngày đặt lịch: </Text>
+              <Text>{t('filter_by_day_book')}: </Text>
               <DatePicker
                 onChange={handleBookingDateChange}
                 style={{ width: 200, marginRight: 12 }}
               />
             </div>
             <div>
-              <Text>Lọc theo ngày tạo lịch: </Text>
+              <Text>{t('filter_by_day_create')}: </Text>
               <DatePicker
                 onChange={handleDateCreatedChange}
                 style={{ width: 200, marginRight: 12 }}
               />
             </div>
             <Search
-              placeholder="Search by customer name or phone"
+              placeholder={t('search_by_customer_name_or_phone')}
               onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 300 }}
             />

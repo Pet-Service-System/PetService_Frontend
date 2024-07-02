@@ -245,14 +245,14 @@ const OrderList = () => {
               {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
             <div>
-              <Text>Lọc theo ngày tạo đơn: </Text>
+              <Text>{t('filter_by_day_create_order')}: </Text>
               <DatePicker
                 onChange={handleDateChange}
                 style={{ width: 200 }}
               />
             </div>
             <Search
-              placeholder="Search by customer name or phone"
+              placeholder={t('search_by_customer_name_or_phone')}
               onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 300 }}
             />
