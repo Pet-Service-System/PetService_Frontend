@@ -7,8 +7,7 @@ import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
-
+const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env.REACT_APP_EXCHANGE_RATE_VND_TO_USD
 
 const { Title, Text } = Typography;
 
@@ -16,7 +15,7 @@ const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
-    shippingCost: 2,
+    shippingCost: 20000,
     cartItems: JSON.parse(localStorage.getItem('shoppingCart')) || [], // Load cartItems from localStorage
   });
   const [customerInfo, setCustomerInfo] = useState({
@@ -29,6 +28,7 @@ const Order = () => {
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const exchangeRateVNDtoUSD = REACT_APP_EXCHANGE_RATE_VND_TO_USD;
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -50,10 +50,7 @@ const Order = () => {
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
-    let shippingCost = 2;
-    if (shippingMethod === 'local') {
-      shippingCost = 0;
-    }
+    let shippingCost = 20000;
 
     setSelectedShippingMethod(shippingMethod);
     setOrderDetails({
@@ -147,7 +144,7 @@ const Order = () => {
     return actions.order.create({
       purchase_units: [{
         amount: {
-          value: (orderDetails.totalAmount + orderDetails.shippingCost).toFixed(2),
+          value: (orderDetails.totalAmount + orderDetails.shippingCost) * exchangeRateVNDtoUSD,
         },
       }],
     });
@@ -290,7 +287,7 @@ const Order = () => {
             <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">
               <Title level={3} className="mb-6">{t('list_of_product')}</Title>
               {orderDetails.cartItems.map((item, index) => {
-                const totalPrice = (item.Price * item.Quantity).toFixed(2);
+                const totalPrice = (item.Price * item.Quantity).toLocaleString('en-US');
                 return (
                   <Row key={index} className="mb-4" gutter={[16, 16]}>
                     <Col span={4}>
@@ -307,10 +304,10 @@ const Order = () => {
                     {t('quantity')}: <Text>{item.Quantity}</Text>
                     </Col>
                     <Col span={4}>
-                      {t('unit_price')}: <Text>${item.Price.toFixed(2)}</Text>
+                      {t('unit_price')}: <Text>{item.Price.toLocaleString('en-US')}</Text>
                     </Col>
                     <Col span={4}>
-                      {t('total')}: <Text className='text-green-600'>${totalPrice}</Text>
+                      {t('total')}: <Text className='text-green-600'>{totalPrice.toLocaleString('en-US')}</Text>
                     </Col>
                   </Row>
                 );
@@ -326,7 +323,7 @@ const Order = () => {
                 value={selectedShippingMethod}
                 onChange={handleShippingChange}
               >
-                <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ($3)</Radio>
+                <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} (20,000đ)</Radio>
               </Radio.Group>
             </div>
 
@@ -336,16 +333,16 @@ const Order = () => {
               <div className="mb-4">
                 <div className="flex justify-between mb-2">
                   <Text strong>{t('total_2')}:</Text>
-                  <Text>${orderDetails.totalAmount.toFixed(2)}</Text>
+                  <Text>{orderDetails.totalAmount.toLocaleString('en-US')}</Text>
                 </div>
                 <div className="flex justify-between mb-2">
                   <Text strong>{t('shipping_fee')}:</Text>
-                  <Text>${orderDetails.shippingCost.toFixed(2)}</Text>
+                  <Text>{orderDetails.shippingCost.toLocaleString('en-US')}</Text>
                 </div>
                 <div className="flex justify-between">
                   <Text strong>{t('total_3')}:</Text>
                   <Text className="text-2xl text-green-600">
-                    ${(orderDetails.totalAmount + orderDetails.shippingCost).toFixed(2)}
+                    {(orderDetails.totalAmount + orderDetails.shippingCost).toLocaleString('en-US')}
                   </Text>
                 </div>
               </div>

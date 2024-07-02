@@ -45,7 +45,7 @@ const Cart = () => {
       title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
-      render: (text) => typeof text === 'number' ? `$${text.toFixed(2)}` : '',
+      render: (text) => typeof text === 'number' ? `${text.toLocaleString('en-US')}` : '',
     },
     {
       title: t('quantity'),
@@ -75,7 +75,7 @@ const Cart = () => {
   ];
 
   const handlePayClick = () => {
-    localStorage.setItem('totalAmount', totalAmount.toFixed(2));
+    localStorage.setItem('totalAmount', totalAmount);
     navigate('/order');
   }
 
@@ -108,7 +108,7 @@ const Cart = () => {
       {shoppingCart.length > 0 && (
         <div className="mt-8 flex justify-end items-center">
           <Text className="text-2xl text-green-600 mr-4">
-            {t('total_amount')}: ${totalAmount.toFixed(2)}
+            {t('total_amount')}: {totalAmount.toLocaleString('en-US')}
           </Text>
           <Button type="primary" onClick={handlePayClick}>
             {t('pay')}

@@ -272,7 +272,7 @@ const ProductDetail = () => {
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
                                 <Paragraph>{`${t('quantity_in_stock')}: ${productData.Quantity}`}</Paragraph>
-                                <Paragraph className="text-green-600 text-4xl">${productData.Price}</Paragraph>
+                                <Paragraph className="text-green-600 text-4xl">{productData.Price.toLocaleString('en-US')}</Paragraph>
                                 <Paragraph>{`${t('description')}: ${productData.Description}`}</Paragraph>
                             </div>
                         )}
