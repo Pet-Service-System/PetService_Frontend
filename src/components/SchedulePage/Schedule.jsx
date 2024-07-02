@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Typography, Button, Modal, Form, Select, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -16,13 +17,14 @@ const Schedule = () => {
   const [roleOfUser] = useState(localStorage.getItem('role'));
   const [user] = useState(JSON.parse(localStorage.getItem('user')));
   const [accountID] = useState(user.id);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          message.error('Authorization token not found. Please log in.');
+          message.error(t('authorization_token_not_found'));
           return;
         }
 
@@ -34,8 +36,8 @@ const Schedule = () => {
 
         setSchedules(response.data);
       } catch (error) {
-        console.error('Error fetching schedules:', error);
-        message.error('Error fetching schedules');
+        console.error(t('error_fetching_schedules'), error);
+        message.error(t('error_fetching_schedules'));
       }
     };
 
@@ -54,8 +56,8 @@ const Schedule = () => {
         console.log('Users fetched:', response.data.accounts);
         setUsers(response.data.accounts);
       } catch (error) {
-        console.error('Error fetching users:', error);
-        message.error('Error fetching users');
+        console.error(t('error_fetching_users'), error);
+        message.error(t('error_fetching_users'));
       }
     };
 
@@ -73,14 +75,14 @@ const Schedule = () => {
 
   const handleRemoveEmployee = async (day, slot, employee) => {
     if (roleOfUser !== 'Store Manager') {
-      message.error('Bạn không có quyền xóa lịch của nhân viên.');
+      message.error(t('no_permission_remove_schedule'));
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('authorization_token_not_found'));
         return;
       }
 
@@ -105,21 +107,21 @@ const Schedule = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      message.success('Xóa lịch cho nhân viên thành công.');
+      message.success(t('remove_schedule_success'));
       setSchedules(response.data);
     } catch (error) {
-      console.error('Error removing employee:', error);
+      console.error(t('error_removing_employee'), error);
       if (error.response && error.response.data && error.response.data.message) {
         message.error(error.response.data.message);
       } else {
-        message.error('Error removing employee');
+        message.error(t('error_removing_employee'));
       }
     }
   };
 
   const columns = [
     {
-      title: 'Time',
+      title: t('time'),
       dataIndex: 'time',
       key: 'time',
       fixed: 'left',
@@ -127,7 +129,7 @@ const Schedule = () => {
       className: 'sticky left-0 bg-white',
     },
     ...days.map((day) => ({
-      title: day,
+      title: t(day.toLowerCase()),
       dataIndex: day,
       key: day,
       render: (text, record) =>
@@ -141,13 +143,13 @@ const Schedule = () => {
               <div>{employee.fullname} ({employee.role})</div>
               {roleOfUser === 'Store Manager' && (
                 <Button type="link" onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
-                  Remove
+                  {t('remove')}
                 </Button>
               )}
             </div>
           ))
         ) : (
-          <div>No employees</div>
+          <div>{t('no_employees')}</div>
         ),
     })),
   ];
@@ -168,14 +170,14 @@ const Schedule = () => {
 
   const handleSchedule = async (values) => {
     if (roleOfUser !== 'Store Manager') {
-      message.error('Bạn không có quyền lập lịch cho nhân viên.');
+      message.error(t('no_permission_schedule_employee'));
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error('Authorization token not found. Please log in.');
+        message.error(t('authorization_token_not_found'));
         return;
       }
 
@@ -205,17 +207,17 @@ const Schedule = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      message.success('Lập lịch cho nhân viên thành công.');
+      message.success(t('schedule_employee_success'));
       setSchedules(response.data);
       setSaving(false)
       setIsModalVisible(false);
       form.resetFields();
     } catch (error) {
-      console.error('Error scheduling employee:', error);
+      console.error(t('error_scheduling_employee'), error);
       if (error.response && error.response.data && error.response.data.message) {
         message.error(error.response.data.message);
       } else {
-        message.error('Error scheduling employee');
+        message.error(t('error_scheduling_employee'));
       }
       setSaving(false)
     }
@@ -231,23 +233,23 @@ const Schedule = () => {
   return (
     <div className="w-11/12 mx-auto mt-12 py-10">
       <Title level={2} className="text-center text-red-500 mb-6">
-        Lịch làm việc của nhân viên
+        {t('employee_schedule')}
       </Title>
       {roleOfUser === 'Store Manager' && (
         <Button type="primary" onClick={() => setIsModalVisible(true)} className="mb-6 float-right">
-          Schedule Employee
+          {t('schedule_employee')}
         </Button>
       )}
       <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
       <Modal
-        title="Schedule Employee"
+        title={t('schedule_employee')}
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
       >
         <Form form={form} onFinish={handleSchedule}>
-          <Form.Item name="day" label="Day" rules={[{ required: true, message: 'Please select a day' }]}>
-            <Select placeholder="Select a day">
+          <Form.Item name="day" label={t('day')} rules={[{ required: true, message: t('please_select_day') }]}>
+            <Select placeholder={t('select_day')}>
               {days.map((day) => (
                 <Option key={day} value={day}>
                   {day}
@@ -255,8 +257,8 @@ const Schedule = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="timeSlot" label="Time Slot" rules={[{ required: true, message: 'Please select a time slot' }]}>
-            <Select placeholder="Select time slot">
+          <Form.Item name="timeSlot" label={t('time_slot')} rules={[{ required: true, message: t('please_select_time_slot') }]}>
+            <Select placeholder={t('select_time_slot')}>
               {timeSlots.map((slot) => (
                 <Option key={`${slot.start} - ${slot.end}`} value={`${slot.start} - ${slot.end}`}>
                   {slot.start} - {slot.end}
@@ -264,8 +266,8 @@ const Schedule = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="fullname" label="Full Name" rules={[{ required: true, message: 'Please select a full name' }]}>
-            <Select placeholder="Select full name" onChange={handleFullnameChange}>
+          <Form.Item name="fullname" label={t('full_name')} rules={[{ required: true, message: t('please_select_full_name') }]}>
+            <Select placeholder={t('select_full_name')} onChange={handleFullnameChange}>
               {users.map((user) => (
                 <Option key={user.AccountID} value={user.fullname}>
                   {user.fullname}
@@ -273,14 +275,14 @@ const Schedule = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="role" label="Role">
+          <Form.Item name="role" label={t('role')}>
             <Select disabled>
               <Option value={roleOfEmp}>{roleOfEmp}</Option>
             </Select>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" className="float-right" disabled={saving}>
-              Submit
+              {t('submit')}
             </Button>
           </Form.Item>
         </Form>
