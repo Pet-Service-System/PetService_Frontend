@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 const GOOGLE_CLIENT_ID = import.meta.env.REACT_APP_GOOGLE_CLIENT_ID
 
 const { Title } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -60,7 +61,7 @@ const LoginForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
-        const response = await axios.post('http://localhost:3001/api/auth/login', {
+        const response = await axios.post(`${API_URL}/api/auth/login`, {
           email,
           password,
         });
@@ -75,7 +76,7 @@ const LoginForm = () => {
           phone: user.phone,
         };
         localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
-        const cartResponse = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
+        const cartResponse = await axios.get(`${API_URL}/api/cart/${user.id}`, {
         });
         message.success(t('login_successful'), 1).then(() => {
           navigate('/', { replace: true });
@@ -99,7 +100,7 @@ const LoginForm = () => {
   const handleGoogleLoginSuccess = async (response) => {
     const { credential } = response;
     try {
-      const authResponse = await fetch('http://localhost:3001/api/auth/google', {
+      const authResponse = await fetch(`${API_URL}/api/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +121,7 @@ const LoginForm = () => {
         };
         localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
         
-        const cartResponse = await axios.get(`http://localhost:3001/api/cart/${data.user.id}`, {
+        const cartResponse = await axios.get(`${API_URL}/api/cart/${data.user.id}`, {
           headers: {
             'Authorization': `Bearer ${data.token}`,
           },

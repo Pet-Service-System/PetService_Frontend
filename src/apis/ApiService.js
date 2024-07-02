@@ -1,8 +1,9 @@
 import axios from "axios";
+const API_URL = process.env.REACT_APP_API_URL;
 
 export const getPetService= async()=>{
     try {
-      const response = await axios.get(`https://6652009d20f4f4c4427970fe.mockapi.io/pet-service`);
+      const response = await axios.get(`${API_URL}/pet-service`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -11,7 +12,7 @@ export const getPetService= async()=>{
 
   export const getPetServiceDetail= async(id)=>{
     try {
-      const response = await axios.get(`https://6652009d20f4f4c4427970fe.mockapi.io/pet-service/${id}`);
+      const response = await axios.get(`${API_URL}/pet-service/${id}`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -20,7 +21,7 @@ export const getPetService= async()=>{
 
   export const getHotelService= async()=>{
     try {
-      const response = await axios.get(`https://66500bc8ec9b4a4a60307f5f.mockapi.io/for-dog-product`);
+      const response = await axios.get(`${API_URL}/for-dog-product`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -29,7 +30,7 @@ export const getPetService= async()=>{
 
   export const getHotelServiceDetail= async(id)=>{
     try {
-      const response = await axios.get(`https://66500bc8ec9b4a4a60307f5f.mockapi.io/for-dog-product/${id}`);
+      const response = await axios.get(`${API_URL}/for-dog-product/${id}`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -38,7 +39,7 @@ export const getPetService= async()=>{
 
   export const getHotels = async () => {
     try {
-        const response = await axios.get(`http://localhost:3001/api/hotels`);
+        const response = await axios.get(`${API_URL}/api/hotels`);
         return response.data;
     } catch (error) {
         console.error('Error fetching hotels:', error);
@@ -48,7 +49,7 @@ export const getPetService= async()=>{
 
 export const getHotelById = async (id) => {
     try {
-        const response = await axios.get(`http://localhost:3001/api/hotels/${id}`);
+        const response = await axios.get(`${API_URL}/api/hotels/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Error fetching hotel with ID ${id}:`, error);

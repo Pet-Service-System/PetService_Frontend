@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { Option } = Select;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
@@ -28,7 +29,7 @@ const Schedule = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:3001/api/schedules', {
+        const response = await axios.get(`${API_URL}/api/schedules`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -48,7 +49,7 @@ const Schedule = () => {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3001/api/accounts/role', {
+        const response = await axios.get(`${API_URL}/api/accounts/role`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -87,7 +88,7 @@ const Schedule = () => {
       }
 
       await axios.post(
-        'http://localhost:3001/api/schedules/remove',
+        `${API_URL}/api/schedules/remove`,
         {
           day,
           start_time: slot.start,
@@ -102,7 +103,7 @@ const Schedule = () => {
       );
 
       // Refetch schedules after successful removal
-      const response = await axios.get('http://localhost:3001/api/schedules', {
+      const response = await axios.get(`${API_URL}/api/schedules`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -186,7 +187,7 @@ const Schedule = () => {
       const accountId = selectedUser ? selectedUser.AccountID : null;
       setSaving(true)
       await axios.post(
-        'http://localhost:3001/api/schedules/assign',
+        `${API_URL}/api/schedules/assign`,
         {
           day,
           slots: [{ start_time, end_time }],
@@ -202,7 +203,7 @@ const Schedule = () => {
       );
 
       // Refetch schedules after successful assignment
-      const response = await axios.get('http://localhost:3001/api/schedules', {
+      const response = await axios.get(`${API_URL}/api/schedules`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

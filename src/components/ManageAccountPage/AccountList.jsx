@@ -3,8 +3,10 @@ import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleto
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
+
 const { Title } = Typography;
 const { Option } = Select;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const AccountList = () => {
   const [accountData, setAccountData] = useState([]);
@@ -22,7 +24,7 @@ const AccountList = () => {
     const fetchAccounts = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3001/api/accounts/all', {
+        const response = await axios.get(`${API_URL}/api/accounts/all`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -77,7 +79,7 @@ const AccountList = () => {
         status: values.status
       };
 
-      await axios.patch(`http://localhost:3001/api/accounts/${id}`, updatedAccount, {
+      await axios.patch(`${API_URL}/api/accounts/${id}`, updatedAccount, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

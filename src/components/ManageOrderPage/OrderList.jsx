@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 const { confirm } = Modal;
-const { Search } = Input
+const { Search } = Input;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 const { Option } = Select;
 
 const OrderList = () => {
@@ -25,7 +26,7 @@ const OrderList = () => {
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/orders/`, {
+      const response = await axios.get(`${API_URL}/api/orders/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -35,7 +36,7 @@ const OrderList = () => {
 
       // Fetch order details for each order
       const orderDetailsPromises = orders.map(order =>
-        axios.get(`http://localhost:3001/api/order-details/order/${order.OrderID}`, {
+        axios.get(`${API_URL}/api/order-details/order/${order.OrderID}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -126,7 +127,7 @@ const OrderList = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `http://localhost:3001/api/orders/${orderId}`,
+        `${API_URL}/api/orders/${orderId}`,
         { Status: newStatus },
         {
           headers: {
