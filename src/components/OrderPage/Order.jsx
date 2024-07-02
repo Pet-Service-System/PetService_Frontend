@@ -8,15 +8,17 @@ import { setShoppingCart } from '../../redux/shoppingCart';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env.REACT_APP_EXCHANGE_RATE_VND_TO_USD
+const REACT_APP_SHIPPING_COST = import.meta.env.REACT_APP_SHIPPING_COST
 
 const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
+  const shippingCost = parseFloat(REACT_APP_SHIPPING_COST)
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
-    shippingCost: 20000,
+    shippingCost: shippingCost,
     cartItems: JSON.parse(localStorage.getItem('shoppingCart')) || [], // Load cartItems from localStorage
   });
   const [customerInfo, setCustomerInfo] = useState({
@@ -29,7 +31,7 @@ const Order = () => {
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const exchangeRateVNDtoUSD = REACT_APP_EXCHANGE_RATE_VND_TO_USD;
+  const exchangeRateVNDtoUSD = parseFloat(REACT_APP_EXCHANGE_RATE_VND_TO_USD);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -51,7 +53,7 @@ const Order = () => {
 
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
-    let shippingCost = 20000;
+    let shippingCost = shippingCost;
 
     setSelectedShippingMethod(shippingMethod);
     setOrderDetails({
@@ -324,7 +326,7 @@ const Order = () => {
                 value={selectedShippingMethod}
                 onChange={handleShippingChange}
               >
-                <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} (20,000đ)</Radio>
+                <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
               </Radio.Group>
             </div>
 
