@@ -399,5 +399,16 @@
     "Administrator": "Administrator",
     "Filter by Status": "Filter by Status",
     "Active": "Active",
-    "Inactive": "Inactive"
+    "Inactive": "Inactive",
+    "filter_booking_date": "Filter by booking date:",
+    "filter_created_date": "Filter by created date:",
+    "service_list": "Booking list",
+    "filter_order_date": "Filter by Order Date",
+    "filter_status": "Filter by Status",
+    "Processing": "Processing",
+    "Delivering": "Delivering",
+    "Shipped": "Shipped",
+    "canceled": "Canceled",
+    "search_customer": "Search by Customer",
+    "search_by_customer": "Search by customer name or phone"
 }

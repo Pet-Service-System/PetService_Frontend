@@ -1,14 +1,14 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Select } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 const { Search } = Input;
-
+const { Option } = Select;
 
 const SpaBooking = () => {  
   const navigate = useNavigate();
@@ -19,6 +19,14 @@ const SpaBooking = () => {
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
+
+  const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [pendingStatus, setPendingStatus] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBookingDate, setSelectedBookingDate] = useState(null);
+  const [selectedDateCreated, setSelectedDateCreated] = useState(null);
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState('');
 
   const getSpaBookings = async (bookingDate, dateCreated) => {
     const token = localStorage.getItem('token');
@@ -54,20 +62,11 @@ const SpaBooking = () => {
     }
   };
 
-  // State for status update modal
-  const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
-  const [selectedBookingId, setSelectedBookingId] = useState(null);
-  const [pendingStatus, setPendingStatus] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBookingDate, setSelectedBookingDate] = useState(null); // State for selected booking date filter
-  const [selectedDateCreated, setSelectedDateCreated] = useState(null); // State for selected date created filter
-
   useEffect(() => {
     fetchSpaBookings();
-  }, [sortOrder, selectedBookingDate, selectedDateCreated]);
+  }, [sortOrder, selectedBookingDate, selectedDateCreated, selectedStatusFilter]);
 
   useEffect(() => {
-    // Filter spaBookings based on searchQuery and selectedDate
     let filteredData = spaBookings.filter(booking =>
       booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       booking.phone.includes(searchQuery)
@@ -85,8 +84,14 @@ const SpaBooking = () => {
       );
     }
 
+    if (selectedStatusFilter) {
+      filteredData = filteredData.filter(booking =>
+        booking.status === selectedStatusFilter
+      );
+    }
+
     setFilteredSpaBookings(filteredData);
-  }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated]);
+  }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated, selectedStatusFilter]);
 
   const fetchSpaBookings = async () => {
     setLoading(true);
@@ -248,35 +253,56 @@ const SpaBooking = () => {
     }
   };
 
+  const handleStatusFilterChange = (value) => {
+    setSelectedStatusFilter(value);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
-          <Title className="text-5xl text-center font-semibold">Danh sách dịch vụ</Title>
-          <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4">
-            <Button onClick={handleSortOrder} style={{ width: 170 }}>
-              Sort by date: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+        <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
+        <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
+        <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
+              {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
-            <div>
-              <Text>Lọc theo ngày đặt lịch: </Text>
-              <DatePicker
-                onChange={handleBookingDateChange}
-                style={{ width: 200, marginRight: 12 }}
-              />
-            </div>
-            <div>
-              <Text>Lọc theo ngày tạo lịch: </Text>
-              <DatePicker
-                onChange={handleDateCreatedChange}
-                style={{ width: 200, marginRight: 12 }}
-              />
-            </div>
-            <Search
-              placeholder="Search by customer name or phone"
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 300 }}
+          <div>
+            <Text>{t('filter_booking_date')}</Text>
+            <DatePicker
+              onChange={handleBookingDateChange}
+              style={{ width: 150, marginRight: 12 }}
             />
-          </Layout>
+          </div>
+          <div>
+            <Text>{t('filter_created_date')}</Text>
+            <DatePicker
+              onChange={handleDateCreatedChange}
+              style={{ width: 150, marginRight: 12 }}
+            />
+          </div>
+          <div>
+            <Text>{t('filter_status')}</Text>
+            <Select
+              placeholder={t('select_status')}
+              style={{ width: 200, marginRight: 12 }}
+              onChange={handleStatusFilterChange}
+              allowClear
+            >
+              <Option value="Pending">{t('pending')}</Option>
+              <Option value="Processing">{t('processing')}</Option>
+              <Option value="Completed">{t('completed')}</Option>
+              <Option value="Canceled">{t('canceled')}</Option>
+            </Select>
+          </div>
+          <div>
+            <Text>{t('search_customer')}</Text>
+            <Search
+              placeholder={t('search')}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 340 }}
+            />
+          </div>
+        </Layout>
           <Spin spinning={loading}>
             <Table
               columns={columns}
