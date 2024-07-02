@@ -5,6 +5,8 @@ import { Form, Input, Button, Typography, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import 'tailwindcss/tailwind.css';
+import { useTranslation } from 'react-i18next';
+
 const GOOGLE_CLIENT_ID = import.meta.env.REACT_APP_GOOGLE_CLIENT_ID
 
 const { Title } = Typography;
@@ -16,6 +18,7 @@ const LoginForm = () => {
   const [disableLogin, setDisableLogin] = useState(false);
   const navigate = useNavigate();
   const GoogleClientID = GOOGLE_CLIENT_ID;
+  const { t } = useTranslation();
 
   useEffect(() => {
     let timer;
@@ -37,15 +40,15 @@ const LoginForm = () => {
   const validate = () => {
     const newErrors = {};
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('email_required');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = t('email_invalid');
     }
   
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('password_required');
     } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = t('password_min_length');
     }
   
     return newErrors;
@@ -74,7 +77,7 @@ const LoginForm = () => {
         localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
         const cartResponse = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
         });
-        message.success('Login successful!', 1).then(() => {
+        message.success(t('login_successful'), 1).then(() => {
           navigate('/', { replace: true });
         });
         console.log(cartResponse.data)
@@ -127,13 +130,13 @@ const LoginForm = () => {
     } catch (error) {
       console.error('Google login error:', error);
     }
-    message.success('Login successful!', 1).then(() => {
+    message.success(t('login_successful'), 1).then(() => {
       navigate('/', { replace: true });
     });
   };
 
   const handleGoogleLoginFailure = (error) => {
-    message.error('Google login failed');
+    message.error(t('google_log_in_fail'));
     console.error('Google login error:', error);
   };
 
@@ -142,15 +145,15 @@ const LoginForm = () => {
       <Row justify="center" style={{ alignItems: 'center' }}>
         <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10 py-10'>
           <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
-            <Title level={3} className="text-blue-500 text-center">Login</Title>
+            <Title level={3} className="text-blue-500 text-center">{t('log_in')}</Title>
             <Form onFinish={handleSubmit} layout="vertical">
             <Form.Item
                 label="Email"
                 name="email"
                 validateTrigger="onSubmit"
                 rules={[
-                  { required: true, message: 'Please enter your email' },
-                  { type: 'email', message: 'Please enter a valid email' }
+                  { required: true, message: t('please_enter_email') },
+                  { type: 'email', message: t('please_enter_valid_email') }
                 ]}
               >
                 <Input
@@ -162,12 +165,12 @@ const LoginForm = () => {
                 />
               </Form.Item>
               <Form.Item
-                label="Password"
+                label={t('password')}
                 name="password"
                 validateTrigger="onSubmit"
                 rules={[
-                  { required: true, message: 'Please enter your password' },
-                  { min: 8, message: 'Password must be at least 8 characters' }
+                  { required: true, message: t('please_enter_password') },
+                  { min: 8, message: t('password_min_length') }
                 ]}
               >
                 <Input.Password
@@ -183,10 +186,10 @@ const LoginForm = () => {
               </Form.Item>
               <div className="flex justify-between items-center w-full">
                 <Button type="link" onClick={() => navigate('/register')} className="p-0">
-                  Register
+                  {t('register')}
                 </Button>
                 <Button type="link" onClick={() => navigate('/forgot-password')} className="p-0">
-                  Forgot Password?
+                  {t('forgot_password')}?
                 </Button>
               </div>
             </Form>
