@@ -5,9 +5,6 @@ import { Form, Input, Button, Typography, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import 'tailwindcss/tailwind.css';
-
-import { useTranslation } from 'react-i18next';
-
 const GOOGLE_CLIENT_ID = import.meta.env.REACT_APP_GOOGLE_CLIENT_ID
 
 const { Title } = Typography;
@@ -19,7 +16,6 @@ const LoginForm = () => {
   const [disableLogin, setDisableLogin] = useState(false);
   const navigate = useNavigate();
   const GoogleClientID = GOOGLE_CLIENT_ID;
-  const { t } = useTranslation();
 
   useEffect(() => {
     let timer;
@@ -146,7 +142,7 @@ const LoginForm = () => {
       <Row justify="center" style={{ alignItems: 'center' }}>
         <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10 py-10'>
           <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
-            <Title level={3} className="text-blue-500 text-center">{t('log_in')}</Title>
+            <Title level={3} className="text-blue-500 text-center">Login</Title>
             <Form onFinish={handleSubmit} layout="vertical">
             <Form.Item
                 label="Email"
@@ -166,7 +162,7 @@ const LoginForm = () => {
                 />
               </Form.Item>
               <Form.Item
-                label={t('password')}
+                label="Password"
                 name="password"
                 validateTrigger="onSubmit"
                 rules={[
@@ -187,10 +183,10 @@ const LoginForm = () => {
               </Form.Item>
               <div className="flex justify-between items-center w-full">
                 <Button type="link" onClick={() => navigate('/register')} className="p-0">
-                  {t('sign_in')}
+                  Register
                 </Button>
                 <Button type="link" onClick={() => navigate('/forgot-password')} className="p-0">
-                  {t('forgot_password')}?
+                  Forgot Password?
                 </Button>
               </div>
             </Form>
