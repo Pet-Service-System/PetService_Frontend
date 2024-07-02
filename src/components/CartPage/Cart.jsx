@@ -92,13 +92,14 @@ const Cart = () => {
         </Button>
       </div>
       <Title className="text-center" level={2}>{t('shopping_cart')}</Title>
-      <Card className="shadow-lg rounded-lg p-10">
+      <Card className="shadow-lg rounded-lg">
         {shoppingCart.length > 0 ? (
           <Table
             dataSource={shoppingCart}
             columns={columns}
             rowKey="ProductID"
             pagination={false}
+            scroll={{ x: 'max-content' }}
           />
         ) : (
           <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>

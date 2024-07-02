@@ -38,7 +38,7 @@
     "for_cat": "For Cat",
     "CONTACT": "CONTACT",
     "SCHEDULE": "SCHEDULE",
-    "MANAGE_ACCOUNT": "MANAGE ACCOUNT",
+    "MANAGE_ACCOUNT": "Manage account",
     "manage_spa_booking": "Manage Spa Booking",
     "order": "Order",
     "STORE": "STORE",
@@ -387,5 +387,17 @@
     "google_log_in_fail" : "Google login failed",
     "please_enter_email": "Please enter your email!",
     "please_enter_valid_email": "Please enter a valid email!",
-    "please_enter_password": "Please enter your password!"
+    "please_enter_password": "Please enter your password!",
+    "login_failed": "Wrong email or password!",
+    "Account List": "Account List",
+    "Search by fullname, email, or phone": "Search by fullname, email, or phone",
+    "Filter by Role": "Filter by Role",
+    "Customer": "Customer",
+    "Sales Staff": "Sales Staff",
+    "Caretaker Staff": "Caretaker Staff",
+    "Store Manager": "Store Manager",
+    "Administrator": "Administrator",
+    "Filter by Status": "Filter by Status",
+    "Active": "Active",
+    "Inactive": "Inactive"
 }

@@ -177,7 +177,7 @@ const Banner = () => {
     } else if (role === 'Administrator') {
       menuItems = [
         { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
-        { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts' },
+        { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts', parent: t('MANAGEMENT') },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -219,7 +219,10 @@ const Banner = () => {
     const currentLanguage = i18n.language;
 
     return (
-      <Menu mode={isVertical ? "inline" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "inline" : "horizontal"} 
+            onClick={closeMenu} 
+            className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} 
+            disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>

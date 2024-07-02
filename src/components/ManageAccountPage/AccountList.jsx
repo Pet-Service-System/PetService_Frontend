@@ -184,67 +184,36 @@ const AccountList = () => {
 
   return (
     <div className="p-4 sm:p-8">
-      <Title level={2} className="text-center">Account List</Title>
-      <div className='flex flex-row justify-end items-center'>
+      <Title level={2} className="text-center">{t('Account List')}</Title>
+      <div className='flex flex-row justify-end items-center mb-2'>
         <Input.Search
-            placeholder="Search by fullname, email, or phone"
-            allowClear
-            onChange={(e) => handleSearch(e.target.value)} // Handle search on change
-            style={{ width: 250, marginRight: 8 }} // Adjust width as per your requirement
-          />
-        <Select
-            placeholder="Filter by Role"
-            allowClear
-            style={{ width: 130, marginRight: 8 }}
-            onChange={handleRoleFilter}
-          >
-            <Option value="Customer">Customer</Option>
-            <Option value="Sales Staff">Sales Staff</Option>
-            <Option value="Caretaker Staff">Caretaker Staff</Option>
-            <Option value="Store Manager">Store Manager</Option>
-            <Option value="Administrator">Administrator</Option>
-          </Select>
-          <Select
-            placeholder="Filter by Status"
-            allowClear
-            style={{ width: 135 }}
-            onChange={handleStatusFilter}
-          >
-            <Option value={1}>Active</Option>
-            <Option value={0}>Inactive</Option>
-          </Select>
-      </div>
-      {/* <div className='flex flex-row justify-between items-center mb-4'>
-        <Input.Search
-          placeholder="Search by fullname, email, or phone"
+          placeholder={t('Search by fullname, email, or phone')}
           allowClear
-          onChange={(e) => handleSearch(e.target.value)} // Handle search on change
-          style={{ width: 250 }} // Adjust width as per your requirement
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 250, marginRight: 8 }} 
         />
-      <div>
-          <Select
-            placeholder="Filter by Role"
-            allowClear
-            style={{ width: 150, marginRight: 8 }}
-            onChange={handleRoleFilter}
-          >
-            <Option value="Customer">Customer</Option>
-            <Option value="Sales Staff">Sales Staff</Option>
-            <Option value="Caretaker Staff">Caretaker Staff</Option>
-            <Option value="Store Manager">Store Manager</Option>
-            <Option value="Administrator">Administrator</Option>
-          </Select>
-          <Select
-            placeholder="Filter by Status"
-            allowClear
-            style={{ width: 150 }}
-            onChange={handleStatusFilter}
-          >
-            <Option value={1}>Active</Option>
-            <Option value={0}>Inactive</Option>
-          </Select>
-        </div>
-      </div> */}
+        <Select
+          placeholder={t('Filter by Role')}
+          allowClear
+          style={{ width: 130, marginRight: 8 }}
+          onChange={handleRoleFilter}
+        >
+          <Option value="Customer">{t('Customer')}</Option>
+          <Option value="Sales Staff">{t('Sales Staff')}</Option>
+          <Option value="Caretaker Staff">{t('Caretaker Staff')}</Option>
+          <Option value="Store Manager">{t('Store Manager')}</Option>
+          <Option value="Administrator">{t('Administrator')}</Option>
+        </Select>
+        <Select
+          placeholder={t('Filter by Status')}
+          allowClear
+          style={{ width: 135 }}
+          onChange={handleStatusFilter}
+        >
+          <Option value={1}>{t('Active')}</Option>
+          <Option value={0}>{t('Inactive')}</Option>
+        </Select>
+      </div>
       <Table
         dataSource={loading ? [] : filteredData}
         columns={columns}

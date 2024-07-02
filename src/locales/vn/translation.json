@@ -37,7 +37,7 @@
     "for_cat": "Dành cho mèo",
     "CONTACT": "LIÊN HỆ",
     "SCHEDULE": "LỊCH",
-    "MANAGE_ACCOUNT": "QUẢN LÍ TÀI KHOẢN",
+    "MANAGE_ACCOUNT": "Quản lý tài khoản",
     "manage_spa_booking": "Spa Booking",
     "order": "Đơn hàng",
     "STORE": "CỬA HÀNG",
@@ -394,5 +394,17 @@
     "google_log_in_fail" : "Đăng nhập Google không thành công",
     "please_enter_email": "Vui lòng nhập email của bạn!",
     "please_enter_valid_email": "Vui lòng nhập email hợp lệ!",
-    "please_enter_password": "Vui lòng nhập mật khẩu của bạn!"
+    "please_enter_password": "Vui lòng nhập mật khẩu của bạn!",
+    "login_failed" : "Sai email hoặc mật khẩu!",
+    "Account List": "Danh sách tài khoản",
+    "Search by fullname, email, or phone": "Tìm kiếm theo họ tên, email hoặc số điện thoại",
+    "Filter by Role": "Lọc theo vai trò",
+    "Customer": "Khách hàng",
+    "Sales Staff": "Nhân viên bán hàng",
+    "Caretaker Staff": "Nhân viên chăm sóc",
+    "Store Manager": "Quản lý cửa hàng",
+    "Administrator": "Quản trị viên",   
+    "Filter by Status": "Lọc theo trạng thái",
+    "Active": "Hoạt động",
+    "Inactive": "Ngừng hoạt động"
 }

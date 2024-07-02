@@ -7,9 +7,12 @@ import SubMenu from 'antd/es/menu/SubMenu';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 import '../../assets/fonts/fonts.css';
-import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+
+
 import { Dropdown } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Header } = Layout;
 
@@ -18,19 +21,17 @@ const Banner = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  // const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
   const dispatch = useDispatch();
   const { t } = useTranslation();
-
   const handleVisibleChange = (visible) => {
     setVisible(visible);
   };
 
-  // const checkTokenValidity = async () => {
   //   if (!token) {
   //     return;
   //   }
@@ -53,7 +54,7 @@ const Banner = () => {
   //         setUser(null);
   //         navigate('/login');
   //         // Inform the user
-  //         alert('Your session has expired. Please log in again.');
+  //         alert(t('session_expired_alert'));
   //       }
   //     }
   //   } catch (error) {
@@ -62,7 +63,6 @@ const Banner = () => {
   // };
 
   useEffect(() => {
-    // checkTokenValidity();
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
@@ -82,19 +82,41 @@ const Banner = () => {
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };
   const clickTitle = () => navigate('/');
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const accountID = user.id;
+    const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
+    console.log('User ID:', accountID);
+    console.log('Cart Items:', cartItems);
+  
+    if (cartItems.length > 0) {
+      try {
+        const response = await axios.post('http://localhost:3001/api/cart', {
+          AccountID: accountID, // Use accountID variable instead of undefined response.AccountID
+          Items: cartItems, // Pass the parsed cartItems directly
+        }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        console.log('Cart saved successfully:', response.data);
+      } catch (error) {
+        console.error('Error saving cart:', error);
+        // Handle specific error scenarios if needed
+      }
+    }
+  
     localStorage.clear();
     dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
-    navigate('/', {replace: true});
+    navigate('/', { replace: true });
   };
 
   const userMenuItems = [
     { key: 'profile', icon: <UserOutlined />, label: t('user_information'), onClick: () => navigate('/user-profile') },
     ...(role === 'Customer' ? [
       { key: 'pet-list', icon: <UnorderedListOutlined />, label: t('list_of_pets'), onClick: () => navigate('/pet-list') },
-      { key: 'orders-history', icon: <HistoryOutlined />, label: t('order_history'), onClick: () => navigate('/orders-history') },
+      { key: 'order-history', icon: <HistoryOutlined />, label: t('order_history'), onClick: () => navigate('/order-history') },
       {
         key: 'service-history',
         icon: <HistoryOutlined />,
@@ -127,6 +149,9 @@ const Banner = () => {
 
   const renderMenuItems = (isVertical) => {
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
+
+
     let menuItems = [];
 
     if (role === 'Guest') {
@@ -137,7 +162,7 @@ const Banner = () => {
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
-      ];
+     ];
     } else if (role === 'Customer') {
       menuItems = [
         { key: 'home', label: t('HOME'), path: '/' },
@@ -146,7 +171,7 @@ const Banner = () => {
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
-      ];
+     ];
     } else if (role === 'Administrator') {
       menuItems = [
         { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
@@ -209,7 +234,7 @@ const Banner = () => {
         )}
         {role === 'Customer' && isVertical && (
           <>
-            <Menu.Item key="cart" onClick={() => navigate('/cart')}>{t('CART')}</Menu.Item>
+            <Menu.Item key="cart" onClick={() => navigate('/cart')}>GIỎ HÀNG</Menu.Item>
             <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
               <Menu.Item onClick={() => { navigate('/user-profile') }}>Thông tin người dùng</Menu.Item>
               <Menu.Item onClick={() => { navigate('/pet-list') }}>Danh sách thú cưng</Menu.Item>
@@ -225,7 +250,7 @@ const Banner = () => {
             <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item> 
           </>
         )}
-        {['Sale staff', 'Caretaker staff', 'Store Manager'].includes(role) && isVertical && (
+        {['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role) && isVertical && (
           <>
             <Menu.Item onClick={() => { navigate('/user-profile') }}>TÀI KHOẢN</Menu.Item>
             <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item> 
@@ -245,7 +270,7 @@ const Banner = () => {
             }
             trigger={['click']}
           >
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            <a className="ant-dropdown-link" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
               <GlobalOutlined /> {currentLanguage === 'en' ? 'English' : 'Tiếng Việt'}
             </a>
           </Dropdown>
@@ -260,7 +285,7 @@ const Banner = () => {
         <div className="flex items-center">
           {/* <img className="ml-20 h-20 w-20 cursor-pointer" src="/src/assets/image/iconPet.png" onClick={clickTitle} alt="Pet Service Logo" /> */}
           <span
-            className="text-5xl ml-10 px-10 cursor-pointer text-white"
+            className="text-4xl lg:text-7xl md:text-5xl cursor-pointer text-white"
             style={{ fontFamily: 'Playground' }}
             onClick={clickTitle}
           >

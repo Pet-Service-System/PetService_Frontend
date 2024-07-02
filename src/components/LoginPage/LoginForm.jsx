@@ -85,7 +85,8 @@ const LoginForm = () => {
         localStorage.setItem('shoppingCart', JSON.stringify(Items));
       } catch (error) {
         if (error.response) {
-          message.error(error.response.data.message);
+          console.error(error.response.data.message);
+          message.error(t('login_failed'))
         }
         setDisableLogin(true);
       } finally {
