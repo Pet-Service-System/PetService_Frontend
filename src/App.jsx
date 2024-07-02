@@ -4,7 +4,6 @@ import HomePage from './pages/HomePage'
 import "./styles/bootstrap.css"
 import "./styles/flexslider.css"
 import "./styles/style.css"
-import AboutPage from './pages/AboutPage'
 import ProductForDogPage from './pages/ProductForDogPage'
 import ProductForCatPage from './pages/ProductForCatPage'
 import ServiceForDogPage from './pages/ServiceForDogPage'
@@ -30,12 +29,12 @@ import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
 import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
 import PurchaseSuccessPage from './pages/PurchaseOrderSuccessPage'
+import StatisticPage from './pages/StatisticPage'
 function App() {
   return (
     <>
     <Routes>
       <Route path='/' element={<HomePage/>}/>
-      <Route path='/about' element={<AboutPage/>}/>
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/register' element={<RegisterPage/>}/>
       <Route path='/forgot-password' element={<ForgotPasswordPage/>}/>
@@ -60,6 +59,7 @@ function App() {
       <Route path='/manage-orders' element={<ManageOrderPage/>}/>
       <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
       <Route path='/purchase-order-successfully' element={<PurchaseSuccessPage/>}/>
+      <Route path='/statistics' element={<StatisticPage/>}/>
     </Routes>
     </>
   )

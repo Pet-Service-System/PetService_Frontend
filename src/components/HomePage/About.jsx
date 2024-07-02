@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 const { Title, Paragraph } = Typography;
 
 
-const Welcome = () => {
+const About = () => {
   const { t } = useTranslation();
   return (
     <div className="bg-gray-200">
@@ -31,4 +31,4 @@ const Welcome = () => {
   );
 };
 
-export default Welcome;
+export default About;

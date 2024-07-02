@@ -1,8 +1,6 @@
 
 import { Typography, Card, Row, Col } from 'antd';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
-
 const { Title, Text } = Typography;
 
 const Welcome = () => {

@@ -332,7 +332,7 @@ const ProductList = () => {
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">{product.Price.toLocaleString('en-US')}</p>
+                    <h2 className="text-green-600 mt-2 text-4xl">{product.Price.toLocaleString('en-US')}</h2>
                     <p className="text-gray-500 mt-2">{product.Description}</p>
                   </div>
                 </Card>

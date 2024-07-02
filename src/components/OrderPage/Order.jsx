@@ -147,7 +147,7 @@ const Order = () => {
     return actions.order.create({
       purchase_units: [{
         amount: {
-          value: (orderDetails.totalAmount + orderDetails.shippingCost) * exchangeRateVNDtoUSD,
+          value: ((orderDetails.totalAmount + orderDetails.shippingCost) * exchangeRateVNDtoUSD).toFixed(2),
         },
       }],
     });

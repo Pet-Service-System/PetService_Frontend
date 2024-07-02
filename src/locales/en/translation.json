@@ -410,5 +410,6 @@
     "Shipped": "Shipped",
     "canceled": "Canceled",
     "search_customer": "Search by Customer",
-    "search_by_customer": "Search by customer name or phone"
+    "search_by_customer": "Search by customer name or phone",
+    "statistics": "STATISTICS"
 }
