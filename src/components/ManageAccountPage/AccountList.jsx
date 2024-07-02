@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton } from 'antd';
+import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton, Layout } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -183,108 +183,114 @@ const AccountList = () => {
   }
 
   return (
-    <div className="p-4 sm:p-8">
-      <Title level={2} className="text-center">{t('Account List')}</Title>
-      <div className='flex flex-row justify-end items-center mb-2'>
-        <Input.Search
-          placeholder={t('Search by fullname, email, or phone')}
-          allowClear
-          onChange={(e) => handleSearch(e.target.value)}
-          style={{ width: 250, marginRight: 8 }} 
+    <Layout style={{ minHeight: '100vh' }}>
+      <Layout className='site-layout'>
+        <div className="p-4 sm:p-8 site-layout-background">
+        <Title level={2} className="text-center">{t('Account List')}</Title>
+        <Layout className='flex lg:flex-row sm:flex-col justify-between mb-4'>
+          <Input.Search
+            placeholder={t('Search by fullname, email, or phone')}
+            allowClear
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: 320, marginRight: 8 }} 
+          />
+          <div>
+            <Select
+              placeholder={t('Filter by Role')}
+              allowClear
+              style={{ width: 150, marginRight: 8 }}
+              onChange={handleRoleFilter}
+            >
+              <Option value="Customer">{t('Customer')}</Option>
+              <Option value="Sales Staff">{t('Sales Staff')}</Option>
+              <Option value="Caretaker Staff">{t('Caretaker Staff')}</Option>
+              <Option value="Store Manager">{t('Store Manager')}</Option>
+              <Option value="Administrator">{t('Administrator')}</Option>
+            </Select>
+            <Select
+              placeholder={t('Filter by Status')}
+              allowClear
+              style={{ width: 160 }}
+              onChange={handleStatusFilter}
+            >
+              <Option value={1}>{t('Active')}</Option>
+              <Option value={0}>{t('Inactive')}</Option>
+            </Select>
+          </div>
+        </Layout>
+        <Table
+          dataSource={loading ? [] : filteredData}
+          columns={columns}
+          bordered
+          rowKey="account_id"
+          pagination={false}
+          loading={loading}
+          scroll={{ x: 'max-content' }}
         />
-        <Select
-          placeholder={t('Filter by Role')}
-          allowClear
-          style={{ width: 130, marginRight: 8 }}
-          onChange={handleRoleFilter}
-        >
-          <Option value="Customer">{t('Customer')}</Option>
-          <Option value="Sales Staff">{t('Sales Staff')}</Option>
-          <Option value="Caretaker Staff">{t('Caretaker Staff')}</Option>
-          <Option value="Store Manager">{t('Store Manager')}</Option>
-          <Option value="Administrator">{t('Administrator')}</Option>
-        </Select>
-        <Select
-          placeholder={t('Filter by Status')}
-          allowClear
-          style={{ width: 135 }}
-          onChange={handleStatusFilter}
-        >
-          <Option value={1}>{t('Active')}</Option>
-          <Option value={0}>{t('Inactive')}</Option>
-        </Select>
-      </div>
-      <Table
-        dataSource={loading ? [] : filteredData}
-        columns={columns}
-        bordered
-        rowKey="account_id"
-        pagination={false}
-        loading={loading}
-        scroll={{ x: 'max-content' }}
-      />
-      {loading && <Skeleton active />}
+        {loading && <Skeleton active />}
 
-      <Modal
-        title="Edit Account"
-        visible={isModalVisible}
-        onCancel={handleCancelEdit}
-        footer={[
-          <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>{t('cancel')}</Button>,
-          <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
-        ]}
-      >
-        <Form form={form}>
-          {/* Fields */}
-          <Form.Item
-            name="fullname"
-            rules={[{ required: true, message: t('please_enter') + t('fullname') + '!' }]}
-          >
-            <Input placeholder="Fullname" />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: t('please_enter') + 'email' + '!'}]}
-          >
-            <Input placeholder="Email" />
-          </Form.Item>
-          <Form.Item
-            name="phone"
-            rules={[{ required: true, message: t('please_enter') + t('phone') + '!'}]}
-          >
-            <Input placeholder="Phone" />
-          </Form.Item>
-          <Form.Item
-            name="address"
-            rules={[{ required: true, message: t('please_enter') + t('adress') + '!' }]}
-          >
-            <Input placeholder="Address" />
-          </Form.Item>
-          <Form.Item
-            name="role"
-            rules={[{ required: true, message: t('please_enter') + t('role') + '!' }]}
-          >
-            <Select placeholder="Select Role">
-              {/* Options for roles */}
-              <Option value="Customer">Customer</Option>
-              <Option value="Sales Staff">Sales Staff</Option>
-              <Option value="Caretaker Staff">Caretaker Staff</Option>
-              <Option value="Store Manager">Store Manager</Option>
-              <Option value="Administrator">Administrator</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="status"
-            rules={[{ required: true, message: t('please_select_the_status') }]}
-          >
-            <Select placeholder="Select Status">
-              <Option value={1}>{t('active')}</Option>
-              <Option value={0}>{t('inactive')}</Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+        <Modal
+          title="Edit Account"
+          visible={isModalVisible}
+          onCancel={handleCancelEdit}
+          footer={[
+            <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>{t('cancel')}</Button>,
+            <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
+          ]}
+        >
+          <Form form={form}>
+            {/* Fields */}
+            <Form.Item
+              name="fullname"
+              rules={[{ required: true, message: t('please_enter') + t('fullname') + '!' }]}
+            >
+              <Input placeholder="Fullname" />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              rules={[{ required: true, message: t('please_enter') + 'email' + '!'}]}
+            >
+              <Input placeholder="Email" />
+            </Form.Item>
+            <Form.Item
+              name="phone"
+              rules={[{ required: true, message: t('please_enter') + t('phone') + '!'}]}
+            >
+              <Input placeholder="Phone" />
+            </Form.Item>
+            <Form.Item
+              name="address"
+              rules={[{ required: true, message: t('please_enter') + t('adress') + '!' }]}
+            >
+              <Input placeholder="Address" />
+            </Form.Item>
+            <Form.Item
+              name="role"
+              rules={[{ required: true, message: t('please_enter') + t('role') + '!' }]}
+            >
+              <Select placeholder="Select Role">
+                {/* Options for roles */}
+                <Option value="Customer">Customer</Option>
+                <Option value="Sales Staff">Sales Staff</Option>
+                <Option value="Caretaker Staff">Caretaker Staff</Option>
+                <Option value="Store Manager">Store Manager</Option>
+                <Option value="Administrator">Administrator</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="status"
+              rules={[{ required: true, message: t('please_select_the_status') }]}
+            >
+              <Select placeholder="Select Status">
+                <Option value={1}>{t('active')}</Option>
+                <Option value={0}>{t('inactive')}</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+      </Layout>
+    </Layout>
   );
 };
 
