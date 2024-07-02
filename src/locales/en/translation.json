@@ -399,5 +399,9 @@
     "Administrator": "Administrator",
     "Filter by Status": "Filter by Status",
     "Active": "Active",
-    "Inactive": "Inactive"
+    "Inactive": "Inactive",
+    "service_list" : "List of services",
+    "filter_by_day_book" : "Filter by booking date",
+    "filter_by_day_create" : "Filter by calendar creation date",
+    "filter_by_day_create_order" : "Filter by order creation date"
 }

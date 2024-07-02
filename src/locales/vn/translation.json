@@ -406,5 +406,9 @@
     "Administrator": "Quản trị viên",   
     "Filter by Status": "Lọc theo trạng thái",
     "Active": "Hoạt động",
-    "Inactive": "Ngừng hoạt động"
+    "Inactive": "Ngừng hoạt động",
+    "service_list" : "Danh sách dịch vụ",
+    "filter_by_day_book" : "Lọc theo ngày đặt lịch",
+    "filter_by_day_create" : "Lọc theo ngày tạo lịch",
+    "filter_by_day_create_order" : "Lọc theo ngày tạo đơn"
 }
