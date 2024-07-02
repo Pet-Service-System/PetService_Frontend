@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
-const { TextArea } = Input
+const { TextArea } = Input;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaServiceDetail = () => {
     const { id } = useParams();
@@ -53,7 +54,7 @@ const SpaServiceDetail = () => {
 
     const fetchServiceDetail = async () => {
         try {
-            const response = await axios.get(`http://localhost:3001/api/services/${id}`);
+            const response = await axios.get(`${API_URL}/api/services/${id}`);
             setServiceData(response.data);
             form.setFieldsValue(response.data); // Set initial form values
         } catch (error) {
@@ -71,7 +72,7 @@ const SpaServiceDetail = () => {
                 return;
             }
 
-            const response = await axios.get(`http://localhost:3001/api/pets/account/${accountID}`, {
+            const response = await axios.get(`${API_URL}/api/pets/account/${accountID}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -115,7 +116,7 @@ const SpaServiceDetail = () => {
                 Status: values.Status
             };
             setSaving(true)
-            await axios.patch(`http://localhost:3001/api/services/${id}`, updatedService, {
+            await axios.patch(`${API_URL}/api/services/${id}`, updatedService, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -153,7 +154,7 @@ const SpaServiceDetail = () => {
             const newPet = { ...values, AccountID: accountID };
 
             const response = await axios.post(
-                'http://localhost:3001/api/pets',
+                `${API_URL}/api/pets`,
                 newPet,
                 {
                     headers: {
@@ -240,7 +241,7 @@ const SpaServiceDetail = () => {
                 AccountID: accountID
             }
 
-            const responseBooking = await axios.post(`http://localhost:3001/api/Spa-bookings`, booking, {
+            const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -256,7 +257,7 @@ const SpaServiceDetail = () => {
                 isReview: false,
             };
 
-            const responseBookingDetail = await axios.post(`http://localhost:3001/api/spa-booking-details`, bookingDetail, {
+            const responseBookingDetail = await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },

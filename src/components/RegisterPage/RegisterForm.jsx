@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 
 const { Title } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const RegisterForm = () => {
   const [fullname, setFullname] = useState('');
@@ -59,7 +60,7 @@ const RegisterForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
-        const response = await axios.post('http://localhost:3001/api/auth/register', {
+        const response = await axios.post(`${API_URL}/api/auth/register`, {
           fullname,
           password,
           email,

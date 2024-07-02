@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ResetPasswordForm = () => {
   const { accountId, token } = useParams();
@@ -14,7 +15,7 @@ const ResetPasswordForm = () => {
   const handleSubmit = async (values) => {
     const { password } = values;
     try {
-      const response = await axios.post(`http://localhost:3001/api/auth/reset-password/${accountId}/${token}`, {
+      const response = await axios.post(`${API_URL}/api/auth/reset-password/${accountId}/${token}`, {
         newPassword: password,
       });
       message.success(response.data.message);

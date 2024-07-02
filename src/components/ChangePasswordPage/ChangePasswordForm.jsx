@@ -4,7 +4,9 @@ import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+
 const { Title } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ChangePasswordForm = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -46,7 +48,7 @@ const ChangePasswordForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
-        const response = await axios.post('http://localhost:3001/api/auth/change-password', {
+        const response = await axios.post(`${API_URL}/api/auth/change-password`, {
           currentPassword: currentPassword,
           newPassword: newPassword,
         }, {

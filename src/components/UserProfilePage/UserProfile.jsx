@@ -13,6 +13,7 @@ import {
 const { Title } = Typography;
 const { Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const UserProfile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -63,7 +64,7 @@ const UserProfile = () => {
         return;
       }
       setSaving(true)
-      await axios.patch(`http://localhost:3001/api/accounts/${user.id}`, updatedData, {
+      await axios.patch(`${API_URL}/api/accounts/${user.id}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

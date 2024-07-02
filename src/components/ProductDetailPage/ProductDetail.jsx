@@ -9,7 +9,8 @@ import { useTranslation } from 'react-i18next';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
-const { TextArea } = Input
+const { TextArea } = Input;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -25,7 +26,7 @@ const ProductDetail = () => {
 
     const fetchProductDetail = async () => {
         try {
-            const response = await axios.get(`http://localhost:3001/api/products/${id}`);
+            const response = await axios.get(`${API_URL}/api/products/${id}`);
             setProductData(response.data);
             form.setFieldsValue(response.data);
             setLoading(false);
@@ -44,14 +45,14 @@ const ProductDetail = () => {
                     'Authorization': `Bearer ${token}`
                 }
             };
-            const response = await axios.get(`http://localhost:3001/api/comments/product/${id}`, config);
+            const response = await axios.get(`${API_URL}/api/comments/product/${id}`, config);
             if (response.data && response.data.comments) {
                 const commentsData = response.data.comments;
                 console.log(commentsData)
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
-                        const accountResponse = await axios.get(`http://localhost:3001/api/accounts/${comment.AccountID}`, config);
+                        const accountResponse = await axios.get(`${API_URL}/api/accounts/${comment.AccountID}`, config);
                         const accountName = accountResponse.data.user.fullname;
                         return { ...comment, username: accountName };
                     })
@@ -172,7 +173,7 @@ const ProductDetail = () => {
                 Status: values.Status
             };
 
-            await axios.patch(`http://localhost:3001/api/products/${id}`, updatedProduct, {
+            await axios.patch(`${API_URL}/api/products/${id}`, updatedProduct, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },

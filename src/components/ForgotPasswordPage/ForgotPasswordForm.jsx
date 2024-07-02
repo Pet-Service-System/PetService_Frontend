@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
@@ -28,7 +29,7 @@ const ForgotPasswordForm = () => {
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true); // Vô hiệu hóa nút Gửi yêu cầu
-        const response = await axios.post('http://localhost:3001/api/auth/forgot-password', {
+        const response = await axios.post(`${API_URL}/api/auth/forgot-password`, {
             email: email,
         });
         console.log('Data from server:', response.data);

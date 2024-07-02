@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const OrderHistory = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const OrderHistory = () => {
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/orders/account/${AccountID}`, {
+      const response = await axios.get(`${API_URL}/api/orders/account/${AccountID}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
