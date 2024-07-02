@@ -390,5 +390,9 @@
     "service_for_dog" : "Dịch vụ dành cho chó",
     "search_by_product_name" : "Tìm kiếm theo tên sản phẩm",
     "product_for_cat" : "Sản phẩm dành cho mèo",
-    "product_for_dog" : "Sản phẩm dành cho chó"
+    "product_for_dog" : "Sản phẩm dành cho chó",
+    "google_log_in_fail" : "Đăng nhập Google không thành công",
+    "please_enter_email": "Vui lòng nhập email của bạn!",
+    "please_enter_valid_email": "Vui lòng nhập email hợp lệ!",
+    "please_enter_password": "Vui lòng nhập mật khẩu của bạn!"
 }
