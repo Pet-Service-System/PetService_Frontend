@@ -168,7 +168,8 @@ const SpaBooking = () => {
       render: (text, record) => (
         <Text className={
           record.status === 'Completed' ? 'text-green-600' :
-            record.status === 'Pending' || record.status === 'Processing' ? 'text-orange-400' :
+            record.status === 'Pending' ? 'text-yellow-500' :
+            record.status === 'Processing' ? 'text-orange-600' :
               'text-red-600'
         }>
           {record.status}

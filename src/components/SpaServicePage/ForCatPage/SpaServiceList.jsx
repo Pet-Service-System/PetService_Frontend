@@ -362,12 +362,12 @@ const SpaServiceList = () => {
             rules={[{ required: true, message: t('please_enter_service_description') }]}
             className="mb-4"
           >
-            <TextArea rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
+            <TextArea rows={4} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
             label={t('image')}
-            rules={[{ required: true, message: t('upload_image') }]}
+            rules={[{ required: editMode == null, message: t('Please upload the service image!') }]}
             className="mb-4"
           >
             <Input type="file" onChange={handleServiceImageUpload} className="w-full p-2 border border-gray-300 rounded" />

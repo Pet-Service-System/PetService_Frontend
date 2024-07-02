@@ -282,7 +282,7 @@ const ProductDetail = () => {
                                 <div className="flex items-center mb-6 p-14">
                                     <Button onClick={handleDecrease}>-</Button>
                                     <Input
-                                        value={quantity}
+                                        value={Quantity}
                                         onChange={(e) => handleChangeQuantity(e.target.value)}
                                         className="mx-3 text-lg w-24 text-center"
                                         type="number"

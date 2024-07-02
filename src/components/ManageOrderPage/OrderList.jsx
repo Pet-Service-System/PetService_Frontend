@@ -19,6 +19,7 @@ const OrderList = () => {
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
   const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
   const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
+  const { t } = useTranslation();
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -137,30 +138,16 @@ const OrderList = () => {
     }
   };
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case 'Processing':
-      case 'Delivering':
-        return { color: 'orange' };
-      case 'Shipped':
-        return { color: 'green' };
-      case 'Canceled':
-        return { color: 'red' };
-      default:
-        return {};
-    }
-  };
-
   const renderUpdateButton = (record) => {
     if (role === 'Sales Staff') {
       switch (record.status) {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
+              <Button type="primary" className="w-40 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
                 {t('delivering')}
               </Button>
-              <Button danger className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
+              <Button danger className="w-40 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
                 {t('cancel')}
               </Button>
             </div>
@@ -219,7 +206,14 @@ const OrderList = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Text style={getStatusStyle(record.status)}>{record.status}</Text>
+        <Text className={
+          record.status === 'Shipped' ? 'text-green-600' :
+            record.status === 'Pending' ? 'text-yellow-500' :
+            record.status === 'Processing' ? 'text-orange-600' :
+              'text-red-600'
+        }>
+          {record.status}
+        </Text>
       )
     },
     {

@@ -272,7 +272,7 @@ const Banner = () => {
             }
             trigger={['click']}
           >
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            <a className="ant-dropdown-link" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
               <GlobalOutlined /> {currentLanguage === 'en' ? 'English' : 'Tiếng Việt'}
             </a>
           </Dropdown>

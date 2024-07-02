@@ -9,41 +9,8 @@ import { useTranslation } from 'react-i18next';
 const { Text, Title } = Typography;
 const { Search } = Input;
 
-const getSpaBookings = async (bookingDate, dateCreated) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        bookingDate: bookingDate ? moment(bookingDate).format('YYYY-MM-DD') : undefined,
-        dateCreated: dateCreated ? moment(dateCreated).format('YYYY-MM-DD') : undefined,
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa bookings:', error);
-    throw error;
-  }
-};
 
-const getSpaBookingDetail = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa booking detail:', error);
-    throw error;
-  }
-};
-
-const SpaBooking = () => {
+const SpaBooking = () => {  
   const navigate = useNavigate();
   const [spaBookings, setSpaBookings] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -52,6 +19,40 @@ const SpaBooking = () => {
   const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
+
+  const getSpaBookings = async (bookingDate, dateCreated) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          bookingDate: bookingDate ? moment(bookingDate).format('YYYY-MM-DD') : undefined,
+          dateCreated: dateCreated ? moment(dateCreated).format('YYYY-MM-DD') : undefined,
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa bookings:', error);
+      throw error;
+    }
+  };
+  
+  const getSpaBookingDetail = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking detail:', error);
+      throw error;
+    }
+  };
 
   // State for status update modal
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
@@ -132,7 +133,7 @@ const SpaBooking = () => {
           },
         }
       );
-      message.success(t('booking_success_update_to')`"${pendingStatus}"`);
+      message.success(`${t('booking_success_update_to')} "${pendingStatus}"`);
       setSaving(false)
       setUpdateStatusModalVisible(false);
       fetchSpaBookings(); // Refresh bookings after update
@@ -196,7 +197,8 @@ const SpaBooking = () => {
       render: (text, record) => (
         <Text className={
           record.status === 'Completed' ? 'text-green-600' :
-            record.status === 'Pending' || record.status === 'Processing' ? 'text-orange-400' :
+            record.status === 'Pending' ? 'text-yellow-500' :
+            record.status === 'Processing' ? 'text-orange-600' :
               'text-red-600'
         }>
           {record.status}
@@ -284,7 +286,7 @@ const SpaBooking = () => {
             />
           </Spin>
           <Modal
-            title={t('update_status') ` (${pendingStatus})`}
+            title={`${t('update_status')} (${pendingStatus})`}
             visible={updateStatusModalVisible}
             onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[

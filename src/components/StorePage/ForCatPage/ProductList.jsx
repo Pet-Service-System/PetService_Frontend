@@ -376,12 +376,12 @@ const ProductList = () => {
             rules={[{ required: true, message: t('please_enter_description') }]}
             className="mb-4"
           >
-            <TextArea rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
+            <TextArea rows={4} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
             label={t('image')}
-            rules={[{ required: true, message: t('please_upload_image') }]}
+            rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
             className="mb-4"
           >
             <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />

@@ -106,24 +106,16 @@ const OrderHistory = () => {
       title: t('status'),
       dataIndex: 'status',
       key: 'status',
-      render: (text, record) => {
-        let colorClass;
-        switch (record.status.toLowerCase()) {
-          case 'canceled':
-            colorClass = 'text-red-600';
-            break;
-          case 'processing':
-          case 'delivering':
-            colorClass = 'text-orange-400';
-            break;
-          case 'shipped':
-            colorClass = 'text-green-600';
-            break;
-          default:
-            colorClass = 'text-black';
-        }
-        return <Text className={colorClass}>{record.status}</Text>;
-      }
+      render: (text, record) => (
+        <Text className={
+          record.status === 'Shipped' ? 'text-green-600' :
+            record.status === 'Pending' ? 'text-yellow-500' :
+            record.status === 'Processing' ? 'text-orange-600' :
+              'text-red-600'
+        }>
+          {record.status}
+        </Text>
+      )
     },
   ];
 

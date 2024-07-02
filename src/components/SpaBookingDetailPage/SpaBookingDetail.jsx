@@ -7,51 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
-const getSpaBookingById = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/Spa-bookings/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa booking:', error);
-    throw error;
-  }
-}
-
-const getSpaBookingDetail = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa booking detail:', error);
-    throw error;
-  }
-}
-
-const getSpaServiceByID = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/services/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching spa service detail:', error);
-    throw error;
-  }
-}
-
 const SpaBookingDetail = () => {
   const [spaBooking, setSpaBooking] = useState(null);
   const [spaBookingDetail, setSpaBookingDetail] = useState(null);
@@ -60,6 +15,51 @@ const SpaBookingDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation();
+
+  const getSpaBookingById = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/Spa-bookings/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking:', error);
+      throw error;
+    }
+  }
+  
+  const getSpaBookingDetail = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa booking detail:', error);
+      throw error;
+    }
+  }
+  
+  const getSpaServiceByID = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/services/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching spa service detail:', error);
+      throw error;
+    }
+  }
 
   useEffect(() => {
     const fetchSpaBooking = async () => {
@@ -120,9 +120,7 @@ const SpaBookingDetail = () => {
         {t('back')}
       </Button>
       <Card className="p-10 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
-        <Title level={2} className="mb-4 text-center">
-          {t('spa_booking_detail_title')} #{spaBooking.BookingID}
-        </Title>
+        <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
         <div className="mb-4">
           <Text strong>{t('date_create')}: </Text>
           <Text>

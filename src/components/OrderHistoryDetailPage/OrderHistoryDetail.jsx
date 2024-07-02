@@ -10,54 +10,6 @@ import { useTranslation } from 'react-i18next';
 const { Title, Text } = Typography;
 const { confirm } = Modal;
 
-const getOrder = async (id) => {
-  const token = localStorage.getItem('token');
-  const { t } = useTranslation();
-  try {
-    const response = await axios.get(`http://localhost:3001/api/orders/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching order details:', error);
-    throw error;
-  }
-}
-
-const getOrderDetail = async (id) => {
-  const token = localStorage.getItem('token');
-  try {
-    const response = await axios.get(`http://localhost:3001/api/order-details/order/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response.data)
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching order details:', error);
-    throw error;
-  }
-}
-
-// Function to fetch product details by ID
-const getProductById = async (productId) => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`http://localhost:3001/api/products/${productId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data; // Assuming API returns product details
-  } catch (error) {
-    console.error('Error fetching product details:', error);
-    throw error;
-  }
-};
-
 const OrderHistoryDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
@@ -71,6 +23,54 @@ const OrderHistoryDetail = () => {
   const navigate = useNavigate();
   const accountID = JSON.parse(localStorage.getItem('user')).id;
   const role = localStorage.getItem('role')
+  const { t } = useTranslation();
+
+  const getOrder = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/orders/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      throw error;
+    }
+  }
+  
+  const getOrderDetail = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`http://localhost:3001/api/order-details/order/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data)
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      throw error;
+    }
+  }
+  
+  // Function to fetch product details by ID
+  const getProductById = async (productId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:3001/api/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data; // Assuming API returns product details
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     fetchOrderDetails(id);
