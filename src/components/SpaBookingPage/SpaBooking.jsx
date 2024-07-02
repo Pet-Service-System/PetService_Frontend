@@ -10,13 +10,14 @@ import { useTranslation } from 'react-i18next';
 const { Text } = Typography;
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const getSpaBookings = async () => {
   const user = JSON.parse(localStorage.getItem('user'))
   const AccountID = user.id
   const token = localStorage.getItem('token');
   try {
-    const response = await axios.get(`http://localhost:3001/api/Spa-bookings/account/${AccountID}`, {
+    const response = await axios.get(`${API_URL}/api/Spa-bookings/account/${AccountID}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -97,7 +98,7 @@ const SpaBooking = () => {
   const getSpaBookingDetailID = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+      const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -119,7 +120,7 @@ const SpaBooking = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `http://localhost:3001/api/spa-booking-details/${bookingDetailID}`,
+        `${API_URL}/api/spa-booking-details/${bookingDetailID}`,
         { Feedback: reviewText },
         {
           headers: {

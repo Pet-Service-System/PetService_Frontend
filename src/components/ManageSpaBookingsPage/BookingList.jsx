@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 const { Text, Title } = Typography;
 const { Search } = Input;
 const { Option } = Select;
+const API_URL = import.meta.env.REACT_APP_API_URL;
+
 
 const SpaBooking = () => {  
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ const SpaBooking = () => {
   const getSpaBookings = async (bookingDate, dateCreated) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/Spa-bookings/`, {
+      const response = await axios.get(`${API_URL}/api/Spa-bookings/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -50,7 +52,7 @@ const SpaBooking = () => {
   const getSpaBookingDetail = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+      const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -130,7 +132,7 @@ const SpaBooking = () => {
       const token = localStorage.getItem('token');
       setSaving(true)
       await axios.put(
-        `http://localhost:3001/api/Spa-bookings/${selectedBookingId}`,
+        `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
         { Status: pendingStatus },
         {
           headers: {

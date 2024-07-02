@@ -6,6 +6,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaBookingDetail = () => {
   const [spaBooking, setSpaBooking] = useState(null);
@@ -19,7 +20,7 @@ const SpaBookingDetail = () => {
   const getSpaBookingById = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/Spa-bookings/${id}`, {
+      const response = await axios.get(`${API_URL}/api/Spa-bookings/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -34,7 +35,7 @@ const SpaBookingDetail = () => {
   const getSpaBookingDetail = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/spa-booking-details/booking/${id}`, {
+      const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -49,7 +50,7 @@ const SpaBookingDetail = () => {
   const getSpaServiceByID = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/services/${id}`, {
+      const response = await axios.get(`${API_URL}/api/services/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

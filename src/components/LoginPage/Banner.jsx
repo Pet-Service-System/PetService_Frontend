@@ -15,6 +15,7 @@ import { GlobalOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 const { Header } = Layout;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Banner = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -36,7 +37,7 @@ const Banner = () => {
   //     return;
   //   }
   //   try {
-  //     const response = await fetch('http://localhost:3001/api/auth/check-token', {
+  //     const response = await fetch('${API_URL}/api/auth/check-token', {
   //       method: 'POST',
   //       headers: {
   //         'Authorization': `Bearer ${token}`
@@ -90,7 +91,7 @@ const Banner = () => {
   
     if (cartItems.length > 0) {
       try {
-        const response = await axios.post('http://localhost:3001/api/cart', {
+        const response = await axios.post(`${API_URL}/api/cart`, {
           AccountID: accountID, // Use accountID variable instead of undefined response.AccountID
           Items: cartItems, // Pass the parsed cartItems directly
         }, {

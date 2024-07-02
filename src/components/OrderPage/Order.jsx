@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env.REACT_APP_EXCHANGE_RATE_VND_TO_USD
 
 const { Title, Text } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
@@ -96,7 +97,7 @@ const Order = () => {
       // Iterate over each product in the order details
       for (const item of orderDetails.cartItems) {
         // Make an API call to get current inventory quantity
-        const inventoryResponse = await axios.get(`http://localhost:3001/api/products/${item.ProductID}`);
+        const inventoryResponse = await axios.get(`${API_URL}/api/products/${item.ProductID}`);
 
         if (inventoryResponse.status !== 200) {
           throw new Error(`Failed to fetch inventory for ProductID ${item.ProductID}`);
@@ -118,7 +119,7 @@ const Order = () => {
         const newQuantity = currentInventory - item.Quantity;
 
         // Make an API call to update the inventory
-        const response = await axios.patch(`http://localhost:3001/api/products/${item.ProductID}`, {
+        const response = await axios.patch(`${API_URL}/api/products/${item.ProductID}`, {
           Quantity: newQuantity
         }, {
           headers: {
@@ -165,7 +166,7 @@ const Order = () => {
       };
 
       // Call the createOrder API using Axios
-      const orderResponse = await axios.post('http://localhost:3001/api/orders', orderData, {
+      const orderResponse = await axios.post(`${API_URL}/api/orders`, orderData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -193,7 +194,7 @@ const Order = () => {
         }))
       };
 
-      const detailsResponse = await axios.post('http://localhost:3001/api/order-details', orderDetailsData, {
+      const detailsResponse = await axios.post(`${API_URL}/api/order-details`, orderDetailsData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}` // Add authorization header if needed
         }

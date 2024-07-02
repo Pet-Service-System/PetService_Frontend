@@ -8,6 +8,7 @@ const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Search } = Input;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
@@ -27,7 +28,7 @@ const ProductList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/products');
+        const response = await axios.get(`${API_URL}/api/products`);
         const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
         setProductData(filteredProducts);
       } catch (error) {
@@ -85,7 +86,7 @@ const ProductList = () => {
         return;
       }
       message.warning(t('processing'));
-      const response = await axios.post('http://localhost:3001/api/products', formData, {
+      const response = await axios.post(`${API_URL}/api/products`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -160,7 +161,7 @@ const ProductList = () => {
       for (let pair of formData.entries()) {
         console.log(pair[0] + ', ' + pair[1]);
       }
-      const response = await axios.patch(`http://localhost:3001/api/products/${editMode}`, formData, {
+      const response = await axios.patch(`${API_URL}/api/products/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

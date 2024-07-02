@@ -10,6 +10,7 @@ const { Sider, Content } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 const { useBreakpoint } = Grid;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const PetList = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const PetList = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:3001/api/pets/account/${accountID}`, {
+      const response = await axios.get(`${API_URL}/api/pets/account/${accountID}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -75,7 +76,7 @@ const PetList = () => {
       };
       console.log('Updating pet with data:', petUpdateData);
 
-      await axios.patch(`http://localhost:3001/api/pets/${editPetId}`, petUpdateData, {
+      await axios.patch(`${API_URL}/api/pets/${editPetId}`, petUpdateData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +116,7 @@ const PetList = () => {
     try {
       const token = localStorage.getItem('token');
 
-      await axios.delete(`http://localhost:3001/api/pets/${id}`, {
+      await axios.delete(`${API_URL}/api/pets/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -140,7 +141,7 @@ const PetList = () => {
       console.log(newPet);
 
       const response = await axios.post(
-        'http://localhost:3001/api/pets',
+        `${API_URL}/api/pets`,
         newPet,
         {
           headers: {

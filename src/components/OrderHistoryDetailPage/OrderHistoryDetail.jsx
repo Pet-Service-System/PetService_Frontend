@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const OrderHistoryDetail = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const OrderHistoryDetail = () => {
   const getOrder = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/orders/${id}`, {
+      const response = await axios.get(`${API_URL}/api/orders/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -43,7 +44,7 @@ const OrderHistoryDetail = () => {
   const getOrderDetail = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:3001/api/order-details/order/${id}`, {
+      const response = await axios.get(`${API_URL}/api/order-details/order/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -60,7 +61,7 @@ const OrderHistoryDetail = () => {
   const getProductById = async (productId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3001/api/products/${productId}`, {
+      const response = await axios.get(`${API_URL}/api/products/${productId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -127,7 +128,7 @@ const OrderHistoryDetail = () => {
           const token = localStorage.getItem('token');
           // Make API call to update order status to 'Canceled'
           const response = await axios.put(
-            `http://localhost:3001/api/orders/${order.OrderID}`,
+            `${API_URL}/api/orders/${order.OrderID}`,
             { Status: 'Canceled' },
             {
               headers: {
@@ -165,7 +166,7 @@ const OrderHistoryDetail = () => {
         const quantity = product.Quantity;
 
         // Make API call to get current inventory quantity
-        const inventoryResponse = await axios.get(`http://localhost:3001/api/products/${productId}`);
+        const inventoryResponse = await axios.get(`${API_URL}/api/products/${productId}`);
 
         if (inventoryResponse.status !== 200) {
           throw new Error(`Failed to fetch inventory for ProductID ${productId}`);
@@ -178,7 +179,7 @@ const OrderHistoryDetail = () => {
 
         // Make API call to update the inventory
         const updateResponse = await axios.patch(
-          `http://localhost:3001/api/products/${productId}`,
+          `${API_URL}/api/products/${productId}`,
           { Quantity: newQuantity },
           {
             headers: {
@@ -216,7 +217,7 @@ const OrderHistoryDetail = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:3001/api/comments/',
+        `${API_URL}/api/comments/`,
         {
           ProductID: selectedProductID,
           AccountID: accountID,

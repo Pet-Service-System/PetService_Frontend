@@ -8,6 +8,7 @@ const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Search } = Input;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaServiceList = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -26,7 +27,7 @@ const SpaServiceList = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/services');
+      const response = await axios.get(`${API_URL}/api/services`);
       const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
       setServiceData(filteredServices);
     } catch (error) {
@@ -88,7 +89,7 @@ const SpaServiceList = () => {
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
-      const response = await axios.post('http://localhost:3001/api/services', formData, {
+      const response = await axios.post(`${API_URL}/api/services`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -160,7 +161,7 @@ const SpaServiceList = () => {
         console.log(`${key}: ${value}`);
       }
       message.warning(t('processing'));
-      const response = await axios.patch(`http://localhost:3001/api/services/${editMode}`, formData, {
+      const response = await axios.patch(`${API_URL}/api/services/${editMode}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
