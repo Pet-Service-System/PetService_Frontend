@@ -407,8 +407,15 @@
     "Filter by Status": "Lọc theo trạng thái",
     "Active": "Hoạt động",
     "Inactive": "Ngừng hoạt động",
-    "service_list" : "Danh sách dịch vụ",
-    "filter_by_day_book" : "Lọc theo ngày đặt lịch",
-    "filter_by_day_create" : "Lọc theo ngày tạo lịch",
-    "filter_by_day_create_order" : "Lọc theo ngày tạo đơn"
+    "filter_booking_date": "Lọc theo ngày đặt lịch:",
+    "filter_created_date": "Lọc theo ngày tạo lịch:",
+    "service_list":  "Danh sách đặt lịch dịch vụ",
+    "filter_order_date": "Lọc theo ngày đặt hàng",
+    "filter_status": "Lọc theo trạng thái",
+    "Processing": "Đang xử lý",
+    "Delivering": "Đang giao hàng",
+    "Shipped": "Đã giao hàng",
+    "canceled": "Đã hủy",
+    "search_customer": "Tìm kiếm theo khách hàng",
+    "search_by_customer": "Tìm kiếm theo tên khách hàng hoặc số điện thoại"
 }

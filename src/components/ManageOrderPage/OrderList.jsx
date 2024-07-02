@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker } from "antd";
+import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker, Select } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ const { Text, Title } = Typography;
 const { confirm } = Modal;
 const { Search } = Input;
 const API_URL = import.meta.env.REACT_APP_API_URL;
+const { Option } = Select;
 
 const OrderList = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const OrderList = () => {
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
   const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
   const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(null); // State cho filter trạng thái
   const { t } = useTranslation();
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
@@ -89,6 +91,10 @@ const OrderList = () => {
       booking.phone.includes(searchQuery)
     );
 
+    if (statusFilter) {
+      filteredData = filteredData.filter(booking => booking.status === statusFilter);
+    }
+
     if (selectedDate) {
       filteredData = filteredData.filter(booking =>
         moment(booking.date).isSame(selectedDate, 'day')
@@ -96,7 +102,7 @@ const OrderList = () => {
     }
 
     setFilteredOrderByDate(filteredData);
-  }, [searchQuery, orders, selectedDate]);
+  }, [searchQuery, orders, selectedDate, statusFilter]);
 
   const handleSortOrder = () => {
     setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
@@ -241,22 +247,39 @@ const OrderList = () => {
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <Title className="text-5xl text-center font-semibold">{t('ordered_list')}</Title>
-          <Layout className="flex lg:flex-row sm:flex-col justify-between mb-4 mt-10">
-            <Button onClick={handleSortOrder} style={{ width: 170 }}>
+          <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
+            <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
               {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
             <div>
-              <Text>{t('filter_by_day_create_order')}: </Text>
+              <Text>{t('filter_order_date')}:</Text> {/* Chỉnh sửa key dịch nếu cần thiết */}
               <DatePicker
                 onChange={handleDateChange}
                 style={{ width: 200 }}
               />
             </div>
-            <Search
-              placeholder={t('search_by_customer_name_or_phone')}
-              onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 300 }}
-            />
+            <div>
+              <Text>{t('filter_status')}</Text>
+              <Select
+                placeholder={t('select_status')}
+                style={{ width: 200, marginRight: 12 }}
+                onChange={setStatusFilter}
+                allowClear
+              >
+                <Option value="Processing">{t('Processing')}</Option>
+                <Option value="Delivering">{t('Delivering')}</Option>
+                <Option value="Shipped">{t('Shipped')}</Option>
+                <Option value="Canceled">{t('canceled')}</Option>
+              </Select>
+            </div>
+            <div>
+              <Text>{t('search_customer')}</Text>
+              <Search
+                placeholder={t('search_by_customer')}
+                onChange={(e) => handleSearch(e.target.value)}
+                style={{ width: 300 }}
+              />
+            </div>
           </Layout>
           <Spin spinning={loading}>
             <Table
