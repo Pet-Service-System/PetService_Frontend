@@ -74,21 +74,19 @@ const LoginForm = () => {
         localStorage.setItem('addressInfo', JSON.stringify(addressInfo));
         const cartResponse = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
         });
-        console.log(cartResponse.data)
-        const { Items } = cartResponse.data;
-        localStorage.setItem('shoppingCart', JSON.stringify(Items));
         message.success('Login successful!', 1).then(() => {
           navigate('/', { replace: true });
         });
-        setDisableLogin(true);
+        console.log(cartResponse.data)
+        const { Items } = cartResponse.data;
+        localStorage.setItem('shoppingCart', JSON.stringify(Items));
       } catch (error) {
         if (error.response) {
           message.error(error.response.data.message);
-        } else {
-          message.error('An error occurred');
         }
         setDisableLogin(true);
       } finally {
+        setDisableLogin(true);
         setIsLoading(false);
       }
     }
@@ -125,17 +123,13 @@ const LoginForm = () => {
         });
         const { Items } = cartResponse.data;
         localStorage.setItem('shoppingCart', JSON.stringify(Items));
-  
-        message.success('Login successful!', 1).then(() => {
-          navigate('/', { replace: true });
-        });
-      } else {
-        message.error('Google login failed: Invalid response from server');
       }
     } catch (error) {
-      message.error('Google login failed');
       console.error('Google login error:', error);
     }
+    message.success('Login successful!', 1).then(() => {
+      navigate('/', { replace: true });
+    });
   };
 
   const handleGoogleLoginFailure = (error) => {
