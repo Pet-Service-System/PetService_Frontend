@@ -27,20 +27,29 @@ const OrderHistory = () => {
   const { t } = useTranslation();
 
   const getOrderHistory = async () => {
-    const token = localStorage.getItem('token');
-    try {
-      const response = await axios.get(`${API_URL}/api/orders/account/${AccountID}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('Fetched data:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching order history:', error);
-      throw error;
-    }
-  };
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.get(`${API_URL}/api/orders/account/${AccountID}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    const sanitizedData = response.data.map(order => ({
+      OrderID: order.OrderID,
+      OrderDate: order.OrderDate,
+      Status: order.Status,
+      TotalPrice: order.TotalPrice,
+      AccountID: order.AccountID,
+    }));
+
+    console.log('Fetched data:', sanitizedData);
+    return sanitizedData;
+  } catch (error) {
+    console.error('Error fetching order history:', error);
+    throw error;
+  }
+};
 
   useEffect(() => {
     fetchOrderHistory();
