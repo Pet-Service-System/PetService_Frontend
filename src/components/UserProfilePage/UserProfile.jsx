@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Typography, Button, Form, Input, message, Grid, Skeleton } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { setShoppingCart } from '../../redux/shoppingCart';
 import {
   UserOutlined,
   UnorderedListOutlined,
   HistoryOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
 
 const { Title } = Typography;
 const { Sider, Content } = Layout;
@@ -24,6 +26,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const screens = useBreakpoint();
   const fetchUserData = async () => {
     setLoading(true);
@@ -115,17 +118,34 @@ const UserProfile = () => {
     });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('account_id');
-    localStorage.removeItem('fullname');
-    localStorage.removeItem('email');
-    localStorage.removeItem('user');
+  const handleLogout = async () => {
+    const accountID = user.id;
+    const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
+    console.log('User ID:', accountID);
+    console.log('Cart Items:', cartItems);
+  
+    if (cartItems.length > 0) {
+      try {
+        const response = await axios.post(`${API_URL}/api/cart`, {
+          AccountID: accountID, // Use accountID variable instead of undefined response.AccountID
+          Items: cartItems, // Pass the parsed cartItems directly
+        }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        console.log('Cart saved successfully:', response.data);
+      } catch (error) {
+        console.error('Error saving cart:', error);
+        // Handle specific error scenarios if needed
+      }
+    }
+  
+    localStorage.clear();
+    dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
-    navigate('/');
-    window.location.reload();
+    navigate('/', { replace: true });
   };
 
   return (
@@ -209,8 +229,8 @@ const UserProfile = () => {
                   />
                 </Form.Item>
                 <div className="flex justify-between mt-6">
-                  <Button type="primary" onClick={handleSave} className="mr-2">{t('save')}</Button>
-                  <Button type="default" onClick={handleCancel}>{t('cancel')}</Button>
+                  <Button type="primary" onClick={handleSave} className="mr-2" disabled={saving}>{t('save')}</Button>
+                  <Button type="default" onClick={handleCancel} disabled={saving}>{t('cancel')}</Button>
                 </div>
               </Form>
             ) : (

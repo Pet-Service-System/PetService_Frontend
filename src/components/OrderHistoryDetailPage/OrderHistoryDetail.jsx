@@ -2,10 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Modal, Rate, Input, message, Image } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
+const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
@@ -145,7 +147,7 @@ const OrderHistoryDetail = () => {
 
           // Update inventory quantities for each product in order detail
           await updateInventoryQuantities(orderDetail.Items);
-
+          await processRefund(order.PaypalOrderID);
           // Fetch updated order details
           fetchOrderDetails(order.OrderID);
 
@@ -157,6 +159,61 @@ const OrderHistoryDetail = () => {
         }
       },
     });
+  };
+
+  const getPaypalAccessToken = async () => {
+    try {
+      const response = await axios.post(
+        'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+        'grant_type=client_credentials',
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)}`,
+          },
+        }
+      );
+      return response.data.access_token;
+    } catch (error) {
+      console.error('Error getting PayPal access token:', error);
+      throw new Error('Failed to get PayPal access token');
+    }
+  };
+
+  const processRefund = async (paypalOrderID) => {
+    try {
+      
+      const accessToken = await getPaypalAccessToken();
+      console.log(paypalOrderID)
+      console.log(accessToken)
+      const response = await axios.post(
+        `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalOrderID}/refund`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+      if (response.status === 201) {
+        // Show success message with modal
+        Modal.success({
+          title: t('refund_success_title'),
+          content: t('refund_success_content'),
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} className="text-center" />,
+        });
+      } else {
+        throw new Error('Failed to process refund');
+      }
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      // Show error message with modal
+      Modal.error({
+        title: t('refund_error_title'),
+        content: t('refund_error_content'),
+      });
+    }
   };
 
   // Function to update inventory quantities for products
