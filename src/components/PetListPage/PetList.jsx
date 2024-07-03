@@ -4,6 +4,8 @@ import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, 
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios'; // Import axios for making API calls
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { setShoppingCart } from '../../redux/shoppingCart';
 
 
 const { Sider, Content } = Layout;
@@ -16,6 +18,7 @@ const PetList = () => {
   const navigate = useNavigate();
   const [pets, setPets] = useState([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editPetId, setEditPetId] = useState(null);
   const [confirmDeletePetId, setConfirmDeletePetId] = useState(null);
@@ -25,7 +28,7 @@ const PetList = () => {
   const [operationLoading, setOperationLoading] = useState(false);
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const genders = ['Đực', 'Cái'];
-  const user = JSON.parse(localStorage.getItem('user'));
+  const dispatch = useDispatch();
   const accountID = user.id;
   const screens = useBreakpoint();
   const { t } = useTranslation();
@@ -189,16 +192,34 @@ const PetList = () => {
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('account_id');
-    localStorage.removeItem('fullname');
-    localStorage.removeItem('email');
-    localStorage.removeItem('user');
+  const handleLogout = async () => {
+    const accountID = user.id;
+    const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
+    console.log('User ID:', accountID);
+    console.log('Cart Items:', cartItems);
+  
+    if (cartItems.length > 0) {
+      try {
+        const response = await axios.post(`${API_URL}/api/cart`, {
+          AccountID: accountID, // Use accountID variable instead of undefined response.AccountID
+          Items: cartItems, // Pass the parsed cartItems directly
+        }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        console.log('Cart saved successfully:', response.data);
+      } catch (error) {
+        console.error('Error saving cart:', error);
+        // Handle specific error scenarios if needed
+      }
+    }
+  
+    localStorage.clear();
+    dispatch(setShoppingCart([]));
     setRole('Guest');
-    navigate('/');
-    window.location.reload();
+    setUser(null);
+    navigate('/', { replace: true });
   };
 
   return (

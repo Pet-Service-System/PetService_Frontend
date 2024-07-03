@@ -158,13 +158,13 @@ const Order = () => {
       if (orderDetails.cartItems.length === 0) {
         throw new Error(t('no_product_in_order'));
       }
-      await actions.order.capture();
-      // Define order data
+      const paypalOrder = await actions.order.capture();
       const orderData = {
         Status: 'Processing',
         TotalPrice: orderDetails.totalAmount + orderDetails.shippingCost,
         AccountID: JSON.parse(localStorage.getItem('user')).id,
         OrderDate: new Date(),
+        PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id
       };
 
       // Call the createOrder API using Axios

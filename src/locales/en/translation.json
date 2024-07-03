@@ -411,5 +411,9 @@
     "canceled": "Canceled",
     "search_customer": "Search by Customer",
     "search_by_customer": "Search by customer name or phone",
-    "statistics": "STATISTICS"
+    "statistics": "STATISTICS",
+    "refund_success_content": "Refund processed successfully. Please allow a few business days for the refund to appear in your bank account.",
+    "refund_error_content": "Failed to process refund. Please try again later.",
+    "refund_error_title": "Refund Error",
+    "refund_success_title": "Refund Success"
 }

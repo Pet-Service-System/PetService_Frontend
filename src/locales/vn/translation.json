@@ -418,5 +418,9 @@
     "canceled": "Đã hủy",
     "search_customer": "Tìm kiếm theo khách hàng",
     "search_by_customer": "Tìm kiếm theo tên khách hàng hoặc số điện thoại",
-    "statistics": "SỐ LIỆU"
+    "statistics": "SỐ LIỆU",
+    "refund_success_content": "Hoàn tiền được xử lý thành công. Vui lòng chờ trong vài ngày làm việc để tiền được hoàn vào tài khoản của bạn.",
+    "refund_error_content": "Không thể xử lý hoàn tiền. Vui lòng thử lại sau.",
+    "refund_error_title": "Lỗi Hoàn Tiền",
+    "refund_success_title": "Hoàn Tiền Thành Công"
 }
