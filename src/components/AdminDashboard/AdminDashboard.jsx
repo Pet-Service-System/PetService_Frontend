@@ -1,213 +1,174 @@
 import React, { useState, useEffect } from "react";
-import { Layout as Menu } from "antd";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Layout, Card, Typography, Row, Col, Grid as AntGrid, Statistic } from "antd";
+import { UserOutlined, LogoutOutlined, CreditCardOutlined, ShoppingOutlined, ShopOutlined } from "@ant-design/icons";
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import CardContent from "@mui/material/CardContent";
-import Card from "@mui/material/Card";
-import Stack from "@mui/material/Stack";
-import StorefrontIcon from "@mui/icons-material/Storefront";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import { Layout, Grid as AntGrid } from "antd";
+import axios from "axios";
 import AccordionItem from "./AccordionItem";
 import BarChart from "./BarChart";
-import axios from "axios";
 import "./style.css";
 
-const { Sider } = Layout;
+const { Sider, Content } = Layout;
 const { useBreakpoint } = AntGrid;
+const { Title, Text } = Typography;
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
-export default function AdminDashboard () {
+export default function AdminDashboard() {
   const navigate = useNavigate();
   const [role, setRole] = useState(localStorage.getItem("role") || "Guest");
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const screens = useBreakpoint();
   const [loading, setLoading] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalBookings, setTotalBookings] = useState(0);
+  const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
 
-  // const fetchUserData = async () => {
-  //   setLoading(true);
-  //   const storedUser = JSON.parse(localStorage.getItem("user"));
-  //   if (!storedUser) {
-  //     navigate("/");
-  //   } else {
-  //     setUser(storedUser);
-  //   }
-  //   setLoading(false);
-  // };
+  useEffect(() => {
+    // Fetch the count of available accounts
+    const fetchAvailableAccounts = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/dashboard/count-available-accounts`
+        );
+        setTotalUsers(response.data.count);
+      } catch (error) {
+        console.error("Error fetching available accounts:", error);
+      }
+    };
 
-  // useEffect(() => {
-  //   fetchUserData();
-  // }, []);
+    // Fetch the count of completed orders
+    const fetchCompletedOrders = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/dashboard/count-completed-orders`
+        );
+        setTotalOrders(response.data.count);
+      } catch (error) {
+        console.error("Error fetching completed orders:", error);
+      }
+    };
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("role");
-  //   localStorage.removeItem("account_id");
-  //   localStorage.removeItem("fullname");
-  //   localStorage.removeItem("email");
-  //   localStorage.removeItem("user");
-  //   navigate("/");
-  //   window.location.reload();
-  // };
+    const fetchCompletedBookings = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/dashboard/count-completed-bookings`
+        );
+        setTotalBookings(response.data.count);
+      } catch (error) {
+        console.error("Error fetching completed bookings:", error);
+      }
+    };
+
+    const fetchMostOrderedProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/dashboard/most-ordered-products`
+        );
+        setMostOrderedProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching top products:", error);
+      }
+    };
+
+    fetchAvailableAccounts();
+    fetchCompletedOrders();
+    fetchCompletedBookings();
+    fetchMostOrderedProducts();
+  }, []);
 
   return (
-    <div>
-      <Layout style={{ minHeight: "100vh" }}>
-      {/* {!screens.xs && (
-        <Sider width={220}>
-          <div className="logo" />
-          <Menu theme="dark" mode="inline">
-            <Menu.Item
-              key="profile"
-              icon={<UserOutlined />}
-              onClick={() => navigate("/user-profile")}
-            >
-              Thông tin người dùng
-            </Menu.Item>
-            <Menu.Item
-              key="logout"
-              icon={<LogoutOutlined />}
-              onClick={handleLogout}
-            >
-              Đăng xuất
-            </Menu.Item>
-          </Menu>
-        </Sider>
-      )} */}
+    <Layout style={{ minHeight: "100vh" }}>
       <Layout>
-        <div className="bgcolor">
-          <Box height={70} />
-          <Box component={"main"} sx={{ flexGrow: 1, p: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={8}>
-                <Stack spacing={2} direction={"row"}>
-                  <Card
-                    sx={{ minWidth: "49%", height: 150 }}
-                    className="gradient"
-                  >
-                    <CardContent>
+        <Content style={{ padding: '24px' }}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <CreditCardOutlined style={{ fontSize: '24px', marginRight: '8px' }} />
+                  <Statistic
+                    title="Total Earnings"
+                    value={500}
+                    precision={2}
+                    prefix="$"
+                    valueStyle={{ color: '#3f8600' }}
+                    suffix={<CountUp end={500} />}
+                  />
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <ShoppingOutlined style={{ fontSize: '24px', marginRight: '8px' }} />
+                  <Statistic
+                    title="Total Orders"
+                    value={totalOrders}
+                    valueStyle={{ color: '#cf1322' }}
+                    suffix={<CountUp end={totalOrders} />}
+                  />
+                </div>
+              </Card>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
+            <Col xs={24} md={12}>
+              <Card>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <ShopOutlined style={{ fontSize: '24px', marginRight: '8px' }} />
+                  <Statistic
+                    title="Total Bookings"
+                    value={totalBookings}
+                    valueStyle={{ color: '#3f8600' }}
+                    suffix={<CountUp end={totalBookings} />}
+                  />
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <UserOutlined style={{ fontSize: '24px', marginRight: '8px' }} />
+                  <Statistic
+                    title="Total Users"
+                    value={totalUsers}
+                    valueStyle={{ color: '#cf1322' }}
+                    suffix={<CountUp end={totalUsers} />}
+                  />
+                </div>
+              </Card>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
+            <Col xs={24} md={16}>
+              <Card>
+                <BarChart />
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card title="Popular Products">
+                <ul>
+                  {mostOrderedProducts.map((product) => (
+                    <li key={product._id}>
+                      <img
+                        src={product.ImageURL}
+                        alt={product.ProductName}
+                        width={50}
+                        height={50}
+                      />
                       <div>
-                        <CreditCardIcon
-                          sx={{ fontSize: 50 }}
-                          className="icon"
-                        />
+                        <Title level={5}>{product.ProductName}</Title>
+                        <Text>Quantity: <CountUp end={product.totalQuantity} /></Text><br />
+                        <Text>Price: ${product.Price}</Text>
                       </div>
-                      <Typography
-                        gutterBottom
-                        variant="h5"
-                        component="div"
-                        fontSize={25}
-                        sx={{ color: "#fff" }}
-                      >
-                        $<CountUp delay={0.2} end={500} />
-                      </Typography>
-                      <Typography
-                        gutterBottom
-                        variant="body2"
-                        component="div"
-                        sx={{ color: "#ccd1d1", fontSize: 20 }}
-                      >
-                        Total Earnings
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                  <Card
-                    sx={{ minWidth: "49%", height: 150 }}
-                    className="gradientlight"
-                  >
-                    <CardContent>
-                      <div>
-                        <ShoppingBagIcon
-                          sx={{ fontSize: 50 }}
-                          className="icon"
-                        />
-                      </div>
-                      <Typography
-                        gutterBottom
-                        variant="h5"
-                        component="div"
-                        fontSize={25}
-                        sx={{ color: "#fff" }}
-                      >
-                        $<CountUp delay={0.2} end={900} />
-                      </Typography>
-                      <Typography
-                        gutterBottom
-                        variant="body2"
-                        component="div"
-                        sx={{ color: "#ccd1d1", fontSize: 20 }}
-                      >
-                        Total Orders
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Stack>
-              </Grid>
-              <Grid item xs={4}>
-                <Stack spacing={2}>
-                  <Card sx={{ maxWidth: 345 }} className="gradientlight">
-                    <Stack spacing={2} direction={"row"}>
-                      <div className="icon">
-                        <StorefrontIcon sx={{ fontSize: 55 }} />
-                      </div>
-                      <div className="paddingall">
-                        <span className="pricetitle">Total Bookings</span>
-                        <br />
-                        <span>
-                          <CountUp delay={0.2} end={10} />
-                        </span>
-                      </div>
-                    </Stack>
-                  </Card>
-                  <Card sx={{ maxWidth: 345 }}>
-                    <Stack spacing={2} direction={"row"}>
-                      <div className="iconstyle">
-                        <StorefrontIcon sx={{ fontSize: 55 }} />
-                      </div>
-                      <div className="paddingall">
-                        <span className="pricetitle">Total Users</span>
-                        <br />
-                        <span>
-                          {/* <CountUp delay={0.2} end={totalUsers} /> */}
-                          <CountUp delay={0.2} end={10} />
-                          {/* hiện bảng thống kê số lượng người dùng hiện đang active */}
-                        </span>
-                      </div>
-                    </Stack>
-                  </Card>
-                </Stack>
-              </Grid>
-            </Grid>
-            <Box height={20} />
-            <Grid container spacing={2}>
-              <Grid item xs={8}>
-                <Card sx={{ height: "60vh" }}>
-                  <CardContent>
-                    <BarChart />
-                    {/* hiện bảng thống kế số liệu theo kiểu bar char */}
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={4}>
-                <Card sx={{ height: "60vh" }}>
-                  <CardContent>
-                    <div className="paddingall">
-                      <span className="pricetitle">Popular Products</span>
-                    </div>
-                    <AccordionItem />
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-          </Box>
-        </div>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </Col>
+          </Row>
+        </Content>
       </Layout>
     </Layout>
-    </div>
   );
-};
+}
