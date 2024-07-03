@@ -16,7 +16,7 @@ export default function AccordionItem() {
         <Typography>Loading...</Typography>
       ) : mostOrderedProducts.length > 0 ? (
         <div>
-          {/* <Typography variant="h6">Top 3 Most Ordered Products</Typography>
+          <Typography variant="h6">Top 3 Most Ordered Products</Typography>
           {mostOrderedProducts.map((product) => (
             <Accordion key={product.ProductID}>
               <AccordionSummary
@@ -31,7 +31,7 @@ export default function AccordionItem() {
                 <Typography>Order Count: {product.orderCount}</Typography>
               </AccordionDetails>
             </Accordion>
-          ))} */}
+          ))}
         </div>
       ) : (
         <Typography>No most ordered products found.</Typography>

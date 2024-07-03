@@ -1,16 +1,14 @@
 import React from 'react'
-import AdminDashboard from '../components/AdminDashboard/AdminDashboard'
 import Banner from '../components/HomePage/Banner'
+import AdminDashboard from '../components/AdminDashboard/AdminDashboard'
 import Footer from '../components/HomePage/Footer'
 
-const AdminDashboardPage = () => {
+export const AdminDashboardPage = () => {
   return (
-    <div>        
-      <Banner/>
-      <AdminDashboard/>
-      <Footer/>
-    </div>
+    <>
+    <Banner/>
+    <AdminDashboard/>
+    <Footer/>
+    </>
   )
 }
-
-export default AdminDashboardPage

@@ -29,34 +29,36 @@ export default function AdminDashboard () {
   const [loading, setLoading] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
 
-  const fetchUserData = async () => {
-    setLoading(true);
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) {
-      navigate("/");
-    } else {
-      setUser(storedUser);
-    }
-    setLoading(false);
-  };
+  // const fetchUserData = async () => {
+  //   setLoading(true);
+  //   const storedUser = JSON.parse(localStorage.getItem("user"));
+  //   if (!storedUser) {
+  //     navigate("/");
+  //   } else {
+  //     setUser(storedUser);
+  //   }
+  //   setLoading(false);
+  // };
 
-  useEffect(() => {
-  }, []);
+  // useEffect(() => {
+  //   fetchUserData();
+  // }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("account_id");
-    localStorage.removeItem("fullname");
-    localStorage.removeItem("email");
-    localStorage.removeItem("user");
-    navigate("/");
-    window.location.reload();
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("role");
+  //   localStorage.removeItem("account_id");
+  //   localStorage.removeItem("fullname");
+  //   localStorage.removeItem("email");
+  //   localStorage.removeItem("user");
+  //   navigate("/");
+  //   window.location.reload();
+  // };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {!screens.xs && (
+    <div>
+      <Layout style={{ minHeight: "100vh" }}>
+      {/* {!screens.xs && (
         <Sider width={220}>
           <div className="logo" />
           <Menu theme="dark" mode="inline">
@@ -76,7 +78,7 @@ export default function AdminDashboard () {
             </Menu.Item>
           </Menu>
         </Sider>
-      )}
+      )} */}
       <Layout>
         <div className="bgcolor">
           <Box height={70} />
@@ -173,6 +175,7 @@ export default function AdminDashboard () {
                         <span>
                           {/* <CountUp delay={0.2} end={totalUsers} /> */}
                           <CountUp delay={0.2} end={10} />
+                          {/* hiện bảng thống kê số lượng người dùng hiện đang active */}
                         </span>
                       </div>
                     </Stack>
@@ -186,6 +189,7 @@ export default function AdminDashboard () {
                 <Card sx={{ height: "60vh" }}>
                   <CardContent>
                     <BarChart />
+                    {/* hiện bảng thống kế số liệu theo kiểu bar char */}
                   </CardContent>
                 </Card>
               </Grid>
@@ -204,5 +208,6 @@ export default function AdminDashboard () {
         </div>
       </Layout>
     </Layout>
+    </div>
   );
 };

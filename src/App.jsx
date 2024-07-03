@@ -30,7 +30,7 @@ import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
 import PurchaseSuccessPage from './pages/PurchaseOrderSuccessPage'
 import StatisticPage from './pages/StatisticPage'
-import AdminDashboardPage from './pages/AdminDashboardPage'
+import { AdminDashboardPage } from './pages/AdminDashboardPage'
 function App() {
   return (
     <>
