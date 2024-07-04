@@ -244,7 +244,7 @@ const Banner = () => {
         )}
         {['Sales Staff', 'Caretaker Staff', 'Store Manager', 'Administrator'].includes(role) && isVertical && (
         <>
-          <Menu.SubMenu onClick={() => { navigate('/user-profile') }} title={t('account')}>
+          <Menu.SubMenu title={t('account')}>
             <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>
             <Menu.Item onClick={() => { navigate('/statistics') }}>{t('statistic_title')}</Menu.Item>
           </Menu.SubMenu>
