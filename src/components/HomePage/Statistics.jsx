@@ -29,7 +29,7 @@ const Statistics = () => {
   }, []);
 
   return (
-    <div className="p-10">
+    <div className="p-10 bg-cyan-400">
       <Card className="shadow-lg w-full">
         <div className="flex flex-col items-center">
           <div className="flex flex-row mb-4 items-center">

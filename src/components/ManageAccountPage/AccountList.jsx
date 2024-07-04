@@ -234,58 +234,62 @@ const AccountList = () => {
         {loading && <Skeleton active />}
         {/* Update account modal */}
         <Modal
-          title="Edit Account"
+          title={t('edit_account')}
           visible={isModalVisible}
           onCancel={handleCancelEdit}
           footer={[
             <Button key="cancel" onClick={handleCancelEdit} disabled={saveLoading}>{t('cancel')}</Button>,
-            <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>Save</Button>,
+            <Button key="submit" type="primary" onClick={() => handleSaveEdit(editMode)} disabled={saveLoading}>{t('save')}</Button>,
           ]}
         >
-          <Form form={form}>
-            {/* Fields */}
+          <Form form={form} layout='vertical'>
             <Form.Item
+              label={t('fullname')}
               name="fullname"
-              rules={[{ required: true, message: t('please_enter') + t('fullname') + '!' }]}
+              rules={[{ required: true, message: t('please_enter') + ' ' + t('fullname') + '!' }]}
             >
-              <Input placeholder="Fullname" />
+              <Input placeholder={t('fullname')} />
             </Form.Item>
             <Form.Item
+              label={t('email')}
               name="email"
-              rules={[{ required: true, message: t('please_enter') + 'email' + '!'}]}
+              rules={[{ required: true, message: t('please_enter') + ' ' + t('email') + '!' }]}
             >
-              <Input placeholder="Email" />
+              <Input placeholder={t('email')} />
             </Form.Item>
             <Form.Item
+              label={t('phone')}
               name="phone"
-              rules={[{ required: true, message: t('please_enter') + t('phone') + '!'}]}
+              rules={[{ required: true, message: t('please_enter') + ' ' + t('phone') + '!' }]}
             >
-              <Input placeholder="Phone" />
+              <Input placeholder={t('phone')} />
             </Form.Item>
             <Form.Item
+              label={t('address')}
               name="address"
-              rules={[{ required: true, message: t('please_enter') + t('adress') + '!' }]}
+              rules={[{ required: true, message: t('please_enter') + ' ' + t('address') + '!' }]}
             >
-              <Input placeholder="Address" />
+              <Input placeholder={t('address')} />
             </Form.Item>
             <Form.Item
+              label={t('role')}
               name="role"
-              rules={[{ required: true, message: t('please_enter') + t('role') + '!' }]}
+              rules={[{ required: true, message: t('please_enter') + ' ' + t('role') + '!' }]}
             >
-              <Select placeholder="Select Role">
-                {/* Options for roles */}
-                <Option value="Customer">Customer</Option>
-                <Option value="Sales Staff">Sales Staff</Option>
-                <Option value="Caretaker Staff">Caretaker Staff</Option>
-                <Option value="Store Manager">Store Manager</Option>
-                <Option value="Administrator">Administrator</Option>
+              <Select placeholder={t('select_role')}>
+                <Option value="Customer">{t('customer')}</Option>
+                <Option value="Sales Staff">{t('sales_staff')}</Option>
+                <Option value="Caretaker Staff">{t('caretaker_staff')}</Option>
+                <Option value="Store Manager">{t('store_manager')}</Option>
+                <Option value="Administrator">{t('administrator')}</Option>
               </Select>
             </Form.Item>
             <Form.Item
+              label={t('status')}
               name="status"
               rules={[{ required: true, message: t('please_select_the_status') }]}
             >
-              <Select placeholder="Select Status">
+              <Select placeholder={t('select_status')}>
                 <Option value={1}>{t('active')}</Option>
                 <Option value={0}>{t('inactive')}</Option>
               </Select>

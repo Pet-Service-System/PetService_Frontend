@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Button, Drawer, Badge, Popover } from 'antd';
-import { MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
+import { LineChartOutlined, MenuOutlined, UserOutlined, ShoppingCartOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import useShopping from '../../hook/useShopping';
 import SubMenu from 'antd/es/menu/SubMenu';
 import { useDispatch } from 'react-redux';
@@ -120,10 +120,12 @@ const Banner = () => {
         label: t('service_history'),
         onClick: () => navigate('/spa-booking'),
       },
-    ] : []),
+    ] : [
+      { key: 'statistics', icon: <LineChartOutlined />, label: t('statistic_title'), onClick: () => navigate('/statistics') },
+    ]),
     { key: 'logout', icon: <LogoutOutlined />, label: t('log_out'), onClick: handleLogout }
   ];
-
+  
   // Render user menu by userMenuItems
   const renderUserMenu = () => (
     <Menu>
@@ -174,7 +176,6 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
-        { key: 'statistics', label: t('statistics'), path: '/statistics' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
@@ -185,7 +186,6 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
-        { key: 'statistics', label: t('statistics'), path: '/statistics' },
       ];
     }
 
