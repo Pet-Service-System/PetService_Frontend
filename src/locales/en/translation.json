@@ -415,5 +415,10 @@
     "refund_success_content": "Refund processed successfully. Please allow a few business days for the refund to appear in your bank account.",
     "refund_error_content": "Failed to process refund. Please try again later.",
     "refund_error_title": "Refund Error",
-    "refund_success_title": "Refund Success"
+    "refund_success_title": "Refund Success",
+    "statistic_title": "Statistics",
+    "shippedOrders": "Shipped Orders",
+    "completedSpaBookings": "Completed Spa Bookings",
+    "totalActiveUsers": "Total Active Users",
+    "mostPopularProduct": "Most Popular Product"
 }
