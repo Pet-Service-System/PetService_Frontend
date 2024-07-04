@@ -2,16 +2,20 @@ import React from "react";
 import { Chart } from "react-google-charts";
 
 export const data = [
-  ["Year", "Sales", "Expenses", "Profit"],
-  ["2022", 1030, 540, 350],
-  ["2023", 1030, 540, 350],
-  ["2024", 1030, 540, 350],
+  ["Day of week", "Total Services Booked", "Total Ordered"],
+  ["Mon", 1030, 540],
+  ["Tue", 1030, 540],
+  ["Wed", 1030, 540],
+  ["Thu", 1030, 540],
+  ["Fri", 1030, 540],
+  ["Sat", 1030, 540],
+  ["Sun", 1030, 540],
 ];
 
 export const options = {
   chart: {
     title: "Company Performance",
-    subtitle: "Sales, Expenses, and Profit: 2022-2024",
+    subtitle: "Total Services Booked, Total Ordered",
   },
   colors: ["rgb(53, 138, 148)", "rgb(37, 11, 165)", "#188310"],
 };
