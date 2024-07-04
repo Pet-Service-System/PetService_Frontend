@@ -249,7 +249,7 @@ const Schedule = () => {
         onCancel={() => setIsModalVisible(false)}
         footer={null}
       >
-        <Form form={form} onFinish={handleSchedule}>
+        <Form form={form} onFinish={handleSchedule} layout='vertical'>
           <Form.Item name="day" label={t('day')} rules={[{ required: true, message: t('please_select_day') }]}>
             <Select placeholder={t('select_day')}>
               {days.map((day) => (

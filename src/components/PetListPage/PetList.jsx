@@ -287,60 +287,73 @@ const PetList = () => {
           </div>
           {/* Add Pet */}
           <Modal
-            title={t('add_pet')}
-            visible={isAddModalVisible}
-            onCancel={() => setIsAddModalVisible(false)}
-            footer={[
-              <Button key="back" onClick={() => setIsAddModalVisible(false)}>
-                {t('cancel')}
-              </Button>,
-              <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
-                {t('add')}
-              </Button>,
-            ]}
-          >
-            <Form form={form} layout="vertical">
-              <Form.Item name="PetName" 
-              rules={[{ required: true, message: t('name') + " " + t('can_not_blank') }]}
-              label="Tên thú cưng">
-                <Input placeholder={t('name')} />
-              </Form.Item>
-              <Form.Item name="PetTypeID" 
-              rules={[{ required: true, message: t('pet_type')+ " " + t('can_not_blank') }]}
-              label="Loại thú cưng">
-                <Select placeholder={t('choose_pet_type')}>
-                  <Option value="PT001">{t('dog')}</Option>
-                  <Option value="PT002">{t('cat')}</Option>
-                </Select>
-              </Form.Item>
-              <Form.Item name="Gender" 
-              rules={[{ required: true, message: t('gender')+ " " + t('can_not_blank') }]}
-              label="Giới tính">
-                <Select placeholder={t('choose_gender')}>
-                  {genders.map((gender, index) => (
-                    <Option key={index} value={gender}>
-                      {gender}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item name="Status" 
-              rules={[{ required: true, message: t('status')+ " " + t('can_not_blank') }]}
-              label="Trạng thái">
-                <Input placeholder={t('status')} />
-              </Form.Item>
-              <Form.Item name="Weight" 
-              rules={[{ required: true, message: t('weight')+ " " + t('can_not_blank') }]}
-              label="Cân nặng thú cưng">
-                <Input placeholder={t('weight')} type="number" />
-              </Form.Item>
-              <Form.Item name="Age" 
-              rules={[{ required: true, message: t('age')+ " " + t('can_not_blank') }]}
-              label="Tuổi thú cưng">
-                <Input placeholder={t('age')} type="number" />
-              </Form.Item>
-            </Form>
-          </Modal>
+                title={t('add_pet_modal_title')}
+                visible={isAddModalVisible}
+                onCancel={() => setIsAddModalVisible(false)}
+                confirmLoading={operationLoading}
+                footer={[
+                    <Button key="back" onClick={() => setIsAddModalVisible(false)}>
+                        {t('cancel')}
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
+                        {t('add')}
+                    </Button>,
+                ]}
+            >
+                <Form form={form} layout="vertical">
+                    <Form.Item
+                        name="PetName"
+                        rules={[{ required: true, message: t('not_null_pet_name') }]}
+                        label={t('pet_name')}
+                    >
+                        <Input placeholder={t('pet_name')} />
+                    </Form.Item>
+                    <Form.Item
+                        name="PetTypeID"
+                        rules={[{ required: true, message: t('not_null_pet_type') }]}
+                        label={t('choose_pet_type')}
+                    >
+                        <Select placeholder={t('choose_pet_type')}>
+                            <Option value="PT001">{t('dog')}</Option>
+                            <Option value="PT002">{t('cat')}</Option>
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        name="Gender"
+                        rules={[{ required: true, message: t('not_null_pet_gender') }]}
+                        label={t('choose_gender')}
+                    >
+                        <Select placeholder={t('choose_gender')}>
+                            {genders.map((gender, index) => (
+                                <Option key={index} value={gender}>
+                                    {gender}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item
+                        name="Status"
+                        rules={[{ required: true, message: t('not_null_pet_status') }]}
+                        label={t('pet_status')}
+                    >
+                        <Input placeholder={t('pet_status')} />
+                    </Form.Item>
+                    <Form.Item
+                        name="Weight"
+                        rules={[{ required: true, message: t('not_null_pet_weight') }]}
+                        label={t('pet_weight')}
+                    >
+                        <Input placeholder={t('pet_weight')} type="number" />
+                    </Form.Item>
+                    <Form.Item
+                        name="Age"
+                        rules={[{ required: true, message: t('not_null_pet_age') }]}
+                        label={t('pet_age')}
+                    >
+                        <Input placeholder={t('pet_age')} type="number" />
+                    </Form.Item>
+                </Form>
+            </Modal>
           {/* Confirm delete Pet */}    
           <Modal
             title={t('cofirm_delete')}

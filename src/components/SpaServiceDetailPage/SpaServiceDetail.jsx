@@ -20,13 +20,13 @@ const SpaServiceDetail = () => {
     const [addPetForm] = Form.useForm();
     const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
     const [pets, setPets] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [setLoading] = useState(false);
     const [operationLoading, setOperationLoading] = useState(false);
     const userRole = localStorage.getItem('role') || 'Guest';
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
     const accountID = user?.id;
-    const [selectedPet, setSelectedPet] = useState(null);
+    const [setSelectedPet] = useState(null);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
     const currentDateTime = moment();
@@ -574,7 +574,7 @@ const SpaServiceDetail = () => {
 
             {/* Add Pet */}
             <Modal
-                title="Thêm thú cưng"
+                title={t('add_pet_modal_title')}
                 visible={isAddModalVisible}
                 onCancel={() => setIsAddModalVisible(false)}
                 confirmLoading={operationLoading}
@@ -588,16 +588,28 @@ const SpaServiceDetail = () => {
                 ]}
             >
                 <Form form={addPetForm} layout="vertical">
-                    <Form.Item name="PetName" rules={[{ required: true, message: t('not_null_pet_name') }]}>
+                    <Form.Item
+                        name="PetName"
+                        rules={[{ required: true, message: t('not_null_pet_name') }]}
+                        label={t('pet_name')}
+                    >
                         <Input placeholder={t('pet_name')} />
                     </Form.Item>
-                    <Form.Item name="PetTypeID" rules={[{ required: true, message: t('not_null_pet_type') }]}>
+                    <Form.Item
+                        name="PetTypeID"
+                        rules={[{ required: true, message: t('not_null_pet_type') }]}
+                        label={t('choose_pet_type')}
+                    >
                         <Select placeholder={t('choose_pet_type')}>
                             <Option value="PT001">{t('dog')}</Option>
                             <Option value="PT002">{t('cat')}</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="Gender" rules={[{ required: true, message: t('not_null_pet_gender') }]}>
+                    <Form.Item
+                        name="Gender"
+                        rules={[{ required: true, message: t('not_null_pet_gender') }]}
+                        label={t('choose_gender')}
+                    >
                         <Select placeholder={t('choose_gender')}>
                             {genders.map((gender, index) => (
                                 <Option key={index} value={gender}>
@@ -606,13 +618,25 @@ const SpaServiceDetail = () => {
                             ))}
                         </Select>
                     </Form.Item>
-                    <Form.Item name="Status" rules={[{ required: true, message: t('not_null_pet_status') }]}>
+                    <Form.Item
+                        name="Status"
+                        rules={[{ required: true, message: t('not_null_pet_status') }]}
+                        label={t('pet_status')}
+                    >
                         <Input placeholder={t('pet_status')} />
                     </Form.Item>
-                    <Form.Item name="Weight" rules={[{ required: true, message: t('not_null_pet_weight') }]}>
+                    <Form.Item
+                        name="Weight"
+                        rules={[{ required: true, message: t('not_null_pet_weight') }]}
+                        label={t('pet_weight')}
+                    >
                         <Input placeholder={t('pet_weight')} type="number" />
                     </Form.Item>
-                    <Form.Item name="Age" rules={[{ required: true, message: t('not_null_pet_age') }]}>
+                    <Form.Item
+                        name="Age"
+                        rules={[{ required: true, message: t('not_null_pet_age') }]}
+                        label={t('pet_age')}
+                    >
                         <Input placeholder={t('pet_age')} type="number" />
                     </Form.Item>
                 </Form>
