@@ -4,7 +4,6 @@ import { UserOutlined, LogoutOutlined, CreditCardOutlined, ShoppingOutlined, Sho
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import AccordionItem from "./AccordionItem";
 import BarChart from "./BarChart";
 import "./style.css";
 
