@@ -28,16 +28,18 @@ const Banner = () => {
   const { shoppingCart } = useShopping();
   const productCount = shoppingCart.length;
   const dispatch = useDispatch();
+  const { i18n } = useTranslation();
   const { t } = useTranslation();
   const handleVisibleChange = (visible) => {
     setVisible(visible);
   };
-
+  // Check token if expired
+  // const checkTokenValidity = async () => {
   //   if (!token) {
   //     return;
   //   }
   //   try {
-  //     const response = await fetch('${API_URL}/api/auth/check-token', {
+  //     const response = await fetch(`${API_URL}/api/auth/check-token`, {
   //       method: 'POST',
   //       headers: {
   //         'Authorization': `Bearer ${token}`
@@ -47,15 +49,8 @@ const Banner = () => {
   //       console.log('Token is valid');
   //     } else {
   //       if (response.status === 401) {
-  //         console.error('Token is expired or invalid');
-  //         // Perform logout
-  //         localStorage.clear();
-  //         dispatch(setShoppingCart([]));
-  //         setRole('Guest');
-  //         setUser(null);
-  //         navigate('/login');
-  //         // Inform the user
-  //         alert(t('session_expired_alert'));
+  //         // Perform logout when token was expired
+  //         handleLogout()
   //       }
   //     }
   //   } catch (error) {
@@ -64,6 +59,8 @@ const Banner = () => {
   // };
 
   useEffect(() => {
+    // checkTokenValidity();
+    //Check sreen size for responsive
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
@@ -88,7 +85,7 @@ const Banner = () => {
     const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
     console.log('User ID:', accountID);
     console.log('Cart Items:', cartItems);
-  
+    // Store cart into db
     if (cartItems.length > 0) {
       try {
         const response = await axios.post(`${API_URL}/api/cart`, {
@@ -102,7 +99,6 @@ const Banner = () => {
         console.log('Cart saved successfully:', response.data);
       } catch (error) {
         console.error('Error saving cart:', error);
-        // Handle specific error scenarios if needed
       }
     }
   
@@ -128,6 +124,7 @@ const Banner = () => {
     { key: 'logout', icon: <LogoutOutlined />, label: t('log_out'), onClick: handleLogout }
   ];
 
+  // Render user menu by userMenuItems
   const renderUserMenu = () => (
     <Menu>
       {userMenuItems.map(item => (
@@ -149,16 +146,11 @@ const Banner = () => {
   );
 
   const renderMenuItems = (isVertical) => {
-    const { t, i18n } = useTranslation();
-    const navigate = useNavigate();
-
-
     let menuItems = [];
 
     if (role === 'Guest') {
       menuItems = [
         { key: 'home', label: t('HOME'), path: '/' },
-        { key: 'about', label: t('INTRODUCTION'), path: '/about' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -167,7 +159,6 @@ const Banner = () => {
     } else if (role === 'Customer') {
       menuItems = [
         { key: 'home', label: t('HOME'), path: '/' },
-        { key: 'about', label: t('INTRODUCTION'), path: '/about' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
@@ -176,13 +167,14 @@ const Banner = () => {
     } else if (role === 'Administrator') {
       menuItems = [
         { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
-        { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts' },
+        { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts', parent: t('MANAGEMENT') },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+        { key: 'statistics', label: t('statistics'), path: '/statistics' },
       ];
     } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
       menuItems = [
@@ -193,9 +185,11 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+        { key: 'statistics', label: t('statistics'), path: '/statistics' },
       ];
     }
 
+    // Vertical menu for responsive
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
         const parent = acc.find((menu) => menu.key === item.parent);
@@ -218,7 +212,10 @@ const Banner = () => {
     const currentLanguage = i18n.language;
 
     return (
-      <Menu mode={isVertical ? "inline" : "horizontal"} onClick={closeMenu} className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} disabledOverflow={true}>
+      <Menu mode={isVertical ? "inline" : "horizontal"} 
+            onClick={closeMenu} 
+            className={isVertical ? '' : 'flex justify-center items-center bg-cyan-400'} 
+            disabledOverflow={true}>
         {verticalMenu.map(item => (
           item.children ? (
             <Menu.SubMenu key={item.key} title={item.label}>

@@ -10,41 +10,43 @@ import {
   UserOutlined,
   ProductOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const { Title } = Typography;
 
 // getOrderHistory function
-const getOrderHistory = async () => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await axios.get(`${API_URL}/api/orders/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching order history:", error);
-    throw error;
-  }
-};
+// const getOrderHistory = async () => {
+//   const token = localStorage.getItem("token");
+//   try {
+//     const response = await axios.get(`${API_URL}/api/orders/`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching order history:", error);
+//     throw error;
+//   }
+// };
 
 // getSpaBookings function
-const getSpaBookings = async () => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await axios.get(`${API_URL}/api/Spa-bookings/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching spa bookings:", error);
-    throw error;
-  }
-};
+// const getSpaBookings = async () => {
+//   const token = localStorage.getItem("token");
+//   try {
+//     const response = await axios.get(`${API_URL}/api/Spa-bookings/`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching spa bookings:", error);
+//     throw error;
+//   }
+// };
 
 // Statistic component
 const Statistics = () => {
@@ -55,6 +57,7 @@ const Statistics = () => {
   const [totalBookings, setTotalBookings] = useState(0);
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const formatter = (value) => <CountUp end={value} separator="," />;
+  const { t } = useTranslation()
 
   const fetchUserData = async () => {
     setLoading(true);
@@ -108,6 +111,7 @@ const Statistics = () => {
         `${API_URL}/api/dashboard/most-ordered-products`
       );
       setMostOrderedProducts(response.data);
+      console.log(mostOrderedProducts)
     } catch (error) {
       console.error("Error fetching top products:", error);
     }
@@ -144,7 +148,7 @@ const Statistics = () => {
   return (
     <div className="p-8">
       <Title level={1} className="text-center text-black">
-        Dashboard
+        {t('statistic_title')}
       </Title>
       <Row gutter={16}>
         <Col span={12}>
@@ -152,7 +156,7 @@ const Statistics = () => {
             <div className="flex flex-row">
               <ShoppingCartOutlined className="text-7xl mr-16" />
               <Statistic
-                title="Shipped Orders"
+                title={t('shippedOrders')}
                 value={totalOrders}
                 formatter={formatter}
               />
@@ -164,7 +168,7 @@ const Statistics = () => {
             <div className="flex flex-row">
               <CarryOutOutlined className="text-7xl mr-16" />
               <Statistic
-                title="Completed Spa Bookings"
+                title={t('completedSpaBookings')}
                 value={totalBookings}
                 formatter={formatter}
               />
@@ -176,7 +180,7 @@ const Statistics = () => {
             <div className="flex flex-row">
               <UserOutlined className="text-7xl mr-16" />
               <Statistic
-                title="Total Active Users"
+                title={t('totalActiveUsers')}
                 value={totalUsers}
                 formatter={formatter}
               />
@@ -185,37 +189,36 @@ const Statistics = () => {
         </Col>
         <Col span={12}>
           <Card className="shadow-lg">
-            <div className="flex flex-row">
-              <ProductOutlined className="text-7xl mr-16" />
-              <div className="flex flex-row items-center">
-                <p level={5} className="mr-8 mb-0 text-gray">
-                  Most popular product
+            <div className="flex flex-col">
+              <div className="flex flex-row mb-4 items-center">
+                <ProductOutlined className="text-7xl mr-16" />
+                <p className="mr-8 mb-0 text-gray">
+                  {t('mostPopularProduct')}
                 </p>
-                <ul className="flex flex-wrap">
-                  {mostOrderedProducts.map((product) => (
-                    <li
-                      key={product._id}
-                      className="flex items-center mb-4 mr-4"
-                    >
-                      <img
-                        src={product.ImageURL}
-                        alt={product.ProductName}
-                        width={50}
-                        height={10}
-                        className="mr-4"
-                      />
-                      <div>
-                        <Title level={5} className="mb-0 text-black">
-                          {product.ProductName}
-                        </Title>
-                        <p className="text-gray-600 mb-0">
-                          Price: ${product.Price}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
               </div>
+              <ul className="flex flex-col">
+                {mostOrderedProducts.map((product) => (
+                  <li key={product._id} className="flex mb-4 items-start">
+                    <img
+                      src={product.ImageURL}
+                      alt={product.ProductName}
+                      width={50}
+                      height={50}
+                      className="mr-4"
+                    />
+                    <div>
+                      <Title level={5} className="mb-1 text-black">
+                        <Link className="text-blue-500 hover:text-blue-800" to={`/product-detail/${product._id}`}>
+                          {product.ProductName}
+                        </Link>
+                      </Title>
+                      <p className="text-gray-600 mb-0">
+                        {t('price')}: {product.Price.toLocaleString('en-US')}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </Card>
         </Col>

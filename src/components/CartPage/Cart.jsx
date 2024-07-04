@@ -1,8 +1,8 @@
-// File: pages/cart.jsx
+// Import các dependencies và hooks cần thiết
 import { useEffect, useState } from 'react';
 import { Table, InputNumber, Button, Typography, Card, Image, Skeleton } from 'antd';
 import useShopping from '../../hook/useShopping';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
@@ -31,8 +31,13 @@ const Cart = () => {
             return { ...response.data, Quantity: item.Quantity };
           })
         );
-        // check if product is available
-        setCartDetails(fetchedDetails.filter(product => product.Status === 'Available'));
+        // Set cart details, filtering out unavailable products and updating Quantity
+        setCartDetails(fetchedDetails.map(product => ({
+          ...product,
+          // Disable unavailable products and set Quantity to 1 for calculation
+          Disabled: product.Status !== 'Available',
+          Quantity: product.Status === 'Available' ? product.Quantity : 1,
+        })));
       } catch (error) {
         console.error('Error fetching cart details:', error);
       } finally {
@@ -43,7 +48,12 @@ const Cart = () => {
     fetchCartDetails();
   }, [shoppingCart]);
 
-  const totalAmount = cartDetails.reduce((total, item) => total + item.Price * item.Quantity, 0);
+  const totalAmount = cartDetails.reduce((total, item) => {
+    if (item.Status === 'Available') {
+      return total + item.Price * item.Quantity;
+    }
+    return total;
+  }, 0);
 
   const columns = [
     {
@@ -59,7 +69,9 @@ const Cart = () => {
       render: (text, record) => (
         <div className="flex items-center">
           <Image src={record.ImageURL} alt={record.ProductName} width={80} />
-          <span className="text-xl font-semibold">{text}</span><br />
+          <Link className="text-blue-500 hover:text-blue-800" to={`/product-detail/${record.ProductID}`}>
+            {text}
+          </Link>
         </div>
       ),
     },
@@ -67,7 +79,13 @@ const Cart = () => {
       title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
-      render: (text) => typeof text === 'number' ? `${text.toLocaleString('en-US')}` : '',
+      render: (text, record) => (
+        record.Status === 'Available' ? (
+          <span>{typeof text === 'number' ? `${text.toLocaleString('en-US')}` : ''}</span>
+        ) : (
+          <span className="text-gray-500 italic">{t('unavailable')}</span>
+        )
+      ),
     },
     {
       title: t('quantity'),
@@ -79,6 +97,7 @@ const Cart = () => {
           value={text}
           onChange={(value) => handleUpdateQuantity(record.ProductID, value)}
           className="w-24"
+          disabled={record.Status !== 'Available'}
         />
       ),
     },
