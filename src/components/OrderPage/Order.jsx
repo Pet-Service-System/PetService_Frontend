@@ -44,6 +44,12 @@ const Order = () => {
   }, []);
 
   useEffect(() => {
+    if (orderDetails.cartItems.length === 0) {
+      navigate(-1); // Navigate back if the cart is empty
+    }
+  }, [orderDetails.cartItems, navigate, t]);
+
+  useEffect(() => {
     const totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
     setOrderDetails((prevOrderDetails) => ({
       ...prevOrderDetails,
@@ -58,14 +64,14 @@ const Order = () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
-
+        // fetch product data from product by id
         const fetchedDetails = await Promise.all(
           orderDetails.cartItems.map(async (item) => {
             const response = await axios.get(`${API_URL}/api/products/${item.ProductID}`, config);
             return { ...response.data, Quantity: item.Quantity };
           })
         );
-
+        // check if product is available
         setProductDetails(fetchedDetails.filter(product => product.Status === 'Available'));
       } catch (error) {
         console.error('Error fetching product details:', error);
@@ -248,6 +254,7 @@ const Order = () => {
   return (
     <div>
       <div className="flex flex-row md:flex-row m-5 px-8">
+        {/* Go back button */}
         <Button
           onClick={() => navigate(-1)}
           className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"

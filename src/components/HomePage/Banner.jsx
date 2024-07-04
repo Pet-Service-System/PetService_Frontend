@@ -99,7 +99,6 @@ const Banner = () => {
         console.log('Cart saved successfully:', response.data);
       } catch (error) {
         console.error('Error saving cart:', error);
-        // Handle specific error scenarios if needed
       }
     }
   

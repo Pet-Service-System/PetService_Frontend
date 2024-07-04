@@ -22,12 +22,14 @@ const Cart = () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // fetch product data from product by id
         const fetchedDetails = await Promise.all(
           shoppingCart.map(async (item) => {
             const response = await axios.get(`${API_URL}/api/products/${item.ProductID}`, config);
             return { ...response.data, Quantity: item.Quantity };
           })
         );
+        // check if product is available
         setCartDetails(fetchedDetails.filter(product => product.Status === 'Available'));
       } catch (error) {
         console.error('Error fetching cart details:', error);
@@ -96,44 +98,46 @@ const Cart = () => {
   }
 
   return (
-    <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
+    <div>
       {/* Go back button */}
-      <div className="flex flex-row md:flex-row m-5">
-        <Button
-          onClick={() => navigate(-1)}
-          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
-          icon={<ArrowLeftOutlined />}
-          size="large"
-        >
-          {t('back')}
-        </Button>
-      </div>
-      <Title className="text-center" level={2}>{t('shopping_cart')}</Title>
-      {/* List of products */}
-      <Card className="shadow-lg rounded-lg">
-        {cartDetails.length > 0 ? (
-          <Table
-            dataSource={cartDetails}
-            columns={columns}
-            rowKey="ProductID"
-            pagination={false}
-            scroll={{ x: 'max-content' }}
-          />
-        ) : (
-          <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>
+      <div className="flex flex-row md:flex-row m-5 px-8">
+      <Button
+        onClick={() => navigate(-1)}
+        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+        icon={<ArrowLeftOutlined />}
+        size="large"
+      >
+        {t('back')}
+      </Button>
+    </div>
+      <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
+        <Title className="text-center" level={2}>{t('shopping_cart')}</Title>
+        {/* List of products */}
+        <Card className="shadow-lg rounded-lg">
+          {cartDetails.length > 0 ? (
+            <Table
+              dataSource={cartDetails}
+              columns={columns}
+              rowKey="ProductID"
+              pagination={false}
+              scroll={{ x: 'max-content' }}
+            />
+          ) : (
+            <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>
+          )}
+        </Card>
+        {/* TotalPrice and purchase button */}
+        {cartDetails.length > 0 && (
+          <div className="mt-8 flex justify-end items-center">
+            <Text className="text-2xl text-green-600 mr-4">
+              {t('total_amount')}: {totalAmount.toLocaleString('en-US')}
+            </Text>
+            <Button type="primary" onClick={handlePayClick}>
+              {t('pay')}
+            </Button>
+          </div>
         )}
-      </Card>
-      {/* TotalPrice and purchase button */}
-      {cartDetails.length > 0 && (
-        <div className="mt-8 flex justify-end items-center">
-          <Text className="text-2xl text-green-600 mr-4">
-            {t('total_amount')}: {totalAmount.toLocaleString('en-US')}
-          </Text>
-          <Button type="primary" onClick={handlePayClick}>
-            {t('pay')}
-          </Button>
-        </div>
-      )}
+      </div>
     </div>
   );
 };
