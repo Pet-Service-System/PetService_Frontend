@@ -279,6 +279,7 @@ const SpaServiceList = () => {
   return (
     <div className="p-10">
       <Title level={1} className="text-center">{t('service_for_cat')}</Title>
+      {/* Search */}
       <div className="flex flex-row justify-end">
         <Search
           placeholder={t('search_by_service_name')}
@@ -286,6 +287,7 @@ const SpaServiceList = () => {
           style={{ marginBottom: 16, width: 300 }}
         />
       </div>
+      {/* Service List */}
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -335,7 +337,7 @@ const SpaServiceList = () => {
           </div>
         )}
       </Form>
-
+      {/* Add/ Edit modal */}
       <Modal
         title={editMode ? t('edit_service') : t('add_new_service')}
         visible={addMode || editMode !== null}

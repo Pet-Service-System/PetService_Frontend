@@ -376,6 +376,7 @@ const OrderHistoryDetail = () => {
 
   return (
     <div className="p-4 md:p-8 lg:p-12">
+      {/* Go back button */}
       <Button
         onClick={() => navigate(-1)}
         className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
@@ -384,6 +385,7 @@ const OrderHistoryDetail = () => {
       >
         {t('back')}
       </Button>
+      {/* Order history detail */}
       <Card className="p-6 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
         <Title level={2} className="mb-4 text-center">{t('order_detail')} #{order.OrderID}</Title>
         <div className="mb-4">

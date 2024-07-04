@@ -34,6 +34,7 @@ const ResetPasswordForm = () => {
           onFinish={handleSubmit}
           layout="vertical"
         >
+          {/* New password */}
           <Form.Item
             label={t('new_password')}
             name="password"
@@ -41,6 +42,7 @@ const ResetPasswordForm = () => {
           >
             <Input.Password />
           </Form.Item>
+          {/* Confirm new Password */}
           <Form.Item
             label={t('confirm_new_password')}
             name="confirmPassword"
@@ -59,6 +61,7 @@ const ResetPasswordForm = () => {
           >
             <Input.Password />
           </Form.Item>
+          {/* Buttons */}
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               {t('reset_password')}

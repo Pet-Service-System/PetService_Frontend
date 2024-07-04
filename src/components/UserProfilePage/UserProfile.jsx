@@ -150,6 +150,7 @@ const UserProfile = () => {
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
+      {/* Sider */}
       {!screens.xs && (
         <Sider width={220}>
           <div className="logo" />
@@ -190,6 +191,7 @@ const UserProfile = () => {
           </Menu>
         </Sider>
       )}
+      {/* User information and buttons */}
       <Layout>
         <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
           <div className="bg-white p-8 rounded-lg shadow-md">

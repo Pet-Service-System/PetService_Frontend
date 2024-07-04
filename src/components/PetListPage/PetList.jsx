@@ -224,6 +224,7 @@ const PetList = () => {
 
   return (
     <Layout className="min-h-screen">
+      {/* Sider */}
       {!screens.xs && (
         <Sider width={220}>
           <div className="logo" />
@@ -264,6 +265,7 @@ const PetList = () => {
           </Menu>
         </Sider>
       )}
+      {/* Table */}
       <Layout>
         <Content className="m-4 p-6 bg-white">
           <div className="flex flex-col items-center">
@@ -339,7 +341,7 @@ const PetList = () => {
               </Form.Item>
             </Form>
           </Modal>
-
+          {/* Confirm delete Pet */}    
           <Modal
             title={t('cofirm_delete')}
             visible={confirmDeletePetId !== null}
@@ -349,7 +351,7 @@ const PetList = () => {
           >
             <p>{t('delete_pet_ask')}</p>
           </Modal>
-
+          {/* Update Pet */}
           <Modal
             title={t('pet_update')}
             visible={isEditModalVisible}

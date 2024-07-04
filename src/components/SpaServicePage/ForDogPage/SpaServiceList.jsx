@@ -202,8 +202,6 @@ const SpaServiceList = () => {
     form.setFieldsValue({ Image: file });
   };
 
-
-
   const columns = [
     {
       title: t('service_id'),
@@ -282,6 +280,7 @@ const SpaServiceList = () => {
   return (
     <div className="p-10">
       <Title level={1} className="text-center">{t('service_for_dog')}</Title>
+      {/* Search box */}
       <div className="flex flex-row justify-end">
         <Search
           placeholder={t('search_by_service_name')}
@@ -289,6 +288,7 @@ const SpaServiceList = () => {
           style={{ marginBottom: 16, width: 300 }}
         />
       </div>
+      {/* Service list */}
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -338,7 +338,7 @@ const SpaServiceList = () => {
           </div>
         )}
       </Form>
-
+      {/* Add/ Update modal */}
       <Modal
         title={editMode ? "Edit Service" : "Add New Service"}
         visible={addMode || editMode !== null}

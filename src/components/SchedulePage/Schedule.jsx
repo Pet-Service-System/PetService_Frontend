@@ -242,6 +242,7 @@ const Schedule = () => {
         </Button>
       )}
       <Table columns={columns} dataSource={data} bordered pagination={false} scroll={{ x: 'max-content' }} />
+      {/* Schedule employee modal */}
       <Modal
         title={t('schedule_employee')}
         visible={isModalVisible}

@@ -20,7 +20,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const GoogleClientID = GOOGLE_CLIENT_ID;
   const { t } = useTranslation();
-
+  // disable button while processing
   useEffect(() => {
     let timer;
     if (disableLogin) {
@@ -30,7 +30,7 @@ const LoginForm = () => {
     }
     return () => clearTimeout(timer);
   }, [disableLogin]);
-
+  // check if user logined
   useEffect(() => {
     const user = localStorage.getItem('user');
     if (user) {
@@ -149,7 +149,8 @@ const LoginForm = () => {
           <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
             <Title level={3} className="text-blue-500 text-center">{t('log_in')}</Title>
             <Form onFinish={handleSubmit} layout="vertical">
-            <Form.Item
+              {/* Email */}
+              <Form.Item
                 label="Email"
                 name="email"
                 validateTrigger="onSubmit"
@@ -166,6 +167,7 @@ const LoginForm = () => {
                   autoComplete="email"
                 />
               </Form.Item>
+              {/* Password */}
               <Form.Item
                 label={t('password')}
                 name="password"
@@ -181,11 +183,13 @@ const LoginForm = () => {
                   name="password"
                 />
               </Form.Item>
+              {/* Button */}
               <Form.Item className="w-full">
                 <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableLogin}>
                   {disableLogin ? 'Logging in...' : 'Login'}
                 </Button>
               </Form.Item>
+              {/* Register and Forgot password button */}
               <div className="flex justify-between items-center w-full">
                 <Button type="link" onClick={() => navigate('/register')} className="p-0">
                   {t('register')}
@@ -195,6 +199,7 @@ const LoginForm = () => {
                 </Button>
               </div>
             </Form>
+            {/* Google Login button */}
             <div className="mt-6 text-center">
               <GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}

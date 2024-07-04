@@ -295,6 +295,7 @@ const SpaServiceDetail = () => {
 
     return (
         <div className="relative">
+            {/* Go back button */}
             <div className="flex flex-row md:flex-row m-5 px-4 md:px-32">
                 <Button
                     onClick={() => navigate(-1)}
@@ -305,6 +306,7 @@ const SpaServiceDetail = () => {
                     {t('back')}
                 </Button>
             </div>
+            {/* Spa service detail */}
             <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
                 <div className="w-full md:w-1/2 flex justify-center">
                     <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />

@@ -96,6 +96,7 @@ const RegisterForm = () => {
         <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
           <Title level={3} className="text-blue-500 text-center mb-4">{t('register')}</Title>
           <Form onFinish={handleSubmit} layout="vertical">
+            {/* Fullname */}
             <Form.Item
               label={t('fullname')}
               name="fullname"
@@ -109,6 +110,7 @@ const RegisterForm = () => {
                 name="fullname"
               />
             </Form.Item>
+            {/* Email */}
             <Form.Item
               label="Email"
               name="email"
@@ -122,6 +124,7 @@ const RegisterForm = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Item>
+            {/* Password */}
             <Form.Item
               label={t('password')}
               name="password"
@@ -135,6 +138,7 @@ const RegisterForm = () => {
                 name="password"
               />
             </Form.Item>
+            {/* Confirm password */}
             <Form.Item
               label={t('confirm_password')}
               name="confirmPassword"
@@ -148,6 +152,7 @@ const RegisterForm = () => {
                 name="confirmPassword"
               />
             </Form.Item>
+            {/* Phone number */}
             <Form.Item
               label={t('phone_number')}
               name="phoneNumber"
@@ -161,6 +166,7 @@ const RegisterForm = () => {
                 name="phoneNumber"
               />
             </Form.Item>
+            {/* Address */}
             <Form.Item
               label={t('address')}
               name="address"
@@ -174,12 +180,14 @@ const RegisterForm = () => {
                 name="address"
               />
             </Form.Item>
+            {/* Buttons */}
             <Form.Item>
               <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableRegister}>
                 {disableRegister ? t('registering') : t('register')}
               </Button>
             </Form.Item>
           </Form>
+          {/* Go back to login link */}
           <div className="text-center mt-4">
             <Button type="link" onClick={() => navigate('/login')}>{t('back_to_login')}</Button>
           </div>

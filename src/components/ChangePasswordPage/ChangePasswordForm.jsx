@@ -18,6 +18,7 @@ const ChangePasswordForm = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Disable button when proccessing
   useEffect(() => {
     let timer;
     if (disableChangePassword) {
@@ -41,7 +42,9 @@ const ChangePasswordForm = () => {
     return newErrors;
   };
 
+
   const handleSubmit = async () => {
+    // check if button is disabled
     if (disableChangePassword) return;
     const token = localStorage.getItem('token');
     const validationErrors = validate();
@@ -73,7 +76,7 @@ const ChangePasswordForm = () => {
       }
     }
   };
-
+  // go back previous page
   const handleCancel = () => {
     navigate(-1);
   };
@@ -85,6 +88,7 @@ const ChangePasswordForm = () => {
           {t('change_password')}
         </Title>
         <Form onFinish={handleSubmit} layout="vertical">
+        {/* Current pwd */}
         <Form.Item
           label={t('current_password')}
           validateStatus={errors.currentPassword ? 'error' : ''}
@@ -102,7 +106,7 @@ const ChangePasswordForm = () => {
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
         </Form.Item>
-
+        {/* New pwd */}
         <Form.Item
           label={t('new_password')}
           validateStatus={errors.newPassword ? 'error' : ''}
@@ -120,7 +124,7 @@ const ChangePasswordForm = () => {
             onChange={(e) => setNewPassword(e.target.value)}
           />
         </Form.Item>
-
+        {/* Confirm new pwd */}
         <Form.Item
           label={t('confirm_new_password')}
           validateStatus={errors.confirmPassword ? 'error' : ''}
@@ -138,7 +142,7 @@ const ChangePasswordForm = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Form.Item>
-
+        {/* Button */}
         <Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button type="primary" htmlType="submit" className="mr-2" disabled={isLoading || disableChangePassword}>

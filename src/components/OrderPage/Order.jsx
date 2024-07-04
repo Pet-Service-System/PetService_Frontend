@@ -15,12 +15,13 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] = useState('nationwide');
-  const shippingCost = parseFloat(REACT_APP_SHIPPING_COST)
+  const shippingCost = parseFloat(REACT_APP_SHIPPING_COST);
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
     shippingCost: shippingCost,
     cartItems: JSON.parse(localStorage.getItem('shoppingCart')) || [], // Load cartItems from localStorage
   });
+  const [productDetails, setProductDetails] = useState([]);
   const [customerInfo, setCustomerInfo] = useState({
     fullname: '',
     address: '',
@@ -41,6 +42,7 @@ const Order = () => {
       setOriginalCustomerInfo(addressInfo);
     }
   }, []);
+
   useEffect(() => {
     const totalAmount = parseFloat(localStorage.getItem('totalAmount')) || 0;
     setOrderDetails((prevOrderDetails) => ({
@@ -51,9 +53,31 @@ const Order = () => {
     setIsPayPalEnabled(true);
   }, []);
 
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        const fetchedDetails = await Promise.all(
+          orderDetails.cartItems.map(async (item) => {
+            const response = await axios.get(`${API_URL}/api/products/${item.ProductID}`, config);
+            return { ...response.data, Quantity: item.Quantity };
+          })
+        );
+
+        setProductDetails(fetchedDetails.filter(product => product.Status === 'Available'));
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+        message.error('Error fetching product details.');
+      }
+    };
+
+    fetchProductDetails();
+  }, [orderDetails.cartItems]);
+
   const handleShippingChange = (e) => {
     const shippingMethod = e.target.value;
-    let shippingCost = shippingCost;
 
     setSelectedShippingMethod(shippingMethod);
     setOrderDetails({
@@ -76,7 +100,6 @@ const Order = () => {
     }));
   };
 
-
   const toggleEditMode = () => {
     setEditMode(!editMode);
   };
@@ -85,14 +108,12 @@ const Order = () => {
     localStorage.setItem('addressInfo', JSON.stringify(customerInfo));
     setOriginalCustomerInfo(customerInfo); // Update originalCustomerInfo with current state
     setEditMode(false);
-    window.location.reload();
   };
 
   const cancelEdit = () => {
     setCustomerInfo(originalCustomerInfo); // Revert to original state
     setEditMode(false);
   };
-
 
   const updateInventoryQuantity = async (orderDetails) => {
     try {
@@ -107,7 +128,7 @@ const Order = () => {
 
         const currentInventory = inventoryResponse.data.Quantity;
 
-        // Validate item.Quantity and item.quantity before proceeding
+        // Validate item.Quantity before proceeding
         if (typeof item.Quantity !== 'number') {
           throw new Error(`Invalid quantity data for ProductID ${item.ProductID}`);
         }
@@ -238,8 +259,8 @@ const Order = () => {
       </div>
       <div className="flex items-center justify-center bg-gray-100 px-10">
         <Row gutter={[16, 16]} className="w-full">
+          {/* Delivery Address and List of Products */}
           <Col xs={24} md={16}>
-            {/* Delivery Address */}
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <div className="flex justify-between items-center mb-6">
                 <Title level={3} className="mb-0">
@@ -289,7 +310,7 @@ const Order = () => {
             </div>
             <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">
               <Title level={3} className="mb-6">{t('list_of_product')}</Title>
-              {orderDetails.cartItems.map((item, index) => {
+              {productDetails.map((item, index) => {
                 const totalPrice = (item.Price * item.Quantity).toLocaleString('en-US');
                 return (
                   <Row key={index} className="mb-4" gutter={[16, 16]}>
@@ -317,9 +338,8 @@ const Order = () => {
               })}
             </div>
           </Col>
-
+          {/* Shipping Method and Total Amount  */}
           <Col xs={24} md={8}>
-            {/* Shipping Method */}
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <Title level={3} className="mb-6">{t('shipping_method')}</Title>
               <Radio.Group
@@ -329,8 +349,7 @@ const Order = () => {
                 <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
               </Radio.Group>
             </div>
-
-            {/* Total Amount */}
+            
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
               <Title level={3} className="mb-6">{t('total_amount')}</Title>
               <div className="mb-4">

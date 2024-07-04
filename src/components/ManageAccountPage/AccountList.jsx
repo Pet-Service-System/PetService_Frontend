@@ -19,7 +19,7 @@ const AccountList = () => {
   const [searchText, setSearchText] = useState(''); // State for search query
   const [filterRole, setFilterRole] = useState(null); // State for role filter
   const [filterStatus, setFilterStatus] = useState(null); // State for status filter
-
+  
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
@@ -189,6 +189,7 @@ const AccountList = () => {
       <Layout className='site-layout'>
         <div className="p-4 sm:p-8 site-layout-background">
         <Title level={2} className="text-center">{t('Account List')}</Title>
+        {/* Search and filter */}
         <Layout className='flex lg:flex-row sm:flex-col justify-between mb-4'>
           <Input.Search
             placeholder={t('Search by fullname, email, or phone')}
@@ -220,6 +221,7 @@ const AccountList = () => {
             </Select>
           </div>
         </Layout>
+        {/* Table */}
         <Table
           dataSource={loading ? [] : filteredData}
           columns={columns}
@@ -230,7 +232,7 @@ const AccountList = () => {
           scroll={{ x: 'max-content' }}
         />
         {loading && <Skeleton active />}
-
+        {/* Update account modal */}
         <Modal
           title="Edit Account"
           visible={isModalVisible}

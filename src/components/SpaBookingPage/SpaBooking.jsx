@@ -227,6 +227,7 @@ const SpaBooking = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
+      {/* Sider */}
       {!screens.xs && (
         <Sider width={220}>
           <div className="logo" />
@@ -267,6 +268,7 @@ const SpaBooking = () => {
           </Menu>
         </Sider>
       )}
+      {/* Table and sort button */}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">{t('spa_booking_history')}</h2>

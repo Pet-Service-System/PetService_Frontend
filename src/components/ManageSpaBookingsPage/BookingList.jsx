@@ -73,19 +73,19 @@ const SpaBooking = () => {
       booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       booking.phone.includes(searchQuery)
     );
-
+    // filter booking date
     if (selectedBookingDate) {
       filteredData = filteredData.filter(booking =>
         moment(booking.bookingDate).isSame(selectedBookingDate, 'day')
       );
     }
-
+    // filter date created
     if (selectedDateCreated) {
       filteredData = filteredData.filter(booking =>
         moment(booking.date).isSame(selectedDateCreated, 'day')
       );
     }
-
+    // filter status
     if (selectedStatusFilter) {
       filteredData = filteredData.filter(booking =>
         booking.status === selectedStatusFilter
@@ -264,6 +264,7 @@ const SpaBooking = () => {
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24 }}>
         <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
+        {/* Search and filter */}
         <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
         <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
               {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
@@ -305,6 +306,7 @@ const SpaBooking = () => {
             />
           </div>
         </Layout>
+        {/* Table */}
           <Spin spinning={loading}>
             <Table
               columns={columns}
@@ -313,6 +315,7 @@ const SpaBooking = () => {
               scroll={{ x: '100%' }}
             />
           </Spin>
+          {/* Update status modal */}
           <Modal
             title={`${t('update_status')} (${pendingStatus})`}
             visible={updateStatusModalVisible}

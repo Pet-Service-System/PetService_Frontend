@@ -284,6 +284,7 @@ const ProductList = () => {
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>{t('product_for_cat')}</Title>
+      {/* Search box */}
       <div className="flex flex-row justify-end">
         <Search
           placeholder={t('search_by_product_name')}
@@ -291,6 +292,7 @@ const ProductList = () => {
           style={{ marginBottom: 16, width: 300 }}
         />
       </div>
+      {/* Product list */}
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -341,7 +343,7 @@ const ProductList = () => {
           </div>
         )}
       </Form>
-
+      {/* Add/ Update modal */}
       <Modal
         title={editMode ? t('edit_product') : t('add_new_product')}
         visible={addMode || editMode !== null}

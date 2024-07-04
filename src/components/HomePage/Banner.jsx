@@ -33,7 +33,7 @@ const Banner = () => {
   const handleVisibleChange = (visible) => {
     setVisible(visible);
   };
-
+  // Check token if expired
   const checkTokenValidity = async () => {
     if (!token) {
       return;
@@ -49,15 +49,8 @@ const Banner = () => {
         console.log('Token is valid');
       } else {
         if (response.status === 401) {
-          console.error('Token is expired or invalid');
-          // Perform logout
-          localStorage.clear();
-          dispatch(setShoppingCart([]));
-          setRole('Guest');
-          setUser(null);
-          navigate('/login');
-          // Inform the user
-          alert(t('session_expired_alert'));
+          // Perform logout when token was expired
+          handleLogout()
         }
       }
     } catch (error) {
@@ -67,6 +60,7 @@ const Banner = () => {
 
   useEffect(() => {
     checkTokenValidity();
+    //Check sreen size for responsive
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
@@ -91,7 +85,7 @@ const Banner = () => {
     const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
     console.log('User ID:', accountID);
     console.log('Cart Items:', cartItems);
-  
+    // Store cart into db
     if (cartItems.length > 0) {
       try {
         const response = await axios.post(`${API_URL}/api/cart`, {
@@ -131,6 +125,7 @@ const Banner = () => {
     { key: 'logout', icon: <LogoutOutlined />, label: t('log_out'), onClick: handleLogout }
   ];
 
+  // Render user menu by userMenuItems
   const renderUserMenu = () => (
     <Menu>
       {userMenuItems.map(item => (
@@ -195,6 +190,7 @@ const Banner = () => {
       ];
     }
 
+    // Vertical menu for responsive
     const verticalMenu = menuItems.reduce((acc, item) => {
       if (item.parent) {
         const parent = acc.find((menu) => menu.key === item.parent);

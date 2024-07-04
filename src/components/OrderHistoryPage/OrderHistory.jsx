@@ -164,6 +164,7 @@ const OrderHistory = () => {
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
+      {/* Sider */}
       {!screens.xs && (
         <Sider width={220}>
           <div className="logo" />
@@ -204,6 +205,7 @@ const OrderHistory = () => {
           </Menu>
         </Sider>
       )}
+      {/* Table */}
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <h2 className="text-5xl text-center font-semibold mb-4">{t('order_history')}</h2>

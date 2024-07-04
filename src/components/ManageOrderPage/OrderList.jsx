@@ -23,6 +23,7 @@ const OrderList = () => {
   const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
   const [statusFilter, setStatusFilter] = useState(null); // State cho filter trạng thái
   const { t } = useTranslation();
+  
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
     try {
@@ -247,6 +248,7 @@ const OrderList = () => {
       <Layout className="site-layout">
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
           <Title className="text-5xl text-center font-semibold">{t('ordered_list')}</Title>
+          {/* Search and filter */}
           <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
             <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
               {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
@@ -281,6 +283,7 @@ const OrderList = () => {
               />
             </div>
           </Layout>
+          {/* Table */}
           <Spin spinning={loading}>
             <Table
               columns={columns}

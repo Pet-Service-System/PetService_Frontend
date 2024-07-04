@@ -206,6 +206,7 @@ const ProductDetail = () => {
     return (
         productData && (
             <div>
+                {/* Go back button */}
                 <div className="flex flex-row md:flex-row m-5 px-4 md:px-32">
                     <Button
                         onClick={() => navigate(-1)}
@@ -216,6 +217,7 @@ const ProductDetail = () => {
                         {t('back')}
                     </Button>
                 </div>
+                {/* Product detail */}
                 <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
                     <div className="w-full md:w-1/2 flex justify-center">
                         <Image src={productData.ImageURL} alt={productData.ProductName} />
@@ -323,6 +325,7 @@ const ProductDetail = () => {
                         ) : null}
                     </div>
                 </div>
+                {/* Comment section */}
                 <div className="m-5 px-4 md:px-32">
                     <Title level={4}>{t('product_reviews')}</Title>
                     {comments.length > 0 && (
