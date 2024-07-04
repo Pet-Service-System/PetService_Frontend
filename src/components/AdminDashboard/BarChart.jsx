@@ -1,31 +1,32 @@
-import { Chart } from 'react-google-charts';
+import React from "react";
+import { Chart } from "react-google-charts";
 
-export default function BarChart({ data }) {
-  const chartData = [
-    ['Day', 'Orders', 'Bookings'],
-    ...data.map(day => [day.dayOfWeek, day.Orders, day.Bookings])
-  ];
+export const data = [
+  ["Day of week", "Total Services Booked", "Total Ordered"],
+  ["Mon", 1030, 540],
+  ["Tue", 1030, 540],
+  ["Wed", 1030, 540],
+  ["Thu", 1030, 540],
+  ["Fri", 1030, 540],
+  ["Sat", 1030, 540],
+  ["Sun", 1030, 540],
+];
 
-  const options = {
-    title: 'Orders and Bookings by Day of Week',
-    chartArea: { width: '50%' },
-    hAxis: {
-      title: 'Day of Week',
-      minValue: 1,
-      maxValue: 7,
-    },
-    vAxis: {
-      title: 'Count',
-      minValue: 0,
-    },
-  };
+export const options = {
+  chart: {
+    title: "Company Performance",
+    subtitle: "Total Services Booked, Total Ordered",
+  },
+  colors: ["rgb(53, 138, 148)", "rgb(37, 11, 165)", "#188310"],
+};
 
+export default function BarChart() {
   return (
     <Chart
-      chartType="ColumnChart"
+      chartType="Bar"
       width="100%"
-      height="400px"
-      data={chartData}
+      height="350px"
+      data={data}
       options={options}
     />
   );
