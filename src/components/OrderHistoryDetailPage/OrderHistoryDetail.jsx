@@ -184,8 +184,6 @@ const OrderHistoryDetail = () => {
     try {
       
       const accessToken = await getPaypalAccessToken();
-      console.log(paypalOrderID)
-      console.log(accessToken)
       const response = await axios.post(
         `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalOrderID}/refund`,
         {},

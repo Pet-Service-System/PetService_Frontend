@@ -193,7 +193,7 @@ const Order = () => {
         OrderDate: new Date(),
         PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id
       };
-
+      
       // Call the createOrder API using Axios
       const orderResponse = await axios.post(`${API_URL}/api/orders`, orderData, {
         headers: {

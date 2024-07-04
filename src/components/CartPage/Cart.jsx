@@ -1,6 +1,6 @@
 // File: pages/cart.jsx
 import { useEffect, useState } from 'react';
-import { Table, InputNumber, Button, Typography, Card, Image } from 'antd';
+import { Table, InputNumber, Button, Typography, Card, Image, Skeleton } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -13,12 +13,14 @@ const { Title, Text } = Typography;
 const Cart = () => {
   const { shoppingCart, handleUpdateQuantity, handleRemoveItem } = useShopping();
   const [cartDetails, setCartDetails] = useState([]);
+  const [loading, setLoading] = useState(false); // State for loading spinner
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   // Fetch product details for items in the cart
   useEffect(() => {
     const fetchCartDetails = async () => {
+      setLoading(true); // Start loading spinner
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -33,6 +35,8 @@ const Cart = () => {
         setCartDetails(fetchedDetails.filter(product => product.Status === 'Available'));
       } catch (error) {
         console.error('Error fetching cart details:', error);
+      } finally {
+        setLoading(false); // Stop loading spinner
       }
     };
 
@@ -101,29 +105,33 @@ const Cart = () => {
     <div>
       {/* Go back button */}
       <div className="flex flex-row md:flex-row m-5 px-8">
-      <Button
-        onClick={() => navigate(-1)}
-        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
-        icon={<ArrowLeftOutlined />}
-        size="large"
-      >
-        {t('back')}
-      </Button>
-    </div>
+        <Button
+          onClick={() => navigate(-1)}
+          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+          icon={<ArrowLeftOutlined />}
+          size="large"
+        >
+          {t('back')}
+        </Button>
+      </div>
       <div className={`container px-4 ${shoppingCart.length === 0 ? 'my-40' : 'mt-10 mb-10'}`}>
         <Title className="text-center" level={2}>{t('shopping_cart')}</Title>
         {/* List of products */}
         <Card className="shadow-lg rounded-lg">
-          {cartDetails.length > 0 ? (
-            <Table
-              dataSource={cartDetails}
-              columns={columns}
-              rowKey="ProductID"
-              pagination={false}
-              scroll={{ x: 'max-content' }}
-            />
+          {loading ? (
+            <Skeleton active />
           ) : (
-            <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>
+            cartDetails.length > 0 ? (
+              <Table
+                dataSource={cartDetails}
+                columns={columns}
+                rowKey="ProductID"
+                pagination={false}
+                scroll={{ x: 'max-content' }}
+              />
+            ) : (
+              <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>
+            )
           )}
         </Card>
         {/* TotalPrice and purchase button */}
