@@ -242,18 +242,15 @@ const Banner = () => {
             <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item>
           </>
         )}
-        {role === 'Administrator' && isVertical && (
-          <>
-            <Menu.Item onClick={() => { navigate('/user-profile') }}>TÀI KHOẢN</Menu.Item>
-            <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item> 
-          </>
-        )}
-        {['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role) && isVertical && (
-          <>
-            <Menu.Item onClick={() => { navigate('/user-profile') }}>TÀI KHOẢN</Menu.Item>
-            <Menu.Item onClick={handleLogout}>ĐĂNG XUẤT</Menu.Item> 
-          </>
-        )}
+        {['Sales Staff', 'Caretaker Staff', 'Store Manager', 'Administrator'].includes(role) && isVertical && (
+        <>
+          <Menu.SubMenu onClick={() => { navigate('/user-profile') }} title={t('account')}>
+            <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>
+            <Menu.Item onClick={() => { navigate('/statistics') }}>{t('statistic_title')}</Menu.Item>
+          </Menu.SubMenu>
+          <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item> 
+        </>
+      )}
         <Menu.Item key="language" className="language-menu">
           <Dropdown
             overlay={
