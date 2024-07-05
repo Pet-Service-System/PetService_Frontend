@@ -5,6 +5,7 @@ import {
   Typography,
   Menu,
   Row,
+  Image,
   Col,
   Grid as AntGrid,
   Statistic,
@@ -20,7 +21,7 @@ import {
   ShopOutlined,
 } from "@ant-design/icons";
 import CountUp from "react-countup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import BarChart from "./BarChart";
@@ -96,11 +97,11 @@ export default function AdminDashboard() {
     const fetchTotalEarnings = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/api/dashboard//calculate-earnings`
+          `${API_URL}/api/dashboard/calculate-earnings`
         );
-        setTotalEarnings(response.data);
+        setTotalEarnings(response.data.totalEarnings);
       } catch (error) {
-        console.error("Error fetching earning:", error);
+        console.error("Error fetching earnings:", error);
       }
     };
 
@@ -210,7 +211,7 @@ export default function AdminDashboard() {
                     style={{ fontSize: "24px", marginRight: "8px" }}
                   />
                   <Statistic
-                    title="Total Earnings"
+                    title={t('totalEarnings')}
                     value={totalEarnings}
                     precision={2}
                     prefix="$"
@@ -227,7 +228,7 @@ export default function AdminDashboard() {
                     style={{ fontSize: "24px", marginRight: "8px" }}
                   />
                   <Statistic
-                    title="Total Orders"
+                    title={t('shippedOrders')}
                     valueStyle={{ color: "#cf1322" }}
                     value={totalOrders}
                     formatter={formatter}
@@ -244,7 +245,7 @@ export default function AdminDashboard() {
                     style={{ fontSize: "24px", marginRight: "8px" }}
                   />
                   <Statistic
-                    title="Total Bookings"
+                    title={t('completedSpaBookings')}
                     value={totalBookings}
                     valueStyle={{ color: "#3f8600" }}
                     formatter={formatter}
@@ -259,7 +260,7 @@ export default function AdminDashboard() {
                     style={{ fontSize: "24px", marginRight: "8px" }}
                   />
                   <Statistic
-                    title="Total Users"
+                    title={t('totalActiveUsers')}
                     value={totalUsers}
                     valueStyle={{ color: "#cf1322" }}
                     formatter={formatter}
@@ -275,16 +276,19 @@ export default function AdminDashboard() {
               </Card>
             </Col>
             <Col xs={24} md={8}>
-              <Card title="Popular Products">
+              <Card title={t('mostPopularProduct')}>
                 <ul>
                   {mostOrderedProducts.map((product) => (
                     <li key={product._id}>
-                      <img
-                        src={product.ImageURL}
-                        alt={product.ProductName}
-                        width={50}
-                        height={50}
-                      />
+                      <Link to={`/product-detail/${product._id}`}>
+                        <Image
+                          src={product.ImageURL}
+                          alt={product.ProductName}
+                          preview={false}
+                          width={50}
+                          height={50}
+                        />
+                      </Link>
                       <div>
                         <Title level={5}>{product.ProductName}</Title>
                         <Text>
