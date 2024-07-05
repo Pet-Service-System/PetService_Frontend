@@ -40,6 +40,7 @@ export default function AdminDashboard() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalBookings, setTotalBookings] = useState(0);
+  const [totalEarnings, setTotalEarnings] = useState(0);
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [isCountUpComplete, setIsCountUpComplete] = useState(false);
   const { t } = useTranslation();
@@ -92,10 +93,22 @@ export default function AdminDashboard() {
       }
     };
 
+    const fetchTotalEarnings = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/dashboard//calculate-earnings`
+        );
+        setTotalEarnings(response.data);
+      } catch (error) {
+        console.error("Error fetching earning:", error);
+      }
+    };
+
     fetchAvailableAccounts();
     fetchCompletedOrders();
     fetchCompletedBookings();
     fetchMostOrderedProducts();
+    fetchTotalEarnings();
     setLoading(false);
     setIsCountUpComplete(true);
   }, []);
@@ -198,10 +211,11 @@ export default function AdminDashboard() {
                   />
                   <Statistic
                     title="Total Earnings"
-                    value={500}
+                    value={totalEarnings}
                     precision={2}
                     prefix="$"
                     valueStyle={{ color: "#3f8600" }}
+                    formatter={formatter}
                   />
                 </div>
               </Card>
