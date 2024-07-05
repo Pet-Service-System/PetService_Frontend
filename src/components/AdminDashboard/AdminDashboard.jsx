@@ -3,6 +3,7 @@ import {
   Layout,
   Card,
   Typography,
+  Menu,
   Row,
   Col,
   Grid as AntGrid,
@@ -12,6 +13,10 @@ import {
   UserOutlined,
   CreditCardOutlined,
   ShoppingOutlined,
+  UnorderedListOutlined,
+  HistoryOutlined,
+  LineChartOutlined,
+  LogoutOutlined,
   ShopOutlined,
 } from "@ant-design/icons";
 import CountUp from "react-countup";
@@ -20,7 +25,7 @@ import axios from "axios";
 import BarChart from "./BarChart";
 import "./style.css";
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 const { useBreakpoint } = AntGrid;
 const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -36,6 +41,7 @@ export default function AdminDashboard() {
   const [totalBookings, setTotalBookings] = useState(0);
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [isCountUpComplete, setIsCountUpComplete] = useState(false);
+  const formatter = (value) => <CountUp end={value} separator="," />;
 
   useEffect(() => {
     // Fetch the count of available accounts
@@ -92,8 +98,80 @@ export default function AdminDashboard() {
     setIsCountUpComplete(true);
   }, []);
 
+  const handleLogout = async () => {
+    const accountID = user.id;
+    const cartItems = JSON.parse(localStorage.getItem("shoppingCart")) || [];
+
+    if (cartItems.length > 0) {
+      try {
+        const response = await axios.post(
+          `${API_URL}/api/cart`,
+          {
+            AccountID: accountID,
+            Items: cartItems,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log("Cart saved successfully:", response.data);
+      } catch (error) {
+        console.error("Error saving cart:", error);
+      }
+    }
+
+    localStorage.clear();
+    dispatch(setShoppingCart([]));
+    setRole("Guest");
+    setUser(null);
+    navigate("/", { replace: true });
+  };
+
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "80vh" }}>
+      {!screens.xs && (
+        <Sider width={220}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline">
+            <Menu.Item
+              key="profile"
+              icon={<UserOutlined />}
+              onClick={() => navigate("/user-profile")}
+            ></Menu.Item>
+            {role === "Customer" && (
+              <>
+                <Menu.Item
+                  key="pet-list"
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => navigate("/pet-list")}
+                ></Menu.Item>
+                <Menu.Item
+                  key="order-history"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate("/order-history")}
+                ></Menu.Item>
+                <Menu.Item
+                  key="spa-booking"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate("/spa-booking")}
+                ></Menu.Item>
+              </>
+            )}
+            <Menu.Item
+              key="statistic"
+              icon={<LineChartOutlined />}
+              onClick={() => navigate("/statistics")}
+            ></Menu.Item>
+            <Menu.Item
+              key="logout"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            ></Menu.Item>
+          </Menu>
+        </Sider>
+      )}
       <Layout>
         <Content style={{ padding: "24px" }}>
           <Row gutter={[16, 16]}>
@@ -121,9 +199,9 @@ export default function AdminDashboard() {
                   />
                   <Statistic
                     title="Total Orders"
-                    value={totalOrders}
                     valueStyle={{ color: "#cf1322" }}
-                    suffix={isCountUpComplete && <CountUp end={totalOrders} />}
+                    value={totalOrders}
+                    formatter={formatter}
                   />
                 </div>
               </Card>
@@ -140,7 +218,7 @@ export default function AdminDashboard() {
                     title="Total Bookings"
                     value={totalBookings}
                     valueStyle={{ color: "#3f8600" }}
-                    suffix={isCountUpComplete && <CountUp end={totalBookings} />}
+                    formatter={formatter}
                   />
                 </div>
               </Card>
@@ -155,7 +233,7 @@ export default function AdminDashboard() {
                     title="Total Users"
                     value={totalUsers}
                     valueStyle={{ color: "#cf1322" }}
-                    suffix={isCountUpComplete && <CountUp end={totalUsers} />}
+                    formatter={formatter}
                   />
                 </div>
               </Card>
