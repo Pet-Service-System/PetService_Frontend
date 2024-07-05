@@ -1,16 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
+import axios from "axios";
 
-export const data = [
-  ["Day of week", "Total Services Booked", "Total Ordered"],
-  ["Mon", 1030, 540],
-  ["Tue", 1030, 540],
-  ["Wed", 1030, 540],
-  ["Thu", 1030, 540],
-  ["Fri", 1030, 540],
-  ["Sat", 1030, 540],
-  ["Sun", 1030, 540],
-];
+const API_URL = import.meta.env.REACT_APP_API_URL;
 
 export const options = {
   chart: {
@@ -21,6 +13,26 @@ export const options = {
 };
 
 export default function BarChart() {
+  const [data, setData] = useState([
+    ["Day of week", "Total Services Booked", "Total Ordered"],
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/dashboard/count-orders-bookings-by-day`);
+        const apiData = response.data;
+
+        // Directly use the API data
+        setData(apiData);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Chart
       chartType="Bar"
