@@ -13,10 +13,12 @@ import {
   HistoryOutlined,
   LogoutOutlined,
   LineChartOutlined,
+  CreditCardOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
+import BarChart from "./BarChart";
 
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
@@ -33,6 +35,7 @@ const Statistics = () => {
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const formatter = (value) => <CountUp end={value} separator="," />;
+  const [totalEarnings, setTotalEarnings] = useState(0);
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -76,11 +79,23 @@ const Statistics = () => {
     }
   };
 
+  const fetchTotalEarnings = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/dashboard/calculate-earnings`
+      );
+      setTotalEarnings(response.data.totalEarnings);
+    } catch (error) {
+      console.error("Error fetching earnings:", error);
+    }
+  };
+
   useEffect(() => {
     fetchAvailableAccounts();
     fetchCompletedOrders();
     fetchCompletedBookings();
     fetchMostOrderedProducts();
+    fetchTotalEarnings()
   }, []);
 
   const handleLogout = async () => {
@@ -149,7 +164,7 @@ const Statistics = () => {
         </Title>
         <div className="px-6 sm:px-8 md:px-12 lg:px-20 xl:px-32">
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} lg={8}>
+            <Col xs={24} md={12}>
               <Card className="shadow-lg mb-4">
                 <div className="flex items-center">
                   <ShoppingCartOutlined className="text-7xl mr-4" />
@@ -161,7 +176,7 @@ const Statistics = () => {
                 </div>
               </Card>
             </Col>
-            <Col xs={24} sm={12} lg={8}>
+            <Col xs={24} md={12}>
               <Card className="shadow-lg mb-4">
                 <div className="flex items-center">
                   <CarryOutOutlined className="text-7xl mr-4" />
@@ -173,16 +188,41 @@ const Statistics = () => {
                 </div>
               </Card>
             </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Card className="shadow-lg mb-4">
-                <div className="flex items-center">
-                  <UserOutlined className="text-7xl mr-4" />
-                  <Statistic
-                    title={t('totalActiveUsers')}
-                    value={totalUsers}
-                    formatter={formatter}
-                  />
-                </div>
+            </Row>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Card className="shadow-lg mb-4">
+                  <div className="flex items-center">
+                    <UserOutlined className="text-7xl mr-4" />
+                    <Statistic
+                      title={t('totalActiveUsers')}
+                      value={totalUsers}
+                      formatter={formatter}
+                    />
+                  </div>
+                </Card>
+              </Col>
+              <Col xs={24} md={12}>
+              <Card>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <CreditCardOutlined
+                      style={{ fontSize: "24px", marginRight: "8px" }}
+                    />
+                    <Statistic
+                      title={t('totalEarnings')}
+                      value={totalEarnings}
+                      precision={2}
+                      prefix="$"
+                      valueStyle={{ color: "#3f8600" }}
+                      formatter={formatter}
+                    />
+                  </div>
+                </Card>
+              </Col>
+            </Row>
+            <Col xs={24} className="mb-4 shadow-lg">
+              <Card>
+                <BarChart />
               </Card>
             </Col>
             <Col xs={24}>
@@ -237,7 +277,6 @@ const Statistics = () => {
                 </div>
               </Card>
             </Col>
-          </Row>
         </div>
       </div>
     </Layout>

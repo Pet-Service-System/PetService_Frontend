@@ -423,5 +423,10 @@
     "mostPopularProduct": "Most Popular Product",
     "account": "ACCOUNT",
     "pet_name": "Pet Name",
-    "add_pet_modal_title": "Add Pet"
+    "add_pet_modal_title": "Add Pet",
+    "cofirm_cancel_order" : "Confirm Cancel Order",
+    "noDataAvailable": "No Data Available",
+    "totalEarnings": "Total Earning",
+    "company_performance": "Company Performance",
+    "services_booked_ordered": "Total Services Booked, Total Ordered"
 }
