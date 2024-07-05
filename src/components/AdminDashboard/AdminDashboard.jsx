@@ -21,6 +21,7 @@ import {
 } from "@ant-design/icons";
 import CountUp from "react-countup";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 import BarChart from "./BarChart";
 import "./style.css";
@@ -41,6 +42,7 @@ export default function AdminDashboard() {
   const [totalBookings, setTotalBookings] = useState(0);
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [isCountUpComplete, setIsCountUpComplete] = useState(false);
+  const { t } = useTranslation();
   const formatter = (value) => <CountUp end={value} separator="," />;
 
   useEffect(() => {
@@ -139,36 +141,49 @@ export default function AdminDashboard() {
               key="profile"
               icon={<UserOutlined />}
               onClick={() => navigate("/user-profile")}
-            ></Menu.Item>
+            >
+              {t("user_information")}
+            </Menu.Item>
+
             {role === "Customer" && (
               <>
                 <Menu.Item
                   key="pet-list"
                   icon={<UnorderedListOutlined />}
                   onClick={() => navigate("/pet-list")}
-                ></Menu.Item>
+                >
+                  {t("list_of_pets")}
+                </Menu.Item>
                 <Menu.Item
                   key="order-history"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate("/order-history")}
-                ></Menu.Item>
+                >
+                  {t("order_history")}
+                </Menu.Item>
                 <Menu.Item
                   key="spa-booking"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate("/spa-booking")}
-                ></Menu.Item>
+                >
+                  {t("service_history")}
+                </Menu.Item>
               </>
             )}
             <Menu.Item
               key="statistic"
               icon={<LineChartOutlined />}
               onClick={() => navigate("/statistics")}
-            ></Menu.Item>
+            >
+              {t("statistic_title")}
+            </Menu.Item>
             <Menu.Item
               key="logout"
               icon={<LogoutOutlined />}
               onClick={handleLogout}
-            ></Menu.Item>
+            >
+              {t("log_out")}
+            </Menu.Item>
           </Menu>
         </Sider>
       )}
