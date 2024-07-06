@@ -37,10 +37,9 @@ const SpaServiceList = () => {
     }
   };
 
-
   useEffect(() => {
     fetchServices();
-  }, [petTypeID]);
+  }, []);
 
   useEffect(() => {
     const filteredData = serviceData.filter(service =>
@@ -48,6 +47,7 @@ const SpaServiceList = () => {
     );
     setfilteredServices(filteredData);
   }, [searchQuery, serviceData]);
+
 
   const handleServiceClick = (id) => {
     navigate(`/spa-service-detail/${id}`);
@@ -68,7 +68,7 @@ const SpaServiceList = () => {
       setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error(t('authorization_token_not_found'));
+        message.error(t('auth_error'));
         return;
       }
 
@@ -82,7 +82,7 @@ const SpaServiceList = () => {
       if (serviceImg) {
         formData.append('image', serviceImg);
       } else {
-        message.error(t('please_upload_service_image'));
+        message.error(t('image_error'));
         return;
       }
       message.warning(t('processing'));
@@ -97,25 +97,26 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('service_added_successfully'))
+        message.success(t('add_success'))
         fetchServices();
-       } else {
-        message.error(t('failed_to_add_service'));
+        setAddMode(false);
+      } else {
+        message.error(t('add_fail'));
       }
     } catch (error) {
       console.error('Error adding service:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error(t('unauthorized_please_log_in'));
+          message.error(t('unauthorized'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('error_adding_service')}: ${error.response.data.message}`);
+          message.error(`${t('add_error')}: ${error.response.data.message}`);
         } else {
-          message.error(t('error_adding_service'));
+          message.error(t('add_error'));
         }
       } else if (error.request) {
-        message.error(t('network_or_server_issue'));
+        message.error(t('network_error'));
       } else {
-        message.error(`${t('error_adding_service')}: ${error.message}`);
+        message.error(`${t('add_error')}: ${error.message}`);
       }
     } finally {
       setSaving(false); // End saving
@@ -144,7 +145,7 @@ const SpaServiceList = () => {
       setSaving(true); // Start saving
       const token = localStorage.getItem('token');
       if (!token) {
-        message.error(t('authorization_token_not_found'));
+        message.error(t('auth_error'));
         return;
       }
 
@@ -169,9 +170,9 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 200) {
-        message.success(t('update_success'), 0.5).then(() => {
-          window.location.reload();
-        });
+        message.success(t('update_success'))
+        fetchServices();
+        setEditMode(null);
       } else {
         message.error(t('update_fail'));
       }
@@ -179,16 +180,16 @@ const SpaServiceList = () => {
       console.error('Error updating service:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error(t('unauthorized_please_log_in'));
+          message.error(t('unauthorized'));
         } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('error_updating_service')}: ${error.response.data.message}`);
+          message.error(`${t('update_error')}: ${error.response.data.message}`);
         } else {
-          message.error(t('error_updating_service'));
+          message.error(t('update_error'));
         }
       } else if (error.request) {
-        message.error(t('network_or_server_issue'));
+        message.error(t('network_error'));
       } else {
-        message.error(`${t('error_updating_service')}: ${error.message}`);
+        message.error(`${t('update_error')}: ${error.message}`);
       }
     } finally {
       setSaving(false); // End saving
@@ -265,7 +266,7 @@ const SpaServiceList = () => {
       render: (_, record) => (
         userRole === 'Store Manager' && (
           <div>
-            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>{t('edit_service')}</Button>
+            <Button type="primary" onClick={() => handleEditClick(record)} style={{ marginRight: '8px' }}>Edit</Button>
           </div>
         )
       ),
@@ -279,7 +280,7 @@ const SpaServiceList = () => {
   return (
     <div className="p-10">
       <Title level={1} className="text-center">{t('service_for_cat')}</Title>
-      {/* Search */}
+      {/* Search box */}
       <div className="flex flex-row justify-end">
         <Search
           placeholder={t('search_by_service_name')}
@@ -287,7 +288,7 @@ const SpaServiceList = () => {
           style={{ marginBottom: 16, width: 300 }}
         />
       </div>
-      {/* Service List */}
+      {/* Service list */}
       <Form form={form}>
         {userRole === 'Store Manager' ? (
           <>
@@ -300,7 +301,7 @@ const SpaServiceList = () => {
               scroll={{ x: 'max-content' }}
             />
             <div className="flex justify-end mt-4">
-              <Button type="primary" onClick={handleAddClick} disabled={loading}>{t('add_service')}</Button>
+              <Button type="primary" onClick={handleAddClick} disabled={loading}>Add Service</Button>
             </div>
           </>
         ) : (
@@ -337,15 +338,15 @@ const SpaServiceList = () => {
           </div>
         )}
       </Form>
-      {/* Add/ Edit modal */}
+      {/* Add/ Update modal */}
       <Modal
-        title={editMode ? t('edit_service') : t('add_new_service')}
+        title={editMode ? "Edit Service" : "Add New Service"}
         visible={addMode || editMode !== null}
         onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>{t('cancel')}</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
           <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
-            {editMode ? t('save') : t('add')}
+            {editMode ? "Save" : "Add"}
           </Button>,
         ]}
         style={{ textAlign: 'center' }}
@@ -354,7 +355,7 @@ const SpaServiceList = () => {
           <Form.Item
             name="ServiceName"
             label={t('service_name')}
-            rules={[{ required: true, message: t('please_enter_service_name') }]}
+            rules={[{ required: true, message: t('enter_service_name') }]}
             className="mb-4"
           >
             <Input placeholder={t('service_name')} className="w-full p-2 border border-gray-300 rounded" />
@@ -362,7 +363,7 @@ const SpaServiceList = () => {
           <Form.Item
             name="Description"
             label={t('description')}
-            rules={[{ required: true, message: t('please_enter_service_description') }]}
+            rules={[{ required: true, message: t('enter_service_description') }]}
             className="mb-4"
           >
             <TextArea rows={4} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
@@ -381,7 +382,7 @@ const SpaServiceList = () => {
           <Form.Item
             name="Status"
             label={t('status')}
-            rules={[{ required: true, message: t('please_select_service_status') }]}
+            rules={[{ required: true, message: t('select_service_status') }]}
             className="mb-4"
          >
             <Select placeholder={t('select_status')}>
@@ -390,7 +391,6 @@ const SpaServiceList = () => {
             </Select>
           </Form.Item>
         </Form>
-
       </Modal>
     </div>
   );

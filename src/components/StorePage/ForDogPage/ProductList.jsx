@@ -25,21 +25,21 @@ const ProductList = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/products`);
-        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
-        setProductData(filteredProducts);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/products`);
+      const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
+      setProductData(filteredProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
-  }, [petTypeID]);
+  }, []);
 
   useEffect(() => {
     const filteredData = productData.filter(product =>
@@ -82,7 +82,7 @@ const ProductList = () => {
       if (productImg) {
         formData.append('image', productImg);
       } else {
-        message.error(t('upload_product_image'));
+        message.error(t('please_upload_product_image'));
         return;
       }
       message.warning(t('processing'));
@@ -94,9 +94,9 @@ const ProductList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('product_added_successfully'), 0.5).then(() => {
-          window.location.reload();
-        });
+        message.success(t('product_added_successfully'))
+        fetchProducts();
+        setAddMode(false);
       } else {
         message.error(t('failed_to_add_product'));
       }
@@ -104,14 +104,14 @@ const ProductList = () => {
       console.error('Error adding product:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error(t('unauthorized'));
+          message.error(t('unauthorized_please_log_in'));
         } else if (error.response.data && error.response.data.message) {
           message.error(`${t('error_adding_product')}: ${error.response.data.message}`);
         } else {
           message.error(t('error_adding_product'));
         }
       } else if (error.request) {
-        message.error(t('network_or_server_issue'));
+        message.error(t('error_adding_product_network_or_server_issue'));
       } else {
         message.error(`${t('error_adding_product')}: ${error.message}`);
       }
@@ -169,9 +169,9 @@ const ProductList = () => {
       });
 
       if (response.status === 200) {
-        message.success(t('product_updated_successfully'), 0.5).then(() => {
-          window.location.reload();
-        });
+        message.success(t('product_updated_successfully'))
+        fetchProducts();
+        setEditMode(null);
       } else {
         message.error(t('failed_to_update_product'));
       }
@@ -179,14 +179,14 @@ const ProductList = () => {
       console.error('Error updating product:', error);
       if (error.response) {
         if (error.response.status === 401) {
-          message.error(t('unauthorized'));
+          message.error(t('unauthorized_please_log_in'));
         } else if (error.response.data && error.response.data.message) {
           message.error(`${t('error_updating_product')}: ${error.response.data.message}`);
         } else {
           message.error(t('error_updating_product'));
         }
       } else if (error.request) {
-        message.error(t('network_or_server_issue'));
+        message.error(t('error_updating_product_network_or_server_issue'));
       } else {
         message.error(`${t('error_updating_product')}: ${error.message}`);
       }
@@ -334,8 +334,8 @@ const ProductList = () => {
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>
-                    <h2 className="text-green-600 mt-2 text-4xl">{product.Price.toLocaleString('en-US')}</h2>
-                    <p className="text-gray-500 mt-2">{product.Description}</p>
+                    <p className="text-green-600 mt-2 text-3xl">{product.Price.toLocaleString('en-US')}</p>
+                    {/* <p className="text-gray-500 mt-2">{product.Description}</p> */}
                   </div>
                 </Card>
               ))
@@ -405,7 +405,7 @@ const ProductList = () => {
             label={t('status')}
             rules={[{ required: true, message: t('select_product_status') }]}
             className="mb-4"
-         >
+          >
             <Select placeholder={t('status')}>
               <Option value="Available">{t('available')}</Option>
               <Option value="Unavailable">{t('unavailable')}</Option>

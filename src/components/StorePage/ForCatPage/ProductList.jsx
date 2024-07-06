@@ -25,21 +25,21 @@ const ProductList = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/products`);
-        const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
-        setProductData(filteredProducts);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/products`);
+      const filteredProducts = response.data.filter(product => product.PetTypeID === petTypeID);
+      setProductData(filteredProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
-  }, [petTypeID]);
+  }, []);
 
   useEffect(() => {
     const filteredData = productData.filter(product =>
@@ -94,9 +94,9 @@ const ProductList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('product_added_successfully'), 0.5).then(() => {
-          window.location.reload();
-        });
+        message.success(t('product_added_successfully'))
+        fetchProducts();
+        setAddMode(false);
       } else {
         message.error(t('failed_to_add_product'));
       }
@@ -169,9 +169,9 @@ const ProductList = () => {
       });
 
       if (response.status === 200) {
-        message.success(t('product_updated_successfully'), 0.5).then(() => {
-          window.location.reload();
-        });
+        message.success(t('product_updated_successfully'))
+        fetchProducts();
+        setEditMode(null);
       } else {
         message.error(t('failed_to_update_product'));
       }

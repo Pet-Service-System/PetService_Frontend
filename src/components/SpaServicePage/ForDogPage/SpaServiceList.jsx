@@ -25,21 +25,21 @@ const SpaServiceList = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/services`);
-        const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
-        setServiceData(filteredServices);
-      } catch (error) {
-        console.error('Error fetching services:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/services`);
+      const filteredServices = response.data.filter(service => service.PetTypeID === petTypeID);
+      setServiceData(filteredServices);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchServices();
-  }, [petTypeID]);
+  }, []);
 
   useEffect(() => {
     const filteredData = serviceData.filter(service =>
@@ -97,9 +97,9 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('add_success')).then(() => {
-          window.location.reload();
-        });
+        message.success(t('add_success'))
+        fetchServices();
+        setAddMode(false);
       } else {
         message.error(t('add_fail'));
       }
@@ -170,9 +170,9 @@ const SpaServiceList = () => {
       });
 
       if (response.status === 200) {
-        message.success(t('update_success')).then(() => {
-          window.location.reload();
-        });
+        message.success(t('update_success'))
+        fetchServices();
+        setEditMode(null);
       } else {
         message.error(t('update_fail'));
       }
