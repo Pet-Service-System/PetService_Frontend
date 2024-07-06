@@ -170,6 +170,26 @@ const Order = () => {
     }
   };
 
+  const deleteCartItem = async (productId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'))
+      const AccountID = user.id
+      const token = localStorage.getItem('token')
+      await axios.delete(`${API_URL}/api/cart/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        data: {
+          AccountID: AccountID,
+          ProductID: productId,
+        }
+      });
+      console.log(`Deleted product ${productId} from cart`);
+    } catch (error) {
+      console.error(`Error deleting product ${productId} from cart:`, error);
+    }
+  };  
+
   const createOrder = (data, actions) => {
     return actions.order.create({
       purchase_units: [{
@@ -212,12 +232,13 @@ const Order = () => {
         });
       }
 
+      const filteredCartItems = orderDetails.cartItems.filter(item => item.Status === 'Available');
       const orderDetailsData = {
         OrderID: orderResponse.data.OrderID,
         CustomerName: customerInfo.fullname,
         Address: customerInfo.address,
         Phone: customerInfo.phone,
-        Items: orderDetails.cartItems.map(item => ({
+        Items: filteredCartItems.map(item => ({
           ProductID: item.ProductID,
           Quantity: item.Quantity
         }))
@@ -233,6 +254,13 @@ const Order = () => {
 
       await updateInventoryQuantity(orderDetails);
 
+      // Xóa các sản phẩm đã thanh toán thành công khỏi giỏ hàng trong cơ sở dữ liệu
+      await Promise.all(orderDetails.cartItems.map(async (item) => {
+        if (item.Status === 'Available') {
+          await deleteCartItem(item.ProductID);
+        }
+      }));
+      
       setTimeout(() => {
         localStorage.removeItem('shoppingCart');
         dispatch(setShoppingCart([]));

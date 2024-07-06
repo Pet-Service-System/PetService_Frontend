@@ -24,19 +24,37 @@ const Cart = () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        // fetch product data from product by id
+  
+        // Fetch product data từng sản phẩm trong giỏ hàng
         const fetchedDetails = await Promise.all(
           shoppingCart.map(async (item) => {
             const response = await axios.get(`${API_URL}/api/products/${item.ProductID}`, config);
-            return { ...response.data, Quantity: item.Quantity };
+            const productFromServer = response.data;
+            
+            // Kiểm tra và cập nhật trạng thái của sản phẩm từ server
+            const updatedItem = {
+              ...item,
+              Status: productFromServer.Status, // Cập nhật trạng thái mới từ server
+              Quantity: item.Quantity, // Giữ nguyên Quantity từ giỏ hàng
+            };
+  
+            // Cập nhật lại item trong localStorage nếu trạng thái đã thay đổi
+            if (item.Status !== productFromServer.Status) {
+              const updatedCart = shoppingCart.map(cartItem => 
+                cartItem.ProductID === item.ProductID ? updatedItem : cartItem
+              );
+              localStorage.setItem('shoppingCart', JSON.stringify(updatedCart));
+            }
+  
+            return { ...productFromServer, Quantity: item.Quantity };
           })
         );
-        // Set cart details, filtering out unavailable products and updating Quantity
+  
+        // Set cart details với các sản phẩm đã fetch được và cập nhật Quantity
         setCartDetails(fetchedDetails.map(product => ({
           ...product,
-          // Disable unavailable products and set Quantity to 1 for calculation
-          Disabled: product.Status !== 'Available',
-          Quantity: product.Status === 'Available' ? product.Quantity : 1,
+          Disabled: product.Status !== 'Available', // Disable sản phẩm nếu không có sẵn
+          Quantity: product.Status === 'Available' ? product.Quantity : 1, // Quantity mặc định là 1 nếu không có sẵn
         })));
       } catch (error) {
         console.error('Error fetching cart details:', error);
@@ -44,9 +62,10 @@ const Cart = () => {
         setLoading(false); // Stop loading spinner
       }
     };
-
+  
     fetchCartDetails();
   }, [shoppingCart]);
+  
 
   const totalAmount = cartDetails.reduce((total, item) => {
     if (item.Status === 'Available') {

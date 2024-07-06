@@ -8,7 +8,6 @@ const useShopping = () => {
   const dispatch = useDispatch();
   const shoppingCart = useSelector((state) => state.shopping);
 
-  // Load shopping cart from localStorage on initial load
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     if (savedCart.length > 0) {
@@ -16,7 +15,6 @@ const useShopping = () => {
     }
   }, [dispatch]);
 
-  // Save shopping cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('shoppingCart', JSON.stringify(shoppingCart));
   }, [shoppingCart]);
@@ -29,9 +27,28 @@ const useShopping = () => {
     dispatch(updateItem(item));
   };
 
-  const handleUpdateQuantity = (id, Quantity) => {
+  const handleUpdateQuantity = async (id, Quantity) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const AccountID = user.id;
+    const token = localStorage.getItem('token');
+  
+    try {
+      const response = await axios.put(`${API_URL}/api/cart`, {
+        AccountID,
+        ProductID: id,
+        Quantity
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      console.log('Cart updated successfully:', response.data);
+    } catch (error) {
+      console.error('Error updating cart:', error);
+    }
     dispatch(updateQuantity({ ProductID: id, Quantity }));
-  };
+  };  
 
   const handleRemoveItem = async (id) => {
     const user = JSON.parse(localStorage.getItem('user'))

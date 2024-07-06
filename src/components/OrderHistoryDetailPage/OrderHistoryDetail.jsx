@@ -372,7 +372,7 @@ const OrderHistoryDetail = () => {
     });
   }
 
-  return (
+  return ( orderDetail.Items &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back button */}
       <Button

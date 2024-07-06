@@ -10,10 +10,11 @@ const shoppingSlice = createSlice({
       return action.payload;
     },
     addItem: (state, action) => {
-      const { ProductID, ProductName, Price, ImageURL, Quantity } = action.payload;
+      const { ProductID, ProductName, Price, ImageURL, Quantity, Status } = action.payload;
       const existingItem = state.find(item => item.ProductID === ProductID);
       if (existingItem) {
         existingItem.Quantity += Quantity;
+        existingItem.Status = Status; // Update status if existing
       } else {
         state.push({
           ProductID,
@@ -21,22 +22,25 @@ const shoppingSlice = createSlice({
           ProductName,
           Price,
           Quantity,
+          Status,
         });
       }
     },
     updateQuantity: (state, action) => {
-      const { ProductID, Quantity } = action.payload;
+      const { ProductID, Quantity, Status } = action.payload; // Include Status
       const existingItem = state.find(item => item.ProductID === ProductID);
       if (existingItem) {
         existingItem.Quantity = Quantity;
+        existingItem.Status = Status; // Update status
       }
     },
     updateItem: (state, action) => {
-      const { ProductID, ProductName, Quantity } = action.payload;
+      const { ProductID, ProductName, Quantity, Status } = action.payload; // Include Status
       const existingItem = state.find(item => item.ProductID === ProductID);
       if (existingItem) {
         existingItem.ProductName = ProductName;
         existingItem.Quantity = Quantity;
+        existingItem.Status = Status; // Update status
       }
     },
     removeItem: (state, action) => {
