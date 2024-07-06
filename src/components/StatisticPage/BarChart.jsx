@@ -6,10 +6,10 @@ import { useTranslation } from "react-i18next";
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 export default function BarChart() {
-  const [data, setData] = useState([
-    ["Day of week", "Total Services Booked", "Total Ordered"],
-  ]);
   const { t } = useTranslation();
+  const [data, setData] = useState([
+    [t("day_of_week"), t("total_services_booked"), t("total_ordered")],
+  ]);
 
   const options = {
     chart: {
@@ -26,14 +26,18 @@ export default function BarChart() {
         const apiData = response.data;
 
         // Directly use the API data
-        setData(apiData);
+        const translatedData = [
+          [t("day_of_week"), t("total_services_booked"), t("total_ordered")],
+          ...apiData.slice(1),
+        ];
+        setData(translatedData);
       } catch (error) {
         console.error("Error fetching data", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [t]); // Re-fetch data when the translation changes
 
   return (
     <Chart

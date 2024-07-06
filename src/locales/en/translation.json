@@ -431,5 +431,20 @@
     "services_booked_ordered": "Total Services Booked, Total Ordered",
     "voucher": "Voucher",
     "enter_voucher_code": "Enter voucher here",
-    "apply_voucher": "Apply"
+    "apply_voucher": "Apply",
+    "day_of_week": "Day of week",
+    "total_services_booked": "Total Services Booked",
+    "total_ordered": "Total Ordered",
+    "voucher_id": "Voucher ID",
+    "pattern": "Pattern",
+    "value": "Value",
+    "expiration_date": "Expiration Date",
+    "action": "Action",
+    "voucher_management": "Voucher Management",
+    "add_voucher": "Add Voucher",
+    "edit_voucher": "Edit Voucher",
+    "voucher_added_successfully": "Voucher added successfully",
+    "failed_to_add_voucher": "Failed to add voucher",
+    "voucher_updated_successfully": "Voucher updated successfully",
+    "failed_to_update_voucher": "Failed to update voucher"
 }

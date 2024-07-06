@@ -30,7 +30,8 @@ import ManageOrderPage from './pages/ManageOrderPage'
 import ManageSpaBookingPage from './pages/ManageSpaBookingPage'
 import PurchaseSuccessPage from './pages/PurchaseOrderSuccessPage'
 import StatisticPage from './pages/StatisticPage'
-import { AdminDashboardPage } from './pages/AdminDashboardPage'
+// import { AdminDashboardPage } from './pages/AdminDashboardPage'
+import VoucherPage from './pages/VoucherPage'
 function App() {
   return (
     <>
@@ -61,7 +62,7 @@ function App() {
       <Route path='/manage-spa-bookings' element={<ManageSpaBookingPage/>}/>
       <Route path='/purchase-order-successfully' element={<PurchaseSuccessPage/>}/>
       <Route path='/statistics' element={<StatisticPage/>}/>
-      <Route path='/admin-dashboard' element={<AdminDashboardPage/>}/>
+      <Route path='/manage-voucher' element={<VoucherPage/>}/>
     </Routes>
     </>
   )

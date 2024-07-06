@@ -436,5 +436,20 @@
     "services_booked_ordered": "Tổng Dịch Vụ Đã Đặt, Tổng Đơn Hàng",
     "voucher": "Mã giảm giá",
     "enter_voucher_code": "Nhập mã giảm giá ở đây",
-    "apply_voucher": "Áp dụng"
+    "apply_voucher": "Áp dụng",
+    "day_of_week": "Ngày trong tuần",
+    "total_services_booked": "Tổng số dịch vụ đã đặt",
+    "total_ordered": "Tổng số đơn đặt hàng",
+    "voucher_id": "Mã Voucher",
+    "pattern": "Mẫu",
+    "value": "Giá trị",
+    "expiration_date": "Ngày hết hạn",
+    "action": "Hành động",
+    "voucher_management": "Quản lý Voucher",
+    "add_voucher": "Thêm Voucher",
+    "edit_voucher": "Chỉnh sửa Voucher",
+    "voucher_added_successfully": "Thêm Voucher thành công",
+    "failed_to_add_voucher": "Thêm Voucher thất bại",
+    "voucher_updated_successfully": "Cập nhật Voucher thành công",
+    "failed_to_update_voucher": "Cập nhật Voucher thất bại"
 }
