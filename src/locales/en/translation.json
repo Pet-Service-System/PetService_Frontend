@@ -428,5 +428,8 @@
     "noDataAvailable": "No Data Available",
     "totalEarnings": "Total Earning",
     "company_performance": "Company Performance",
-    "services_booked_ordered": "Total Services Booked, Total Ordered"
+    "services_booked_ordered": "Total Services Booked, Total Ordered",
+    "voucher": "Voucher",
+    "enter_voucher_code": "Enter voucher here",
+    "apply_voucher": "Apply"
 }

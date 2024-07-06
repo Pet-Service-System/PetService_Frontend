@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env
   .REACT_APP_EXCHANGE_RATE_VND_TO_USD;
 const REACT_APP_SHIPPING_COST = import.meta.env.REACT_APP_SHIPPING_COST;
+import useShopping from '../../hook/useShopping';
 
 const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -50,6 +51,7 @@ const Order = () => {
   const dispatch = useDispatch();
   const exchangeRateVNDtoUSD = parseFloat(REACT_APP_EXCHANGE_RATE_VND_TO_USD);
   const { t } = useTranslation();
+  const { handleRemoveItem } = useShopping();
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem("addressInfo"));
@@ -311,12 +313,11 @@ const Order = () => {
       await Promise.all(orderDetails.cartItems.map(async (item) => {
         if (item.Status === 'Available') {
           await deleteCartItem(item.ProductID);
+          handleRemoveItem(item.ProductID)
         }
       }));
       
       setTimeout(() => {
-        localStorage.removeItem("shoppingCart");
-        dispatch(setShoppingCart([]));
         navigate("/purchase-order-successfully", { replace: true });
       }, 700);
     } catch (error) {
@@ -461,6 +462,21 @@ const Order = () => {
               <Title level={3} className="mb-6">
                 {t("shipping_method")}
               </Title>
+              <Radio.Group
+                value={selectedShippingMethod}
+                onChange={handleShippingChange}
+              >
+                <Radio value="nationwide" className="font-medium block mb-2">
+                  {t("shipping_fee_nationwide")} (
+                  {shippingCost.toLocaleString("en-US")}đ)
+                </Radio>
+              </Radio.Group>
+            </div>
+
+            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+              <Title level={3} className="mb-6">
+                {t("voucher")}
+              </Title>
               <div className="mb-4">
                 <Input
                   placeholder={t("enter_voucher_code")}
@@ -472,15 +488,6 @@ const Order = () => {
                   {t("apply_voucher")}
                 </Button>
               </div>
-              <Radio.Group
-                value={selectedShippingMethod}
-                onChange={handleShippingChange}
-              >
-                <Radio value="nationwide" className="font-medium block mb-2">
-                  {t("shipping_fee_nationwide")} (
-                  {shippingCost.toLocaleString("en-US")}đ)
-                </Radio>
-              </Radio.Group>
             </div>
 
             <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">

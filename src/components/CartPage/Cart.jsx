@@ -178,7 +178,7 @@ const Cart = () => {
             <Text className="text-2xl text-green-600 mr-4">
               {t('total_amount')}: {totalAmount.toLocaleString('en-US')}
             </Text>
-            <Button type="primary" onClick={handlePayClick}>
+            <Button type="primary" onClick={handlePayClick} disabled={totalAmount===0}>
               {t('pay')}
             </Button>
           </div>
