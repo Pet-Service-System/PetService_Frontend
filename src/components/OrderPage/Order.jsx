@@ -17,8 +17,6 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setShoppingCart } from "../../redux/shoppingCart";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env
@@ -49,7 +47,6 @@ const Order = () => {
   const [editMode, setEditMode] = useState(false); // State for edit mode
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const exchangeRateVNDtoUSD = parseFloat(REACT_APP_EXCHANGE_RATE_VND_TO_USD);
   const { t } = useTranslation();
   const { handleRemoveItem } = useShopping();
