@@ -370,7 +370,7 @@
     "spa_service_booking_history": "Lịch sử đặt dịch vụ spa",
     "search_by_customer_name_or_phone": "Tìm kiếm theo tên khách hàng hoặc số điện thoại",
     "no_product_in_order": "Không có sản phẩm trong đơn hàng.",
-    "quantity_out_of_inventory": "Số lượng yêu cầu vượt quá số lượng tồn kho",
+    "quantity_out_of_inventory": "Số lượng yêu cầu vượt quá số lượng tồn kho, hãy kiểm tra giỏ hàng",
     "plz_login_or_register_to_buy": "Vui lòng đăng nhập hoặc đăng ký để mua hàng.",
     "email_invalid": "Email không hợp lệ",
     "password_must_have_8_characters": "Mật khẩu cần ít nhất 8 ký tự",

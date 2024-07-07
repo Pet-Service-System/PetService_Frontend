@@ -19,6 +19,7 @@ const ProductDetail = () => {
     const [Quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
+    const { shoppingCart } = useShopping();
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const userRole = localStorage.getItem('role') || 'Guest';
@@ -105,16 +106,25 @@ const ProductDetail = () => {
             return;
         }
         if (productData) {
-            if (Quantity > productData.Quantity) {
+            const cartQuantity = shoppingCart.reduce((total, item) => {
+                if (item.ProductID === productData.ProductID) {
+                    return total + item.Quantity;
+                }
+                return total;
+            }, 0);
+    
+            const totalQuantity = Quantity + cartQuantity;
+    
+            if (totalQuantity > productData.Quantity) {
                 message.error(t('quantity_out_of_inventory'));
                 return;
             }
-
+    
             const productWithQuantity = { ...productData, Quantity };
             handleAddItem(productWithQuantity);
             message.success(t('product_added_to_cart_successfully'));
         }
-    };
+    };    
 
     const showLoginModal = () => {
         Modal.info({
@@ -142,7 +152,7 @@ const ProductDetail = () => {
 
     const handleChangeQuantity = (value) => {
         if (!isNaN(value) && value > 0) {
-            setQuantity(value);
+            setQuantity(parseFloat(value));
         }
     };
 
@@ -288,7 +298,6 @@ const ProductDetail = () => {
                                         value={Quantity}
                                         onChange={(e) => handleChangeQuantity(e.target.value)}
                                         className="mx-3 text-lg w-24 text-center"
-                                        type="number"
                                         min="1"
                                     />
                                     <Button onClick={handleIncrease}>+</Button>

@@ -363,7 +363,7 @@
     "spa_service_booking_history": "Spa Service Booking History",
     "search_by_customer_name_or_phone": "Search by customer name or phone",
     "no_product_in_order": "There are no products in the order.",
-    "quantity_out_of_inventory": "Quantity requested exceeds inventory quantity",
+    "quantity_out_of_inventory": "Quantity requested exceeds inventory quantity, please check your cart",
     "plz_login_or_register_to_buy": "Please log in or register to purchase.",
     "email_invalid": "Email is invalid",
     "password_must_have_8_characters": "Password must be at least 8 characters",
