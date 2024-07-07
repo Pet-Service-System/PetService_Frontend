@@ -261,17 +261,17 @@ const Voucher = () => {
         ]}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="Pattern" label={t('pattern')} rules={[{ required: true, message: t('please_enter_pattern') }]}>
+          <Form.Item name="Pattern" label={t('pattern')} rules={[{ required: false }]}>
             <Input disabled={editMode !== null} />
           </Form.Item>
           <Form.Item name="UsageLimit" label={t('usage_limit')} rules={[{ required: true, message: t('please_enter_usage_limit') }]}>
-            <Input type="number" />
+            <Input suffix={t('times')} type="number" />
           </Form.Item>
           <Form.Item name="DiscountValue" label={t('discount_value')} rules={[{ required: true, message: t('please_enter_discount_value') }]}>
-            <Input type="number" />
+            <Input suffix='vnd' type="number" />
           </Form.Item>
           <Form.Item name="MinimumOrderValue" label={t('minimum_order_value')} rules={[{ required: true, message: t('please_enter_minimum_order_value') }]}>
-            <Input type="number" />
+            <Input suffix='vnd' type="number" />
           </Form.Item>
           <Form.Item name="ExpirationDate" label={t('expiration_date')} rules={[{ required: true, message: t('please_select_expiration_date') }]}>
             <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />

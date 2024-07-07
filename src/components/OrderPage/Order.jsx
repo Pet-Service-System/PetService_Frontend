@@ -45,6 +45,7 @@ const Order = () => {
     phone: "",
   });
   const [isPayPalEnabled, setIsPayPalEnabled] = useState(false);
+  const [voucherCode, setVoucherCode] = useState(""); // State for voucher code
   const [editMode, setEditMode] = useState(false); // State for edit mode
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const Order = () => {
   const exchangeRateVNDtoUSD = parseFloat(REACT_APP_EXCHANGE_RATE_VND_TO_USD);
   const { t } = useTranslation();
   const { handleRemoveItem } = useShopping();
+  const [discountValue, setDiscountValue] = useState(0); // State for discount value
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem("addressInfo"));
@@ -230,17 +232,55 @@ const Order = () => {
     } catch (error) {
       console.error(`Error deleting product ${productId} from cart:`, error);
     }
-  };  
+  };
+  
+  const checkVoucher = async () => {
+    try {
+      if (voucherCode.trim() === '') {
+        return;
+      }
+      const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
+      const voucher = response.data;
+
+      // Check if the voucher is valid and apply the discount
+      if (voucher) {
+        await setDiscountValue(voucher.DiscountValue);
+        message.success(t("voucher_applied"));
+      } else {
+        message.error(t("invalid_voucher"));
+      }
+    } catch (error) {
+      console.error(`Error:`, error);
+      message.error(t("invalid_voucher"));
+    }
+  };
+
+  const updateVoucherUsageLimit = async () => {
+    try {
+      if (voucherCode.trim() === '') {
+        return;
+      }
+      const response = await axios.put(`${API_URL}/api/voucher/pattern/${voucherCode}`);
+      return(response.data)
+    } catch (error) {
+      console.error(`Error:`, error);
+      message.error(t("invalid_voucher"));
+    }
+  };
 
   const createOrder = (data, actions) => {
+    const totalAmountWithDiscount = (
+      orderDetails.totalAmount +
+      orderDetails.shippingCost -
+      discountValue
+    ).toFixed(2);
+
+    const totalAmountInUSD = (totalAmountWithDiscount * exchangeRateVNDtoUSD).toFixed(2);
     return actions.order.create({
       purchase_units: [
         {
           amount: {
-            value: (
-              (orderDetails.totalAmount + orderDetails.shippingCost) *
-              exchangeRateVNDtoUSD
-            ).toFixed(2),
+            value: totalAmountInUSD,
           },
         },
       ],
@@ -308,6 +348,14 @@ const Order = () => {
       console.log("Order details created:", detailsResponse.data);
 
       await updateInventoryQuantity(orderDetails);
+      
+      if (voucherCode) {
+        try {
+          await updateVoucherUsageLimit();
+        } catch (error) {
+          console.error('Error updating voucher usage limit:', error)
+        }
+      }
 
       // Xóa các sản phẩm đã thanh toán thành công khỏi giỏ hàng trong cơ sở dữ liệu
       await Promise.all(orderDetails.cartItems.map(async (item) => {
@@ -316,6 +364,8 @@ const Order = () => {
           handleRemoveItem(item.ProductID)
         }
       }));
+
+
       
       setTimeout(() => {
         navigate("/purchase-order-successfully", { replace: true });
@@ -480,11 +530,11 @@ const Order = () => {
               <div className="mb-4">
                 <Input
                   placeholder={t("enter_voucher_code")}
-                  // value={voucherCode}
-                  // onChange={handleVoucherCodeChange}
+                  value={voucherCode} // Value binding for the voucher code input
+                  onChange={(e) => setVoucherCode(e.target.value)} // Update state on input change
                   className="mb-2"
                 />
-                <Button type="primary" className="mt-2"> {/*onClick={applyVoucherCode}*/}
+                <Button type="primary" className="mt-2" onClick={checkVoucher}>
                   {t("apply_voucher")}
                 </Button>
               </div>
@@ -507,11 +557,19 @@ const Order = () => {
                     {orderDetails.shippingCost.toLocaleString("en-US")}
                   </Text>
                 </div>
+                {discountValue > 0 && (
+                    <div className="flex justify-between mb-2">
+                      <Text strong>{t("voucher_applied")}:</Text>
+                      <Text className="text-red-600">
+                        -{(discountValue).toLocaleString("en-US")}
+                      </Text>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <Text strong>{t("total_3")}:</Text>
                   <Text className="text-2xl text-green-600">
                     {(
-                      orderDetails.totalAmount + orderDetails.shippingCost
+                      orderDetails.totalAmount + orderDetails.shippingCost - discountValue
                     ).toLocaleString("en-US")}
                   </Text>
                 </div>

@@ -289,7 +289,6 @@ const OrderHistoryDetail = () => {
       );
       console.log('Comment created:', response.data);
       message.success(t('comment_success'));
-      fetchOrderDetails(id); // Refresh comments
     } catch (error) {
       if (error.response && error.response.status === 404) {
         message.error(t('already_comment'));
@@ -384,7 +383,7 @@ const OrderHistoryDetail = () => {
         {t('back')}
       </Button>
       {/* Order history detail */}
-      <Card className="p-6 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
+      <Card className="p-6 max-w-screen-lg mx-auto mt-4 shadow-lg rounded-lg">
         <Title level={2} className="mb-4 text-center">{t('order_detail')} #{order.OrderID}</Title>
         <div className="mb-4">
           <Text strong>{t('order_date')}:</Text> <Text>{moment(order.date).format('DD/MM/YYYY HH:mm')}</Text>

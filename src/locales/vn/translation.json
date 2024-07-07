@@ -460,5 +460,20 @@
     "pet_product": "Sản phẩm thú cưng",
     "voucher_code_pattern": "Mã Voucher (Mẫu)",
     "times": "lần",
-    "add_voucher_note": "Không nhập để tự động tạo mẫu"
+    "add_voucher_note": "Không nhập để tự động tạo mẫu",
+    "please_enter_pattern": "Vui lòng nhập mẫu",
+    "please_enter_usage_limit": "Vui lòng nhập giới hạn sử dụng",
+    "please_enter_discount_value": "Vui lòng nhập giá trị giảm giá",
+    "please_enter_minimum_order_value": "Vui lòng nhập giá trị đơn hàng tối thiểu",
+    "please_select_expiration_date": "Vui lòng chọn ngày hết hạn",
+    "error_adding_voucher": "Lỗi khi thêm mã giảm giá",
+    "error_adding_voucher_network_or_server_issue": "Lỗi khi thêm mã giảm giá: Lỗi mạng hoặc máy chủ",
+    "error_updating_voucher": "Lỗi khi cập nhật mã giảm giá",
+    "error_updating_voucher_network_or_server_issue": "Lỗi khi cập nhật mã giảm giá: Lỗi mạng hoặc máy chủ",
+    "voucher_deleted_successfully": "Xóa mã giảm giá thành công",
+    "failed_to_delete_voucher": "Xóa mã giảm giá thất bại",
+    "error_deleting_voucher": "Lỗi khi xóa mã giảm giá",
+    "error_deleting_voucher_network_or_server_issue": "Lỗi khi xóa mã giảm giá: Lỗi mạng hoặc máy chủ",
+    "voucher_applied": "Áp dụng mã giảm giá thành công",
+    "invalid_voucher": "Mã giảm giá không tìm thấy hoặc hết hạn"
 }

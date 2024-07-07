@@ -122,7 +122,7 @@ const SpaBookingDetail = () => {
         {t('back')}
       </Button>
       {/* Booking detail */}
-      <Card className="p-10 max-w-4xl mx-auto mt-4 shadow-lg rounded-lg">
+      <Card className="p-10 max-w-screen-md mx-auto mt-4 shadow-lg rounded-lg">
         <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
         <div className="mb-4">
           <Text strong>{t('date_create')}: </Text>
