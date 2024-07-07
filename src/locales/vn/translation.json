@@ -459,5 +459,6 @@
     "failed_to_fetch_vouchers": "Không thể lấy danh sách voucher",
     "pet_product": "Sản phẩm thú cưng",
     "voucher_code_pattern": "Mã Voucher (Mẫu)",
-    "times": "lần"
+    "times": "lần",
+    "add_voucher_note": "Không nhập để tự động tạo mẫu"
 }

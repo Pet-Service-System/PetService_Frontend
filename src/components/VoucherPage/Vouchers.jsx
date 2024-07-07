@@ -1,21 +1,26 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, InputNumber, DatePicker, Select, Typography, message, Input } from 'antd';
+import { Table, Button, Modal, Form, Input, DatePicker, Select, Typography, message, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import 'tailwindcss/tailwind.css';
 import moment from 'moment';
 
 const { Option } = Select;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Voucher = () => {
   const [vouchers, setVouchers] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingVoucher, setEditingVoucher] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [editMode, setEditMode] = useState(null);
+  const [addMode, setAddMode] = useState(false);
+  const [filterStatus, setFilterStatus] = useState(null); // State for filtering by status
   const [form] = Form.useForm();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    fetchVouchers();
+  }, []);
 
   const fetchVouchers = async () => {
     try {
@@ -24,25 +29,18 @@ const Voucher = () => {
     } catch (error) {
       console.error('Failed to fetch vouchers:', error);
       message.error(t('failed_to_fetch_vouchers'));
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchVouchers();
-  }, []);
-
-  const showModal = (voucher = null) => {
-    setEditingVoucher(voucher);
-    setIsModalVisible(true);
-    form.setFieldsValue({
-      ...voucher,
-      ExpirationDate: voucher ? moment(voucher.ExpirationDate) : null,
-    });
+  const handleAddClick = () => {
+    setAddMode(true);
+    form.resetFields();
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setEditingVoucher(null);
+  const handleCancelAdd = () => {
+    setAddMode(false);
     form.resetFields();
   };
 
@@ -71,7 +69,7 @@ const Voucher = () => {
       if (response.status === 201) {
         message.success(t('voucher_added_successfully'));
         fetchVouchers();
-        handleCancel();
+        handleCancelAdd();
       } else {
         message.error(t('failed_to_add_voucher'));
       }
@@ -95,6 +93,19 @@ const Voucher = () => {
     }
   };
 
+  const handleEditClick = (voucher) => {
+    setEditMode(voucher.VoucherID);
+    form.setFieldsValue({
+      ...voucher,
+      ExpirationDate: moment(voucher.ExpirationDate),
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(null);
+    form.resetFields();
+  };
+
   const handleSaveEdit = async () => {
     try {
       setSaving(true);
@@ -111,7 +122,7 @@ const Voucher = () => {
       };
 
       message.warning(t('processing'));
-      const response = await axios.put(`${API_URL}/api/voucher/${editingVoucher.VoucherID}`, formattedValues, {
+      const response = await axios.put(`${API_URL}/api/voucher/${editMode}`, formattedValues, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -120,7 +131,7 @@ const Voucher = () => {
       if (response.status === 200) {
         message.success(t('voucher_updated_successfully'));
         fetchVouchers();
-        handleCancel();
+        setEditMode(null);
       } else {
         message.error(t('failed_to_update_voucher'));
       }
@@ -144,71 +155,132 @@ const Voucher = () => {
     }
   };
 
+  const handleDelete = async (voucherId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error(t('authorization_token_not_found'));
+        return;
+      }
+
+      message.warning(t('processing'));
+      const response = await axios.delete(`${API_URL}/api/voucher/${voucherId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        message.success(t('voucher_deleted_successfully'));
+        fetchVouchers();
+      } else {
+        message.error(t('failed_to_delete_voucher'));
+      }
+    } catch (error) {
+      console.error('Error deleting voucher:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error(t('unauthorized_please_log_in'));
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`${t('error_deleting_voucher')}: ${error.response.data.message}`);
+        } else {
+          message.error(t('error_deleting_voucher'));
+        }
+      } else if (error.request) {
+        message.error(t('error_deleting_voucher_network_or_server_issue'));
+      } else {
+        message.error(`${t('error_deleting_voucher')}: ${error.message}`);
+      }
+    }
+  };
+
   const columns = [
     { title: t('voucher_id'), dataIndex: 'VoucherID', key: 'VoucherID' },
     { title: t('pattern'), dataIndex: 'Pattern', key: 'Pattern' },
     { title: t('usage_limit'), dataIndex: 'UsageLimit', key: 'UsageLimit' },
     { title: t('discount_value'), dataIndex: 'DiscountValue', key: 'DiscountValue' },
     { title: t('minimum_order_value'), dataIndex: 'MinimumOrderValue', key: 'MinimumOrderValue' },
-    { title: t('status'), dataIndex: 'Status', key: 'Status' },
+    { title: t('status'), dataIndex: 'Status', key: 'Status', render: text => (
+      <Tag color={text === 'Active' ? 'green' : 'red'}>
+        {text.toUpperCase()}
+      </Tag>
+    )},
     { title: t('expiration_date'), dataIndex: 'ExpirationDate', key: 'ExpirationDate', render: date => moment(date).format('YYYY-MM-DD') },
     {
       title: t('action'),
       key: 'action',
       render: (text, record) => (
-        <Button type="primary" onClick={() => showModal(record)}>{t('edit')}</Button>
+        <div>
+          <Button type="primary" onClick={() => handleEditClick(record)}>{t('edit')}</Button>
+          <Button type="danger" onClick={() => handleDelete(record.VoucherID)} className="ml-2">{t('delete')}</Button>
+        </div>
       ),
     },
   ];
 
+  // Filtered vouchers based on filterStatus
+  const filteredVouchers = filterStatus ? vouchers.filter(voucher => voucher.Status === filterStatus) : vouchers;
+
   return (
-    <div className="p-4">
-      <Title className="text-2xl mb-4 text-center">{t('voucher_management')}</Title>
-      <Button type="primary" className="mb-4 float-end" onClick={() => showModal()}>
-        {t('add_voucher')}
-      </Button>
+    <div className="p-10">
+      <Title level={1} className='text-center'>{t('voucher_management')}</Title>
+      <div className="flex justify-end mb-4 items-end">
+        <div className='flex flex-col'>
+          <Text>{t('filter_status')}</Text>
+          <Select
+            placeholder={t('select_status')}
+            style={{ width: 200, marginRight: 12 }}
+            onChange={value => setFilterStatus(value)}
+            allowClear
+            value={filterStatus}
+          >
+            <Option value="Active">{t('active')}</Option>
+            <Option value="Inactive">{t('inactive')}</Option>
+          </Select>
+        </div>
+        <Button type="primary" onClick={handleAddClick} disabled={loading}>{t('add_voucher')}</Button>
+      </div>
       <Table
+        dataSource={filteredVouchers}
         columns={columns}
-        dataSource={vouchers}
-        scroll={{ x: 'max-content' }}
         rowKey="VoucherID"
+        loading={loading}
+        bordered
+        scroll={{ x: 'max-content' }}
       />
+      {/* Add/ Update modal */}
       <Modal
-        title={editingVoucher ? t('edit_voucher') : t('add_voucher')}
-        visible={isModalVisible}
-        onCancel={handleCancel}
+        title={editMode ? t('edit_voucher') : t('add_voucher')}
+        visible={addMode || editMode !== null}
+        onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={handleCancel} disabled={saving}>{t('cancel')}</Button>,
-          <Button key="submit" type="primary" onClick={editingVoucher ? handleSaveEdit : handleSaveAdd} disabled={saving}>
-            {editingVoucher ? t('update') : t('add')}
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd}>{t('cancel')}</Button>,
+          <Button key="save" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} loading={saving}>
+            {t('save')}
           </Button>,
         ]}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={editingVoucher}
-        >
-          <Form.Item name="Pattern" label={t('voucher_code_pattern')} rules={[{ required: false }]}>
-            <Input />
+        <Form form={form} layout="vertical">
+          <Form.Item name="Pattern" label={t('pattern')} rules={[{ required: true, message: t('please_enter_pattern') }]}>
+            <Input disabled={editMode !== null} />
           </Form.Item>
-          <Form.Item name="UsageLimit" label={t('usage_limit')} rules={[{ required: true }]}>
-            <InputNumber suffix={t('times')} className="w-full" />
+          <Form.Item name="UsageLimit" label={t('usage_limit')} rules={[{ required: true, message: t('please_enter_usage_limit') }]}>
+            <Input type="number" />
           </Form.Item>
-          <Form.Item name="DiscountValue" label={t('discount_value')} rules={[{ required: true }]}>
-            <InputNumber suffix="vnđ" className="w-full" />
+          <Form.Item name="DiscountValue" label={t('discount_value')} rules={[{ required: true, message: t('please_enter_discount_value') }]}>
+            <Input type="number" />
           </Form.Item>
-          <Form.Item name="MinimumOrderValue" label={t('minimum_order_value')} rules={[{ required: false }]}>
-            <InputNumber suffix="vnđ" className="w-full" />
+          <Form.Item name="MinimumOrderValue" label={t('minimum_order_value')} rules={[{ required: true, message: t('please_enter_minimum_order_value') }]}>
+            <Input type="number" />
           </Form.Item>
-          <Form.Item name="Status" label={t('status')} rules={[{ required: true }]}>
-            <Select>
+          <Form.Item name="ExpirationDate" label={t('expiration_date')} rules={[{ required: true, message: t('please_select_expiration_date') }]}>
+            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="Status" label={t('status')} rules={[{ required: true, message: t('please_select_status') }]}>
+            <Select style={{ width: '100%' }}>
               <Option value="Active">{t('active')}</Option>
               <Option value="Inactive">{t('inactive')}</Option>
             </Select>
-          </Form.Item>
-          <Form.Item name="ExpirationDate" label={t('expiration_date')} rules={[{ required: true }]}>
-            <DatePicker className="w-full" />
           </Form.Item>
         </Form>
       </Modal>

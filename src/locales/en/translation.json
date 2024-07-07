@@ -454,5 +454,6 @@
     "failed_to_update_voucher": "Failed to update voucher",
     "pet_product": "Pet Product",
     "voucher_code_pattern": "Voucher Code (Pattern)",
-    "times": "times"
+    "times": "times",
+    "add_voucher_note": "Do not import to automatically create templates"
 }
