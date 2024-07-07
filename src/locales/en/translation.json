@@ -453,5 +453,6 @@
     "failed_to_add_voucher": "Failed to add voucher",
     "failed_to_update_voucher": "Failed to update voucher",
     "pet_product": "Pet Product",
-    "voucher_code_pattern": "VoucherCode (Pattern)"
+    "voucher_code_pattern": "Voucher Code (Pattern)",
+    "times": "times"
 }

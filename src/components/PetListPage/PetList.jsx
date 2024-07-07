@@ -343,14 +343,14 @@ const PetList = () => {
                         rules={[{ required: true, message: t('not_null_pet_weight') }]}
                         label={t('pet_weight')}
                     >
-                        <Input placeholder={t('pet_weight')} type="number" />
+                        <Input suffix="kg" placeholder={t('pet_weight')} type="number" />
                     </Form.Item>
                     <Form.Item
                         name="Age"
                         rules={[{ required: true, message: t('not_null_pet_age') }]}
                         label={t('pet_age')}
                     >
-                        <Input placeholder={t('pet_age')} type="number" />
+                        <Input suffix={t('age')} placeholder={t('pet_age')} type="number" />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -404,10 +404,10 @@ const PetList = () => {
                 <Input placeholder={t('status')} />
               </Form.Item>
               <Form.Item name="Weight" label="Cân nặng thú cưng" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
-                <Input placeholder={t('weight')} type="number" />
+                <Input suffix="kg" placeholder={t('weight')} type="number" />
               </Form.Item>
               <Form.Item name="Age" label="Tuổi thú cưng" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
-                <Input placeholder={t('age')} type="number" />
+                <Input suffix={t('age')} placeholder={t('age')} type="number" />
               </Form.Item>
             </Form>
           </Modal>

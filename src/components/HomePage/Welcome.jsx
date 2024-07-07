@@ -7,7 +7,7 @@ const Welcome = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="text-left py-40 bg-cover bg-center" style={{ backgroundImage: "url(/src/assets/image/petbackground.jpg)" }}>
+    <div className="text-left py-40 bg-cover bg-center" style={{ backgroundImage: "url(https://res.cloudinary.com/dbaoct3be/image/upload/v1720326895/z5609830512219_6a06895a2d22b508c9a1c233f119d9d9_jc5ypo.jpg)" }}>
       <div className="container mx-auto">
         <Row justify="left" align="middle" style={{ minHeight: '35vh' }}>
           <Col>

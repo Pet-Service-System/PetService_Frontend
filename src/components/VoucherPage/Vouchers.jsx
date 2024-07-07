@@ -104,7 +104,6 @@ const Voucher = () => {
     { title: t('usage_limit'), dataIndex: 'UsageLimit', key: 'UsageLimit' },
     { title: t('discount_value'), dataIndex: 'DiscountValue', key: 'DiscountValue' },
     { title: t('minimum_order_value'), dataIndex: 'MinimumOrderValue', key: 'MinimumOrderValue' },
-    { title: t('using_type'), dataIndex: 'UsingType', key: 'UsingType' },
     { title: t('status'), dataIndex: 'Status', key: 'Status' },
     { title: t('expiration_date'), dataIndex: 'ExpirationDate', key: 'ExpirationDate', render: date => moment(date).format('YYYY-MM-DD') },
     {
@@ -148,24 +147,18 @@ const Voucher = () => {
             <Input />
           </Form.Item>
           <Form.Item name="UsageLimit" label={t('usage_limit')} rules={[{ required: true }]}>
-            <InputNumber className="w-full" />
+            <InputNumber suffix={t('times')} className="w-full" />
           </Form.Item>
           <Form.Item name="DiscountValue" label={t('discount_value')} rules={[{ required: true }]}>
-            <InputNumber className="w-full" />
+            <InputNumber suffix="vnđ" className="w-full" />
           </Form.Item>
           <Form.Item name="MinimumOrderValue" label={t('minimum_order_value')} rules={[{ required: false }]}>
-            <InputNumber className="w-full" />
-          </Form.Item>
-          <Form.Item name="UsingType" label={t('using_type')} rules={[{ required: true }]}>
-            <Select>
-              <Option value="Pet Product">{t('pet_product')}</Option>
-              <Option value="Pet Service">{t('pet_service')}</Option>
-            </Select>
+            <InputNumber suffix="vnđ" className="w-full" />
           </Form.Item>
           <Form.Item name="Status" label={t('status')} rules={[{ required: true }]}>
             <Select>
-              <Option value="active">{t('active')}</Option>
-              <Option value="inactive">{t('inactive')}</Option>
+              <Option value="Active">{t('active')}</Option>
+              <Option value="Inactive">{t('inactive')}</Option>
             </Select>
           </Form.Item>
           <Form.Item name="ExpirationDate" label={t('expiration_date')} rules={[{ required: true }]}>

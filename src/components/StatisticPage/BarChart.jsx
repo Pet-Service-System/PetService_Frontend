@@ -24,7 +24,6 @@ export default function BarChart() {
       try {
         const response = await axios.get(`${API_URL}/api/dashboard/count-orders-bookings-by-day`);
         const apiData = response.data;
-
         // Directly use the API data
         const translatedData = [
           [t("day_of_week"), t("total_services_booked"), t("total_ordered")],

@@ -543,7 +543,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_age')}
                                 rules={[{ required: true, message: t('plz_enter_pet_age') }]}
                             >
-                                <Input suffix="tuổi" placeholder={t('enter_pet_weight')} type="number" />
+                                <Input suffix={t('age')} placeholder={t('enter_pet_age')} type="number" />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -630,14 +630,14 @@ const SpaServiceDetail = () => {
                         rules={[{ required: true, message: t('not_null_pet_weight') }]}
                         label={t('pet_weight')}
                     >
-                        <Input placeholder={t('pet_weight')} type="number" />
+                        <Input suffix="kg" placeholder={t('pet_weight')} type="number" />
                     </Form.Item>
                     <Form.Item
                         name="Age"
                         rules={[{ required: true, message: t('not_null_pet_age') }]}
                         label={t('pet_age')}
                     >
-                        <Input placeholder={t('pet_age')} type="number" />
+                        <Input suffix={t('age')} placeholder={t('pet_age')} type="number" />
                     </Form.Item>
                 </Form>
             </Modal>

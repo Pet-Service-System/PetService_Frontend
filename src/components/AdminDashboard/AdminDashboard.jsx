@@ -99,6 +99,7 @@ export default function AdminDashboard() {
         const response = await axios.get(
           `${API_URL}/api/dashboard/calculate-earnings`
         );
+        console.log(response.data)
         setTotalEarnings(response.data.totalEarnings);
       } catch (error) {
         console.error("Error fetching earnings:", error);

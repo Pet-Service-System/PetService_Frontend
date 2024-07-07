@@ -458,5 +458,6 @@
     "using_type": "Loại sử dụng",
     "failed_to_fetch_vouchers": "Không thể lấy danh sách voucher",
     "pet_product": "Sản phẩm thú cưng",
-    "voucher_code_pattern": "Mã Voucher (Mẫu)"
+    "voucher_code_pattern": "Mã Voucher (Mẫu)",
+    "times": "lần"
 }

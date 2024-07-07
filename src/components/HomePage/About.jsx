@@ -13,7 +13,7 @@ const About = () => {
           <Col xs={24} md={12}>
             <div className="flex justify-center">
               <div className="w-full">
-                <Image preview={false} src="/src/assets/image/Team.jpg" alt=" " className="w-full h-auto" />
+                <Image preview={false} src="https://res.cloudinary.com/dbaoct3be/image/upload/v1720326895/z5609830475267_b28fcc553a85da413bbac73fd71cc330_wi5h3c.jpg" alt=" " className="w-full h-auto" />
               </div>
             </div>
           </Col>
