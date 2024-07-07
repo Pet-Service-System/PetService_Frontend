@@ -60,18 +60,36 @@ const Voucher = () => {
         ...values,
         ExpirationDate: values.ExpirationDate ? values.ExpirationDate.format('YYYY-MM-DD') : null,
       };
-      console.log('Sending data to server:', formattedValues);
+
+      message.warning(t('processing'));
       const response = await axios.post(`${API_URL}/api/voucher`, formattedValues, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      setVouchers((prev) => [...prev, response.data]);
-      message.success(t('voucher_added_successfully'));
-      handleCancel();
+
+      if (response.status === 201) {
+        message.success(t('voucher_added_successfully'));
+        fetchVouchers();
+        handleCancel();
+      } else {
+        message.error(t('failed_to_add_voucher'));
+      }
     } catch (error) {
-      console.error('Error adding voucher:', error.response ? error.response.data : error);
-      message.error(t('failed_to_add_voucher'));
+      console.error('Error adding voucher:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error(t('unauthorized_please_log_in'));
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`${t('error_adding_voucher')}: ${error.response.data.message}`);
+        } else {
+          message.error(t('error_adding_voucher'));
+        }
+      } else if (error.request) {
+        message.error(t('error_adding_voucher_network_or_server_issue'));
+      } else {
+        message.error(`${t('error_adding_voucher')}: ${error.message}`);
+      }
     } finally {
       setSaving(false);
     }
@@ -80,19 +98,47 @@ const Voucher = () => {
   const handleSaveEdit = async () => {
     try {
       setSaving(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error(t('authorization_token_not_found'));
+        return;
+      }
+
       const values = await form.validateFields();
       const formattedValues = {
         ...values,
         ExpirationDate: values.ExpirationDate ? values.ExpirationDate.format('YYYY-MM-DD') : null,
       };
-      console.log('Sending data to server:', formattedValues);
-      const response = await axios.put(`${API_URL}/api/voucher/${editingVoucher.VoucherID}`, formattedValues);
-      setVouchers((prev) => prev.map((v) => (v.VoucherID === editingVoucher.VoucherID ? response.data : v)));
-      message.success(t('voucher_updated_successfully'));
-      handleCancel();
+
+      message.warning(t('processing'));
+      const response = await axios.put(`${API_URL}/api/voucher/${editingVoucher.VoucherID}`, formattedValues, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        message.success(t('voucher_updated_successfully'));
+        fetchVouchers();
+        handleCancel();
+      } else {
+        message.error(t('failed_to_update_voucher'));
+      }
     } catch (error) {
-      console.error('Error updating voucher:', error.response ? error.response.data : error);
-      message.error(t('failed_to_update_voucher'));
+      console.error('Error updating voucher:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error(t('unauthorized_please_log_in'));
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`${t('error_updating_voucher')}: ${error.response.data.message}`);
+        } else {
+          message.error(t('error_updating_voucher'));
+        }
+      } else if (error.request) {
+        message.error(t('error_updating_voucher_network_or_server_issue'));
+      } else {
+        message.error(`${t('error_updating_voucher')}: ${error.message}`);
+      }
     } finally {
       setSaving(false);
     }
