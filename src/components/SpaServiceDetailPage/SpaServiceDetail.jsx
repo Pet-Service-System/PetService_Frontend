@@ -57,37 +57,46 @@ const SpaServiceDetail = () => {
             const response = await axios.get(`${API_URL}/api/services/${id}`);
             setServiceData(response.data);
             form.setFieldsValue(response.data); // Set initial form values
+            await fetchPets(response.data.PetTypeID); // Gọi fetchPets với PetTypeID từ serviceData
         } catch (error) {
             console.error('Error fetching service detail:', error);
             message.error(t('error_fetching_service_detail'));
         }
     };
 
-    const fetchPets = async () => {
+    const fetchPets = async (petTypeID) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
+            const accountID = user?.id; // Assuming `user` is defined in your component
             if (!token || !accountID) {
                 console.error('Token or account ID not found in localStorage');
                 return;
             }
-
+    
             const response = await axios.get(`${API_URL}/api/pets/account/${accountID}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setPets(response.data);
+    
+            // Filter pets based on petTypeID if provided
+            let filteredPets = response.data;
+            if (petTypeID) {
+                filteredPets = response.data.filter(pet => pet.PetTypeID === petTypeID);
+            }
+    
+            setPets(filteredPets);
         } catch (error) {
             console.error('Error fetching pets:', error);
             message.error('Failed to fetch pets');
         }
         setLoading(false);
     };
+    
 
     useEffect(() => {
         fetchServiceDetail();
-        fetchPets();
     }, [id, accountID]);
 
     const handleEditService = () => {
