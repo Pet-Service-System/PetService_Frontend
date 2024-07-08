@@ -47,6 +47,10 @@ export default function AdminDashboard() {
   const { t } = useTranslation();
   const formatter = (value) => <CountUp end={value} separator="," />;
 
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
+
   useEffect(() => {
     // Fetch the count of available accounts
     const fetchAvailableAccounts = async () => {

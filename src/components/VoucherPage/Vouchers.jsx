@@ -3,12 +3,18 @@ import { Table, Button, Modal, Form, Input, DatePicker, Select, Typography, mess
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Voucher = () => {
+  const navigate = useNavigate();
+  const [role] = useState(localStorage.getItem("role") || "Guest");
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

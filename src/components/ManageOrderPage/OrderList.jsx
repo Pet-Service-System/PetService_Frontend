@@ -13,9 +13,12 @@ const { Option } = Select;
 
 const OrderList = () => {
   const navigate = useNavigate();
+  const [role] = useState(localStorage.getItem("role") || "Guest");
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
   const [orders, setOrders] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter

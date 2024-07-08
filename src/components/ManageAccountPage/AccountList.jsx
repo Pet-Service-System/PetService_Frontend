@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Table, Typography, Button, Input, Form, message, Select, Modal, Skeleton, Layout } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 
 const { Title } = Typography;
@@ -9,6 +10,11 @@ const { Option } = Select;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const AccountList = () => {
+  const navigate = useNavigate();
+  const [role] = useState(localStorage.getItem("role") || "Guest");
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
   const [accountData, setAccountData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
@@ -19,6 +25,7 @@ const AccountList = () => {
   const [searchText, setSearchText] = useState(''); // State for search query
   const [filterRole, setFilterRole] = useState(null); // State for role filter
   const [filterStatus, setFilterStatus] = useState(null); // State for status filter
+  
   
   useEffect(() => {
     const fetchAccounts = async () => {

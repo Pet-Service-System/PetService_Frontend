@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Typography, Button, Modal, Form, Select, message } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 const { Option } = Select;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const Schedule = () => {
+  const navigate = useNavigate();
+  const [role] = useState(localStorage.getItem("role") || "Guest");
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
   const [schedules, setSchedules] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();

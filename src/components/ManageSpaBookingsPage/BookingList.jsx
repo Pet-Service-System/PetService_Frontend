@@ -14,11 +14,14 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaBooking = () => {  
   const navigate = useNavigate();
+  const [role] = useState(localStorage.getItem("role") || "Guest");
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
   const [spaBookings, setSpaBookings] = useState([]);
   const [saving, setSaving] = useState(false);
   const [filteredSpaBookings, setFilteredSpaBookings] = useState([]);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [role] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 

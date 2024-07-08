@@ -27,10 +27,14 @@ const { Sider } = Layout;
 const { useBreakpoint } = Grid;
 
 const Statistics = () => {
+  const navigate = useNavigate();
+  const [role, setRole] = useState(localStorage.getItem("role") || "Guest");
+  if(role === 'Customer' || role === 'Guest'){
+    navigate('/')
+  }
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [totalBookings, setTotalBookings] = useState(0);
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +42,6 @@ const Statistics = () => {
   const [totalEarnings, setTotalEarnings] = useState(0);
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const screens = useBreakpoint();
 
   const fetchAvailableAccounts = async () => {
