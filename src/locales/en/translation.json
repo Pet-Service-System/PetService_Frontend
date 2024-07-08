@@ -470,5 +470,8 @@
     "error_deleting_voucher_network_or_server_issue": "Error deleting voucher: Network or server issue",
     "failed_to_fetch_vouchers": "Failed to fetch vouchers",
     "voucher_applied": "Applied voucher successfully",
-    "invalid_voucher": "Voucher is not found or expired"
+    "invalid_voucher": "Voucher is not found or expired",
+    "only": "only",
+    "products_available": "products available",
+    "exceed_invetory_quantity": "Exceed invetory quantity"
 }

@@ -180,11 +180,15 @@ const Order = () => {
         // Calculate the new quantity after purchase
         const newQuantity = currentInventory - item.Quantity;
 
+        // Update product status to "unavailable" if newQuantity is 0
+      const newStatus = newQuantity === 0 ? "Unavailable" : "Available";
+
         // Make an API call to update the inventory
         const response = await axios.patch(
           `${API_URL}/api/products/${item.ProductID}`,
           {
             Quantity: newQuantity,
+            Status: newStatus,
           },
           {
             headers: {
@@ -361,10 +365,9 @@ const Order = () => {
           handleRemoveItem(item.ProductID)
         }
       }));
-
-
       
       setTimeout(() => {
+        
         navigate("/purchase-order-successfully", { replace: true });
       }, 700);
     } catch (error) {

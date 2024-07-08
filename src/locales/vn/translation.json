@@ -475,5 +475,8 @@
     "error_deleting_voucher": "Lỗi khi xóa mã giảm giá",
     "error_deleting_voucher_network_or_server_issue": "Lỗi khi xóa mã giảm giá: Lỗi mạng hoặc máy chủ",
     "voucher_applied": "Áp dụng mã giảm giá thành công",
-    "invalid_voucher": "Mã giảm giá không tìm thấy hoặc hết hạn"
+    "invalid_voucher": "Mã giảm giá không tìm thấy hoặc hết hạn",
+    "only": "chỉ còn",
+    "products_available": "sản phẩm có sẵn",
+    "exceed_invetory_quantity": "Vượt số lượng tồn kho"
 }

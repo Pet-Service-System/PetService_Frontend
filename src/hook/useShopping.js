@@ -2,12 +2,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { addItem, updateItem, removeItem, setShoppingCart, updateQuantity } from "../redux/shoppingCart";
 import { useEffect } from "react";
 import axios from "axios";
+import { message } from "antd";
+import { useTranslation } from "react-i18next";
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const useShopping = () => {
   const dispatch = useDispatch();
   const shoppingCart = useSelector((state) => state.shopping);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
     if (savedCart.length > 0) {
@@ -33,7 +35,12 @@ const useShopping = () => {
     const token = localStorage.getItem('token');
   
     try {
-      const response = await axios.put(`${API_URL}/api/cart`, {
+      const responseProduct = await axios.get(`${API_URL}/api/products/${id}`);
+      if(Quantity > responseProduct.data.Quantity){
+        message.error(`${t('exceed_invetory_quantity')}`)
+        return;
+      }
+      const responseCart = await axios.put(`${API_URL}/api/cart`, {
         AccountID,
         ProductID: id,
         Quantity
@@ -43,7 +50,7 @@ const useShopping = () => {
         }
       });
   
-      console.log('Cart updated successfully:', response.data);
+      console.log('Cart updated successfully:', responseCart.data);
     } catch (error) {
       console.error('Error updating cart:', error);
     }

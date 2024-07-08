@@ -37,6 +37,11 @@ const Cart = () => {
               Status: productFromServer.Status, // Cập nhật trạng thái mới từ server
               Quantity: item.Quantity, // Giữ nguyên Quantity từ giỏ hàng
             };
+
+            // Kiểm tra nếu số lượng trong giỏ hàng vượt quá số lượng tồn kho
+            if (item.Quantity > productFromServer.Quantity) {
+              return { ...productFromServer, Quantity: productFromServer.Quantity };
+            }
   
             // Cập nhật lại item trong localStorage nếu trạng thái đã thay đổi
             if (item.Status !== productFromServer.Status) {

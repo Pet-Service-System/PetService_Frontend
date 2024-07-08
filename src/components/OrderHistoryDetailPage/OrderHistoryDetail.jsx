@@ -410,13 +410,17 @@ const OrderHistoryDetail = () => {
           <Text strong>{t('order_detail')}:</Text>
         </div>
 
-        <Table
-          dataSource={orderDetail.Items}
-          columns={columns}
-          rowKey="ProductID"
-          scroll={{ x: 'max-content' }}
-          bordered
-        />
+        {orderDetail.Items &&(
+            <Table
+            dataSource={orderDetail.Items}
+            columns={columns}
+            rowKey="ProductID"
+            scroll={{ x: 'max-content' }}
+            bordered
+            />
+          )
+        }
+        
         {/* Render the cancel button conditionally */}
         {(role === 'Customer' || role === 'Sales Staff') && order.Status === 'Processing' && (
           <Button danger className="float-end" onClick={handleCancelOrder} disabled={isSubmitting}>
