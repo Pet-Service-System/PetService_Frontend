@@ -96,6 +96,7 @@ const ProductList = () => {
       if (response.status === 201) {
         message.success(t('product_added_successfully'))
         fetchProducts();
+        form.resetFields();
         setProductImg("");
         setAddMode(false);
       } else {

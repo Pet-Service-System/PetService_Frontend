@@ -99,6 +99,7 @@ const SpaServiceList = () => {
       if (response.status === 201) {
         message.success(t('add_success'))
         fetchServices();
+        form.resetFields();
         setAddMode(false);
       } else {
         message.error(t('add_fail'));
@@ -172,6 +173,7 @@ const SpaServiceList = () => {
       if (response.status === 200) {
         message.success(t('update_success'))
         fetchServices();
+        form.resetFields();
         setEditMode(null);
       } else {
         message.error(t('update_fail'));

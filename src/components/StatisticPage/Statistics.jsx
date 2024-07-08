@@ -214,7 +214,7 @@ const Statistics = () => {
                       title={t('totalEarnings')}
                       value={totalEarnings}
                       precision={2}
-                      suffix='vnd'
+                      suffix='đ'
                       valueStyle={{ color: "#3f8600" }}
                       formatter={formatter}
                     />
