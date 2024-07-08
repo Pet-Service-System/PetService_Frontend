@@ -132,8 +132,8 @@ const Schedule = () => {
       dataIndex: 'time',
       key: 'time',
       fixed: 'left',
-      render: (text) => <strong>{text}</strong>,
       className: 'sticky left-0 bg-white',
+      render: (text) => <strong>{text}</strong>,
     },
     ...days.map((day) => ({
       title: t(day.toLowerCase()),

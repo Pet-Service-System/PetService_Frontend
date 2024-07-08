@@ -20,6 +20,7 @@ const SpaServiceDetail = () => {
     const [addPetForm] = Form.useForm();
     const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
     const [pets, setPets] = useState([]);
+    const [productImg, setProductImg] = useState(""); // For image upload
     const [loading, setLoading] = useState(false);
     const [operationLoading, setOperationLoading] = useState(false);
     const userRole = localStorage.getItem('role') || 'Guest';
@@ -105,7 +106,14 @@ const SpaServiceDetail = () => {
 
     const handleCancelEdit = async () => {
         setEditMode(false);
+        setProductImg("");
         await fetchServiceDetail(); // Reload service data from the database
+    };
+
+    const handleProductImageUpload = (e) => {
+        const file = e.target.files[0];
+        setProductImg(file);
+        form.setFieldsValue({ Image: file });
     };
 
     const handleSaveEdit = async () => {
@@ -317,7 +325,7 @@ const SpaServiceDetail = () => {
             </div>
             {/* Spa service detail */}
             <div className="flex flex-col md:flex-row m-5 px-4 md:px-32">
-                <div className="w-full md:w-1/2 flex justify-center">
+                <div className="w-full lg:w-1/2 h-full lg:h-1/2 flex justify-center">
                     <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
                 </div>
                 <div className="w-full md:w-1/2 p-5 md:ml-10">
@@ -345,12 +353,16 @@ const SpaServiceDetail = () => {
                                 <TextArea disabled={!editMode} rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} />
                             </Form.Item>
                             <Form.Item
-                                name="ImageURL"
-                                label={t('image')}
-                                rules={[{ required: true, message: t('upload_image') }]}
-                            >
-                                <Input disabled={!editMode} />
-                            </Form.Item>
+                                    name="Image"
+                                    label={t('image')}
+                                    rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
+                                    className="mb-4"
+                                >
+                                    <Input disabled={!editMode} type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
+                                    {productImg && (
+                                    <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
+                                    )}
+                                </Form.Item>
                             <Form.Item
                                 name="Status"
                                 label={t('status')}

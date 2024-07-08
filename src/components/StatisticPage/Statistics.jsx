@@ -19,7 +19,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import BarChart from "./BarChart";
-
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const { Title } = Typography;
@@ -215,7 +214,7 @@ const Statistics = () => {
                       title={t('totalEarnings')}
                       value={totalEarnings}
                       precision={2}
-                      prefix="$"
+                      suffix='vnd'
                       valueStyle={{ color: "#3f8600" }}
                       formatter={formatter}
                     />
