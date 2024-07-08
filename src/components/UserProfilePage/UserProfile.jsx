@@ -93,8 +93,6 @@ const UserProfile = () => {
     let newErrors = {};
     if (!formData.fullname) {
       newErrors.fullname = t('fullname_required');
-    } else if (!/^[a-zA-Z\s]*$/.test(formData.fullname)) {
-      newErrors.fullname = t('no_special_character');
     }
 
     if (!formData.phone) {
@@ -153,48 +151,45 @@ const UserProfile = () => {
     <Layout style={{ minHeight: '80vh' }}>
       {/* Sider */}
       {!screens.xs && (
-          <Sider width={220}>
-            <div className="logo" />
-            <Menu theme="dark" mode="inline">
-              <Menu.Item
-                key="profile"
-                icon={<UserOutlined />}
-                onClick={() => navigate('/user-profile')}
-              >
-                {t('user_information')}
-              </Menu.Item>
-              {role === 'Customer' && (
-                <>
-                  <Menu.Item
-                    key="pet-list"
-                    icon={<UnorderedListOutlined />}
-                    onClick={() => navigate('/pet-list')}
-                  >
-                    {t('list_of_pets')}
-                  </Menu.Item>
-                  <Menu.Item
-                    key="order-history"
-                    icon={<HistoryOutlined />}
-                    onClick={() => navigate('/order-history')}
-                  >
-                    {t('order_history')}
-                  </Menu.Item>
-                  <Menu.Item key="spa-booking"
-                    onClick={() => navigate('/spa-booking')}
-                    icon={<HistoryOutlined />}>
-                    {t('service_history')}
-                  </Menu.Item>
-                </>
-              )}
-              <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
-                {t('statistic_title')}
-              </Menu.Item>
-              <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-                {t('log_out')}
-              </Menu.Item>
-            </Menu>
-          </Sider>
-        )}
+        <Sider width={220}>
+          <div className="logo" />
+          <Menu theme="dark" mode="inline">
+            <Menu.Item
+              key="profile"
+              icon={<UserOutlined />}
+              onClick={() => navigate('/user-profile')}
+            >
+              {t('user_information')}
+            </Menu.Item>
+            {role === 'Customer' && (
+              <>
+                <Menu.Item
+                  key="pet-list"
+                  icon={<UnorderedListOutlined />}
+                  onClick={() => navigate('/pet-list')}
+                >
+                  {t('list_of_pets')}
+                </Menu.Item>
+                <Menu.Item
+                  key="order-history"
+                  icon={<HistoryOutlined />}
+                  onClick={() => navigate('/order-history')}
+                >
+                  {t('order_history')}
+                </Menu.Item>
+                <Menu.Item key="spa-booking"
+                  onClick={() => navigate('/spa-booking')}
+                  icon={<HistoryOutlined />}>
+                  {t('service_history')}
+                </Menu.Item>
+              </>
+            )}
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              {t('log_out')}
+            </Menu.Item>
+          </Menu>
+        </Sider>
+      )}
       {/* User information and buttons */}
       <Layout>
         <Content style={{ margin: '16px', padding: '24px', background: '#fff' }}>
