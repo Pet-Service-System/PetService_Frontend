@@ -124,7 +124,17 @@ const SpaBooking = () => {
     try {
       await axios.put(
         `${API_URL}/api/spa-booking-details/${bookingDetailID}`,
-        { Feedback: reviewText },
+        { Feedback: reviewText},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      await axios.put(
+        `${API_URL}/api/Spa-bookings/${bookingID}`,
+        { isReviewed: true},
         {
           headers: {
             Authorization: `Bearer ${token}`,
