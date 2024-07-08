@@ -80,25 +80,6 @@ const ProductDetail = () => {
 
     const handleDecrease = () => setQuantity(Quantity > 1 ? Quantity - 1 : 1);
 
-    const handleOrderNow = async () => {
-        if (!localStorage.getItem('user')) {
-            showLoginModal();
-            return;
-        }
-        if (productData) {
-            if (Quantity > productData.Quantity) {
-                message.error(t('quantity_out_of_inventory'));
-                return;
-            }
-
-            const productWithQuantity = { ...productData, Quantity };
-            await handleAddItem(productWithQuantity);
-            const totalAmount = productData.Price;
-            localStorage.setItem('totalAmount', totalAmount.toFixed(2));
-            navigate('/order');
-        }
-    };
-
     const { handleAddItem } = useShopping();
 
     const handleProductImageUpload = (e) => {
@@ -320,12 +301,6 @@ const ProductDetail = () => {
                                         disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
                                     >
                                         {t('add_to_cart')}
-                                    </Button>
-                                    <Button type="primary"
-                                        onClick={handleOrderNow}
-                                        disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
-                                    >
-                                        {t('order_now')}
                                     </Button>
                                 </div>
                                 {(productData.Status === 'Unavailable' || productData.Quantity === 0) && (
