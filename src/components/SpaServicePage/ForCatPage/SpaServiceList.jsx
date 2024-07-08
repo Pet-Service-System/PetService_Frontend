@@ -214,6 +214,14 @@ const SpaServiceList = () => {
       ),
     },
     {
+      title: t('image_url'),
+      dataIndex: 'ImageURL',
+      key: 'ImageURL',
+      render: (text, record) => (
+        <Image src={text} alt={record.ServiceName} style={{ width: '50px', cursor: 'pointer' }} />
+      ),
+    },
+    {
       title: t('service_name'),
       dataIndex: 'ServiceName',
       key: 'ServiceName',
@@ -243,14 +251,6 @@ const SpaServiceList = () => {
       ),
     },
     {
-      title: t('image_url'),
-      dataIndex: 'ImageURL',
-      key: 'ImageURL',
-      render: (text, record) => (
-        <Image src={text} alt={record.ServiceName} style={{ width: '50px', cursor: 'pointer' }} />
-      ),
-    },
-    {
       title: t('status'),
       dataIndex: 'Status',
       key: 'Status',
@@ -263,6 +263,8 @@ const SpaServiceList = () => {
     {
       title: t('actions'),
       key: 'actions',
+      fixed: 'right',
+      className: 'sticky right-0 bg-white',
       render: (_, record) => (
         userRole === 'Store Manager' && (
           <div>

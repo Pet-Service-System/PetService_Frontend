@@ -96,6 +96,7 @@ const ProductList = () => {
       if (response.status === 201) {
         message.success(t('product_added_successfully'))
         form.resetFields();
+        setProductImg("");
         fetchProducts();
         setAddMode(false);
       } else {
@@ -214,6 +215,14 @@ const ProductList = () => {
       ),
     },
     {
+      title: t('image_url'),
+      dataIndex: 'ImageURL',
+      key: 'ImageURL',
+      render: (text, record) => (
+        <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
+      ),
+    },
+    {
       title: t('product_name'),
       dataIndex: 'ProductName',
       key: 'ProductName',
@@ -240,14 +249,6 @@ const ProductList = () => {
         <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 1, expandable: true, symbol: 'more' }}>
           {text}
         </Paragraph>
-      ),
-    },
-    {
-      title: t('image_url'),
-      dataIndex: 'ImageURL',
-      key: 'ImageURL',
-      render: (text, record) => (
-        <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
       ),
     },
     {
