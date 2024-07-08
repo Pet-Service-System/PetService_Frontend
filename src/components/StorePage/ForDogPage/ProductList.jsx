@@ -170,6 +170,7 @@ const ProductList = () => {
 
       if (response.status === 200) {
         message.success(t('product_updated_successfully'))
+        form.resetFields();
         fetchProducts();
         setEditMode(null);
       } else {

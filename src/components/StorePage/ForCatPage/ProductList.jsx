@@ -95,6 +95,7 @@ const ProductList = () => {
 
       if (response.status === 201) {
         message.success(t('product_added_successfully'))
+        form.resetFields();
         fetchProducts();
         setAddMode(false);
       } else {
