@@ -219,6 +219,8 @@ const ProductList = () => {
       title: t('image_url'),
       dataIndex: 'ImageURL',
       key: 'ImageURL',
+      fixed: 'left',
+      className: 'sticky left-0 bg-white',
       render: (text, record) => (
         <Image src={text} alt={record.ProductName} style={{ width: '50px', cursor: 'pointer' }} />
       ),
