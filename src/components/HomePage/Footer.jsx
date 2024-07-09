@@ -19,7 +19,6 @@ const Footer = () => {
                 {t('introduction_paragraph_2')}
               </p>
               <p className="text-base md:text-lg lg:text-xl">{t('contact_us_at')}: (+00) 123 234</p>
-              <p className="text-base md:text-lg lg:text-xl">Email: petmanagementsystem@g</p>
             </div>
             <div>
               <h3 className="text-lg md:text-xl font-semibold mb-4">{t('adress')}</h3>
