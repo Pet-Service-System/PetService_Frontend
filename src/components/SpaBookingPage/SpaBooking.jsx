@@ -290,7 +290,7 @@ const SpaBooking = () => {
               columns={columns}
               dataSource={spaBookings}
               rowKey="id"
-              scroll={{ x: '100%' }}
+              scroll={{ x: 'max-content' }}
             />
           </Spin>
           <Modal

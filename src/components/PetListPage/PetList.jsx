@@ -276,7 +276,7 @@ const PetList = () => {
               <Spin size="large" />
             ) : (
               <div className="w-full overflow-x-auto">
-                <Table columns={columns} dataSource={pets} rowKey="PetID" pagination={false} />
+                <Table columns={columns} dataSource={pets} rowKey="PetID" scroll={{ x: 'max-content' }} pagination={false} />
               </div>
             )}
             <div className="flex justify-end w-full mt-4">

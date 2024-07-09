@@ -315,7 +315,7 @@ const SpaBooking = () => {
               columns={columns}
               dataSource={filteredSpaBookings}
               rowKey="id"
-              scroll={{ x: '100%' }}
+              scroll={{ x: 'max-content' }}
             />
           </Spin>
           {/* Update status modal */}
