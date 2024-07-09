@@ -246,6 +246,7 @@ const SpaServiceDetail = () => {
 
             if (diffHours < 3) {
                 message.error(t('3_hours_rule'));
+                setOperationLoading(false);
                 return;
             }
 

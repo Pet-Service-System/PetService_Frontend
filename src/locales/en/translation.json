@@ -473,5 +473,6 @@
     "invalid_voucher": "Voucher is not found or expired",
     "only": "only",
     "products_available": "products available",
-    "exceed_invetory_quantity": "Exceed invetory quantity"
+    "exceed_invetory_quantity": "Exceed invetory quantity",
+    "unavailaplz_enter_customer_nameble": "Please enter customername"
 }

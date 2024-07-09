@@ -478,5 +478,7 @@
     "invalid_voucher": "Mã giảm giá không tìm thấy hoặc hết hạn",
     "only": "chỉ còn",
     "products_available": "sản phẩm có sẵn",
-    "exceed_invetory_quantity": "Vượt số lượng tồn kho"
+    "exceed_invetory_quantity": "Vượt số lượng tồn kho",
+    "unavailaplz_enter_customer_nameble": "Hãy nhập tên khách hàng"
+    
 }
