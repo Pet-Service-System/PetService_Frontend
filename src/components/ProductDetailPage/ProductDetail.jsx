@@ -380,6 +380,7 @@ const ProductDetail = () => {
                                     <Button type="primary"
                                         onClick={handleAddToCart}
                                         disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
+                                        className='py-10 px-20'
                                     >
                                         {t('add_to_cart')}
                                     </Button>

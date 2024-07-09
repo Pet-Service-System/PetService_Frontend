@@ -392,6 +392,7 @@ const SpaServiceDetail = () => {
                                     type="primary"
                                     onClick={handleBookingNow}
                                     disabled={serviceData.Status === 'Unavailable'}
+                                    className='py-10 px-20'
                                 >
                                     {t('booking_now')}
                                 </Button>
