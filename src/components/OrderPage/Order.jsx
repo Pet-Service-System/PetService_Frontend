@@ -272,8 +272,7 @@ const Order = () => {
   const createOrder = (data, actions) => {
     const totalAmountWithDiscount = (
       orderDetails.totalAmount +
-      orderDetails.shippingCost -
-      discountValue
+      orderDetails.shippingCost 
     ).toFixed(2);
 
     const totalAmountInUSD = (totalAmountWithDiscount * exchangeRateVNDtoUSD).toFixed(2);
@@ -569,7 +568,7 @@ const Order = () => {
                   <Text strong>{t("total_3")}:</Text>
                   <Text className="text-2xl text-green-600">
                     {(
-                      orderDetails.totalAmount + orderDetails.shippingCost - discountValue
+                      orderDetails.totalAmount + orderDetails.shippingCost 
                     ).toLocaleString("en-US")}
                   </Text>
                 </div>
