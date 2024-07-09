@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Typography, Button, Modal, Form, Select, message } from 'antd';
 import { useTranslation } from 'react-i18next';
+import {
+  CloseCircleOutlined
+} from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
@@ -132,7 +135,7 @@ const Schedule = () => {
       dataIndex: 'time',
       key: 'time',
       fixed: 'left',
-      className: 'sticky left-0 bg-white',
+      className: 'sticky left-0 bg-blue-200',
       render: (text) => <strong>{text}</strong>,
     },
     ...days.map((day) => ({
@@ -149,8 +152,8 @@ const Schedule = () => {
             >
               <div>{employee.fullname} ({employee.role})</div>
               {roleOfUser === 'Store Manager' && (
-                <Button type="link" onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
-                  {t('remove')}
+                <Button type="link" danger onClick={() => handleRemoveEmployee(day, { start: record.key, end: record.time.split(' - ')[1] }, employee)}>
+                  <CloseCircleOutlined />
                 </Button>
               )}
             </div>
