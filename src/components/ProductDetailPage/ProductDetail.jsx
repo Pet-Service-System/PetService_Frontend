@@ -26,7 +26,7 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
     const accountID = user?.id;
-    const userRole = localStorage.getItem('role') || 'Guest';
+    const role = localStorage.getItem('role') || 'Guest';
     const { t } = useTranslation();
     const [replyingCommentId, setReplyingCommentId] = useState(null);
     const [replyContent, setReplyContent] = useState('');
@@ -58,9 +58,8 @@ const ProductDetail = () => {
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
-                        const accountCommentResponse = await axios.get(`${API_URL}/api/accounts/${comment.AccountID}`, config);
-                        const accountCommentName = accountCommentResponse.data.user.fullname;
-    
+                        const accountCommentResponse = await axios.get(`${API_URL}/api/accounts/fullname/${comment.AccountID}`, config);
+                        const accountCommentName = accountCommentResponse.data.fullname
                         // Fetch replies for each comment
                         const repliesResponse = await axios.get(`${API_URL}/api/replies/comment/${comment.CommentID}`, config);
                         const repliesData = repliesResponse.data.replies;
@@ -68,8 +67,8 @@ const ProductDetail = () => {
                         // Fetch account information for each reply
                         const updatedReplies = await Promise.all(
                             repliesData.map(async (reply) => {
-                                const accountReplyResponse = await axios.get(`${API_URL}/api/accounts/${reply.AccountID}`, config);
-                                const accountReplyName = accountReplyResponse.data.user.fullname;
+                                const accountReplyResponse = await axios.get(`${API_URL}/api/accounts/fullname/${reply.AccountID}`, config);
+                                const accountReplyName = accountReplyResponse.data.fullname
                                 return { ...reply, username: accountReplyName };
                             })
                         );
@@ -304,7 +303,7 @@ const ProductDetail = () => {
                         <Image src={productData.ImageURL} alt={productData.ProductName} />
                     </div>
                     <div className="w-full md:w-1/2 p-5 md:ml-10">
-                        {userRole === 'Store Manager' ? (
+                        {role === 'Store Manager' ? (
                             <Form form={form} layout="vertical">
                                 <Form.Item
                                     name="ProductName"
@@ -365,7 +364,7 @@ const ProductDetail = () => {
                             </div>
                         )}
 
-                        {userRole === 'Guest' || userRole === 'Customer' ? (
+                        {role === 'Guest' || role === 'Customer' ? (
                             <>
                                 <div className="flex items-center mb-6 p-14">
                                     <Button onClick={handleDecrease}>-</Button>
@@ -389,7 +388,7 @@ const ProductDetail = () => {
                                     <p className="text-red-500 text-right">{t('product_unavailable')}</p>
                                 )}
                             </>
-                        ) : userRole === 'Store Manager' ? (
+                        ) : role === 'Store Manager' ? (
                             editMode ? (
                                 <div className="flex space-x-4 justify-end">
                                     <Button type="primary" onClick={() => handleSaveEdit(id)}>{t('save')}</Button>
@@ -405,73 +404,74 @@ const ProductDetail = () => {
                 </div>
                 {/* Comment section */}
                 <div className="m-5 px-4 md:px-32">
-                    
                     {comments.length > 0 && (
-                        <div>
+                        <div className='text-right'>
                             <Rate disabled allowHalf value={calculateAverageRating(comments)} />
                             <span style={{ marginLeft: '10px' }}>
                                 {comments.length} {comments.length === 1 ? t('review') : t('reviews')}
                             </span>
                         </div>
                     )}
+                    <div className="border-t border-gray-300 my-8"></div>
                     <Title level={4}>{t('product_reviews')}</Title>
                     <List
-    dataSource={comments}
-    renderItem={(comment) => (
-        <>
-            {/* Comment section */}
-            <List.Item key={comment.CommentID} className="border-b">
-                <List.Item.Meta
-                    title={
-                        <span>
-                            <Rate disabled value={comment.Rating} /><br/>
-                            {comment.username} 
-                            <Text className='text-gray-400'> - {moment(comment.CommentDate).format('DD/MM/YYYY')}</Text>
-                        </span>
-                    }
-                    description={comment.CommentContent}
-                />
-                <div className="ml-8">
-                    <Button type="primary" onClick={() => startReply(comment.CommentID)} disabled={comment.isReplied === true}>
-                        {comment.isReplied ? t('replied') : t('reply')}
-                    </Button>
-                </div>
-            </List.Item>
+                        dataSource={comments}
+                        renderItem={(comment) => (
+                            <>
+                                {/* Comment section */}
+                                <List.Item key={comment.CommentID} className="border-b">
+                                    <List.Item.Meta
+                                        title={
+                                            <span>
+                                                <Rate disabled value={comment.Rating} /><br/>
+                                                {comment.username} 
+                                                <Text className='text-gray-400'> - {moment(comment.CommentDate).format('DD/MM/YYYY')}</Text>
+                                            </span>
+                                        }
+                                        description={comment.CommentContent}
+                                    />
+                                    {role === 'Sales Staff' && (
+                                        <div className="ml-8">
+                                            <Button type="primary" onClick={() => startReply(comment.CommentID)} disabled={comment.isReplied === true}>
+                                                {comment.isReplied ? t('replied') : t('reply')}
+                                            </Button>
+                                        </div>
+                                    )}
+                                </List.Item>
 
-            {/* Reply section */}
-            {replyingCommentId === comment.CommentID && (
-                <div className="ml-8 mt-4">
-                    <TextArea
-                        rows={2}
-                        value={replyContent}
-                        onChange={handleReplyContentChange}
-                        placeholder={t('enter_reply_content')}
+                                {/* Reply section */}
+                                {replyingCommentId === comment.CommentID && (
+                                    <div className="ml-8 mt-4">
+                                        <TextArea
+                                            rows={2}
+                                            value={replyContent}
+                                            onChange={handleReplyContentChange}
+                                            placeholder={t('enter_reply_content')}
+                                        />
+                                        <div className="mt-2 text-end">
+                                            <Button type="primary" onClick={submitReply}>{t('submit')}</Button>
+                                            <Button className="ml-2" onClick={cancelReply}>{t('cancel')}</Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Render replies */}
+                                {comment.replies && comment.replies.map((reply) => (
+                                    <List.Item key={reply.ReplyID} className="ml-8">
+                                        <List.Item.Meta
+                                            title={
+                                                <span>
+                                                    {reply.username}
+                                                    <Text className='text-gray-400'> - {moment(reply.ReplyDate).format('DD/MM/YYYY')}</Text>
+                                                </span>
+                                            }
+                                            description={reply.ReplyContent}
+                                        />
+                                    </List.Item>
+                                ))}
+                            </>
+                        )}
                     />
-                    <div className="mt-2 text-end">
-                        <Button type="primary" onClick={submitReply}>{t('submit')}</Button>
-                        <Button className="ml-2" onClick={cancelReply}>{t('cancel')}</Button>
-                    </div>
-                </div>
-            )}
-
-            {/* Render replies */}
-            {comment.replies && comment.replies.map((reply) => (
-                <List.Item key={reply.ReplyID} className="ml-8">
-                    <List.Item.Meta
-                        title={
-                            <span>
-                                {reply.username}
-                                <Text className='text-gray-400'> - {moment(reply.ReplyDate).format('DD/MM/YYYY')}</Text>
-                            </span>
-                        }
-                        description={reply.ReplyContent}
-                    />
-                </List.Item>
-            ))}
-        </>
-    )}
-/>
-
                 </div>
             </div>
         )
