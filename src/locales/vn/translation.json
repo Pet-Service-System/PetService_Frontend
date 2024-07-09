@@ -143,7 +143,7 @@
     "order_now": "Đặt ngay",
     "product_unavailable": "Sản phẩm hiện đang tạm ngừng kinh doanh hoặc đã hết hàng.",
     "product_reviews": "Đánh giá sản phẩm",
-    "review": "đánh giá",
+    "review": "Đánh giá",
     "reviews": "đánh giá",
     "product_added_to_cart_successfully": "Sản phẩm được thêm vào giỏ hàng thành công",
     "error_fetching_product_detail": "Lỗi khi tìm nạp chi tiết sản phẩm",
@@ -479,6 +479,12 @@
     "only": "chỉ còn",
     "products_available": "sản phẩm có sẵn",
     "exceed_invetory_quantity": "Vượt số lượng tồn kho",
-    "unavailaplz_enter_customer_nameble": "Hãy nhập tên khách hàng"
-    
+    "unavailaplz_enter_customer_nameble": "Hãy nhập tên khách hàng",
+    "reply": "Phản hồi",
+    "enter_reply_content": "Nhập nội dung phản hồi",
+    "reply_successfully": "Phản hồi thành công",
+    "please_enter_reply_content": "Không để thể trống nội dung phản hồi",
+    "replied": "Đã phản hồi",
+    "commented": "Đã bình luận",
+    "reviewed": "Đã đánh giá"
 }

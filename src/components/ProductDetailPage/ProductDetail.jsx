@@ -5,9 +5,10 @@ import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List
 import useShopping from '../../hook/useShopping';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -23,8 +24,12 @@ const ProductDetail = () => {
     const { shoppingCart } = useShopping();
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accountID = user?.id;
     const userRole = localStorage.getItem('role') || 'Guest';
     const { t } = useTranslation();
+    const [replyingCommentId, setReplyingCommentId] = useState(null);
+    const [replyContent, setReplyContent] = useState('');
 
     const fetchProductDetail = async () => {
         try {
@@ -50,13 +55,26 @@ const ProductDetail = () => {
             const response = await axios.get(`${API_URL}/api/comments/product/${id}`, config);
             if (response.data && response.data.comments) {
                 const commentsData = response.data.comments;
-                console.log(commentsData)
                 const updatedComments = await Promise.all(
                     commentsData.map(async (comment) => {
                         // Fetch account information for each comment
-                        const accountResponse = await axios.get(`${API_URL}/api/accounts/${comment.AccountID}`, config);
-                        const accountName = accountResponse.data.user.fullname;
-                        return { ...comment, username: accountName };
+                        const accountCommentResponse = await axios.get(`${API_URL}/api/accounts/${comment.AccountID}`, config);
+                        const accountCommentName = accountCommentResponse.data.user.fullname;
+    
+                        // Fetch replies for each comment
+                        const repliesResponse = await axios.get(`${API_URL}/api/replies/comment/${comment.CommentID}`, config);
+                        const repliesData = repliesResponse.data.replies;
+    
+                        // Fetch account information for each reply
+                        const updatedReplies = await Promise.all(
+                            repliesData.map(async (reply) => {
+                                const accountReplyResponse = await axios.get(`${API_URL}/api/accounts/${reply.AccountID}`, config);
+                                const accountReplyName = accountReplyResponse.data.user.fullname;
+                                return { ...reply, username: accountReplyName };
+                            })
+                        );
+    
+                        return { ...comment, username: accountCommentName, replies: updatedReplies };
                     })
                 );
                 setComments(updatedComments);
@@ -65,10 +83,74 @@ const ProductDetail = () => {
             console.error('Error fetching comments:', error);
         }
     };
+
     useEffect(() => {
         fetchProductDetail();
         fetchComments();
     }, [id]);
+
+    const startReply = (commentId) => {
+        setReplyingCommentId(commentId);
+    };
+    
+    const cancelReply = () => {
+        setReplyingCommentId(null);
+        setReplyContent("");
+    };
+    
+    const handleReplyContentChange = (e) => {
+        setReplyContent(e.target.value);
+    };
+    
+    const submitReply = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showLoginModal();
+                return;
+            }
+
+            // Check if replyContent is null or empty
+            if (!replyContent || replyContent.trim() === '') {
+                return;
+            }
+    
+            const newReply = {
+                AccountID: accountID,
+                CommentID: replyingCommentId,
+                ReplyContent: replyContent,
+                ReplyDate: Date(),
+            };
+    
+            await axios.post(`${API_URL}/api/replies`, newReply, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            await axios.put(`${API_URL}/api/comments/${replyingCommentId}`, 
+                {
+                    isReplied: true,
+                }, 
+                {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            message.success(t('reply_successfully'));
+            setReplyingCommentId(null);
+            setReplyContent("");
+            await fetchComments(); // Reload comments after adding reply
+        } catch (error) {
+            console.error('Error adding reply:', error);
+            if (error.response && error.response.status === 401) {
+                message.error(t('unauthorized'));
+            } else {
+                message.error(t('error_reply'));
+            }
+        }
+    };
 
     const handleIncrease = () => {
         if (Quantity < productData.Quantity) {
@@ -323,7 +405,7 @@ const ProductDetail = () => {
                 </div>
                 {/* Comment section */}
                 <div className="m-5 px-4 md:px-32">
-                    <Title level={4}>{t('product_reviews')}</Title>
+                    
                     {comments.length > 0 && (
                         <div>
                             <Rate disabled allowHalf value={calculateAverageRating(comments)} />
@@ -332,18 +414,64 @@ const ProductDetail = () => {
                             </span>
                         </div>
                     )}
+                    <Title level={4}>{t('product_reviews')}</Title>
                     <List
-                        dataSource={comments}
-                        renderItem={(item) => (
-                            <List.Item key={item.AccountID}>
-                                <List.Item.Meta
-                                    title={item.username}  // Display username here
-                                    description={item.CommentContent}
-                                />
-                                <Rate disabled defaultValue={item.Rating} />
-                            </List.Item>
-                        )}
+    dataSource={comments}
+    renderItem={(comment) => (
+        <>
+            {/* Comment section */}
+            <List.Item key={comment.CommentID} className="border-b">
+                <List.Item.Meta
+                    title={
+                        <span>
+                            <Rate disabled value={comment.Rating} /><br/>
+                            {comment.username} 
+                            <Text className='text-gray-400'> - {moment(comment.CommentDate).format('DD/MM/YYYY')}</Text>
+                        </span>
+                    }
+                    description={comment.CommentContent}
+                />
+                <div className="ml-8">
+                    <Button type="primary" onClick={() => startReply(comment.CommentID)} disabled={comment.isReplied === true}>
+                        {comment.isReplied ? t('replied') : t('reply')}
+                    </Button>
+                </div>
+            </List.Item>
+
+            {/* Reply section */}
+            {replyingCommentId === comment.CommentID && (
+                <div className="ml-8 mt-4">
+                    <TextArea
+                        rows={2}
+                        value={replyContent}
+                        onChange={handleReplyContentChange}
+                        placeholder={t('enter_reply_content')}
                     />
+                    <div className="mt-2 text-end">
+                        <Button type="primary" onClick={submitReply}>{t('submit')}</Button>
+                        <Button className="ml-2" onClick={cancelReply}>{t('cancel')}</Button>
+                    </div>
+                </div>
+            )}
+
+            {/* Render replies */}
+            {comment.replies && comment.replies.map((reply) => (
+                <List.Item key={reply.ReplyID} className="ml-8">
+                    <List.Item.Meta
+                        title={
+                            <span>
+                                {reply.username}
+                                <Text className='text-gray-400'> - {moment(reply.ReplyDate).format('DD/MM/YYYY')}</Text>
+                            </span>
+                        }
+                        description={reply.ReplyContent}
+                    />
+                </List.Item>
+            ))}
+        </>
+    )}
+/>
+
                 </div>
             </div>
         )

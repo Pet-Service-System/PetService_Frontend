@@ -199,7 +199,7 @@ const SpaBooking = () => {
           onClick={() => handleReviewTransaction(record.id, record.isReviewed)} // Truyền trạng thái isReviewed vào hàm
           disabled={record.status !== 'Completed' || record.isReviewed}
         >
-          {t('review')}
+          {record.isReviewed ? t('reviewed') : t('review')}
         </Button>
       ),
     },

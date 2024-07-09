@@ -145,7 +145,7 @@
     "product_unavailable": "Product is currently discontinued or out of stock.",
     "edit": "Edit",
     "product_reviews": "Product Reviews",
-    "review": "review",
+    "review": "Review",
     "reviews": "reviews",
     "product_added_to_cart_successfully": "Product added to cart successfully",
     "error_fetching_product_detail": "Error fetching product detail",
@@ -474,5 +474,12 @@
     "only": "only",
     "products_available": "products available",
     "exceed_invetory_quantity": "Exceed invetory quantity",
-    "unavailaplz_enter_customer_nameble": "Please enter customername"
+    "unavailaplz_enter_customer_nameble": "Please enter customername",
+    "reply": "Reply",
+    "enter_reply_content": "Enter reply content",
+    "reply_successfully": "Reply successfully",
+    "please_enter_reply_content": "Please enter reply content",
+    "replied": "Replied",
+    "commented": "Commented",
+    "reviewed": "Reviewed"
 }

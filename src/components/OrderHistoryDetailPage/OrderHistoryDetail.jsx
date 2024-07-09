@@ -282,6 +282,8 @@ const OrderHistoryDetail = () => {
           AccountID: accountID,
           Rating: rating,
           CommentContent: comment.trim(),
+          CommentDate: Date(),
+          isReplied: false,
         },
         {
           headers: {
@@ -393,7 +395,7 @@ const OrderHistoryDetail = () => {
           onClick={() => openModal(record.ProductID)}
           disabled={order.Status !== 'Shipped' || isSubmitting ||record.isCommented === true}
         >
-          {t('comment')}
+          {record.isCommented ? t('commented') : t('comment')}
         </Button>
       ),
     });
