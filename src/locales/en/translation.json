@@ -333,7 +333,7 @@
     "3_hours_rule": "You can only schedule from 3 hours onwards from the current time.",
     "booking_success": "Booking successful",
     "press_to_direct_to_service_history": "Click here to go to the service history page",
-    "error_create_booking": "Error creating booking",
+    "error_create_booking": "This time slot has reached its limit, please choose another time slot",
     "plz_enter_customer_name": "Please enter customer name!",
     "plz_enter_phone_number": "Please enter phone number!",
     "enter_name": "Enter name",

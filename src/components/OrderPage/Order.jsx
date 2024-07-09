@@ -23,6 +23,8 @@ const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env
   .REACT_APP_EXCHANGE_RATE_VND_TO_USD;
 const REACT_APP_SHIPPING_COST = import.meta.env.REACT_APP_SHIPPING_COST;
 import useShopping from '../../hook/useShopping';
+import { useDispatch } from "react-redux";
+import { setShoppingCart } from '../../redux/shoppingCart';
 
 const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -31,6 +33,7 @@ const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState("nationwide");
   const shippingCost = parseFloat(REACT_APP_SHIPPING_COST);
+  const dispatch = useDispatch();
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
     shippingCost: shippingCost,
@@ -366,7 +369,8 @@ const Order = () => {
       }));
       
       setTimeout(() => {
-        
+        localStorage.removeItem('shoppingCart');
+        dispatch(setShoppingCart([]));
         navigate("/purchase-order-successfully", { replace: true });
       }, 700);
     } catch (error) {
