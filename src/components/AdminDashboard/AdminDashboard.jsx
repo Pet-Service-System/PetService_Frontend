@@ -297,13 +297,13 @@ export default function AdminDashboard() {
                       <div>
                         <Title level={5}>{product.ProductName}</Title>
                         <Text>
-                          Quantity:{" "}
+                        {t('quantity')}:{" "}
                           {isCountUpComplete && (
                             <CountUp end={product.totalQuantity} />
                           )}
                         </Text>
                         <br />
-                        <Text>Price: ${product.Price}</Text>
+                        <Text>{t('price')}: ${product.Price}</Text>
                       </div>
                     </li>
                   ))}
