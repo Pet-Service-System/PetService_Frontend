@@ -235,7 +235,7 @@ const Banner = () => {
         {role === 'Customer' && isVertical && (
           <>
             <Menu.Item key="cart" onClick={() => navigate('/cart')}>{t('CART')}</Menu.Item>
-            <Menu.SubMenu key="user-profile" title="TÀI KHOẢN">
+            <Menu.SubMenu key="user-profile" title={t('ACCOUNT')}>
               <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_profile')}</Menu.Item>
               <Menu.Item onClick={() => { navigate('/pet-list') }}>{t('list_of_pets')}</Menu.Item>
               <Menu.Item onClick={() => { navigate('/order-history') }}>{t('orders_history')}</Menu.Item>
