@@ -28,6 +28,7 @@ const OrderHistoryDetail = () => {
   const accountID = JSON.parse(localStorage.getItem('user')).id;
   const role = localStorage.getItem('role')
   const shippingCost = parseFloat(REACT_APP_SHIPPING_COST)
+  const [selectedOrderID, setSelectedOrderID] = useState(null); // State for selected order ID
   const { t } = useTranslation();
 
   const getOrder = async (id) => {
@@ -89,6 +90,7 @@ const OrderHistoryDetail = () => {
 
       const orderDetailData = await getOrderDetail(orderId);
       setOrderDetail(orderDetailData);
+      setSelectedOrderID(orderId); // Set the selected order ID
 
       // Fetch product details for each product in order detail
       const productsWithDetails = await Promise.all(
@@ -288,6 +290,32 @@ const OrderHistoryDetail = () => {
         }
       );
       console.log('Comment created:', response.data);
+
+
+      // Update isCommented for the product in the order details
+      const updateResponse = await axios.patch(
+        `${API_URL}/api/order-details/updateOrderCommentStatus`,
+        {
+          OrderID: selectedOrderID,
+          ProductID: selectedProductID,
+          isCommented: true,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the local state to disable the comment button
+      setOrderDetail((prevOrderDetail) => ({
+        ...prevOrderDetail,
+        Items: prevOrderDetail.Items.map((item) =>
+          item.ProductID === selectedProductID ? { ...item, isCommented: true } : item
+        ),
+      }));
+      
+      console.log('Product isCommented updated:', updateResponse.data);
       message.success(t('comment_success'));
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -363,7 +391,7 @@ const OrderHistoryDetail = () => {
         <Button
           type="primary"
           onClick={() => openModal(record.ProductID)}
-          disabled={order.Status !== 'Shipped' || isSubmitting} // Disable when not shipped or submitting
+          disabled={order.Status !== 'Shipped' || isSubmitting ||record.isCommented === true}
         >
           {t('comment')}
         </Button>

@@ -335,6 +335,7 @@ const Order = () => {
         Items: filteredCartItems.map(item => ({
           ProductID: item.ProductID,
           Quantity: item.Quantity,
+          isCommented: false,
         })),
       };
 
