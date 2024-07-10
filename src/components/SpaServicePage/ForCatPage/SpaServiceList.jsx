@@ -106,20 +106,8 @@ const SpaServiceList = () => {
       }
     } catch (error) {
       console.error('Error adding service:', error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          message.error(t('unauthorized'));
-        } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('add_error')}: ${error.response.data.message}`);
-        } else {
-          message.error(t('add_error'));
-        }
-      } else if (error.request) {
-        message.error(t('network_error'));
-      } else {
-        message.error(`${t('add_error')}: ${error.message}`);
-      }
-    } finally {
+      handleErrorResponse(error, t('add_error'));
+     } finally {
       setSaving(false); // End saving
     }
   };
@@ -180,20 +168,8 @@ const SpaServiceList = () => {
       }
     } catch (error) {
       console.error('Error updating service:', error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          message.error(t('unauthorized'));
-        } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('update_error')}: ${error.response.data.message}`);
-        } else {
-          message.error(t('update_error'));
-        }
-      } else if (error.request) {
-        message.error(t('network_error'));
-      } else {
-        message.error(`${t('update_error')}: ${error.message}`);
-      }
-    } finally {
+      handleErrorResponse(error, t('update_error'));
+     } finally {
       setSaving(false); // End saving
     }
   };
@@ -202,6 +178,22 @@ const SpaServiceList = () => {
     const file = e.target.files[0];
     setServiceImg(file);
     form.setFieldsValue({ Image: file });
+  };
+
+  const handleErrorResponse = (error, defaultMessage) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        message.error(t('unauthorized'));
+      } else if (error.response.data && error.response.data.message) {
+        message.error(`${defaultMessage}: ${error.response.data.message}`);
+      } else {
+        message.error(defaultMessage);
+      }
+    } else if (error.request) {
+      message.error(t('network_error'));
+    } else {
+      message.error(`${defaultMessage}: ${error.message}`);
+    }
   };
 
   const columns = [
@@ -346,13 +338,13 @@ const SpaServiceList = () => {
       </Form>
       {/* Add/ Update modal */}
       <Modal
-        title={editMode ? "Edit Service" : "Add New Service"}
+        title={editMode ? t('edit_service') : t('add_service')}
         visible={addMode || editMode !== null}
         onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
-            {editMode ? "Save" : "Add"}
+            {editMode ? t('save') : t('add')}
           </Button>,
         ]}
         style={{ textAlign: 'center' }}
