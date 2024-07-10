@@ -491,5 +491,10 @@
     "are_you_sure_cancel_booking": "Are you sure cancel booking?",
     "success_cancel_booking": "Cancel booking successfully",
     "error_occur_cancel_booking": "Error occurred while canceling boooking",
-    "search": "Search"
+    "search": "Search",
+    "email_already_used": "This email address is already in use.",
+    "password_must_have_8_characters_and_word": "Password must be at least 8 characters long and contain at least one letter.",
+    "address_length": "Address must be between 5 and 100 characters long.",
+    "fullname_length": "Full name must be between 2 and 50 characters long.",
+    "email_not_exist": "This email address does not exist."
 }

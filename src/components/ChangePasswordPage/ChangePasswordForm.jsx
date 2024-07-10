@@ -34,12 +34,14 @@ const ChangePasswordForm = () => {
 
   const validate = () => {
     const newErrors = {};
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Password must contain at least 8 characters, at least one letter and one number
+
     if (!currentPassword.trim()) newErrors.currentPassword = t('current_password_is_required');
     if (!newPassword.trim()) newErrors.newPassword = t('new_password_is_required');
-    if (newPassword.length < 8) newErrors.newPassword = t('password_min_length');
-    if (!confirmPassword.trim()) newErrors.confirmPassword = t('confirm_password_is_required');
+    if (!passwordRegex.test(newPassword)) newErrors.newPassword = t('password_must_have_8_characters_and_word');
     if (newPassword === currentPassword) newErrors.newPassword = t('new_password_must_be_different');
-    if (newPassword !== confirmPassword) newErrors.confirmPassword = t('passwords_do_not_match');
+    if (!confirmPassword.trim()) newErrors.confirmPassword = t('confirm_password_is_required');
+   if (newPassword !== confirmPassword) newErrors.confirmPassword = t('passwords_do_not_match');
     setErrors(newErrors); // Cập nhật state errors để hiển thị lỗi ngay khi validation fails
     return newErrors;
   };
@@ -90,77 +92,78 @@ const ChangePasswordForm = () => {
           {t('change_password')}
         </Title>
         <Form onFinish={handleSubmit} layout="vertical">
-        {/* Current pwd */}
-        <Form.Item
-          label={t('current_password')}
-          validateStatus={errors.currentPassword ? 'error' : ''}
-          help={errors.currentPassword}
-          hasFeedback
-          validateTrigger="onChange"
-          rules={[
-            { required: true, message: t('password_is_required') },
-            { min: 8, message: t('password_min_length') } 
-          ]}
-        >
-          <Input.Password
-            prefix={<LockOutlined />}
-            name="currentPassword"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder={t('current_password')}
-          />
-        </Form.Item>
-        {/* New pwd */}
-        <Form.Item
-          label={t('new_password')}
-          validateStatus={errors.newPassword ? 'error' : ''}
-          help={errors.newPassword}
-          hasFeedback
-          validateTrigger="onChange"
-          rules={[
-            { required: true, message: t('new_password_is_required') },
-            { min: 8, message: t('password_min_length') }
-          ]}
-        >
-          <Input.Password
-            prefix={<LockOutlined />}
-            name="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder={t('new_password')}
-          />
-        </Form.Item>
-        {/* Confirm new pwd */}
-        <Form.Item
-          label={t('confirm_new_password')}
-          validateStatus={errors.confirmPassword ? 'error' : ''}
-          help={errors.confirmPassword}
-          hasFeedback
-          validateTrigger="onChange"
-          rules={[
-            { required: true, message: t('confirm_password_is_required') },
-            { min: 8, message: t('password_min_length') }
-          ]}
-        >
-          <Input.Password
-            prefix={<LockOutlined />}
-            name="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder={t('confirm_new_password')}
-          />
-        </Form.Item>
-        {/* Button */}
-        <Form.Item>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button type="primary" htmlType="submit" className="mr-2" disabled={isLoading || disableChangePassword}>
-              {disableChangePassword ? t('changing_password') : t('change_password')}
-            </Button>
-            <Button onClick={handleCancel}>
-              {t('cancel')}
-            </Button>
-          </div>
-        </Form.Item>
+          {/* Current Password */}
+          <Form.Item
+            label={t('current_password')}
+            validateStatus={errors.currentPassword ? 'error' : ''}
+            help={errors.currentPassword}
+            hasFeedback
+            validateTrigger="onChange"
+            rules={[
+              { required: true, message: t('current_password_is_required') },
+              { min: 8, message: t('password_min_length') }
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              name="currentPassword"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder={t('current_password')}
+            />
+          </Form.Item>
+          {/* New Password */}
+          <Form.Item
+            label={t('new_password')}
+            validateStatus={errors.newPassword ? 'error' : ''}
+            help={errors.newPassword}
+            hasFeedback
+            validateTrigger="onChange"
+            rules={[
+              { required: true, message: t('new_password_is_required') },
+              { min: 8, message: t('password_min_length') },
+              { pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, message: t('password_must_have_8_characters_and_word') }
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              name="newPassword"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder={t('new_password')}
+            />
+          </Form.Item>
+          {/* Confirm New Password */}
+          <Form.Item
+            label={t('confirm_new_password')}
+            validateStatus={errors.confirmPassword ? 'error' : ''}
+            help={errors.confirmPassword}
+            hasFeedback
+            validateTrigger="onChange"
+            rules={[
+              { required: true, message: t('confirm_password_is_required') },
+              { min: 8, message: t('password_min_length') }
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder={t('confirm_new_password')}
+            />
+          </Form.Item>
+          {/* Button */}
+          <Form.Item>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button type="primary" htmlType="submit" className="mr-2" disabled={isLoading || disableChangePassword}>
+                {disableChangePassword ? t('changing_password') : t('change_password')}
+              </Button>
+              <Button onClick={handleCancel}>
+                {t('cancel')}
+              </Button>
+            </div>
+          </Form.Item>
         </Form>
       </div>
     </div>

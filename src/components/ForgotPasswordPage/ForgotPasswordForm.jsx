@@ -16,20 +16,35 @@ const ForgotPasswordForm = () => {
   const [isLoading, setIsLoading] = useState(false); // State để điều khiển trạng thái của nút Gửi yêu cầu
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
-  const validate = () => {
+
+  const validate = async () => {
     const newErrors = {};
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('email_required');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-    }
+      newErrors.email = t('email_invalid');
+    } else {
+      const emailExists = await checkEmailExists(email);
+      if (!emailExists) {
+        newErrors.email = t('email_not_exist');
+      }
+   }
     return newErrors;
   };
-  const validationErrors = validate();
-  
+
+  const checkEmailExists = async (email) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/check-email`, { email });
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking email existence:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async () => {
-    if (Object.keys(validationErrors).length === 0) {
+    const validationErrors = await validate();
+   if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true); // Vô hiệu hóa nút Gửi yêu cầu
         const response = await axios.post(`${API_URL}/api/auth/forgot-password`, {
@@ -62,7 +77,7 @@ const ForgotPasswordForm = () => {
             <Form.Item
               label={t('email')}
               name="email"
-              rules={[{ required: true, message: t('email_is_required') }]}
+              rules={[{ required: true, message: t('email_required') }]}
               validateStatus={errors.email && 'error'}
               help={errors.email}
             >
