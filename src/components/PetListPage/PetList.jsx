@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 
-
 const { Sider } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
@@ -302,7 +301,10 @@ const PetList = () => {
                 <Form form={form} layout="vertical">
                     <Form.Item
                         name="PetName"
-                        rules={[{ required: true, message: t('not_null_pet_name') }]}
+                        rules={[
+                          { required: true, message: t('not_null_pet_name') },
+                          { max: 50, message: t('pet_name_too_long') }
+                        ]}
                         label={t('pet_name')}
                     >
                         <Input placeholder={t('pet_name')} />
@@ -339,14 +341,20 @@ const PetList = () => {
                     </Form.Item>
                     <Form.Item
                         name="Weight"
-                        rules={[{ required: true, message: t('not_null_pet_weight') }]}
+                        rules={[
+                          { required: true, message: t('not_null_pet_weight') },
+                          { type: 'number', min: 0, message: t('weight_must_be_positive') }
+                        ]}
                         label={t('pet_weight')}
                     >
                         <Input suffix="kg" placeholder={t('pet_weight')} type="number" />
                     </Form.Item>
                     <Form.Item
                         name="Age"
-                        rules={[{ required: true, message: t('not_null_pet_age') }]}
+                        rules={[
+                          { required: true, message: t('not_null_pet_age') },
+                          { type: 'number', min: 0, message: t('age_must_be_positive') }
+                        ]}
                         label={t('pet_age')}
                     >
                         <Input suffix={t('age')} placeholder={t('pet_age')} type="number" />
@@ -355,7 +363,7 @@ const PetList = () => {
             </Modal>
           {/* Confirm delete Pet */}    
           <Modal
-            title={t('cofirm_delete')}
+            title={t('confirm_delete')}
             visible={confirmDeletePetId !== null}
             onOk={handleConfirmDelete}
             onCancel={handleCancelDelete}
@@ -381,16 +389,31 @@ const PetList = () => {
               <Form.Item name="PetID" hidden>
                 <Input type="hidden" />
               </Form.Item>
-              <Form.Item name="PetName" label="Tên thú cưng" rules={[{ required: true, message: t('name') + t('can_not_blank') }]}>
-                <Input placeholder={t('name')} />
+              <Form.Item
+                name="PetName"
+                label={t('pet_name')}
+                rules={[
+                  { required: true, message: t('not_null_pet_name') },
+                  { max: 50, message: t('pet_name_too_long') }
+                ]}
+              >
+                <Input placeholder={t('pet_name')} />
               </Form.Item>
-              <Form.Item name="PetTypeID" label="Loại thú cưng" rules={[{ required: true, message: t('pet_type') + t('can_not_blank') }]}>
+              <Form.Item
+                name="PetTypeID"
+                label={t('choose_pet_type')}
+                rules={[{ required: true, message: t('not_null_pet_type') }]}
+              >
                 <Select placeholder={t('choose_pet_type')}>
                   <Option value="PT001">{t('dog')}</Option>
                   <Option value="PT002">{t('cat')}</Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="Gender" label="Giới tính" rules={[{ required: true, message: t('gender') + t('can_not_blank') }]}>
+              <Form.Item
+                name="Gender"
+                label={t('choose_gender')}
+                rules={[{ required: true, message: t('not_null_pet_gender') }]}
+              >
                 <Select placeholder={t('choose_gender')}>
                   {genders.map((gender, index) => (
                     <Option key={index} value={gender}>
@@ -399,14 +422,32 @@ const PetList = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="Status" label="Trạng thái" rules={[{ required: true, message: t('status') + t('can_not_blank') }]}>
-                <Input placeholder={t('status')} />
+              <Form.Item
+                name="Status"
+                label={t('pet_status')}
+                rules={[{ required: true, message: t('not_null_pet_status') }]}
+              >
+                <Input placeholder={t('pet_status')} />
               </Form.Item>
-              <Form.Item name="Weight" label="Cân nặng thú cưng" rules={[{ required: true, message: t('weight') + t('can_not_blank') }]}>
-                <Input suffix="kg" placeholder={t('weight')} type="number" />
+              <Form.Item
+                name="Weight"
+                label={t('pet_weight')}
+                rules={[
+                  { required: true, message: t('not_null_pet_weight') },
+                  { type: 'number', min: 0, message: t('weight_must_be_positive') }
+                ]}
+              >
+                <Input suffix="kg" placeholder={t('pet_weight')} type="number" />
               </Form.Item>
-              <Form.Item name="Age" label="Tuổi thú cưng" rules={[{ required: true, message: t('age') + t('can_not_blank') }]}>
-                <Input suffix={t('age')} placeholder={t('age')} type="number" />
+              <Form.Item
+                name="Age"
+                label={t('pet_age')}
+                rules={[
+                  { required: true, message: t('not_null_pet_age') },
+                  { type: 'number', min: 0, message: t('age_must_be_positive') }
+                ]}
+              >
+                <Input suffix={t('age')} placeholder={t('pet_age')} type="number" />
               </Form.Item>
             </Form>
           </Modal>
