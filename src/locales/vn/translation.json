@@ -348,7 +348,7 @@
     "booking_time": "Khung giờ",
     "choose_booking_time": "Chọn khung giờ",
     "plz_choose_booking_time": "Vui lòng chọn khung giờ!",
-    "booking_date": "Ngày đặt",
+    "booking_date": "Ngày đặt lịch",
     "plz_choose_booking_date": "Vui lòng chọn ngày đặt!",
     "choose_pet": "Chọn thú cưng",
     "plz_choose_pet": "Vui lòng chọn thú cưng!",
@@ -495,6 +495,6 @@
     "cofirm_cancel_booking": "Xác nhận hủy đặt chỗ",
     "are_you_sure_cancel_booking": "Bạn có chắc chắn muốn hủy đặt chỗ?",
     "success_cancel_booking": "Hủy đặt chỗ thành công",
-    "error_occur_cancel_booking": "Có lỗi xảy ra khi hủy đặt chỗ"
-
+    "error_occur_cancel_booking": "Có lỗi xảy ra khi hủy đặt chỗ",
+    "search": "Tìm kiếm"
 }

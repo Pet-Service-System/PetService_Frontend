@@ -47,7 +47,6 @@ const SpaBooking = () => {
   const [loading, setLoading] = useState(false);
   const screens = useBreakpoint();
   const { t } = useTranslation();
-  const [selectedBookingDate, setSelectedBookingDate] = useState(null);
   const [selectedDateCreated, setSelectedDateCreated] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [bookingCount, setBookingCount] = useState({
@@ -63,14 +62,8 @@ const SpaBooking = () => {
   }, [sortOrder, activeTab]);
 
   useEffect(() => {
-    if (selectedBookingDate || selectedDateCreated) {
+    if (selectedDateCreated) {
       let filteredData = spaBookings;
-      // filter booking date
-      if (selectedBookingDate) {
-        filteredData = filteredData.filter(booking =>
-          moment(booking.date).isSame(selectedBookingDate, 'day')
-        );
-      }
       // filter date created
       if (selectedDateCreated) {
         filteredData = filteredData.filter(booking =>
@@ -82,7 +75,7 @@ const SpaBooking = () => {
       // Reload all spa bookings if no filters are applied
       fetchSpaBookings();
     }
-  }, [selectedBookingDate, selectedDateCreated]);
+  }, [selectedDateCreated]);
 
   const fetchSpaBookings = async () => {
     setLoading(true);
@@ -274,10 +267,6 @@ const SpaBooking = () => {
     setUser(null);
     navigate('/', { replace: true });
   };
-
-  const handleBookingDateChange = (date) => {
-    setSelectedBookingDate(date ? date.toDate() : null);
-  };
   
   const handleDateCreatedChange = (date) => {
     setSelectedDateCreated(date ? date.toDate() : null);
@@ -332,13 +321,6 @@ const SpaBooking = () => {
           <Typography.Title className="text-5xl text-center font-semibold mb-4">{t('spa_booking_history')}</Typography.Title>
           {/* Search and filter */}
         <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
-            <div>
-              <Text className="mr-1">{t('filter_booking_date')}</Text>
-              <DatePicker
-                onChange={handleBookingDateChange}
-                style={{ width: 150, marginRight: 12 }}
-              />
-            </div>
             <div>
               <Text className="mr-1">{t('filter_created_date')}</Text>
               <DatePicker

@@ -180,10 +180,10 @@ const OrderList = () => {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
+              <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
                 {t('delivering')}
               </Button>
-              <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
+              <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center text-xl" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
                 {t('cancel')}
               </Button>
             </div>
@@ -191,7 +191,7 @@ const OrderList = () => {
         case 'Delivering':
           return (
             <Button
-              className="min-w-[100px] text-white w-auto px-2 py-1 text-center mr-2 bg-green-500 hover:bg-green-600" 
+              className="min-w-[100px] text-white w-auto px-2 py-1 text-center mr-2 bg-green-500 hover:bg-green-600 text-xl" 
               onClick={() => showConfirm(record.id, 'Shipped')}
               disabled={confirmLoading}
             >
@@ -211,6 +211,8 @@ const OrderList = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      fixed: 'left',
+      className: 'sticky left-0 bg-white',
       render: (text, record) => (
         <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>{record.id}</Button>
       ),
@@ -288,7 +290,7 @@ const OrderList = () => {
                 style={{ width: 200 }}
               />
             </div>
-            <div className="flex justify-end items-center">
+            <div className="flex md:justify-end items-center">
               <Text className="mr-1">{t('search_customer')}:</Text>
               <Search
                 placeholder={t('search_by_customer')}

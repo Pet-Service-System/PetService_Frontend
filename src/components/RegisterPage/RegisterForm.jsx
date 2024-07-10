@@ -3,7 +3,13 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
+import {
+  UserOutlined,
+  MailOutlined,
+  LockOutlined,
+  PhoneOutlined,
+  HomeOutlined,
+} from '@ant-design/icons';
 
 const { Title } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -105,9 +111,11 @@ const RegisterForm = () => {
               rules={[{ required: true, message: t('plz_enter_fullname') }]}
             >
               <Input
+                prefix={<UserOutlined />}
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
                 name="fullname"
+                placeholder={t('fullname')}
               />
             </Form.Item>
             {/* Email */}
@@ -120,8 +128,10 @@ const RegisterForm = () => {
             >
               <Input
                 type="email"
+                prefix={<MailOutlined />}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('email')}
               />
             </Form.Item>
             {/* Password */}
@@ -133,9 +143,11 @@ const RegisterForm = () => {
               rules={[{ required: true, message: t('plz_enter_password')}]}
             >
               <Input.Password
+                prefix={<LockOutlined />}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 name="password"
+                placeholder={t('password')}
               />
             </Form.Item>
             {/* Confirm password */}
@@ -148,8 +160,10 @@ const RegisterForm = () => {
             >
               <Input.Password
                 value={confirmPassword}
+                prefix={<LockOutlined />}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 name="confirmPassword"
+                placeholder={t('confirm_password')}
               />
             </Form.Item>
             {/* Phone number */}
@@ -162,8 +176,10 @@ const RegisterForm = () => {
             >
               <Input
                 value={phoneNumber}
+                prefix={<PhoneOutlined />}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 name="phoneNumber"
+                placeholder={t('phone_number')}
               />
             </Form.Item>
             {/* Address */}
@@ -176,8 +192,10 @@ const RegisterForm = () => {
             >
               <Input
                 value={address}
+                prefix={<HomeOutlined />}
                 onChange={(e) => setAddress(e.target.value)}
                 name="address"
+                placeholder={t('address')}
               />
             </Form.Item>
             {/* Buttons */}

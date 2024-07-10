@@ -316,7 +316,7 @@ const ProductList = () => {
             </div>
           </>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {loading ? (
               Array.from({ length: 4 }).map((_, index) => (
                 <Card key={index} style={{ width: 240 }}>
@@ -337,7 +337,6 @@ const ProductList = () => {
                     src={product.ImageURL}
                     preview={false}
                     className="rounded-t-lg w-full h-44 object-cover"
-                    style={{ width: '100%', height: '250px' }}
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>

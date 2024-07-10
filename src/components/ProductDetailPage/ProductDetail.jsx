@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate, Modal } from 'antd';
 import useShopping from '../../hook/useShopping';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 
@@ -379,6 +379,7 @@ const ProductDetail = () => {
                                 <div className="flex space-x-4 justify-end">
                                     <Button type="primary"
                                         onClick={handleAddToCart}
+                                        icon={<ShoppingCartOutlined style={{ fontSize: '24px' }}/>}
                                         disabled={(productData.Status === 'Unavailable' || productData.Quantity === 0)}
                                         className='py-10 px-20'
                                     >

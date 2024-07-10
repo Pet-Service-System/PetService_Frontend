@@ -3,6 +3,9 @@ import { Button, Form, Input, Typography, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import {
+  MailOutlined,
+} from '@ant-design/icons';
 
 const { Title } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -64,9 +67,11 @@ const ForgotPasswordForm = () => {
               help={errors.email}
             >
               <Input
+                prefix={<MailOutlined />}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('email')}
               />
             </Form.Item>
             <Form.Item>

@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
 
 
-const { Sider, Content } = Layout;
+const { Sider } = Layout;
 const { Title } = Typography;
 const { Option } = Select;
 const { useBreakpoint } = Grid;
@@ -266,10 +266,9 @@ const PetList = () => {
         </Sider>
       )}
       {/* Table */}
-      <Layout>
-        <Content className="m-4 p-6 bg-white">
-          <div className="flex flex-col items-center">
-            <Title level={2} className="my-4">
+      <Layout className='site-layout'>
+        <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
+            <Title level={1} className="text-center font-semibold mb-4">
               {t('list_of_pets')}
             </Title>
             {loading ? (
@@ -411,7 +410,6 @@ const PetList = () => {
               </Form.Item>
             </Form>
           </Modal>
-        </Content>
       </Layout>
     </Layout>
   );

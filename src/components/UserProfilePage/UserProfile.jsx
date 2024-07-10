@@ -10,6 +10,9 @@ import {
   HistoryOutlined,
   LogoutOutlined,
   LineChartOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 
@@ -208,49 +211,56 @@ const UserProfile = () => {
               <Skeleton active />
             ) : isEditMode ? (
               <Form layout="vertical">
-                <Form.Item label={t('fullname_2')} validateStatus={errors.fullname && "error"} help={errors.fullname}>
-                  <Input
-                    name="fullname"
-                    value={formData.fullname}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Email">
-                  <Input
-                    name="email"
-                    value={formData.email}
-                    disabled
-                  />
-                </Form.Item>
-                <Form.Item label={t('phone')} validateStatus={errors.phone && "error"} help={errors.phone}>
-                  <Input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <Form.Item label={t('adress')} validateStatus={errors.address && "error"} help={errors.address}>
-                  <Input
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </Form.Item>
-                <div className="flex justify-between mt-6">
-                  <Button type="primary" onClick={handleSave} className="mr-2" disabled={saving}>{t('save')}</Button>
-                  <Button type="default" onClick={handleCancel} disabled={saving}>{t('cancel')}</Button>
-                </div>
-              </Form>
+              <Form.Item label={t('fullname_2')} validateStatus={errors.fullname && "error"} help={errors.fullname}>
+                <Input
+                  name="fullname"
+                  prefix={<UserOutlined />}
+                  value={formData.fullname}
+                  onChange={handleChange}
+                  disabled={!isEditMode} // Thêm disabled khi không phải chế độ chỉnh sửa
+                />
+              </Form.Item>
+              <Form.Item label="Email">
+                <Input
+                  name="email"
+                  prefix={<MailOutlined />}
+                  value={formData.email}
+                  disabled
+                />
+              </Form.Item>
+              <Form.Item label={t('phone')} validateStatus={errors.phone && "error"} help={errors.phone}>
+                <Input
+                  name="phone"
+                  prefix={<PhoneOutlined />}
+                  value={formData.phone}
+                  onChange={handleChange}
+                  disabled={!isEditMode} // Thêm disabled khi không phải chế độ chỉnh sửa
+                />
+              </Form.Item>
+              <Form.Item label={t('adress')} validateStatus={errors.address && "error"} help={errors.address}>
+                <Input
+                  name="address"
+                  prefix={<HomeOutlined />}
+                  value={formData.address}
+                  onChange={handleChange}
+                  disabled={!isEditMode} // Thêm disabled khi không phải chế độ chỉnh sửa
+                />
+              </Form.Item>
+              <div className="flex justify-between mt-6">
+                <Button type="primary" onClick={handleSave} className="mr-2" disabled={saving}>{t('save')}</Button>
+                <Button type="default" onClick={handleCancel} disabled={saving}>{t('cancel')}</Button>
+              </div>
+            </Form>
             ) : (
               <>
                 <Title level={5}>{t('fullname_2')}</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.fullname}</p>
+                <p className="bg-gray-200 p-2 rounded-md"><UserOutlined className='mr-2'/>{user.fullname}</p>
                 <Title level={5}>Email</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.email}</p>
+                <p className="bg-gray-200 p-2 rounded-md"><MailOutlined className='mr-2'/>{user.email}</p>
                 <Title level={5}>{t('phone')}</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.phone}</p>
+                <p className="bg-gray-200 p-2 rounded-md"><PhoneOutlined className='mr-2'/>{user.phone}</p>
                 <Title level={5}>{t('adress')}</Title>
-                <p className="bg-gray-200 p-2 rounded-md">{user.address}</p>
+                <p className="bg-gray-200 p-2 rounded-md"><HomeOutlined className='mr-2'/>{user.address}</p>
                 <div className="flex justify-between mt-6">
                   <Button type="primary" onClick={handleUpdateInfo} className="mr-2">{t('update_information')}</Button>
                   <Button type="default" onClick={handleChangePassword}>{t('change_password')}</Button>

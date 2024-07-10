@@ -2,7 +2,9 @@ import { Form, Input, Button, Typography, message } from 'antd';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
+import {
+  LockOutlined,
+} from '@ant-design/icons';
 const { Title } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
@@ -40,7 +42,7 @@ const ResetPasswordForm = () => {
             name="password"
             rules={[{ required: true, message: t('please_enter_new_password') }]}
           >
-            <Input.Password />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('new_password')}/>
           </Form.Item>
           {/* Confirm new Password */}
           <Form.Item
@@ -59,7 +61,7 @@ const ResetPasswordForm = () => {
               }),
             ]}
           >
-            <Input.Password />
+            <Input.Password prefix={<LockOutlined />} placeholder={t('confirm_new_password')}/>
           </Form.Item>
           {/* Buttons */}
           <Form.Item>

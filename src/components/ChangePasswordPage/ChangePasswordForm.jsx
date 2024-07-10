@@ -3,7 +3,9 @@ import axios from 'axios';
 import { Form, Input, Button, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
+import {
+  LockOutlined,
+} from '@ant-design/icons';
 
 const { Title } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -101,9 +103,11 @@ const ChangePasswordForm = () => {
           ]}
         >
           <Input.Password
+            prefix={<LockOutlined />}
             name="currentPassword"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder={t('current_password')}
           />
         </Form.Item>
         {/* New pwd */}
@@ -119,9 +123,11 @@ const ChangePasswordForm = () => {
           ]}
         >
           <Input.Password
+            prefix={<LockOutlined />}
             name="newPassword"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            placeholder={t('new_password')}
           />
         </Form.Item>
         {/* Confirm new pwd */}
@@ -137,9 +143,11 @@ const ChangePasswordForm = () => {
           ]}
         >
           <Input.Password
+            prefix={<LockOutlined />}
             name="confirmPassword"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder={t('confirm_new_password')}
           />
         </Form.Item>
         {/* Button */}

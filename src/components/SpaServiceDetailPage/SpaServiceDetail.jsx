@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, ScheduleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 
@@ -393,6 +393,7 @@ const SpaServiceDetail = () => {
                                     onClick={handleBookingNow}
                                     disabled={serviceData.Status === 'Unavailable'}
                                     className='py-10 px-20'
+                                    icon={<ScheduleOutlined style={{ fontSize: '24px' }}/>}
                                 >
                                     {t('booking_now')}
                                 </Button>

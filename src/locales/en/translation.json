@@ -490,5 +490,6 @@
     "cofirm_cancel_booking": "Confirm cancel booking",
     "are_you_sure_cancel_booking": "Are you sure cancel booking?",
     "success_cancel_booking": "Cancel booking successfully",
-    "error_occur_cancel_booking": "Error occurred while canceling boooking"
+    "error_occur_cancel_booking": "Error occurred while canceling boooking",
+    "search": "Search"
 }

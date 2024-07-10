@@ -1,14 +1,14 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Select } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 const { Search } = Input;
-const { Option } = Select;
+const { TabPane } = Tabs;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 
@@ -20,18 +20,24 @@ const SpaBooking = () => {
   }
   const [spaBookings, setSpaBookings] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [sortOrder] = useState('desc');
   const [filteredSpaBookings, setFilteredSpaBookings] = useState([]);
-  const [sortOrder, setSortOrder] = useState('desc');
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
-
+  const [activeTab, setActiveTab] = useState('all');
+  const [bookingCount, setBookingCount] = useState({
+    all: 0,
+    completed: 0,
+    pending: 0,
+    processing: 0,
+    canceled: 0,
+  });
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [pendingStatus, setPendingStatus] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBookingDate, setSelectedBookingDate] = useState(null);
   const [selectedDateCreated, setSelectedDateCreated] = useState(null);
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState('');
 
   const getSpaBookings = async (bookingDate, dateCreated) => {
     const token = localStorage.getItem('token');
@@ -69,7 +75,7 @@ const SpaBooking = () => {
 
   useEffect(() => {
     fetchSpaBookings();
-  }, [sortOrder, selectedBookingDate, selectedDateCreated, selectedStatusFilter]);
+  }, [activeTab, sortOrder]);
 
   useEffect(() => {
     let filteredData = spaBookings.filter(booking =>
@@ -88,15 +94,9 @@ const SpaBooking = () => {
         moment(booking.date).isSame(selectedDateCreated, 'day')
       );
     }
-    // filter status
-    if (selectedStatusFilter) {
-      filteredData = filteredData.filter(booking =>
-        booking.status === selectedStatusFilter
-      );
-    }
 
     setFilteredSpaBookings(filteredData);
-  }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated, selectedStatusFilter]);
+  }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated]);
 
   const fetchSpaBookings = async () => {
     setLoading(true);
@@ -118,18 +118,26 @@ const SpaBooking = () => {
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
-      setSpaBookings(sortedData);
+
+        setBookingCount({
+          all: sortedData.length,
+          completed: sortedData.filter(booking => booking.status === 'Completed').length,
+          pending: sortedData.filter(booking => booking.status === 'Pending').length,
+          processing: sortedData.filter(booking => booking.status === 'Processing').length,
+          canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
+        });
+
+      const filteredData = activeTab === 'all'
+        ? sortedData
+        : sortedData.filter(booking => booking.status.toLowerCase() === activeTab);
+
+      setSpaBookings(filteredData);
     } catch (error) {
       console.error('Error fetching spa bookings:', error);
     } finally {
       setLoading(false);
     }
   };
-
-  const handleSortOrder = () => {
-    setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
-  };
-
   const handleUpdateStatus = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -159,15 +167,15 @@ const SpaBooking = () => {
       if (record.status === 'Pending') {
         return (
           <>
-            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>{t('processing')}</Button>
-            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
+            <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>{t('processing')}</Button>
+            <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center text-xl" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
       } else if (record.status === 'Processing') {
         return (
           <>
-            <Button type="primary" className="mr-2 w-40" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>{t('completed')}</Button>
-            <Button danger className="w-40" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
+            <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>{t('completed')}</Button>
+            <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center text-xl" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
       }
@@ -180,6 +188,8 @@ const SpaBooking = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      fixed: 'left',
+      className: 'sticky left-0 bg-white',
       render: (text, record) => (
         <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.id}</Button>
       ),
@@ -188,12 +198,13 @@ const SpaBooking = () => {
       title: t('date'),
       dataIndex: 'date',
       key: 'date',
+      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
       render: (text, record) => (
         <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text>
       ),
     },
     {
-      title: 'Booking Date',
+      title: t('booking_date'),
       dataIndex: 'bookingDate',
       key: 'bookingDate',
       render: (text, record) => (
@@ -258,10 +269,6 @@ const SpaBooking = () => {
     }
   };
 
-  const handleStatusFilterChange = (value) => {
-    setSelectedStatusFilter(value);
-  };
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -269,39 +276,22 @@ const SpaBooking = () => {
         <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
         {/* Search and filter */}
         <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
-          <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
-              {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
-            </Button>
           <div>
-            <Text>{t('filter_booking_date')}</Text>
+            <Text className="mr-1">{t('filter_booking_date')}</Text>
             <DatePicker
               onChange={handleBookingDateChange}
               style={{ width: 150, marginRight: 12 }}
             />
           </div>
           <div>
-            <Text>{t('filter_created_date')}</Text>
+            <Text className="mr-1">{t('filter_created_date')}</Text>
             <DatePicker
               onChange={handleDateCreatedChange}
               style={{ width: 150, marginRight: 12 }}
             />
           </div>
-          <div>
-            <Text>{t('filter_status')}</Text>
-            <Select
-              placeholder={t('select_status')}
-              style={{ width: 200, marginRight: 12 }}
-              onChange={handleStatusFilterChange}
-              allowClear
-            >
-              <Option value="Pending">{t('pending')}</Option>
-              <Option value="Processing">{t('processing')}</Option>
-              <Option value="Completed">{t('completed')}</Option>
-              <Option value="Canceled">{t('canceled')}</Option>
-            </Select>
-          </div>
-          <div>
-            <Text>{t('search_customer')}</Text>
+          <div className="flex md:justify-end items-center">
+            <Text className="mr-1">{t('search_customer')}:</Text>
             <Search
               placeholder={t('search')}
               onChange={(e) => handleSearch(e.target.value)}
@@ -310,6 +300,13 @@ const SpaBooking = () => {
           </div>
         </Layout>
         {/* Table */}
+        <Tabs activeKey={activeTab} onChange={setActiveTab}>
+            <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
+            <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
+            <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
+            <TabPane tab={<span>{t('processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.processing}</span></span>} key="processing" />
+            <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
+          </Tabs>
           <Spin spinning={loading}>
             <Table
               columns={columns}

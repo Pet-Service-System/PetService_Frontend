@@ -138,6 +138,7 @@ const OrderHistory = () => {
       dataIndex: 'id',
       key: 'id',
       fixed: 'left',
+      className: 'sticky left-0 bg-white',
       render: (text, record) => (
         <Button type="link" onClick={() => navigate(`/order-history-detail/${record.id}`)}>{record.id}</Button>
       ),
@@ -255,8 +256,8 @@ const OrderHistory = () => {
       )}
       <Layout className="site-layout">
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-            <h2 className="text-5xl text-center font-semibold mb-4">{t('order_history')}</h2>
-            <Layout className="flex lg:flex-row sm:flex-col justify-end mt-10 mb-4 lg:items-end">
+            <Typography.Title className="text-center font-semibold mb-4">{t('order_history')}</Typography.Title>
+            <Layout className="flex lg:flex-row sm:flex-col mt-10 mb-4 lg:items-end">
               <div>
                 <Text>{t('filter_order_date')}: </Text>
                 <DatePicker
