@@ -118,7 +118,7 @@ const ProductDetail = () => {
                 AccountID: accountID,
                 CommentID: replyingCommentId,
                 ReplyContent: replyContent,
-                ReplyDate: Date(),
+                ReplyDate: new Date(),
             };
     
             await axios.post(`${API_URL}/api/replies`, newReply, {
@@ -315,15 +315,21 @@ const ProductDetail = () => {
                                 <Form.Item
                                     name="Quantity"
                                     label={t('quantity')}
-                                    rules={[{ required: true, message: t('please_enter_quantity') }]}
-                                >
+                                    rules={[
+                                        { required: true, message: t('please_enter_quantity') },
+                                        { type: 'number', min: 1, message: t('quantity_must_be_positive') }
+                                    ]}
+                               >
                                     <Input type='number' disabled={!editMode} placeholder= {t('quantity')} />
                                 </Form.Item>
                                 <Form.Item
                                     name="Price"
                                     label={t('price')}
-                                    rules={[{ required: true, message: t('please_enter_price') }]}
-                                >
+                                    rules={[
+                                        { required: true, message: t('please_enter_price') },
+                                        { type: 'number', min: 0, message: t('price_must_be_positive') }
+                                    ]}
+                               >
                                     <Input suffix='đ' type="number" disabled={!editMode} />
                                 </Form.Item>
                                 <Form.Item
@@ -336,7 +342,7 @@ const ProductDetail = () => {
                                 <Form.Item
                                     name="Image"
                                     label={t('image')}
-                                    rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
+                                    rules={[{ required: editMode == null, message: t('please_upload_product_image') }]}
                                     className="mb-4"
                                 >
                                     <Input disabled={!editMode} type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
@@ -359,7 +365,7 @@ const ProductDetail = () => {
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
                                 <Paragraph>{`${t('quantity_in_stock')}: ${productData.Quantity}`}</Paragraph>
-                                <Paragraph className="text-green-600 text-4xl">{productData.Price.toLocaleString('en-US')}đ</Paragraph>
+                                <Paragraph className="text-green-600 text-4xl">{`${productData.Price.toLocaleString('en-US')}đ`}</Paragraph>
                                 <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 5, expandable: true, symbol: 'more' }}>{`${t('description')}: ${productData.Description}`}</Paragraph>
                             </div>
                         )}

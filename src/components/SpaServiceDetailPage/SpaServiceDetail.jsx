@@ -335,8 +335,11 @@ const SpaServiceDetail = () => {
                             <Form.Item
                                 name="ServiceName"
                                 label={t('service_name')}
-                                rules={[{ required: true, message: t('enter_service_name') }]}
-                            >
+                                rules={[
+                                  { required: true, message: t('enter_service_name') },
+                                  { max: 100, message: t('service_name_too_long') }
+                                ]}
+                           >
                                 <Input disabled={!editMode} />
                             </Form.Item>
                             {/* <Form.Item
@@ -349,18 +352,21 @@ const SpaServiceDetail = () => {
                             <Form.Item
                                 name="Description"
                                 label={t('description')}
-                                rules={[{ required: true, message:  t('enter_service_description') }]}
-                            >
+                                rules={[
+                                  { required: true, message: t('enter_service_description') },
+                                  { max: 1000, message: t('description_too_long') }
+                                ]}
+                           >
                                 <TextArea disabled={!editMode} rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} />
                             </Form.Item>
                             <Form.Item
-                                    name="Image"
-                                    label={t('image')}
-                                    rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
-                                    className="mb-4"
-                                >
-                                    <Input disabled={!editMode} type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
-                                    {productImg && (
+                                name="Image"
+                                label={t('image')}
+                                rules={[{ required: !serviceData.ImageURL, message: t('please_upload_product_image') }]}
+                                className="mb-4"
+                            >
+                                <Input disabled={!editMode} type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
+                                {productImg && (
                                     <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
                                     )}
                                 </Form.Item>
@@ -434,7 +440,7 @@ const SpaServiceDetail = () => {
                             <Form.Item
                                 name="CustomerName"
                                 label={t('customer_name')}
-                                rules={[{ required: true, message: t('unavailaplz_enter_customer_nameble') }]}
+                                rules={[{ required: true, message: t('plz_enter_customer_name') }]}
                                 initialValue={user?.fullname}
                             >
                                 <Input placeholder={t('enter_name')} />
@@ -558,8 +564,11 @@ const SpaServiceDetail = () => {
                             <Form.Item
                                 name="PetWeight"
                                 label={t('pet_weight')}
-                                rules={[{ required: true, message: t('plz_enter_pet_weight') }]}
-                            >
+                                rules={[
+                                  { required: true, message: t('plz_enter_pet_weight') },
+                                  { type: 'number', min: 0, message: t('weight_must_be_positive') }
+                                ]}
+                           >
                                 <Input suffix="kg" placeholder={t('enter_pet_weight')} type="number" />
                             </Form.Item>
                         </Col>
@@ -567,9 +576,12 @@ const SpaServiceDetail = () => {
                             <Form.Item
                                 name="PetAge"
                                 label={t('pet_age')}
-                                rules={[{ required: true, message: t('plz_enter_pet_age') }]}
+                                rules={[
+                                  { required: true, message: t('plz_enter_pet_age') },
+                                  { type: 'number', min: 0, message: t('age_must_be_positive') }
+                                ]}
                             >
-                                <Input suffix="tuổi" placeholder={t('enter_pet_weight')} type="number" />
+                                <Input suffix={t('age')} placeholder={t('enter_pet_age')} type="number" />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -614,17 +626,29 @@ const SpaServiceDetail = () => {
                 ]}
             >
                 <Form form={addPetForm} layout="vertical">
-                    <Form.Item name="PetName" rules={[{ required: true, message: t('not_null_pet_name') }]}>
+                    <Form.Item
+                        name="PetName"
+                        label={t('pet_name')}
+                        rules={[{ required: true, message: t('not_null_pet_name') }]}
+                    >
                         <Input placeholder={t('pet_name')} />
                     </Form.Item>
-                    <Form.Item name="PetTypeID" rules={[{ required: true, message: t('not_null_pet_type') }]}>
+                    <Form.Item
+                        name="PetTypeID"
+                        label={t('choose_pet_type')}
+                        rules={[{ required: true, message: t('not_null_pet_type') }]}
+                    >
                         <Select placeholder={t('choose_pet_type')}>
                             <Option value="PT001">{t('dog')}</Option>
                             <Option value="PT002">{t('cat')}</Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="Gender" rules={[{ required: true, message: t('not_null_pet_gender') }]}>
-                        <Select placeholder={t('choose_gender')}>
+                    <Form.Item
+                        name="Gender"
+                        label={t('choose_gender')}
+                        rules={[{ required: true, message: t('not_null_pet_gender') }]}
+                    >
+                       <Select placeholder={t('choose_gender')}>
                             {genders.map((gender, index) => (
                                 <Option key={index} value={gender}>
                                     {gender}
@@ -632,13 +656,31 @@ const SpaServiceDetail = () => {
                             ))}
                         </Select>
                     </Form.Item>
-                    <Form.Item name="Status" rules={[{ required: true, message: t('not_null_pet_status') }]}>
-                        <Input placeholder={t('pet_status')} />
+                    <Form.Item
+                        name="Status"
+                        label={t('pet_status')}
+                        rules={[{ required: true, message: t('not_null_pet_status') }]}
+                    >
+                       <Input placeholder={t('pet_status')} />
                     </Form.Item>
-                    <Form.Item name="Weight" rules={[{ required: true, message: t('not_null_pet_weight') }]}>
+                    <Form.Item
+                        name="Weight"
+                        label={t('pet_weight')}
+                        rules={[
+                          { required: true, message: t('not_null_pet_weight') },
+                          { type: 'number', min: 0, message: t('weight_must_be_positive') }
+                        ]}
+                    >
                         <Input placeholder={t('pet_weight')} type="number" />
                     </Form.Item>
-                    <Form.Item name="Age" rules={[{ required: true, message: t('not_null_pet_age') }]}>
+                    <Form.Item
+                        name="Age"
+                        label={t('pet_age')}
+                        rules={[
+                          { required: true, message: t('not_null_pet_age') },
+                          { type: 'number', min: 0, message: t('age_must_be_positive') }
+                        ]}
+                    >
                         <Input placeholder={t('pet_age')} type="number" />
                     </Form.Item>
                 </Form>
