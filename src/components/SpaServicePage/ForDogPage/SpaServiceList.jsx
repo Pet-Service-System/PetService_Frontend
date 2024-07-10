@@ -21,7 +21,7 @@ const SpaServiceList = () => {
   const [form] = Form.useForm();
   const [serviceImg, setServiceImg] = useState(""); // For image upload
   const navigate = useNavigate();
-  const [filteredServices, setfilteredServices] = useState([]); // State for filtered data
+  const [filteredServices, setFilteredServices] = useState([]); // State for filtered data
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const { t } = useTranslation();
 
@@ -45,7 +45,7 @@ const SpaServiceList = () => {
     const filteredData = serviceData.filter(service =>
       service.ServiceName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setfilteredServices(filteredData);
+    setFilteredServices(filteredData);
   }, [searchQuery, serviceData]);
 
 
@@ -106,20 +106,8 @@ const SpaServiceList = () => {
       }
     } catch (error) {
       console.error('Error adding service:', error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          message.error(t('unauthorized'));
-        } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('add_error')}: ${error.response.data.message}`);
-        } else {
-          message.error(t('add_error'));
-        }
-      } else if (error.request) {
-        message.error(t('network_error'));
-      } else {
-        message.error(`${t('add_error')}: ${error.message}`);
-      }
-    } finally {
+      handleErrorResponse(error, t('add_error'));
+     } finally {
       setSaving(false); // End saving
     }
   };
@@ -180,20 +168,8 @@ const SpaServiceList = () => {
       }
     } catch (error) {
       console.error('Error updating service:', error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          message.error(t('unauthorized'));
-        } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('update_error')}: ${error.response.data.message}`);
-        } else {
-          message.error(t('update_error'));
-        }
-      } else if (error.request) {
-        message.error(t('network_error'));
-      } else {
-        message.error(`${t('update_error')}: ${error.message}`);
-      }
-    } finally {
+      handleErrorResponse(error, t('update_error'));
+     } finally {
       setSaving(false); // End saving
     }
   };
@@ -202,6 +178,22 @@ const SpaServiceList = () => {
     const file = e.target.files[0];
     setServiceImg(file);
     form.setFieldsValue({ Image: file });
+  };
+
+  const handleErrorResponse = (error, defaultMessage) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        message.error(t('unauthorized'));
+      } else if (error.response.data && error.response.data.message) {
+        message.error(`${defaultMessage}: ${error.response.data.message}`);
+      } else {
+        message.error(defaultMessage);
+      }
+    } else if (error.request) {
+      message.error(t('network_error'));
+    } else {
+      message.error(`${defaultMessage}: ${error.message}`);
+    }
   };
 
   const columns = [

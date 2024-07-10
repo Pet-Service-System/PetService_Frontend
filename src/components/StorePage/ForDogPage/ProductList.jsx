@@ -374,24 +374,32 @@ const ProductList = () => {
           <Form.Item
             name="Price"
             label={t('price')}
-            rules={[{ required: true, message: t('please_enter_price') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('please_enter_price') },
+              { type: 'number', min: 0, message: t('price_must_be_positive') }
+            ]}
+           className="mb-4"
           >
             <Input type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Description"
             label={t('description')}
-            rules={[{ required: true, message: t('please_enter_description') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('please_enter_description') },
+              { max: 500, message: t('description_too_long') }
+            ]}
+           className="mb-4"
           >
             <TextArea rows={4} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
             label={t('image')}
-            rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
-            className="mb-4"
+            rules={[
+              { required: editMode == null, message: t('please_upload_product_image') }
+            ]}
+           className="mb-4"
           >
             <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
             {productImg && (
@@ -401,16 +409,21 @@ const ProductList = () => {
           <Form.Item
             name="Quantity"
             label={t('quantity')}
-            rules={[{ required: true, message: t('enter_product_quantity') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('enter_product_quantity') },
+              { type: 'number', min: 0, message: t('quantity_must_be_positive') }
+            ]}
+           className="mb-4"
           >
             <Input type='number' placeholder={t('quantity')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Status"
             label={t('status')}
-            rules={[{ required: true, message: t('select_product_status') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('select_product_status') }
+            ]}
+           className="mb-4"
           >
             <Select placeholder={t('status')}>
               <Option value="Available">{t('available')}</Option>

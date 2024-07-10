@@ -21,8 +21,8 @@ const ProductList = () => {
   const [form] = Form.useForm();
   const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
-  const [filteredProducts, setfilteredProducts] = useState([]); // State for filtered data
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { t } = useTranslation();
 
   const fetchProducts = async () => {
@@ -45,7 +45,7 @@ const ProductList = () => {
     const filteredData = productData.filter(product =>
       product.ProductName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setfilteredProducts(filteredData);
+    setFilteredProducts(filteredData);
   }, [searchQuery, productData]);
 
   const handleProductClick = (id) => {
@@ -94,7 +94,7 @@ const ProductList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('product_added_successfully'))
+        message.success(t('product_added_successfully'));
         form.resetFields();
         setProductImg("");
         fetchProducts();
@@ -104,20 +104,8 @@ const ProductList = () => {
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          message.error(t('unauthorized_please_log_in'));
-        } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('error_adding_product')}: ${error.response.data.message}`);
-        } else {
-          message.error(t('error_adding_product'));
-        }
-      } else if (error.request) {
-        message.error(t('error_adding_product_network_or_server_issue'));
-      } else {
-        message.error(`${t('error_adding_product')}: ${error.message}`);
-      }
-    } finally {
+      handleErrorResponse(error, t('error_adding_product'));
+     } finally {
       setSaving(false); // End saving
     }
   };
@@ -180,20 +168,8 @@ const ProductList = () => {
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      if (error.response) {
-        if (error.response.status === 401) {
-          message.error(t('unauthorized_please_log_in'));
-        } else if (error.response.data && error.response.data.message) {
-          message.error(`${t('error_updating_product')}: ${error.response.data.message}`);
-        } else {
-          message.error(t('error_updating_product'));
-        }
-      } else if (error.request) {
-        message.error(t('error_updating_product_network_or_server_issue'));
-      } else {
-        message.error(`${t('error_updating_product')}: ${error.message}`);
-      }
-    } finally {
+      handleErrorResponse(error, t('error_updating_product'));
+     } finally {
       setSaving(false); // End saving
     }
   };
@@ -202,6 +178,22 @@ const ProductList = () => {
     const file = e.target.files[0];
     setProductImg(file);
     form.setFieldsValue({ Image: file });
+  };
+
+  const handleErrorResponse = (error, defaultMessage) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        message.error(t('unauthorized_please_log_in'));
+      } else if (error.response.data && error.response.data.message) {
+        message.error(`${defaultMessage}: ${error.response.data.message}`);
+      } else {
+        message.error(defaultMessage);
+      }
+    } else if (error.request) {
+      message.error(t('error_network_or_server_issue'));
+    } else {
+      message.error(`${defaultMessage}: ${error.message}`);
+    }
   };
 
   const columns = [
@@ -374,7 +366,7 @@ const ProductList = () => {
           <Form.Item
             name="Price"
             label={t('price')}
-            rules={[{ required: true, message: t('please_enter_price') }]}
+            rules={[{ required: true, message: t('please_enter_price') }, { type: 'number', min: 0, message: t('price_must_be_non_negative') }]}
             className="mb-4"
           >
             <Input suffix='đ' type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
@@ -390,7 +382,7 @@ const ProductList = () => {
           <Form.Item
             name="Image"
             label={t('image')}
-            rules={[{ required: editMode == null, message: t('Please upload the product image!') }]}
+            rules={[{ required: editMode == null, message: t('please_upload_product_image') }]}
             className="mb-4"
           >
             <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
@@ -401,7 +393,7 @@ const ProductList = () => {
           <Form.Item
             name="Quantity"
             label={t('quantity')}
-            rules={[{ required: true, message: t('enter_product_quantity') }]}
+            rules={[{ required: true, message: t('enter_product_quantity') }, { type: 'number', min: 0, message: t('quantity_must_be_non_negative') }]}
             className="mb-4"
           >
             <Input type='number' placeholder={t('quantity')} className="w-full p-2 border border-gray-300 rounded" />
