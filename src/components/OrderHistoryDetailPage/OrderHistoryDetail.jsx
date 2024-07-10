@@ -394,6 +394,7 @@ const OrderHistoryDetail = () => {
           type="primary"
           onClick={() => openModal(record.ProductID)}
           disabled={order.Status !== 'Shipped' || isSubmitting ||record.isCommented === true}
+          className='min-w-[100px] w-auto px-2 py-1 text-center text-xl'
         >
           {record.isCommented ? t('commented') : t('comment')}
         </Button>
@@ -452,7 +453,7 @@ const OrderHistoryDetail = () => {
         }
         
         {/* Render the cancel button conditionally */}
-        {(role === 'Customer' || role === 'Sales Staff') && order.Status === 'Processing' && (
+        {(role === 'Customer') && order.Status === 'Processing' && (
           <Button danger className="float-end" onClick={handleCancelOrder} disabled={isSubmitting}>
             {t('cancel_order')}
           </Button>

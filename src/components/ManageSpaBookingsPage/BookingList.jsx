@@ -269,7 +269,7 @@ const SpaBooking = () => {
         <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
         {/* Search and filter */}
         <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
-        <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
+          <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
               {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
             </Button>
           <div>

@@ -163,6 +163,8 @@ const AccountList = () => {
     {
       title: t('actions'),
       key: 'actions',
+      fixed: 'right',
+      className: 'sticky right-0 bg-white',
       render: (_, record) => (
         // Check if the role is "Administrator" and disable the edit button accordingly
         record.role === 'Administrator' ? (

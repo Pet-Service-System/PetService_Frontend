@@ -153,7 +153,7 @@
     "product_updated_successfully": "Product updated successfully",
     "unauthorized": "Unauthorized. Please log in.",
     "error_updating_product": "Error updating product",
-    "register": "Register",
+    "register": "Create a new account",
     "email": "Email",
     "confirm_password": "Confirm Password",
     "phone_number": "Phone Number",
@@ -481,5 +481,14 @@
     "please_enter_reply_content": "Please enter reply content",
     "replied": "Replied",
     "commented": "Commented",
-    "reviewed": "Reviewed"
+    "reviewed": "Reviewed",
+    "log_in_using_your_account_on": "Log in using your account on",
+    "login": "Login",
+    "logging": "Logging in...",
+    "all": "All",
+    "cancel_booking": "Cancel booking",
+    "cofirm_cancel_booking": "Confirm cancel booking",
+    "are_you_sure_cancel_booking": "Are you sure cancel booking?",
+    "success_cancel_booking": "Cancel booking successfully",
+    "error_occur_cancel_booking": "Error occurred while canceling boooking"
 }

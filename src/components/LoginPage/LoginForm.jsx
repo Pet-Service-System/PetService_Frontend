@@ -1,15 +1,16 @@
 /* eslint-disable no-irregular-whitespace */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, message, Row, Col } from 'antd';
+import { Form, Input, Button, Typography, message, Row, Col, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import 'tailwindcss/tailwind.css';
 import { useTranslation } from 'react-i18next';
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
 
 const GOOGLE_CLIENT_ID = import.meta.env.REACT_APP_GOOGLE_CLIENT_ID
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const LoginForm = () => {
@@ -145,13 +146,12 @@ const LoginForm = () => {
   return (
     <GoogleOAuthProvider clientId={GoogleClientID}>
       <Row justify="center" style={{ alignItems: 'center' }}>
-        <Col xs={24} sm={20} md={16} lg={12} xl={8} className='px-10 py-10'>
-          <div className="p-6 md:p-12 bg-white rounded-lg shadow-md">
-            <Title level={3} className="text-blue-500 text-center">{t('log_in')}</Title>
+        <Col xs={24} sm={20} md={16} lg={12} xl={9} className='px-10 py-10'>
+          <div className="p-6 md:p-12 bg-white rounded-lg shadow-lg">
+            <Title level={2} className="text-center text-blue-600 py-10">{t('log_in')}</Title>
             <Form onFinish={handleSubmit} layout="vertical">
               {/* Email */}
               <Form.Item
-                label="Email"
                 name="email"
                 validateTrigger="onSubmit"
                 rules={[
@@ -165,11 +165,12 @@ const LoginForm = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   name="email"
                   autoComplete="email"
+                  prefix={<MailOutlined />}
+                  placeholder={t('email')}
                 />
               </Form.Item>
               {/* Password */}
               <Form.Item
-                label={t('password')}
                 name="password"
                 validateTrigger="onSubmit"
                 rules={[
@@ -181,24 +182,28 @@ const LoginForm = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   name="password"
+                  prefix={<LockOutlined />}
+                  placeholder={t('password')}
                 />
               </Form.Item>
               {/* Button */}
-              <Form.Item className="w-full">
+              <Form.Item>
                 <Button type="primary" htmlType="submit" className="w-full" disabled={isLoading || disableLogin}>
-                  {disableLogin ? 'Logging in...' : 'Login'}
+                  {disableLogin ? t('logging') : t('login')}
                 </Button>
               </Form.Item>
-              {/* Register and Forgot password button */}
-              <div className="flex justify-between items-center w-full">
-                <Button type="link" onClick={() => navigate('/register')} className="p-0">
-                  {t('register')}
+              <Form.Item>
+                <Button onClick={() => navigate('/register')} className="w-full">
+                    {t('register')}
                 </Button>
+              </Form.Item>
+              <Form.Item className="text-right">
                 <Button type="link" onClick={() => navigate('/forgot-password')} className="p-0">
-                  {t('forgot_password')}?
+                    {t('forgot_password')}?
                 </Button>
-              </div>
+              </Form.Item>
             </Form>
+            <Text>{t('log_in_using_your_account_on')}:</Text>
             {/* Google Login button */}
             <div className="mt-6 text-center">
               <GoogleLogin

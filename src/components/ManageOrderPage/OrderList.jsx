@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker, Select } from "antd";
+import { Table, Button, Typography, Layout, Spin, message, Modal, Input, DatePicker, Tabs, Tag } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ const { Text, Title } = Typography;
 const { confirm } = Modal;
 const { Search } = Input;
 const API_URL = import.meta.env.REACT_APP_API_URL;
-const { Option } = Select;
+const { TabPane } = Tabs;
 
 const OrderList = () => {
   const navigate = useNavigate();
@@ -18,14 +18,21 @@ const OrderList = () => {
     navigate('/')
   }
   const [orders, setOrders] = useState([]);
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [activeTab, setActiveTab] = useState('all'); 
+  const [sortOrder] = useState('desc');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState(null); // State for selected date filter
   const [confirmLoading, setConfirmLoading] = useState(false); // State to track modal loading state
   const [filteredOrderByDate, setFilteredOrderByDate] = useState([]);
-  const [statusFilter, setStatusFilter] = useState(null); // State cho filter trạng thái
   const { t } = useTranslation();
+  const [orderCounts, setOrderCounts] = useState({
+    all: 0,
+    Processing: 0,
+    Delivering: 0,
+    Shipped: 0,
+    Canceled: 0
+  });
   
   const getOrderHistory = async () => {
     const token = localStorage.getItem('token');
@@ -37,6 +44,28 @@ const OrderList = () => {
       });
 
       const orders = response.data;
+
+      const sanitizedData = orders.map(order => ({
+        OrderID: order.OrderID,
+        OrderDate: order.OrderDate,
+        Status: order.Status,
+        TotalPrice: order.TotalPrice,
+        AccountID: order.AccountID,
+      }));
+
+      const counts = sanitizedData.reduce((acc, order) => {
+        acc.all += 1;
+        acc[order.Status] += 1;
+        return acc;
+      }, {
+        all: 0,
+        Processing: 0,
+        Delivering: 0,
+        Shipped: 0,
+        Canceled: 0
+      });
+
+      setOrderCounts(counts);
 
       // Fetch order details for each order
       const orderDetailsPromises = orders.map(order =>
@@ -95,10 +124,6 @@ const OrderList = () => {
       booking.phone.includes(searchQuery)
     );
 
-    if (statusFilter) {
-      filteredData = filteredData.filter(booking => booking.status === statusFilter);
-    }
-
     if (selectedDate) {
       filteredData = filteredData.filter(booking =>
         moment(booking.date).isSame(selectedDate, 'day')
@@ -106,11 +131,7 @@ const OrderList = () => {
     }
 
     setFilteredOrderByDate(filteredData);
-  }, [searchQuery, orders, selectedDate, statusFilter]);
-
-  const handleSortOrder = () => {
-    setSortOrder(prevSortOrder => prevSortOrder === 'desc' ? 'asc' : 'desc');
-  };
+  }, [searchQuery, orders, selectedDate]);
 
   const showConfirm = (orderId, newStatus) => {
     confirm({
@@ -124,6 +145,10 @@ const OrderList = () => {
         console.log('Cancelled');
       },
     });
+  };
+
+  const handleTabChange = (key) => {
+    setActiveTab(key);
   };
 
   const handleUpdateStatus = async (orderId, newStatus) => {
@@ -155,17 +180,21 @@ const OrderList = () => {
         case 'Processing':
           return (
             <div>
-              <Button type="primary" className="w-40 mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
+              <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2" onClick={() => showConfirm(record.id, 'Delivering')} disabled={confirmLoading}>
                 {t('delivering')}
               </Button>
-              <Button danger className="w-40 mr-2" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
+              <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center" onClick={() => showConfirm(record.id, 'Canceled')} disabled={confirmLoading}>
                 {t('cancel')}
               </Button>
             </div>
           );
         case 'Delivering':
           return (
-            <Button type="primary" className="w-36 mr-2" onClick={() => showConfirm(record.id, 'Shipped')} disabled={confirmLoading}>
+            <Button
+              className="min-w-[100px] text-white w-auto px-2 py-1 text-center mr-2 bg-green-500 hover:bg-green-600" 
+              onClick={() => showConfirm(record.id, 'Shipped')}
+              disabled={confirmLoading}
+            >
               {t('delivered')}
             </Button>
           );
@@ -190,6 +219,7 @@ const OrderList = () => {
       title: t('date'),
       dataIndex: 'date',
       key: 'date',
+      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
       render: (text, record) => (
         <Text>{moment(record.date).format('DD/MM/YYYY HH:mm')}</Text> // Format date using moment.js
       ),
@@ -217,14 +247,12 @@ const OrderList = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Text className={
-          record.status === 'Shipped' ? 'text-green-600' :
-            record.status === 'Pending' ? 'text-yellow-500' :
-            record.status === 'Processing' ? 'text-orange-600' :
-              'text-red-600'
-        }>
-          {record.status}
-        </Text>
+        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Shipped' ? 
+                  'green' : record.status === 'Pending' ? 
+                  'orange' : record.status === 'Processing' ? 
+                  'blue' : 'red'}>
+        {record.status}
+        </Tag>
       )
     },
     {
@@ -253,32 +281,15 @@ const OrderList = () => {
           <Title className="text-5xl text-center font-semibold">{t('ordered_list')}</Title>
           {/* Search and filter */}
           <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
-            <Button onClick={handleSortOrder} style={{ width: 200 }} className="mr-10">
-              {t('sort_by_date')}: {sortOrder === 'desc' ? t('newest') : t('oldest')}
-            </Button>
             <div>
-              <Text>{t('filter_order_date')}:</Text> {/* Chỉnh sửa key dịch nếu cần thiết */}
+              <Text className="mr-1">{t('filter_order_date')}:</Text> {/* Chỉnh sửa key dịch nếu cần thiết */}
               <DatePicker
                 onChange={handleDateChange}
                 style={{ width: 200 }}
               />
             </div>
-            <div>
-              <Text>{t('filter_status')}</Text>
-              <Select
-                placeholder={t('select_status')}
-                style={{ width: 200, marginRight: 12 }}
-                onChange={setStatusFilter}
-                allowClear
-              >
-                <Option value="Processing">{t('Processing')}</Option>
-                <Option value="Delivering">{t('Delivering')}</Option>
-                <Option value="Shipped">{t('Shipped')}</Option>
-                <Option value="Canceled">{t('canceled')}</Option>
-              </Select>
-            </div>
-            <div>
-              <Text>{t('search_customer')}</Text>
+            <div className="flex justify-end items-center">
+              <Text className="mr-1">{t('search_customer')}:</Text>
               <Search
                 placeholder={t('search_by_customer')}
                 onChange={(e) => handleSearch(e.target.value)}
@@ -287,6 +298,13 @@ const OrderList = () => {
             </div>
           </Layout>
           {/* Table */}
+          <Tabs activeKey={activeTab} onChange={handleTabChange}>
+              <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{orderCounts.all}</span></span>} key="all" />
+              <TabPane tab={<span>{t('Processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{orderCounts.Processing}</span></span>} key="Processing" />
+              <TabPane tab={<span>{t('Delivering')} <span className="inline-block bg-orange-200 text-orange-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{orderCounts.Delivering}</span></span>} key="Delivering" />
+              <TabPane tab={<span>{t('Shipped')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{orderCounts.Shipped}</span></span>} key="Shipped" />
+              <TabPane tab={<span>{t('Canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{orderCounts.Canceled}</span></span>} key="Canceled" />
+            </Tabs>
           <Spin spinning={loading}>
             <Table
               columns={columns}

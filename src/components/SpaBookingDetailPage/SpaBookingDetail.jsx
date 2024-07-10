@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
+const { confirm } = Modal;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaBookingDetail = () => {
@@ -13,6 +14,7 @@ const SpaBookingDetail = () => {
   const [spaBookingDetail, setSpaBookingDetail] = useState(null);
   const [serviceData, setServiceData] = useState(null)
   const [loading, setLoading] = useState(false);
+  const role = localStorage.getItem('role')
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation();
@@ -62,24 +64,26 @@ const SpaBookingDetail = () => {
     }
   }
 
+  
+  const fetchSpaBooking = async () => {
+    setLoading(true);
+    try {
+      const booking = await getSpaBookingById(id);
+      const bookingDetail = await getSpaBookingDetail(id);
+      const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID)
+      setSpaBooking(booking);
+      setSpaBookingDetail(bookingDetail);
+      setServiceData(serviceInfo)
+    } catch (error) {
+      console.error('Error fetching spa booking:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSpaBooking = async () => {
-      setLoading(true);
-      try {
-        const booking = await getSpaBookingById(id);
-        const bookingDetail = await getSpaBookingDetail(id);
-        const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID)
-        setSpaBooking(booking);
-        setSpaBookingDetail(bookingDetail);
-        setServiceData(serviceInfo)
-      } catch (error) {
-        console.error('Error fetching spa booking:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchSpaBooking();
-  }, [id]);
+  }, []);
 
   if (loading || !spaBooking || !spaBookingDetail) {
     return <Spin size="large" className="flex justify-center items-center h-screen" />;
@@ -109,6 +113,43 @@ const SpaBookingDetail = () => {
       ),
     },
   ];
+
+  const handleCancelBooking = async () => {
+    confirm({
+      title: t('cofirm_cancel_booking'),
+      icon: <ExclamationCircleOutlined />,
+      content: t('are_you_sure_cancel_booking'),
+      okText: t('agree'),
+      cancelText: t('cancel'),
+      onOk: async () => {
+        try {
+          const token = localStorage.getItem('token');
+          // Make API call to update order status to 'Canceled'
+          const response = await axios.put(
+            `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
+            { Status: 'Canceled' },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.status !== 200) {
+            throw new Error(`Failed to cancel booking ${spaBooking.OrderID}`);
+          }
+
+          fetchSpaBooking();
+
+          // Show success message
+          message.success(t('success_cancel_booking'));
+        } catch (error) {
+          console.error('Error cancelling booking:', error);
+          message.error(t('error_occur_cancel_booking'));
+        }
+      },
+    });
+  };
 
   return ( spaBookingDetail &&
     <div className="p-4 md:p-8 lg:p-12">
@@ -206,6 +247,12 @@ const SpaBookingDetail = () => {
             <Text strong>{t('feedback')}: </Text>
             <Text>{spaBookingDetail.Feedback}</Text>
           </div>
+        )}
+        {/* Render the cancel button conditionally */}
+        {(role === 'Customer') && spaBooking.Status === 'Pending' && (
+          <Button danger className="float-end" onClick={handleCancelBooking}>
+            {t('cancel_booking')}
+          </Button>
         )}
       </Card>
     </div>
