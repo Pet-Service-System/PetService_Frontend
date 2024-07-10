@@ -3,13 +3,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  UserOutlined,
-  MailOutlined,
-  LockOutlined,
-  PhoneOutlined,
-  HomeOutlined,
-} from '@ant-design/icons';
+import { UserOutlined, MailOutlined, LockOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons';
+
 
 const { Title } = Typography;
 const API_URL = import.meta.env.REACT_APP_API_URL;
@@ -27,25 +22,59 @@ const RegisterForm = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const validate = () => {
+  const validate = async () => {
     const newErrors = {};
-    if (!fullname) newErrors.fullname = t('fullname_required');
-    if (!email) newErrors.email = t('email_required');
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+
+    if (!fullname) {
+      newErrors.fullname = t('fullname_required');
+    } else if (fullname.length < 2 || fullname.length > 50) {
+      newErrors.fullname = t('fullname_length');
+    }
+
+    if (!email) {
+      newErrors.email = t('email_required');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = t('email_invalid');
+    } else {
+      const emailExists = await checkEmailExists(email);
+      console.log(emailExists);
+      if (emailExists) {
+        newErrors.email = t('email_already_used');
+      }
     }
     if (!password) {
       newErrors.password = t('password_required');
-    } else if (password.length < 8) {
-      newErrors.password = t('password_must_have_8_characters');
+    } else if (password.length < 8 || !/[a-zA-Z]/.test(password)) {
+      newErrors.password = t('password_must_have_8_characters_and_word');
     }
-    if (password !== confirmPassword) newErrors.confirmPassword = t('passwords_do_not_match');
-    if (!phoneNumber) newErrors.phoneNumber = t('phone_number_required');
-    else if (!/^\d{10}$/.test(phoneNumber)) {
+
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = t('passwords_do_not_match');
+    }
+
+    if (!phoneNumber) {
+      newErrors.phoneNumber = t('phone_number_required');
+    } else if (!/^\d{10}$/.test(phoneNumber)) {
       newErrors.phoneNumber = t('phone_must_have_10_numbers');
     }
-    if (!address) newErrors.address = t('address_required');
+
+    if (!address) {
+      newErrors.address = t('address_required');
+    } else if (address.length < 2 || address.length > 100) {
+      newErrors.address = t('address_length');
+    }
+
     return newErrors;
+  };
+
+  const checkEmailExists = async (email) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/check-email`, { email });
+      return response.data.exists;
+    } catch (error) {
+      console.error('Error checking email existence:', error);
+      return false;
+    }
   };
 
   useEffect(() => {
@@ -62,7 +91,7 @@ const RegisterForm = () => {
   const handleSubmit = async () => {
     if (disableRegister) return;
 
-    const validationErrors = validate();
+    const validationErrors = await validate();
     if (Object.keys(validationErrors).length === 0) {
       try {
         setIsLoading(true);
@@ -140,7 +169,7 @@ const RegisterForm = () => {
               name="password"
               validateStatus={errors.password && 'error'}
               help={errors.password}
-              rules={[{ required: true, message: t('plz_enter_password')}]}
+              rules={[{ required: true, message: t('plz_enter_password') }]}
             >
               <Input.Password
                 prefix={<LockOutlined />}

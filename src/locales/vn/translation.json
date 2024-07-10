@@ -496,5 +496,10 @@
     "are_you_sure_cancel_booking": "Bạn có chắc chắn muốn hủy đặt chỗ?",
     "success_cancel_booking": "Hủy đặt chỗ thành công",
     "error_occur_cancel_booking": "Có lỗi xảy ra khi hủy đặt chỗ",
-    "search": "Tìm kiếm"
+    "search": "Tìm kiếm",
+    "email_already_used": "Địa chỉ email này đã được sử dụng.",
+    "password_must_have_8_characters_and_word": "Mật khẩu phải dài ít nhất 8 ký tự và chứa ít nhất một chữ cái.",
+    "address_length": "Địa chỉ phải dài từ 5 đến 100 ký tự.",
+    "fullname_length": "Tên đầy đủ phải dài từ 2 đến 50 ký tự.",
+    "email_not_exist": "Địa chỉ email này không tồn tại."
 }
