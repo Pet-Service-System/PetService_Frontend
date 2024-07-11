@@ -381,8 +381,13 @@ const OrderHistoryDetail = () => {
       title: t('price'),
       dataIndex: 'Price',
       key: 'Price',
-      render: (text) => <span className="text-green-600">{text.toLocaleString('en-US')}</span>,
-    },
+      render: (text) => {
+        if (typeof text === 'number') {
+          return <span className="text-green-600">{text.toLocaleString('en-US')}</span>;
+        }
+        return null;
+      },
+    }    
   ];
 
   if (role === 'Customer') {

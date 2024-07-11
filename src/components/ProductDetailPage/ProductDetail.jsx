@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate, Modal } from 'antd';
+import { Button, Input, Image, Form, message, Typography, Skeleton, Select, List, Rate, Modal, Spin } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -412,74 +412,82 @@ const ProductDetail = () => {
                 </div>
                 {/* Comment section */}
                 <div className="m-5 px-4 md:px-32">
-                    {comments.length > 0 && (
-                        <div className='text-right'>
-                            <Rate disabled allowHalf value={calculateAverageRating(comments)} />
-                            <span style={{ marginLeft: '10px' }}>
-                                {comments.length} {comments.length === 1 ? t('review') : t('reviews')}
-                            </span>
+                    {loading ? (
+                        <div className="text-center py-8">
+                            <Spin size="large" />
                         </div>
-                    )}
-                    <div className="border-t border-gray-300 my-8"></div>
-                    <Title level={4}>{t('product_reviews')}</Title>
-                    <List
-                        dataSource={comments}
-                        renderItem={(comment) => (
-                            <>
-                                {/* Comment section */}
-                                <List.Item key={comment.CommentID} className="border-b">
-                                    <List.Item.Meta
-                                        title={
-                                            <span>
-                                                <Rate disabled value={comment.Rating} /><br/>
-                                                {comment.username} 
-                                                <Text className='text-gray-400'> - {moment(comment.CommentDate).format('DD/MM/YYYY')}</Text>
-                                            </span>
-                                        }
-                                        description={comment.CommentContent}
-                                    />
-                                    {role === 'Sales Staff' && (
-                                        <div className="ml-8">
-                                            <Button type="primary" onClick={() => startReply(comment.CommentID)} disabled={comment.isReplied === true}>
-                                                {comment.isReplied ? t('replied') : t('reply')}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </List.Item>
+                    ) : (
+                        <>
+                            {comments.length > 0 && (
+                                <div className='text-right'>
+                                    <Rate disabled allowHalf value={calculateAverageRating(comments)} />
+                                    <span style={{ marginLeft: '10px' }}>
+                                        {comments.length} {comments.length === 1 ? t('review') : t('reviews')}
+                                    </span>
+                                </div>
+                            )}
+                            <div className="border-t border-gray-300 my-8"></div>
+                            <Title level={4}>{t('product_reviews')}</Title>
+                            <List
+                                dataSource={comments}
+                                renderItem={(comment) => (
+                                    <>
+                                        {/* Comment section */}
+                                        <List.Item key={comment.CommentID} className="border-b">
+                                            <List.Item.Meta
+                                                title={
+                                                    <span>
+                                                        <Rate disabled value={comment.Rating} /><br/>
+                                                        {comment.username} 
+                                                        <Text className='text-gray-400'> - {moment(comment.CommentDate).format('DD/MM/YYYY')}</Text>
+                                                    </span>
+                                                }
+                                                description={comment.CommentContent}
+                                            />
+                                            {role === 'Sales Staff' && (
+                                                <div className="ml-8">
+                                                    <Button type="primary" onClick={() => startReply(comment.CommentID)} disabled={comment.isReplied === true}>
+                                                        {comment.isReplied ? t('replied') : t('reply')}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </List.Item>
 
-                                {/* Reply section */}
-                                {replyingCommentId === comment.CommentID && (
-                                    <div className="ml-8 mt-4">
-                                        <TextArea
-                                            rows={2}
-                                            value={replyContent}
-                                            onChange={handleReplyContentChange}
-                                            placeholder={t('enter_reply_content')}
-                                        />
-                                        <div className="mt-2 text-end">
-                                            <Button type="primary" onClick={submitReply}>{t('submit')}</Button>
-                                            <Button className="ml-2" onClick={cancelReply}>{t('cancel')}</Button>
-                                        </div>
-                                    </div>
+                                        {/* Reply section */}
+                                        {replyingCommentId === comment.CommentID && (
+                                            <div className="ml-8 mt-4">
+                                                <TextArea
+                                                    rows={2}
+                                                    value={replyContent}
+                                                    onChange={handleReplyContentChange}
+                                                    placeholder={t('enter_reply_content')}
+                                                />
+                                                <div className="mt-2 text-end">
+                                                    <Button type="primary" onClick={submitReply}>{t('submit')}</Button>
+                                                    <Button className="ml-2" onClick={cancelReply}>{t('cancel')}</Button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Render replies */}
+                                        {comment.replies && comment.replies.map((reply) => (
+                                            <List.Item key={reply.ReplyID} className="ml-8">
+                                                <List.Item.Meta
+                                                    title={
+                                                        <span>
+                                                            {reply.username}
+                                                            <Text className='text-gray-400'> - {moment(reply.ReplyDate).format('DD/MM/YYYY')}</Text>
+                                                        </span>
+                                                    }
+                                                    description={reply.ReplyContent}
+                                                />
+                                            </List.Item>
+                                        ))}
+                                    </>
                                 )}
-
-                                {/* Render replies */}
-                                {comment.replies && comment.replies.map((reply) => (
-                                    <List.Item key={reply.ReplyID} className="ml-8">
-                                        <List.Item.Meta
-                                            title={
-                                                <span>
-                                                    {reply.username}
-                                                    <Text className='text-gray-400'> - {moment(reply.ReplyDate).format('DD/MM/YYYY')}</Text>
-                                                </span>
-                                            }
-                                            description={reply.ReplyContent}
-                                        />
-                                    </List.Item>
-                                ))}
-                            </>
-                        )}
-                    />
+                            />
+                        </>
+                    )}
                 </div>
             </div>
         )
