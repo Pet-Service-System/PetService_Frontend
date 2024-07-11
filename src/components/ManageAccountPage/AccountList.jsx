@@ -236,7 +236,7 @@ const AccountList = () => {
           columns={columns}
           bordered
           rowKey="account_id"
-          pagination={false}
+          pagination={true}
           loading={loading}
           scroll={{ x: 'max-content' }}
         />
