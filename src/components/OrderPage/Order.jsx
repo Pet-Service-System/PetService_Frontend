@@ -262,7 +262,7 @@ const Order = () => {
 
       // Check if the voucher is valid and apply the discount
       if (voucher) {
-        await setDiscountValue(voucher.DiscountValue);
+        setDiscountValue(voucher.DiscountValue);
         message.success(t("voucher_applied"));
       } else {
         message.error(t("invalid_voucher"));
@@ -273,23 +273,10 @@ const Order = () => {
     }
   };
 
-  const updateVoucherUsageLimit = async () => {
-    try {
-      if (voucherCode.trim() === '') {
-        return;
-      }
-      const response = await axios.put(`${API_URL}/api/voucher/pattern/${voucherCode}`);
-      return(response.data)
-    } catch (error) {
-      console.error(`Error:`, error);
-      message.error(t("invalid_voucher"));
-    }
-  };
-
   const createOrder = (data, actions) => {
     const totalAmountWithDiscount = (
       orderDetails.totalAmount +
-      orderDetails.shippingCost 
+      orderDetails.shippingCost - discountValue
     ).toFixed(2);
 
     const totalAmountInUSD = (totalAmountWithDiscount * exchangeRateVNDtoUSD).toFixed(2);
@@ -367,13 +354,6 @@ const Order = () => {
 
       await updateInventoryQuantity(orderDetails);
       
-      if (voucherCode) {
-        try {
-          await updateVoucherUsageLimit();
-        } catch (error) {
-          console.error('Error updating voucher usage limit:', error)
-        }
-      }
 
       // Xóa các sản phẩm đã thanh toán thành công khỏi giỏ hàng trong cơ sở dữ liệu
       await Promise.all(orderDetails.cartItems.map(async (item) => {
@@ -587,14 +567,14 @@ const Order = () => {
                   <Text strong>{t("total_3")}:</Text>
                   <Text className="text-2xl text-green-600">
                     {(
-                      orderDetails.totalAmount + orderDetails.shippingCost 
+                      orderDetails.totalAmount + orderDetails.shippingCost - discountValue 
                     ).toLocaleString("en-US")}
                   </Text>
                 </div>
               </div>
               <div className="text-right">
                 {/* PayPal Buttons */}
-                {exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
+                {discountValue > 0 && exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
                   <PayPalButtons
                     createOrder={createOrder}
                     onApprove={(data, actions) => onApprove(data, actions)}
