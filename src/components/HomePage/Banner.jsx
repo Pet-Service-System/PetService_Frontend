@@ -176,9 +176,8 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
-        // { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
       ];
-    } else if (['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role)) {
+    } else if (role === 'Store Manager') {
       menuItems = [
         { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
@@ -187,9 +186,19 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
-        // { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
+        { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
       ];
-    }
+    } else if (['Sales Staff', 'Caretaker Staff'].includes(role)) {
+      menuItems = [
+        { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
+        { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
+        { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
+        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
+        { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+      ];
+    } 
 
     // Vertical menu for responsive
     const verticalMenu = menuItems.reduce((acc, item) => {
