@@ -19,9 +19,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-const REACT_APP_EXCHANGE_RATE_VND_TO_USD = import.meta.env
-  .REACT_APP_EXCHANGE_RATE_VND_TO_USD;
 const REACT_APP_SHIPPING_COST = import.meta.env.REACT_APP_SHIPPING_COST;
+const REACT_APP_EXCHANGE_RATE_API = import.meta.env.REACT_APP_EXCHANGE_RATE_API;
 import useShopping from '../../hook/useShopping';
 import { useDispatch } from "react-redux";
 import { setShoppingCart } from '../../redux/shoppingCart';
@@ -33,6 +32,7 @@ const Order = () => {
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState("nationwide");
   const shippingCost = parseFloat(REACT_APP_SHIPPING_COST);
+  const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
   const dispatch = useDispatch();
   const [orderDetails, setOrderDetails] = useState({
     totalAmount: 0,
@@ -50,10 +50,24 @@ const Order = () => {
   const [editMode, setEditMode] = useState(false); // State for edit mode
   const [originalCustomerInfo, setOriginalCustomerInfo] = useState({}); // State to store original values
   const navigate = useNavigate();
-  const exchangeRateVNDtoUSD = parseFloat(REACT_APP_EXCHANGE_RATE_VND_TO_USD);
   const { t } = useTranslation();
   const { handleRemoveItem } = useShopping();
   // const [discountValue, setDiscountValue] = useState(0); // State for discount value
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await axios.get(`https://v6.exchangerate-api.com/v6/${REACT_APP_EXCHANGE_RATE_API}/latest/VND`);
+        setExchangeRateVNDtoUSD(response.data.conversion_rates.USD);
+      } catch (error) {
+        console.error("Error fetching exchange rate:", error);
+        message.error("Error fetching exchange rate.");
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
+  console.log(exchangeRateVNDtoUSD)
 
   useEffect(() => {
     const addressInfo = JSON.parse(localStorage.getItem("addressInfo"));
@@ -580,7 +594,7 @@ const Order = () => {
               </div>
               <div className="text-right">
                 {/* PayPal Buttons */}
-                {isPayPalEnabled && !editMode && (
+                {exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
                   <PayPalButtons
                     createOrder={createOrder}
                     onApprove={(data, actions) => onApprove(data, actions)}
