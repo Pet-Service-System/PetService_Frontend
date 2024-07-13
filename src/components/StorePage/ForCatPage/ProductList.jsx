@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select, Tabs } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -8,10 +8,12 @@ const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Search } = Input;
+const { TabPane  } = Tabs;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false); // State for API call status
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
@@ -21,8 +23,9 @@ const ProductList = () => {
   const [form] = Form.useForm();
   const [productImg, setProductImg] = useState(""); // For image upload
   const navigate = useNavigate();
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]); // State for filtered data
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [activeCategory, setActiveCategory] = useState('');
   const { t } = useTranslation();
 
   const fetchProducts = async () => {
@@ -37,9 +40,36 @@ const ProductList = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}/api/categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      message.error("Error fetching categories.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    // Filter products based on activeCategory whenever it changes
+    const filteredData = activeCategory === 'all' 
+      ? productData 
+      : productData.filter(product => product.CategoryID === activeCategory);
+    setFilteredProducts(filteredData);
+  }, [activeCategory, productData]);
+  
 
   useEffect(() => {
     const filteredData = productData.filter(product =>
@@ -78,6 +108,7 @@ const ProductList = () => {
       formData.append('Description', values.Description);
       formData.append('Quantity', parseInt(values.Quantity, 10));
       formData.append('PetTypeID', petTypeID);
+      formData.append('CategoryID', values.CategoryID); // Added CategoryID
       formData.append('Status', values.Status);
       if (productImg) {
         formData.append('image', productImg);
@@ -94,18 +125,30 @@ const ProductList = () => {
       });
 
       if (response.status === 201) {
-        message.success(t('product_added_successfully'));
+        message.success(t('product_added_successfully'))
+        fetchProducts();
         form.resetFields();
         setProductImg("");
-        fetchProducts();
         setAddMode(false);
       } else {
         message.error(t('failed_to_add_product'));
       }
     } catch (error) {
       console.error('Error adding product:', error);
-      handleErrorResponse(error, t('error_adding_product'));
-     } finally {
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error(t('unauthorized_please_log_in'));
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`${t('error_adding_product')}: ${error.response.data.message}`);
+        } else {
+          message.error(t('error_adding_product'));
+        }
+      } else if (error.request) {
+        message.error(t('error_adding_product_network_or_server_issue'));
+      } else {
+        message.error(`${t('error_adding_product')}: ${error.message}`);
+      }
+    } finally {
       setSaving(false); // End saving
     }
   };
@@ -118,6 +161,7 @@ const ProductList = () => {
       Description: record.Description,
       Quantity: record.Quantity,
       Status: record.Status,
+      CategoryID: record.CategoryID, // Added CategoryID
     });
     setProductImg(""); // Reset image state
   };
@@ -144,10 +188,11 @@ const ProductList = () => {
       formData.append('Description', values.Description);
       formData.append('Quantity', parseInt(values.Quantity, 10));
       formData.append('Status', values.Status);
+      formData.append('CategoryID', values.CategoryID); // Added CategoryID
       if (productImg) {
         formData.append('image', productImg);
       }
-      message.warning(t('processing'))
+      message.warning(t('processing'));
       for (let pair of formData.entries()) {
         console.log(pair[0] + ', ' + pair[1]);
       }
@@ -168,8 +213,20 @@ const ProductList = () => {
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      handleErrorResponse(error, t('error_updating_product'));
-     } finally {
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error(t('unauthorized_please_log_in'));
+        } else if (error.response.data && error.response.data.message) {
+          message.error(`${t('error_updating_product')}: ${error.response.data.message}`);
+        } else {
+          message.error(t('error_updating_product'));
+        }
+      } else if (error.request) {
+        message.error(t('error_updating_product_network_or_server_issue'));
+      } else {
+        message.error(`${t('error_updating_product')}: ${error.message}`);
+      }
+    } finally {
       setSaving(false); // End saving
     }
   };
@@ -178,22 +235,6 @@ const ProductList = () => {
     const file = e.target.files[0];
     setProductImg(file);
     form.setFieldsValue({ Image: file });
-  };
-
-  const handleErrorResponse = (error, defaultMessage) => {
-    if (error.response) {
-      if (error.response.status === 401) {
-        message.error(t('unauthorized_please_log_in'));
-      } else if (error.response.data && error.response.data.message) {
-        message.error(`${defaultMessage}: ${error.response.data.message}`);
-      } else {
-        message.error(defaultMessage);
-      }
-    } else if (error.request) {
-      message.error(t('error_network_or_server_issue'));
-    } else {
-      message.error(`${defaultMessage}: ${error.message}`);
-    }
   };
 
   const columns = [
@@ -262,6 +303,15 @@ const ProductList = () => {
       key: 'Quantity',
     },
     {
+      title: t('category'),
+      dataIndex: 'CategoryID',
+      key: 'CategoryID',
+      render: (text) => {
+        const category = categories.find(cat => cat.CategoryID === text);
+        return category ? category.Name : text;
+      },
+    },
+    {
       title: t('actions'),
       key: 'actions',
       fixed: 'right',
@@ -291,6 +341,13 @@ const ProductList = () => {
           style={{ marginBottom: 16, width: 300 }}
         />
       </div>
+      {/* Tabs for categories */}
+      <Tabs activeKey={activeCategory} onChange={setActiveCategory} type="card" className="mb-4">
+        <TabPane tab={t('all')} key="all" />
+        {categories.map(category => (
+          <TabPane tab={category.Name} key={category.CategoryID} />
+        ))}
+      </Tabs>
       {/* Product list */}
       <Form form={form}>
         {userRole === 'Store Manager' ? (
@@ -366,24 +423,32 @@ const ProductList = () => {
           <Form.Item
             name="Price"
             label={t('price')}
-            rules={[{ required: true, message: t('please_enter_price') }, { type: 'number', min: 0, message: t('price_must_be_non_negative') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('please_enter_price') },
+              { type: 'number', min: 0, message: t('price_must_be_positive') }
+            ]}
+           className="mb-4"
           >
-            <Input suffix='đ' type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
+            <Input type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Description"
             label={t('description')}
-            rules={[{ required: true, message: t('please_enter_description') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('please_enter_description') },
+              { max: 500, message: t('description_too_long') }
+            ]}
+           className="mb-4"
           >
             <TextArea rows={4} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Image"
             label={t('image')}
-            rules={[{ required: editMode == null, message: t('please_upload_product_image') }]}
-            className="mb-4"
+            rules={[
+              { required: editMode == null, message: t('please_upload_product_image') }
+            ]}
+           className="mb-4"
           >
             <Input type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
             {productImg && (
@@ -393,20 +458,37 @@ const ProductList = () => {
           <Form.Item
             name="Quantity"
             label={t('quantity')}
-            rules={[{ required: true, message: t('enter_product_quantity') }, { type: 'number', min: 0, message: t('quantity_must_be_non_negative') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('enter_product_quantity') },
+              { type: 'number', min: 0, message: t('quantity_must_be_positive') }
+            ]}
+           className="mb-4"
           >
             <Input type='number' placeholder={t('quantity')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Status"
             label={t('status')}
-            rules={[{ required: true, message: t('select_product_status') }]}
-            className="mb-4"
+            rules={[
+              { required: true, message: t('select_product_status') }
+            ]}
+           className="mb-4"
           >
             <Select placeholder={t('status')}>
               <Option value="Available">{t('available')}</Option>
               <Option value="Unavailable">{t('unavailable')}</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="CategoryID"
+            label={t('category')}
+            rules={[{ required: true, message: t('please_select_category') }]}
+            className="mb-4"
+          >
+            <Select placeholder={t('category')}>
+              {categories.map(category => (
+                <Option key={category.CategoryID} value={category.CategoryID}>{category.Name}</Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>
