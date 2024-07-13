@@ -136,7 +136,6 @@ const Cart = () => {
   ];
 
   const handlePayClick = () => {
-    localStorage.setItem('totalAmount', totalAmount);
     navigate('/order');
   }
 

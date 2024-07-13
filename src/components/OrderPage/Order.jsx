@@ -88,16 +88,6 @@ const Order = () => {
   }, [orderDetails.cartItems, navigate, t]);
 
   useEffect(() => {
-    const totalAmount = parseFloat(localStorage.getItem("totalAmount")) || 0;
-    setOrderDetails((prevOrderDetails) => ({
-      ...prevOrderDetails,
-      totalAmount: totalAmount,
-    }));
-
-    setIsPayPalEnabled(true);
-  }, []);
-
-  useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -112,10 +102,19 @@ const Order = () => {
             return { ...response.data, Quantity: item.Quantity };
           })
         );
+        // Calculate total amount based on fetched product details
+        const totalAmount = fetchedDetails.reduce((acc, item) => {
+          return acc + (item.Price * item.Quantity);
+        }, 0);
+        setOrderDetails((prevOrderDetails) => ({
+          ...prevOrderDetails,
+          totalAmount: totalAmount,
+        }));
         // check if product is available
         setProductDetails(
           fetchedDetails.filter((product) => product.Status === "Available")
         );
+        setIsPayPalEnabled(true);
       } catch (error) {
         console.error("Error fetching product details:", error);
         message.error("Error fetching product details.");
