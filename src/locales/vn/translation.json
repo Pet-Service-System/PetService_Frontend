@@ -502,5 +502,7 @@
     "address_length": "Địa chỉ phải dài từ 5 đến 100 ký tự.",
     "fullname_length": "Tên đầy đủ phải dài từ 2 đến 50 ký tự.",
     "email_not_exist": "Địa chỉ email này không tồn tại.",
-    "category": "Loại sản phẩm"
+    "category": "Loại sản phẩm",
+    "discount_applied": "Áp dụng mã giảm giá",
+    "subtotal": "Tổng tiền hàng"
 }

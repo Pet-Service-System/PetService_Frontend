@@ -30,6 +30,7 @@ const useShopping = () => {
   };
 
   const handleUpdateQuantity = async (id, Quantity) => {
+    if(Quantity <= 0) return;
     const user = JSON.parse(localStorage.getItem('user'));
     const AccountID = user.id;
     const token = localStorage.getItem('token');

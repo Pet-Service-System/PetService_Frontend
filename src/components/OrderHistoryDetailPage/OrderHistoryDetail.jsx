@@ -16,20 +16,26 @@ const REACT_APP_SHIPPING_COST = import.meta.env.REACT_APP_SHIPPING_COST
 
 const OrderHistoryDetail = () => {
   const { id } = useParams();
-  const [order, setOrder] = useState(null);
-  const [orderDetail, setOrderDetail] = useState(null);
+  
+  
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [selectedProductID, setSelectedProductID] = useState(null);
+  
   const [isSubmitting, setIsSubmitting] = useState(false); // State for submit status
   const navigate = useNavigate();
-  const accountID = JSON.parse(localStorage.getItem('user')).id;
+  
   const role = localStorage.getItem('role')
   const shippingCost = parseFloat(REACT_APP_SHIPPING_COST)
   const [selectedOrderID, setSelectedOrderID] = useState(null); // State for selected order ID
   const { t } = useTranslation();
+  const accountID = JSON.parse(localStorage.getItem('user')).id;
+  const [order, setOrder] = useState(null);
+  const [orderDetail, setOrderDetail] = useState(null);
+  const [voucherData, setVoucherData] = useState(null)
+  const [selectedProductID, setSelectedProductID] = useState(null);
+  const [subTotal, setSubTotal] = useState(0);
 
   const getOrder = async (id) => {
     const token = localStorage.getItem('token');
@@ -54,7 +60,21 @@ const OrderHistoryDetail = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data)
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      throw error;
+    }
+  }
+
+  const getVoucherInformation = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}/api/voucher/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching order details:', error);
@@ -79,7 +99,9 @@ const OrderHistoryDetail = () => {
   };
 
   useEffect(() => {
-    fetchOrderDetails(id);
+    if (id) {
+      fetchOrderDetails(id);
+    }
   }, [id]);
 
   const fetchOrderDetails = async (orderId) => {
@@ -87,12 +109,8 @@ const OrderHistoryDetail = () => {
     try {
       const orderData = await getOrder(orderId);
       setOrder(orderData);
-
+      setSelectedOrderID(orderId);
       const orderDetailData = await getOrderDetail(orderId);
-      setOrderDetail(orderDetailData);
-      setSelectedOrderID(orderId); // Set the selected order ID
-
-      // Fetch product details for each product in order detail
       const productsWithDetails = await Promise.all(
         orderDetailData.Items.map(async (product) => {
           const productDetails = await getProductById(product.ProductID);
@@ -101,12 +119,23 @@ const OrderHistoryDetail = () => {
             ProductName: productDetails.ProductName,
             Price: productDetails.Price,
             Quantity: product.Quantity,
-            ImageURL: productDetails.ImageURL
+            ImageURL: productDetails.ImageURL,
           };
         })
       );
 
       setOrderDetail({ ...orderDetailData, Items: productsWithDetails });
+
+      // Calculate subtotal
+      const newSubTotal = productsWithDetails.reduce((total, item) => {
+        return total + item.Price * item.Quantity;
+      }, 0);
+
+      setSubTotal(newSubTotal);
+
+      if (orderData.VoucherID) {
+        fetchVoucher(orderData.VoucherID);
+      }
     } catch (error) {
       console.error('Error fetching order details:', error);
     } finally {
@@ -114,6 +143,15 @@ const OrderHistoryDetail = () => {
     }
   };
 
+  const fetchVoucher = async (voucherId) => {
+    try {
+      const voucherData = await getVoucherInformation(voucherId);
+      setVoucherData(voucherData);
+      console.log(voucherData);
+    } catch (error) {
+      console.error('Error fetching voucher details:', error);
+    }
+  };
 
   const openModal = (productID) => {
     setSelectedProductID(productID);
@@ -407,56 +445,73 @@ const OrderHistoryDetail = () => {
     });
   }
 
-  return ( orderDetail.Items &&
+  return ( orderDetail.Items && voucherData &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back button */}
       <Button
         onClick={() => navigate(-1)}
-        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+        className="bg-blue-500 hover:bg-blue-700 text-white rounded transition duration-300"
         icon={<ArrowLeftOutlined />}
         size="large"
       >
         {t('back')}
       </Button>
       {/* Order history detail */}
-      <Card className="p-6 max-w-screen-lg mx-auto mt-4 shadow-lg rounded-lg">
-        <Title level={2} className="mb-4 text-center">{t('order_detail')} #{order.OrderID}</Title>
-        <div className="mb-4">
+      <Card className="p-4 max-w-screen-md mx-auto shadow-lg rounded-lg transform scale-90">
+        <Title level={2} className="mb-2 text-center">{t('order_detail')} #{order.OrderID}</Title>
+        <div className="mb-2">
           <Text strong>{t('order_date')}:</Text> <Text>{moment(order.date).format('DD/MM/YYYY HH:mm')}</Text>
         </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <Text strong>{t('status')}:</Text> <Text className={`${getStatusClass(order.Status)}`}>{order.Status}</Text>
         </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <Text strong>{t('customer_name')}:</Text> <Text>{orderDetail.CustomerName}</Text>
         </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <Text strong>{t('phone_number')}:</Text> <Text>{orderDetail.Phone}</Text>
         </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <Text strong>{t('address')}:</Text> <Text>{orderDetail.Address}</Text>
         </div>
-        <div className="mb-4">
-          <Text strong>{t('shipping_fee')}: </Text> <Text>{shippingCost.toLocaleString('en-US')}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('total_amount')}:</Text> <Text className="text-green-600">{order.TotalPrice.toLocaleString('en-US')}</Text>
-        </div>
-        <div className="mb-4">
+        <div className="mb-2">
           <Text strong>{t('order_detail')}:</Text>
         </div>
 
-        {orderDetail.Items &&(
-            <Table
+        {orderDetail.Items && (
+          <Table
             dataSource={orderDetail.Items}
             columns={columns}
             rowKey="ProductID"
             scroll={{ x: 'max-content' }}
             bordered
-            />
-          )
-        }
-        
+            pagination={false}
+          />
+        )}
+
+        <Card className="text-right w-1/2 ml-auto border-none mt-4"> {/* Adjusted margin-top */}
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('subtotal')}:</Text>
+            <Text>{subTotal.toLocaleString('en-US')}</Text>
+          </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('shipping_fee')}:</Text>
+            <Text>{shippingCost.toLocaleString('en-US')}</Text>
+          </div>
+          {voucherData && (
+            <div className="mb-4 flex justify-between">
+              <Text strong>{t('discount_applied')} ({voucherData.Pattern}): </Text>
+              <div>
+                <Text className="text-red-600"> -{voucherData.DiscountValue.toLocaleString('en-US')}</Text>
+              </div>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <Text strong>{t('total_amount')}:</Text>
+            <Text className="text-green-500">{(order.TotalPrice-voucherData.DiscountValue).toLocaleString('en-US')}</Text>
+          </div>
+        </Card>
+
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && order.Status === 'Processing' && (
           <Button danger className="float-end" onClick={handleCancelOrder} disabled={isSubmitting}>

@@ -250,7 +250,7 @@ const SpaBookingDetail = () => {
         )}
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.Status === 'Pending' && (
-          <Button danger className="float-end" onClick={handleCancelBooking}>
+          <Button danger className="float-end mt-4" onClick={handleCancelBooking}>
             {t('cancel_booking')}
           </Button>
         )}

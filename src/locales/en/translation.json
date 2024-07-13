@@ -497,5 +497,7 @@
     "address_length": "Address must be between 5 and 100 characters long.",
     "fullname_length": "Full name must be between 2 and 50 characters long.",
     "email_not_exist": "This email address does not exist.",
-    "category": "Category"
+    "category": "Category",
+    "discount_applied": "Apply voucher",
+    "subtotal": "Subtotal"
 }

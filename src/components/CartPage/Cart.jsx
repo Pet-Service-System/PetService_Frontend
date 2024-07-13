@@ -1,6 +1,6 @@
 // Import các dependencies và hooks cần thiết
 import { useEffect, useState } from 'react';
-import { Table, InputNumber, Button, Typography, Card, Image, Skeleton } from 'antd';
+import { Table, InputNumber, Button, Typography, Card, Image } from 'antd';
 import useShopping from '../../hook/useShopping';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -13,14 +13,12 @@ const { Title, Text } = Typography;
 const Cart = () => {
   const { shoppingCart, handleUpdateQuantity, handleRemoveItem } = useShopping();
   const [cartDetails, setCartDetails] = useState([]);
-  const [loading, setLoading] = useState(false); // State for loading spinner
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   // Fetch product details for items in the cart
   useEffect(() => {
     const fetchCartDetails = async () => {
-      setLoading(true); // Start loading spinner
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -63,8 +61,6 @@ const Cart = () => {
         })));
       } catch (error) {
         console.error('Error fetching cart details:', error);
-      } finally {
-        setLoading(false); // Stop loading spinner
       }
     };
   
@@ -161,20 +157,16 @@ const Cart = () => {
         <Title className="text-center" level={2}>{t('shopping_cart')}</Title>
         {/* List of products */}
         <Card className="shadow-lg rounded-lg">
-          {loading ? (
-            <Skeleton active />
+          {cartDetails.length > 0 ? (
+            <Table
+              dataSource={cartDetails}
+              columns={columns}
+              rowKey="ProductID"
+              pagination={false}
+              scroll={{ x: 'max-content' }}
+            />
           ) : (
-            cartDetails.length > 0 ? (
-              <Table
-                dataSource={cartDetails}
-                columns={columns}
-                rowKey="ProductID"
-                pagination={false}
-                scroll={{ x: 'max-content' }}
-              />
-            ) : (
-              <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>
-            )
+            <Text className="text-center text-2xl text-gray-500">{t('your_cart_is_empty')}</Text>
           )}
         </Card>
         {/* TotalPrice and purchase button */}
