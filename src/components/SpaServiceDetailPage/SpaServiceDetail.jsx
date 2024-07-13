@@ -499,7 +499,7 @@ const SpaServiceDetail = () => {
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="PetID"
-                                label={t('pet')}
+                                label={t('my_pet')}
                                 rules={[{ required: true, message: t('plz_choose_pet') }]}
                             >
                                 <Select

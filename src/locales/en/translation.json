@@ -499,5 +499,7 @@
     "email_not_exist": "This email address does not exist.",
     "category": "Category",
     "discount_applied": "Apply voucher",
-    "subtotal": "Subtotal"
+    "subtotal": "Subtotal",
+    "my_pet": "My pet",
+    "pet_information": "Pet information"
 }

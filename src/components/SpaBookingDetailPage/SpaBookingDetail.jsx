@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image, message, Modal } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -156,83 +156,92 @@ const SpaBookingDetail = () => {
       {/* Go back */}
       <Button
         onClick={() => navigate(-1)}
-        className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+        className="bg-blue-500 hover:bg-blue-700 text-white rounded transition duration-300"
         icon={<ArrowLeftOutlined />}
         size="large"
       >
         {t('back')}
       </Button>
       {/* Booking detail */}
-      <Card className="p-10 max-w-screen-md mx-auto mt-4 shadow-lg rounded-lg">
+      <Card className="p-4 max-w-screen-md mx-auto shadow-lg rounded-lg transform scale-90">
         <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
-        <div className="mb-4">
-          <Text strong>{t('date_create')}: </Text>
-          <Text>
-            {new Date(spaBooking.CreateDate).toLocaleDateString('vi-VN', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            })}{' '}
-            {new Date(spaBooking.CreateDate).toLocaleTimeString('vi-VN', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            })}
-          </Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('customer_name')}: </Text>
-          <Text>{spaBookingDetail.CustomerName}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('phone')}: </Text>
-          <Text>{spaBookingDetail.Phone}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('pet_name')}: </Text>
-          <Text>{spaBookingDetail.PetName}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('pet_gender')}: </Text>
-          <Text>{spaBookingDetail.PetGender}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('pet_status')}: </Text>
-          <Text>{spaBookingDetail.PetStatus}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('pet_type')}: </Text>
-          <Text>{petTypeName}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('pet_weight')}: </Text>
-          <Text>{spaBookingDetail.PetWeight} kg</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('pet_age')}: </Text>
-          <Text>{spaBookingDetail.PetAge} {t('years_old')}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('book_date')}: </Text>
-          <Text>{spaBookingDetail.BookingDate}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('book_time')}: </Text>
-          <Text>{spaBookingDetail.BookingTime}</Text>
-        </div>
-        <div className="mb-4">
-          <Text strong>{t('status')}: </Text>
-          <Text className={
-            spaBooking.Status === 'Completed' ? 'text-green-600' :
-              spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing' ? 'text-orange-400' :
-                'text-red-600'
-          }>
-            {spaBooking.Status}
-          </Text>
-        </div>
-        {/* <div className="mb-4">
-          <Text strong>Tổng giá:</Text> <Text className="text-green-600">${spaBooking.TotalPrice}</Text>
-        </div> */}
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <div className="mb-4">
+              <Text strong>{t('date_create')}: </Text>
+              <Text>
+                {new Date(spaBooking.CreateDate).toLocaleDateString('vi-VN', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                })}{' '}
+                {new Date(spaBooking.CreateDate).toLocaleTimeString('vi-VN', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false,
+                })}
+              </Text>
+            </div>
+            <div className="mb-4">
+              <Text strong>{t('customer_name')}: </Text>
+              <Text>{spaBookingDetail.CustomerName}</Text>
+            </div>
+            <div className="mb-4">
+              <Text strong>{t('phone')}: </Text>
+              <Text>{spaBookingDetail.Phone}</Text>
+            </div>
+          </Col>
+          <Col span={12}>
+            <div className="mb-4">
+              <Text strong>{t('book_date')}: </Text>
+              <Text>{spaBookingDetail.BookingDate}</Text>
+            </div>
+            <div className="mb-4">
+              <Text strong>{t('book_time')}: </Text>
+              <Text>{spaBookingDetail.BookingTime}</Text>
+            </div>
+            <div className="mb-4">
+              <Text strong>{t('status')}: </Text>
+              <Text
+                className={
+                  spaBooking.Status === 'Completed'
+                    ? 'text-green-600'
+                    : spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing'
+                    ? 'text-orange-400'
+                    : 'text-red-600'
+                }
+              >
+                {spaBooking.Status}
+              </Text>
+            </div>
+          </Col>
+        </Row>
+        <Card title={t('pet_information')} className="mb-4">
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_name')}: </Text>
+            <Text>{spaBookingDetail.PetName}</Text>
+          </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_gender')}: </Text>
+            <Text>{spaBookingDetail.PetGender}</Text>
+          </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_status')}: </Text>
+            <Text>{spaBookingDetail.PetStatus}</Text>
+          </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_type')}: </Text>
+            <Text>{petTypeName}</Text>
+          </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_weight')}: </Text>
+            <Text>{spaBookingDetail.PetWeight} kg</Text>
+          </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_age')}: </Text>
+            <Text>{spaBookingDetail.PetAge} {t('years_old')}</Text>
+          </div>
+        </Card>
         <div className="mb-4">
           <Text strong>{t('booked_services')}:</Text>
         </div>

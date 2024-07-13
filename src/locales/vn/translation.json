@@ -504,5 +504,7 @@
     "email_not_exist": "Địa chỉ email này không tồn tại.",
     "category": "Loại sản phẩm",
     "discount_applied": "Áp dụng mã giảm giá",
-    "subtotal": "Tổng tiền hàng"
+    "subtotal": "Tổng tiền hàng",
+    "my_pet": "Thú cưng của tôi",
+    "pet_information": "Thông tin thú cưng"
 }

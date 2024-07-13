@@ -489,7 +489,7 @@ const OrderHistoryDetail = () => {
           />
         )}
 
-        <Card className="text-right w-1/2 ml-auto border-none mt-4"> {/* Adjusted margin-top */}
+        <Card className="text-right w-1/2 ml-auto border-none"> {/* Adjusted margin-top */}
           <div className="mb-4 flex justify-between">
             <Text strong>{t('subtotal')}:</Text>
             <Text>{subTotal.toLocaleString('en-US')}</Text>
