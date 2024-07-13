@@ -506,5 +506,8 @@
     "discount_applied": "Áp dụng mã giảm giá",
     "subtotal": "Tổng tiền hàng",
     "my_pet": "Thú cưng của tôi",
-    "pet_information": "Thông tin thú cưng"
+    "pet_information": "Thông tin thú cưng",
+    "add_category": "Thêm loại hàng",
+    "search_pattern": "Tìm kiếm theo mã",
+    "enter_pattern": "Nhập mã"
 }

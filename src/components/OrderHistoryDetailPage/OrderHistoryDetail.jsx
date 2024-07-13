@@ -25,7 +25,7 @@ const OrderHistoryDetail = () => {
   
   const [isSubmitting, setIsSubmitting] = useState(false); // State for submit status
   const navigate = useNavigate();
-  
+  const [discountValue, setDiscountValue] = useState(0)
   const role = localStorage.getItem('role')
   const shippingCost = parseFloat(REACT_APP_SHIPPING_COST)
   const [selectedOrderID, setSelectedOrderID] = useState(null); // State for selected order ID
@@ -146,8 +146,10 @@ const OrderHistoryDetail = () => {
   const fetchVoucher = async (voucherId) => {
     try {
       const voucherData = await getVoucherInformation(voucherId);
-      setVoucherData(voucherData);
-      console.log(voucherData);
+      if(voucherData){
+        setVoucherData(voucherData);
+        setDiscountValue(voucherData.DiscountValue)
+      }
     } catch (error) {
       console.error('Error fetching voucher details:', error);
     }
@@ -445,7 +447,7 @@ const OrderHistoryDetail = () => {
     });
   }
 
-  return ( orderDetail.Items && voucherData &&
+  return ( orderDetail.Items &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back button */}
       <Button
@@ -502,13 +504,13 @@ const OrderHistoryDetail = () => {
             <div className="mb-4 flex justify-between">
               <Text strong>{t('discount_applied')} ({voucherData.Pattern}): </Text>
               <div>
-                <Text className="text-red-600"> -{voucherData.DiscountValue.toLocaleString('en-US')}</Text>
+                <Text className="text-red-600"> -{discountValue.toLocaleString('en-US')}</Text>
               </div>
             </div>
           )}
           <div className="flex justify-between">
             <Text strong>{t('total_amount')}:</Text>
-            <Text className="text-green-500">{(order.TotalPrice-voucherData.DiscountValue).toLocaleString('en-US')}</Text>
+            <Text className="text-green-500">{(order.TotalPrice-discountValue).toLocaleString('en-US')}</Text>
           </div>
         </Card>
 

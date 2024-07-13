@@ -147,7 +147,7 @@ const CategoryList = () => {
       <div className="site-layout-background" style={{ padding: 24 }}>
         <Typography.Title className="text-center text-5xl">{t('category')}</Typography.Title>
         <Space className="mb-4 flex justify-end">
-          <Button type="primary" onClick={handleAddCategory}>Add Category</Button>
+          <Button type="primary" onClick={handleAddCategory}>{t('add_category')}</Button>
         </Space>
         <Table
           dataSource={categories}

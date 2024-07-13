@@ -1,7 +1,7 @@
 /* eslint-disable no-irregular-whitespace */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, Typography, message, Row, Col, Card } from 'antd';
+import { Form, Input, Button, Typography, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import 'tailwindcss/tailwind.css';
@@ -81,6 +81,8 @@ const LoginForm = () => {
         });
         message.success(t('login_successful'), 1).then(() => {
           navigate('/', { replace: true });
+          // Force refresh after login success
+          window.location.reload();
         });
         console.log(cartResponse.data)
         const { Items } = cartResponse.data;
@@ -97,7 +99,7 @@ const LoginForm = () => {
       }
     }
   };
-
+  
   const handleGoogleLoginSuccess = async (response) => {
     const { credential } = response;
     try {
@@ -135,8 +137,11 @@ const LoginForm = () => {
     }
     message.success(t('login_successful'), 1).then(() => {
       navigate('/', { replace: true });
+      // Force refresh after login success
+      window.location.reload();
     });
   };
+  
 
   const handleGoogleLoginFailure = (error) => {
     message.error(t('google_log_in_fail'));

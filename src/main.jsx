@@ -8,6 +8,8 @@ import store from './redux/store.js';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 import './i18n.js'; // Import the i18n configuration
+import Banner from './components/HomePage/Banner.jsx';
+import Footer from './components/HomePage/Footer.jsx';
 
 const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 
@@ -16,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <PayPalScriptProvider options={{ "client-id": PAYPAL_CLIENT_ID }}>
       <BrowserRouter>
         <Provider store={store}>
-          <App />
+          <Banner/>
+            <App />
+          <Footer/>
         </Provider>
       </BrowserRouter>
     </PayPalScriptProvider>

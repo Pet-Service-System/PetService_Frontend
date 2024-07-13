@@ -6,3 +6,16 @@
   .ant-table-cell {
   background-color: rgb(98, 255, 169);
 }
+
+/* styles.css */
+.custom-tabs .ant-tabs-tab {
+  transition: all 0.3s; /* Thêm hiệu ứng transition */
+}
+
+.custom-tabs .ant-tabs-tab-active {
+  background-color: #1890ff; /* Màu nền của tab khi được chọn */
+  color: #fff; /* Màu chữ của tab khi được chọn */
+  border-color: #1890ff; /* Màu viền của tab khi được chọn */
+  transform: scale(1.1); /* Hiệu ứng phóng to khi được chọn */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Đổ bóng khi được chọn */
+}

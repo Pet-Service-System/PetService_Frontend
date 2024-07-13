@@ -22,7 +22,7 @@ import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import SchedulePage from './pages/SchedulePage'
-import ProdutcDetailPage from './pages/ProdutcDetailPage'
+import ProductDetailPage from './pages/ProductDetailPage'
 import SpaBookingPage from './pages/SpaBookingPage'
 import OrderHistoryDetail from './pages/OrderHistoryDetailPage'
 import SpaBookingDetailPage from './pages/SpaBookingDetailPage'
@@ -47,7 +47,7 @@ function App() {
       <Route path='/services-for-cat' element={<ServiceForCatPage/>}/>
       <Route path='/user-profile' element={<UserProfilePage/>}/>
       <Route path='/change-password' element={<ChangePasswordPage/>}/>
-      <Route path='/product-detail/:id' element={<ProdutcDetailPage/>}/>
+      <Route path='/product-detail/:id' element={<ProductDetailPage/>}/>
       <Route path='/pet-list' element={<PetListPage/>}/>
       <Route path='/order-history' element={<OrderHistoryPage/>}/>
       <Route path='/spa-service-detail/:id' element={<SpaServiceDetailPage/>}/>

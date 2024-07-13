@@ -6,7 +6,6 @@ import useShopping from '../../hook/useShopping';
 import SubMenu from 'antd/es/menu/SubMenu';
 import { useDispatch } from 'react-redux';
 import { setShoppingCart } from '../../redux/shoppingCart';
-import '../../assets/fonts/fonts.css';
 import axios from 'axios';
 
 
@@ -49,7 +48,6 @@ const Banner = () => {
         console.log('Token is valid');
       } else {
         if (response.status === 401) {
-          // Perform logout when token was expired
           handleLogout()
         }
       }
@@ -60,21 +58,31 @@ const Banner = () => {
 
   useEffect(() => {
     checkTokenValidity();
-    //Check sreen size for responsive
+    // Check sreen size for responsive
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
         setIsDrawerVisible(false);
       }
     };
-
+  
     handleResize();
     window.addEventListener('resize', handleResize);
-
+  
+    // Update role and user state after login
+    const storedRole = localStorage.getItem('role');
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedRole) {
+      setRole(storedRole);
+    }
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, []);  
 
   const closeMenu = () => setIsDrawerVisible(false);
   const handleLoginClick = () => { closeMenu(); navigate('/login'); };

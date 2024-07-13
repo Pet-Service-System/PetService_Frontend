@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select, Tabs } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import '../../../styles/style.css';
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
@@ -342,7 +343,12 @@ const ProductList = () => {
         />
       </div>
       {/* Tabs for categories */}
-      <Tabs activeKey={activeCategory} onChange={setActiveCategory} type="card" className="mb-4">
+      <Tabs
+        activeKey={activeCategory}
+        onChange={setActiveCategory}
+        type="card"
+        className="custom-tabs"
+      >
         <TabPane tab={t('all')} key="all" />
         {categories.map(category => (
           <TabPane tab={category.Name} key={category.CategoryID} />

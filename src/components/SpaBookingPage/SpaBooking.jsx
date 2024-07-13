@@ -305,7 +305,7 @@ const SpaBooking = () => {
                 <Menu.Item key="spa-booking"
                   onClick={() => navigate('/spa-booking')}
                   icon={<HistoryOutlined />}>
-                  {t('spa_booking')}
+                  {t('service_history')}
                 </Menu.Item>
               </>
             )}

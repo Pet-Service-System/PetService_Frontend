@@ -18,6 +18,7 @@ const Voucher = () => {
   const [editMode, setEditMode] = useState(null);
   const [addMode, setAddMode] = useState(false);
   const [filterStatus, setFilterStatus] = useState(null); // State for filtering by status
+  const [searchPattern, setSearchPattern] = useState(''); // State for searching pattern
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
@@ -212,7 +213,7 @@ const Voucher = () => {
         {text.toUpperCase()}
       </Tag>
     )},
-    { title: t('expiration_date'), dataIndex: 'ExpirationDate', key: 'ExpirationDate', render: date => moment(date).format('YYYY-MM-DD') },
+    { title: t('expiration_date'), dataIndex: 'ExpirationDate', key: 'ExpirationDate', render: date => moment(date).format('YYYY-MM-DD'), sorter: (a, b) => moment(a.ExpirationDate) - moment(b.ExpirationDate), },
     {
       title: t('action'),
       key: 'action',
@@ -225,18 +226,30 @@ const Voucher = () => {
     },
   ];
 
-  // Filtered vouchers based on filterStatus
-  const filteredVouchers = filterStatus ? vouchers.filter(voucher => voucher.Status === filterStatus) : vouchers;
+  // Filtered vouchers based on filterStatus and searchPattern
+  const filteredVouchers = vouchers.filter(voucher => {
+    const matchesStatus = filterStatus ? voucher.Status === filterStatus : true;
+    const matchesPattern = voucher.Pattern.toLowerCase().includes(searchPattern.toLowerCase());
+    return matchesStatus && matchesPattern;
+  });
 
   return (
     <div className="p-10">
       <Title level={1} className='text-center'>{t('voucher_management')}</Title>
-      <div className="flex justify-end mb-4 items-end">
-        <div className='flex flex-col'>
+      <div className="flex flex-col sm:flex-row justify-end mb-4 items-end space-y-4 sm:space-y-0 sm:space-x-4">
+        <div className="flex flex-col w-full sm:w-auto">
+          <Text>{t('search_pattern')}</Text>
+          <Input
+            placeholder={t('enter_pattern')}
+            value={searchPattern}
+            onChange={(e) => setSearchPattern(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col w-full sm:w-auto">
           <Text>{t('filter_status')}</Text>
           <Select
             placeholder={t('select_status')}
-            style={{ width: 200, marginRight: 12 }}
+            style={{ width: '100%' }}
             onChange={value => setFilterStatus(value)}
             allowClear
             value={filterStatus}
@@ -245,8 +258,11 @@ const Voucher = () => {
             <Option value="Inactive">{t('inactive')}</Option>
           </Select>
         </div>
-        <Button type="primary" onClick={handleAddClick} disabled={loading}>{t('add_voucher')}</Button>
+        <Button type="primary" onClick={handleAddClick} disabled={loading} className="w-full sm:w-auto">
+          {t('add_voucher')}
+        </Button>
       </div>
+
       <Table
         dataSource={filteredVouchers}
         columns={columns}
