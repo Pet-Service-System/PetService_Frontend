@@ -15,9 +15,6 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 const SpaBooking = () => {  
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
-  if(role === 'Customer' || role === 'Guest'){
-    navigate('/')
-  }
   const [spaBookings, setSpaBookings] = useState([]);
   const [saving, setSaving] = useState(false);
   const [sortOrder] = useState('desc');
@@ -74,7 +71,11 @@ const SpaBooking = () => {
   };
 
   useEffect(() => {
-    fetchSpaBookings();
+    if(role === 'Customer' || role === 'Guest'){
+      navigate('/')
+    } else {
+      fetchSpaBookings();
+    }
   }, [activeTab, sortOrder]);
 
   useEffect(() => {
@@ -171,7 +172,10 @@ const SpaBooking = () => {
             <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center text-xl" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
-      } else if (record.status === 'Processing') {
+      };
+    }
+    if (role === 'Caretaker Staff') {
+      if (record.status === 'Processing') {
         return (
           <>
             <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>{t('completed')}</Button>
@@ -241,7 +245,7 @@ const SpaBooking = () => {
       key: 'actions',
       render: (text, record) => renderActions(record),
     },
-  ].filter(col => col.key !== 'actions' || role === 'Sales Staff');
+  ].filter(col => col.key !== 'actions' || role === 'Caretaker Staff' || role === 'Sales Staff');
 
   const showUpdateStatusModal = (id, status) => {
     setSelectedBookingId(id);

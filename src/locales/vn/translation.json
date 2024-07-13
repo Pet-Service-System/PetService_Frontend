@@ -501,5 +501,6 @@
     "password_must_have_8_characters_and_word": "Mật khẩu phải dài ít nhất 8 ký tự và chứa ít nhất một chữ cái.",
     "address_length": "Địa chỉ phải dài từ 5 đến 100 ký tự.",
     "fullname_length": "Tên đầy đủ phải dài từ 2 đến 50 ký tự.",
-    "email_not_exist": "Địa chỉ email này không tồn tại."
+    "email_not_exist": "Địa chỉ email này không tồn tại.",
+    "category": "Loại sản phẩm"
 }

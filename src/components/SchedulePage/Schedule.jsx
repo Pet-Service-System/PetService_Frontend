@@ -14,9 +14,7 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 const Schedule = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
-  if(role === 'Customer' || role === 'Guest'){
-    navigate('/')
-  }
+  
   const [schedules, setSchedules] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -30,29 +28,33 @@ const Schedule = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          message.error(t('authorization_token_not_found'));
-          return;
-        }
-
-        const response = await axios.get(`${API_URL}/api/schedules`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setSchedules(response.data);
-      } catch (error) {
-        console.error(t('error_fetching_schedules'), error);
-        message.error(t('error_fetching_schedules'));
-      }
-    };
-
-    fetchSchedules();
+    if(role === 'Customer' || role === 'Guest'){
+      navigate('/')
+    } else{
+      fetchSchedules();
+    }
   }, []);
+
+  const fetchSchedules = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error(t('authorization_token_not_found'));
+        return;
+      }
+
+      const response = await axios.get(`${API_URL}/api/schedules`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setSchedules(response.data);
+    } catch (error) {
+      console.error(t('error_fetching_schedules'), error);
+      message.error(t('error_fetching_schedules'));
+    }
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {

@@ -28,9 +28,7 @@ const { useBreakpoint } = Grid;
 const Statistics = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState(localStorage.getItem("role") || "Guest");
-  if(role === 'Customer' || role === 'Guest'){
-    navigate('/')
-  }
+  
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
@@ -93,11 +91,15 @@ const Statistics = () => {
   };
 
   useEffect(() => {
-    fetchAvailableAccounts();
-    fetchCompletedOrders();
-    fetchCompletedBookings();
-    fetchMostOrderedProducts();
-    fetchTotalEarnings()
+    if(role === 'Customer' || role === 'Guest'){
+      navigate('/')
+    }else{
+      fetchAvailableAccounts();
+      fetchCompletedOrders();
+      fetchCompletedBookings();
+      fetchMostOrderedProducts();
+      fetchTotalEarnings()
+    }
   }, []);
 
   const handleLogout = async () => {

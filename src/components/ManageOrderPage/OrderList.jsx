@@ -14,9 +14,6 @@ const { TabPane } = Tabs;
 const OrderList = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
-  if(role === 'Customer' || role === 'Guest'){
-    navigate('/')
-  }
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('all'); 
   const [sortOrder] = useState('desc');
@@ -114,7 +111,11 @@ const OrderList = () => {
   };
 
   useEffect(() => {
-    fetchOrderHistory();
+    if(role === 'Customer' || role === 'Guest'){
+      navigate('/')
+    } else {
+      fetchOrderHistory();
+    }
   }, [sortOrder]);
 
   useEffect(() => {

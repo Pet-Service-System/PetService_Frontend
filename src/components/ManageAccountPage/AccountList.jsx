@@ -12,9 +12,7 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 const AccountList = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
-  if(role === 'Customer' || role === 'Guest'){
-    navigate('/')
-  }
+  
   const [accountData, setAccountData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(null); // null: view mode, id: edit mode
@@ -28,24 +26,28 @@ const AccountList = () => {
   
   
   useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/api/accounts/all`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setAccountData(response.data.accounts);
-      } catch (error) {
-        console.error('Error fetching accounts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAccounts();
+    if(role === 'Customer' || role === 'Guest'){
+      navigate('/')
+    } else {
+      fetchAccounts();
+    }
   }, []);
+
+  const fetchAccounts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/accounts/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setAccountData(response.data.accounts);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEditClick = (record) => {
     setEditMode(record.AccountID);

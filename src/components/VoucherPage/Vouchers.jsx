@@ -12,9 +12,6 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 const Voucher = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
-  if(role === 'Customer' || role === 'Guest'){
-    navigate('/')
-  }
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -25,7 +22,11 @@ const Voucher = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    fetchVouchers();
+    if(role === 'Customer' || role === 'Guest'){
+      navigate('/')
+    } else{
+      fetchVouchers();
+    }
   }, []);
 
   const fetchVouchers = async () => {

@@ -12,6 +12,7 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const ProductList = () => {
   const [productData, setProductData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false); // State for API call status
   const [userRole] = useState(localStorage.getItem('role') || 'Guest');
@@ -37,7 +38,25 @@ const ProductList = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}/api/categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      message.error("Error fetching categories.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
 
