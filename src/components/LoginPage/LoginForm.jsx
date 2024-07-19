@@ -90,7 +90,11 @@ const LoginForm = () => {
       } catch (error) {
         if (error.response) {
           console.error(error.response.data.message);
-          message.error(t('login_failed'))
+          if (error.response.data.message === 'Account is inactive') {
+            message.error(t('account_locked'));
+          } else {
+            message.error(t('login_failed'));
+          }
         }
         setDisableLogin(true);
       } finally {
@@ -133,6 +137,14 @@ const LoginForm = () => {
         localStorage.setItem('shoppingCart', JSON.stringify(Items));
       }
     } catch (error) {
+      if (error.response) {
+        console.error(error.response.data.message);
+        if (error.response.data.message === 'Account is inactive') {
+          message.error(t('account_locked'));
+        } else {
+          message.error(t('login_failed'));
+        }
+      }
       console.error('Google login error:', error);
     }
     message.success(t('login_successful'), 1).then(() => {

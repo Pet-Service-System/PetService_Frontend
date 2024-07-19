@@ -504,5 +504,6 @@
     "pet_information": "Pet information",
     "add_category": "Add Category",
     "search_pattern": "Search by pattern",
-    "enter_pattern": "Enter pattern"
+    "enter_pattern": "Enter pattern",
+    "account_locked": "Your account is locked. Please contact support."
 }
