@@ -8,6 +8,7 @@ import {
   Input,
   Button,
   message,
+  Layout,
 } from "antd";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import {
@@ -397,212 +398,214 @@ const Order = () => {
   };
 
   return (
-    <div>
-      <div className="flex flex-row md:flex-row m-5 px-8">
-        {/* Go back button */}
-        <Button
-          onClick={() => navigate(-1)}
-          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
-          icon={<ArrowLeftOutlined />}
-          size="large"
-        >
-          {t("back")}
-        </Button>
-      </div>
-      <div className="flex items-center justify-center bg-gray-100 px-10">
-        <Row gutter={[16, 16]} className="w-full">
-          {/* Delivery Address and List of Products */}
-          <Col xs={24} md={16}>
-            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <div className="flex justify-between items-center mb-6">
-                <Title level={3} className="mb-0">
-                  {t("delivery_address")}
-                </Title>
-                {!editMode ? (
-                  <Button
-                    onClick={toggleEditMode}
-                    icon={<EditOutlined />}
-                    type="text"
-                  >
-                    {t("edit")}
-                  </Button>
-                ) : (
-                  <div>
+    <Layout style={{ minHeight: '80vh' }}>
+      <Layout className="site-layout">
+        <div className="flex flex-row md:flex-row m-5 px-8">
+          {/* Go back button */}
+          <Button
+            onClick={() => navigate(-1)}
+            className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded transition duration-300"
+            icon={<ArrowLeftOutlined />}
+            size="large"
+          >
+            {t("back")}
+          </Button>
+        </div>
+        <div className="flex items-center justify-center bg-gray-100 px-10">
+          <Row gutter={[16, 16]} className="w-full">
+            {/* Delivery Address and List of Products */}
+            <Col xs={24} md={16}>
+              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+                <div className="flex justify-between items-center mb-6">
+                  <Title level={3} className="mb-0">
+                    {t("delivery_address")}
+                  </Title>
+                  {!editMode ? (
                     <Button
-                      onClick={saveChanges}
-                      icon={<SaveOutlined />}
-                      type="primary"
-                      className="mr-2"
+                      onClick={toggleEditMode}
+                      icon={<EditOutlined />}
+                      type="text"
                     >
-                      {t("save")}
+                      {t("edit")}
                     </Button>
-                    <Button
-                      onClick={cancelEdit}
-                      icon={<CloseOutlined />}
-                      type="default"
-                    >
-                      {t("cancel")}
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <Text strong>{t("fullname")}:</Text>
-              <Input
-                name="fullname"
-                value={customerInfo.fullname}
-                onChange={handleInputChange}
-                className="mb-2"
-                disabled={!editMode} // Disable input if not in edit mode
-              />
-              <br />
-              <Text strong>{t("adress")}:</Text>
-              <Input
-                name="address"
-                value={customerInfo.address}
-                onChange={handleInputChange}
-                className="mb-2"
-                disabled={!editMode} // Disable input if not in edit mode
-              />
-              <br />
-              <Text strong>{t("phone")}:</Text>
-              <Input
-                name="phone"
-                value={customerInfo.phone}
-                onChange={handleInputChange}
-                className="mb-2"
-                disabled={!editMode} // Disable input if not in edit mode
-              />
-            </div>
-            <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">
-              <Title level={3} className="mb-6">
-                {t("list_of_product")}
-              </Title>
-              {productDetails.map((item, index) => {
-                const totalPrice = (item.Price * item.Quantity).toLocaleString(
-                  "en-US"
-                );
-                return (
-                  <Row key={index} className="mb-4" gutter={[16, 16]}>
-                    <Col span={4}>
-                      <Image
-                        src={item.ImageURL}
-                        alt={item.ProductName}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    </Col>
-                    <Col span={4}>
-                      <Text strong>{item.ProductName}</Text>
-                    </Col>
-                    <Col span={4}>
-                      {t("quantity")}: <Text>{item.Quantity}</Text>
-                    </Col>
-                    <Col span={4}>
-                      {t("unit_price")}:{" "}
-                      <Text>{item.Price.toLocaleString("en-US")}</Text>
-                    </Col>
-                    <Col span={4}>
-                      {t("total")}:{" "}
-                      <Text className="text-green-600">
-                        {totalPrice.toLocaleString("en-US")}
-                      </Text>
-                    </Col>
-                  </Row>
-                );
-              })}
-            </div>
-          </Col>
-          {/* Shipping Method and Total Amount  */}
-          <Col xs={24} md={8}>
-            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">{t('shipping_method')}</Title>
-              <Radio.Group
-                value={selectedShippingMethod}
-                onChange={handleShippingChange}
-              >
-                <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
-              </Radio.Group>
-            </div>
-            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">
-                {t("shipping_method")}
-              </Title>
-              <Radio.Group
-                value={selectedShippingMethod}
-                onChange={handleShippingChange}
-              >
-                <Radio value="nationwide" className="font-medium block mb-2">
-                  {t("shipping_fee_nationwide")} (
-                  {shippingCost.toLocaleString("en-US")}đ)
-                </Radio>
-              </Radio.Group>
-            </div>
-
-            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">
-                {t("voucher")}
-              </Title>
-              <div className="mb-4">
+                  ) : (
+                    <div>
+                      <Button
+                        onClick={saveChanges}
+                        icon={<SaveOutlined />}
+                        type="primary"
+                        className="mr-2"
+                      >
+                        {t("save")}
+                      </Button>
+                      <Button
+                        onClick={cancelEdit}
+                        icon={<CloseOutlined />}
+                        type="default"
+                      >
+                        {t("cancel")}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <Text strong>{t("fullname")}:</Text>
                 <Input
-                  placeholder={t("enter_voucher_code")}
-                  value={voucherCode} // Value binding for the voucher code input
-                  onChange={(e) => setVoucherCode(e.target.value)} // Update state on input change
+                  name="fullname"
+                  value={customerInfo.fullname}
+                  onChange={handleInputChange}
                   className="mb-2"
+                  disabled={!editMode} // Disable input if not in edit mode
                 />
-                <Button type="primary" className="mt-2" onClick={checkVoucher}>
-                  {t("apply_voucher")}
-                </Button>
+                <br />
+                <Text strong>{t("adress")}:</Text>
+                <Input
+                  name="address"
+                  value={customerInfo.address}
+                  onChange={handleInputChange}
+                  className="mb-2"
+                  disabled={!editMode} // Disable input if not in edit mode
+                />
+                <br />
+                <Text strong>{t("phone")}:</Text>
+                <Input
+                  name="phone"
+                  value={customerInfo.phone}
+                  onChange={handleInputChange}
+                  className="mb-2"
+                  disabled={!editMode} // Disable input if not in edit mode
+                />
               </div>
-            </div>
+              <div className="p-8 bg-white rounded-lg shadow-md mt-4 md:mb-2">
+                <Title level={3} className="mb-6">
+                  {t("list_of_product")}
+                </Title>
+                {productDetails.map((item, index) => {
+                  const totalPrice = (item.Price * item.Quantity).toLocaleString(
+                    "en-US"
+                  );
+                  return (
+                    <Row key={index} className="mb-4" gutter={[16, 16]}>
+                      <Col span={4}>
+                        <Image
+                          src={item.ImageURL}
+                          alt={item.ProductName}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      </Col>
+                      <Col span={4}>
+                        <Text strong>{item.ProductName}</Text>
+                      </Col>
+                      <Col span={4}>
+                        {t("quantity")}: <Text>{item.Quantity}</Text>
+                      </Col>
+                      <Col span={4}>
+                        {t("unit_price")}:{" "}
+                        <Text>{item.Price.toLocaleString("en-US")}</Text>
+                      </Col>
+                      <Col span={4}>
+                        {t("total")}:{" "}
+                        <Text className="text-green-600">
+                          {totalPrice.toLocaleString("en-US")}
+                        </Text>
+                      </Col>
+                    </Row>
+                  );
+                })}
+              </div>
+            </Col>
+            {/* Shipping Method and Total Amount  */}
+            <Col xs={24} md={8}>
+              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+                <Title level={3} className="mb-6">{t('shipping_method')}</Title>
+                <Radio.Group
+                  value={selectedShippingMethod}
+                  onChange={handleShippingChange}
+                >
+                  <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
+                </Radio.Group>
+              </div>
+              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+                <Title level={3} className="mb-6">
+                  {t("shipping_method")}
+                </Title>
+                <Radio.Group
+                  value={selectedShippingMethod}
+                  onChange={handleShippingChange}
+                >
+                  <Radio value="nationwide" className="font-medium block mb-2">
+                    {t("shipping_fee_nationwide")} (
+                    {shippingCost.toLocaleString("en-US")}đ)
+                  </Radio>
+                </Radio.Group>
+              </div>
 
-            <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-              <Title level={3} className="mb-6">
-                {t("total_amount")}
-              </Title>
-              <div className="mb-4">
-                <div className="flex justify-between mb-2">
-                  <Text strong>{t("total_2")}:</Text>
-                  <Text>
-                    {orderDetails.totalAmount.toLocaleString("en-US")}
-                  </Text>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <Text strong>{t("shipping_fee")}:</Text>
-                  <Text>
-                    {orderDetails.shippingCost.toLocaleString("en-US")}
-                  </Text>
-                </div>
-                {discountValue > 0 && (
-                    <div className="flex justify-between mb-2">
-                      <Text strong>{t("voucher_applied")}:</Text>
-                      <Text className="text-red-600">
-                        -{(discountValue).toLocaleString("en-US")}
-                      </Text>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <Text strong>{t("total_3")}:</Text>
-                  <Text className="text-2xl text-green-600">
-                    {(
-                      orderDetails.totalAmount + orderDetails.shippingCost - discountValue 
-                    ).toLocaleString("en-US")}
-                  </Text>
-                </div>
-              </div>
-              <div className="text-right">
-                {/* PayPal Buttons */}
-                { exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
-                  <PayPalButtons
-                  createOrder={(data, actions) => createOrder(data, actions)}
-                    onApprove={(data, actions) => onApprove(data, actions)}
-                    onError={(err) => onError(err)}
+              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+                <Title level={3} className="mb-6">
+                  {t("voucher")}
+                </Title>
+                <div className="mb-4">
+                  <Input
+                    placeholder={t("enter_voucher_code")}
+                    value={voucherCode} // Value binding for the voucher code input
+                    onChange={(e) => setVoucherCode(e.target.value)} // Update state on input change
+                    className="mb-2"
                   />
-                )}
+                  <Button type="primary" className="mt-2" onClick={checkVoucher}>
+                    {t("apply_voucher")}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Col>
-        </Row>
-      </div>
-    </div>
+
+              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
+                <Title level={3} className="mb-6">
+                  {t("total_amount")}
+                </Title>
+                <div className="mb-4">
+                  <div className="flex justify-between mb-2">
+                    <Text strong>{t("total_2")}:</Text>
+                    <Text>
+                      {orderDetails.totalAmount.toLocaleString("en-US")}
+                    </Text>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <Text strong>{t("shipping_fee")}:</Text>
+                    <Text>
+                      {orderDetails.shippingCost.toLocaleString("en-US")}
+                    </Text>
+                  </div>
+                  {discountValue > 0 && (
+                      <div className="flex justify-between mb-2">
+                        <Text strong>{t("voucher_applied")}:</Text>
+                        <Text className="text-red-600">
+                          -{(discountValue).toLocaleString("en-US")}
+                        </Text>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <Text strong>{t("total_3")}:</Text>
+                    <Text className="text-2xl text-green-600">
+                      {(
+                        orderDetails.totalAmount + orderDetails.shippingCost - discountValue 
+                      ).toLocaleString("en-US")}
+                    </Text>
+                  </div>
+                </div>
+                <div className="text-right">
+                  {/* PayPal Buttons */}
+                  { exchangeRateVNDtoUSD > 0 && isPayPalEnabled && !editMode && (
+                    <PayPalButtons
+                    createOrder={(data, actions) => createOrder(data, actions)}
+                      onApprove={(data, actions) => onApprove(data, actions)}
+                      onError={(err) => onError(err)}
+                    />
+                  )}
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </Layout>
+    </Layout>
   );
 };
 

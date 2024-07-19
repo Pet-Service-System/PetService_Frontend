@@ -95,6 +95,8 @@ const AccountList = () => {
       });
 
       message.success(t('account_updated_successfully'))
+      fetchAccounts();
+      setIsModalVisible(false);
     } catch (error) {
       console.error(t('error_updating_account'), error);
       if (error.response && error.response.status === 401) {
