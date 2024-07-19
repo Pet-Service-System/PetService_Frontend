@@ -128,11 +128,12 @@ const Banner = () => {
         label: t('service_history'),
         onClick: () => navigate('/spa-booking'),
       },
-    ] : [
+    ] : []),
+    ...(role === 'Store Manager' ? [
       { key: 'statistics', icon: <LineChartOutlined />, label: t('statistic_title'), onClick: () => navigate('/statistics') },
-    ]),
+    ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: t('log_out'), onClick: handleLogout }
-  ];
+];
   
   // Render user menu by userMenuItems
   const renderUserMenu = () => (
@@ -263,7 +264,15 @@ const Banner = () => {
             <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item>
           </>
         )}
-        {['Sales Staff', 'Caretaker Staff', 'Store Manager', 'Administrator'].includes(role) && isVertical && (
+        {['Sales Staff', 'Caretaker Staff'].includes(role) && isVertical && (
+        <>
+          <Menu.SubMenu title={t('account')}>
+            <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>
+          </Menu.SubMenu>
+          <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item> 
+        </>
+        )}
+        {role === 'Store Manager' && isVertical && (
         <>
           <Menu.SubMenu title={t('account')}>
             <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>
