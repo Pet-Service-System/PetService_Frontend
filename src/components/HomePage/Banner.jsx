@@ -199,7 +199,7 @@ const Banner = () => {
         { key: 'manage-category', label: t('category'), path: '/manage-category', parent: t('MANAGEMENT') },
         { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts', parent: t('MANAGEMENT') },
       ];
-    } else if (['Sales Staff', 'Caretaker Staff'].includes(role)) {
+    } else if (role === 'Sales Staff') {
       menuItems = [
         { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
@@ -208,6 +208,11 @@ const Banner = () => {
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
         { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+      ];
+    } else if (role === 'Caretaker Staff') {
+      menuItems = [
+        { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
+        { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
       ];
     } 
 
