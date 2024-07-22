@@ -94,9 +94,9 @@ const AccountList = () => {
         },
       });
 
-      message.success(t('account_updated_successfully'))
-      fetchAccounts();
-      setIsModalVisible(false);
+      message.success(t('account_updated_successfully'), 0.5).then(() => {
+        window.location.reload(); // Reload the page after successful update
+      });
     } catch (error) {
       console.error(t('error_updating_account'), error);
       if (error.response && error.response.status === 401) {
@@ -169,7 +169,7 @@ const AccountList = () => {
       className: 'sticky right-0 bg-white',
       render: (_, record) => (
         // Check if the role is "Administrator" and disable the edit button accordingly
-        record.role === 'Store Manager' ? (
+        record.role === 'Administrator' ? (
           <Button type="primary" disabled>{t('edit')}</Button>
         ) : (
           <Button type="primary" onClick={() => handleEditClick(record)}>Edit</Button>
@@ -219,6 +219,7 @@ const AccountList = () => {
               <Option value="Sales Staff">{t('Sales Staff')}</Option>
               <Option value="Caretaker Staff">{t('Caretaker Staff')}</Option>
               <Option value="Store Manager">{t('Store Manager')}</Option>
+              <Option value="Administrator">{t('Administrator')}</Option>
             </Select>
             <Select
               placeholder={t('Filter by Status')}
@@ -254,34 +255,6 @@ const AccountList = () => {
         >
           <Form form={form} layout='vertical'>
             <Form.Item
-              label={t('fullname')}
-              name="fullname"
-              rules={[{ required: true, message: t('please_enter') + ' ' + t('fullname') + '!' }]}
-            >
-              <Input placeholder={t('fullname')} />
-            </Form.Item>
-            <Form.Item
-              label={t('email')}
-              name="email"
-              rules={[{ required: true, message: t('please_enter') + ' ' + t('email') + '!' }]}
-            >
-              <Input placeholder={t('email')} />
-            </Form.Item>
-            <Form.Item
-              label={t('phone')}
-              name="phone"
-              rules={[{ required: true, message: t('please_enter') + ' ' + t('phone') + '!' }]}
-            >
-              <Input placeholder={t('phone')} />
-            </Form.Item>
-            <Form.Item
-              label={t('address')}
-              name="address"
-              rules={[{ required: true, message: t('please_enter') + ' ' + t('address') + '!' }]}
-            >
-              <Input placeholder={t('address')} />
-            </Form.Item>
-            <Form.Item
               label={t('role')}
               name="role"
               rules={[{ required: true, message: t('please_enter') + ' ' + t('role') + '!' }]}
@@ -291,6 +264,7 @@ const AccountList = () => {
                 <Option value="Sales Staff">{t('sales_staff')}</Option>
                 <Option value="Caretaker Staff">{t('caretaker_staff')}</Option>
                 <Option value="Store Manager">{t('store_manager')}</Option>
+                <Option value="Administrator">{t('administrator')}</Option>
               </Select>
             </Form.Item>
             <Form.Item
