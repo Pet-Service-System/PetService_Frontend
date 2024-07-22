@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal, Spin, Grid } from 'antd';
+import { Layout, Menu, Table, Button, Input, Select, Form, Typography, message, Modal, Spin, Grid, InputNumber } from 'antd';
 import { UserOutlined, UnorderedListOutlined, HistoryOutlined, LogoutOutlined } from '@ant-design/icons';
 import axios from 'axios'; // Import axios for making API calls
 import { useTranslation } from 'react-i18next';
@@ -347,7 +347,7 @@ const PetList = () => {
                         ]}
                         label={t('pet_weight')}
                     >
-                        <Input suffix="kg" placeholder={t('pet_weight')} type="number" />
+                        <InputNumber className='min-w-full' suffix="kg" placeholder={t('pet_weight')} />
                     </Form.Item>
                     <Form.Item
                         name="Age"
@@ -357,7 +357,7 @@ const PetList = () => {
                         ]}
                         label={t('pet_age')}
                     >
-                        <Input suffix={t('age')} placeholder={t('pet_age')} type="number" />
+                        <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('pet_age')} />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -430,25 +430,25 @@ const PetList = () => {
                 <Input placeholder={t('pet_status')} />
               </Form.Item>
               <Form.Item
-                name="Weight"
-                label={t('pet_weight')}
-                rules={[
-                  { required: true, message: t('not_null_pet_weight') },
-                  { type: 'number', min: 0, message: t('weight_must_be_positive') }
-                ]}
-              >
-                <Input suffix="kg" placeholder={t('pet_weight')} type="number" />
-              </Form.Item>
-              <Form.Item
-                name="Age"
-                label={t('pet_age')}
-                rules={[
-                  { required: true, message: t('not_null_pet_age') },
-                  { type: 'number', min: 0, message: t('age_must_be_positive') }
-                ]}
-              >
-                <Input suffix={t('age')} placeholder={t('pet_age')} type="number" />
-              </Form.Item>
+                        name="Weight"
+                        rules={[
+                          { required: true, message: t('not_null_pet_weight') },
+                          { type: 'number', min: 0, message: t('weight_must_be_positive') }
+                        ]}
+                        label={t('pet_weight')}
+                    >
+                        <InputNumber className='min-w-full' suffix="kg" placeholder={t('pet_weight')} />
+                    </Form.Item>
+                    <Form.Item
+                        name="Age"
+                        rules={[
+                          { required: true, message: t('not_null_pet_age') },
+                          { type: 'number', min: 0, message: t('age_must_be_positive') }
+                        ]}
+                        label={t('pet_age')}
+                    >
+                        <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('pet_age')} />
+                    </Form.Item>
             </Form>
           </Modal>
       </Layout>

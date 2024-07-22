@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification } from 'antd';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification, InputNumber } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, ScheduleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
@@ -569,7 +569,7 @@ const SpaServiceDetail = () => {
                                   { type: 'number', min: 0, message: t('weight_must_be_positive') }
                                 ]}
                            >
-                                <Input suffix="kg" placeholder={t('enter_pet_weight')} type="number" />
+                                <InputNumber className='min-w-full' suffix="kg" placeholder={t('enter_pet_weight')} type="number" />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -581,7 +581,7 @@ const SpaServiceDetail = () => {
                                   { type: 'number', min: 0, message: t('age_must_be_positive') }
                                 ]}
                             >
-                                <Input suffix={t('age')} placeholder={t('enter_pet_age')} type="number" />
+                                <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('enter_pet_age')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -665,23 +665,23 @@ const SpaServiceDetail = () => {
                     </Form.Item>
                     <Form.Item
                         name="Weight"
-                        label={t('pet_weight')}
                         rules={[
                           { required: true, message: t('not_null_pet_weight') },
                           { type: 'number', min: 0, message: t('weight_must_be_positive') }
                         ]}
+                        label={t('pet_weight')}
                     >
-                        <Input placeholder={t('pet_weight')} type="number" />
+                        <InputNumber className='min-w-full' suffix="kg" placeholder={t('pet_weight')} />
                     </Form.Item>
                     <Form.Item
                         name="Age"
-                        label={t('pet_age')}
                         rules={[
                           { required: true, message: t('not_null_pet_age') },
                           { type: 'number', min: 0, message: t('age_must_be_positive') }
                         ]}
+                        label={t('pet_age')}
                     >
-                        <Input placeholder={t('pet_age')} type="number" />
+                        <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('pet_age')} />
                     </Form.Item>
                 </Form>
             </Modal>
