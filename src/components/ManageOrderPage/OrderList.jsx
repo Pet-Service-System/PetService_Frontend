@@ -15,6 +15,7 @@ const OrderList = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]); // State for filtered orders
   const [activeTab, setActiveTab] = useState('all'); 
   const [sortOrder] = useState('desc');
   const [loading, setLoading] = useState(false);
@@ -119,20 +120,29 @@ const OrderList = () => {
   }, [sortOrder]);
 
   useEffect(() => {
-    // Filter spaBookings based on searchQuery and selectedDate
-    let filteredData = orders.filter(booking =>
-      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.phone.includes(searchQuery)
+    // Filter orders based on searchQuery and selectedDate
+    let filteredData = orders.filter(order =>
+      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.phone.includes(searchQuery)
     );
 
     if (selectedDate) {
-      filteredData = filteredData.filter(booking =>
-        moment(booking.date).isSame(selectedDate, 'day')
+      filteredData = filteredData.filter(order =>
+        moment(order.date).isSame(selectedDate, 'day')
       );
     }
 
     setFilteredOrderByDate(filteredData);
   }, [searchQuery, orders, selectedDate]);
+
+  useEffect(() => {
+    // Filter orders based on active tab
+    let filteredData = orders;
+    if (activeTab !== 'all') {
+      filteredData = orders.filter(order => order.status === activeTab);
+    }
+    setFilteredOrders(filteredData);
+  }, [activeTab, orders]);
 
   const showConfirm = (orderId, newStatus) => {
     confirm({
@@ -311,7 +321,7 @@ const OrderList = () => {
           <Spin spinning={loading}>
             <Table
               columns={columns}
-              dataSource={filteredOrderByDate}
+              dataSource={filteredOrders} // Use filteredOrders instead of orders
               scroll={{ x: 'max-content' }}
               rowKey="id"
             />
