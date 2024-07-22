@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select, Tabs } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select, Tabs, InputNumber } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import '../../../styles/style.css';
@@ -435,7 +435,7 @@ const ProductList = () => {
             ]}
            className="mb-4"
           >
-            <Input type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
+            <InputNumber type='number' placeholder={t('price')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Description"
@@ -470,7 +470,7 @@ const ProductList = () => {
             ]}
            className="mb-4"
           >
-            <Input type='number' placeholder={t('quantity')} className="w-full p-2 border border-gray-300 rounded" />
+            <InputNumber placeholder={t('quantity')} className="w-full p-2 border border-gray-300 rounded" />
           </Form.Item>
           <Form.Item
             name="Status"

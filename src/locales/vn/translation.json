@@ -511,5 +511,8 @@
     "add_category": "Thêm loại hàng",
     "search_pattern": "Tìm kiếm theo mã",
     "enter_pattern": "Nhập mã",
-    "account_locked": "Tài khoản đã bị khóa. Vui lòng liên hệ để được hỗ trợ."
+    "account_locked": "Tài khoản đã bị khóa. Vui lòng liên hệ để được hỗ trợ.",
+    "usage_limit_must_be_positive": "Số lần phải dương!",
+    "value_must_be_positive": "Giá trị phải dương!"
+    
 }

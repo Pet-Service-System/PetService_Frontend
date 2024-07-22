@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, DatePicker, Select, Typography, message, Tag } from 'antd';
+import { Table, Button, Modal, Form, Input, DatePicker, Select, Typography, message, Tag, InputNumber } from 'antd';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import moment from 'moment';
@@ -287,14 +287,15 @@ const Voucher = () => {
           <Form.Item name="Pattern" label={t('pattern')} rules={[{ required: false }]}>
             <Input disabled={editMode !== null} />
           </Form.Item>
-          <Form.Item name="UsageLimit" label={t('usage_limit')} rules={[{ required: true, message: t('please_enter_usage_limit') }]}>
-            <Input suffix={t('times')} type="number" />
+          <Form.Item name="UsageLimit" label={t('usage_limit')} 
+                     rules={[{ required: true, message: t('please_enter_usage_limit') }, { type: 'number', min: 0, message: t('usage_limit_must_be_positive') }]}>
+            <InputNumber className='w-full' suffix={t('times')} type="number" />
           </Form.Item>
-          <Form.Item name="DiscountValue" label={t('discount_value')} rules={[{ required: true, message: t('please_enter_discount_value') }]}>
-            <Input suffix='vnd' type="number" />
+          <Form.Item name="DiscountValue" label={t('discount_value')} rules={[{ required: true, message: t('please_enter_discount_value') }, { type: 'number', min: 0, message: t('value_must_be_positive') }]}>
+            <InputNumber className='w-full' suffix='vnd' type="number" />
           </Form.Item>
-          <Form.Item name="MinimumOrderValue" label={t('minimum_order_value')} rules={[{ required: true, message: t('please_enter_minimum_order_value') }]}>
-            <Input suffix='vnd' type="number" />
+          <Form.Item name="MinimumOrderValue" label={t('minimum_order_value')} rules={[{ required: true, message: t('please_enter_minimum_order_value') }, { type: 'number', min: 0, message: t('value_must_be_positive') }]}>
+            <InputNumber className='w-full' suffix='vnd' type="number" />
           </Form.Item>
           <Form.Item name="ExpirationDate" label={t('expiration_date')} rules={[{ required: true, message: t('please_select_expiration_date') }]}>
             <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />

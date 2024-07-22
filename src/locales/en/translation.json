@@ -505,5 +505,7 @@
     "add_category": "Add Category",
     "search_pattern": "Search by pattern",
     "enter_pattern": "Enter pattern",
-    "account_locked": "Your account is locked. Please contact support."
+    "account_locked": "Your account is locked. Please contact support.",
+    "usage_limit_must_be_positive": "Usage limimt must be positive!",
+    "value_must_be_positive": "Value must be positivie!"
 }
