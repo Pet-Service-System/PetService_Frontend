@@ -28,10 +28,12 @@ const SpaServiceDetail = () => {
     const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
     const accountID = user?.id;
     const [selectedPet, setSelectedPet] = useState(null);
+    const [selectedCaretaker, setSelectedCaretaker] = useState(null);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
     const [isPayPalButtonVisible, setIsPayPalButtonVisible] = useState(false);
     const currentDateTime = moment();
+    const [caretakers, setCaretakers] = useState('');
     const availableTimes = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
         "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -45,6 +47,42 @@ const SpaServiceDetail = () => {
     useEffect(() => {
         currentPriceRef.current = currentPrice;
     }, [currentPrice]);
+
+    const fetchAccounts = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_URL}/api/accounts/all`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            // Filter out Caretaker Staff accounts and map to include both id and name
+            const caretakers = response.data.accounts
+                .filter(account => account.role === 'Caretaker Staff')
+                .map(account => ({
+                    id: account._id,
+                    name: account.fullname
+                }));
+            setCaretakers(caretakers);
+        } catch (error) {
+            console.error('Error fetching accounts:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+
+    const handleCaretakerChange = (value) => {
+        const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
+        setSelectedCaretaker(selectedCaretaker);
+        bookingForm.setFieldsValue({
+            CaretakerNote: selectedCaretaker ? selectedCaretaker.name : ''
+        });
+        if (selectedPet && selectedPet.Weight) {
+            updateCurrentPrice(selectedPet.Weight);
+        }
+    };
+    
 
     const handlePetSelectChange = (value) => {
         const selectedPet = pets.find(pet => pet.PetID === value);
@@ -63,6 +101,7 @@ const SpaServiceDetail = () => {
         updateCurrentPrice(selectedPet.Weight);
     };
 
+
     useEffect(() => {
         const fetchExchangeRate = async () => {
           try {
@@ -75,6 +114,7 @@ const SpaServiceDetail = () => {
         };
     
         fetchExchangeRate();
+        fetchAccounts()
       }, []);
 
     // Hàm để cập nhật giá dựa trên trọng lượng
@@ -288,8 +328,6 @@ const SpaServiceDetail = () => {
             if (error.response) {
                 const serverMessage = error.response.data.message || t('error_create_booking');
                 message.error(serverMessage);
-            } else {
-                message.error(t('network_error'));
             }
             setOperationLoading(false);
         }
@@ -328,10 +366,10 @@ const SpaServiceDetail = () => {
         });
     };
 
-      const onApprove = async (data, actions) => {
+    const onApprove = async (data, actions) => {
         try {
-          const paypalOrder = await actions.order.capture();
-          const values = await bookingForm.validateFields();
+            const paypalOrder = await actions.order.capture();
+            const values = await bookingForm.validateFields();
             const token = localStorage.getItem('token');
             if (!token) {
                 message.error(t('authorization_token_not_found'));
@@ -349,6 +387,7 @@ const SpaServiceDetail = () => {
                     TotalPrice: currentPriceRef.current,
                     AccountID: accountID,
                     PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
+                    CaretakerNote: values.CaretakerNote,
                     CancelReason: ""
                 };
 
@@ -390,16 +429,16 @@ const SpaServiceDetail = () => {
                 setIsPayPalButtonVisible(false);
                 setCurrentPrice(0)
         } catch (error) {
-          console.error("Error during PayPal checkout:", error);
-          // Handle error
-          message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
+            console.error("Error during PayPal checkout:", error);
+            // Handle error
+            message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
         }
-      };
-    
-      const onError = (err) => {
+    };
+
+    const onError = (err) => {
         message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
         console.error("Error during PayPal checkout:", err);
-      };
+    };
 
     return (
         <div className="relative">
@@ -632,6 +671,31 @@ const SpaServiceDetail = () => {
                             >
                                 <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('enter_pet_age')} />
                             </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                        <Form.Item
+                            name="CaretakerNote"
+                            label={t('Nhân viên chăm sóc')}
+                        >
+                            <Select
+                                placeholder={t('choose_caretaker')}
+                                onChange={(value) => handleCaretakerChange(value)}
+                            >
+                                {/* Empty option */}
+                                <Select.Option value='' key="empty-option">
+                                    {t('Select caretaker')}
+                                </Select.Option>
+                                
+                                {/* Options for caretakers */}
+                                {caretakers.map(caretaker => (
+                                    <Select.Option key={caretaker.id} value={caretaker.id}>
+                                        {caretaker.name}
+                                    </Select.Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={16}>
