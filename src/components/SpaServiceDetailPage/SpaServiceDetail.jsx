@@ -5,22 +5,20 @@ import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Moda
 import { ArrowLeftOutlined, CheckCircleOutlined, ScheduleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
+import { PayPalButtons } from "@paypal/react-paypal-js";
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
-const { TextArea } = Input;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaServiceDetail = () => {
     const { id } = useParams();
     const [serviceData, setServiceData] = useState(null);
-    const [editMode, setEditMode] = useState(false);
     const [form] = Form.useForm();
     const [bookingForm] = Form.useForm();
     const [addPetForm] = Form.useForm();
     const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
     const [pets, setPets] = useState([]);
-    const [productImg, setProductImg] = useState(""); // For image upload
     const [loading, setLoading] = useState(false);
     const [operationLoading, setOperationLoading] = useState(false);
     const userRole = localStorage.getItem('role') || 'Guest';
@@ -31,13 +29,13 @@ const SpaServiceDetail = () => {
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
     const currentDateTime = moment();
-    const [saving, setSaving] = useState(false);
     const availableTimes = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
         "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
         "15:00", "15:30", "16:00", "16:30"
     ];
     const { t } = useTranslation();
+    const [currentPrice, setCurrentPrice] = useState(0);
 
     const handlePetSelectChange = (value) => {
         const selectedPet = pets.find(pet => pet.PetID === value);
@@ -51,7 +49,52 @@ const SpaServiceDetail = () => {
             PetAge: selectedPet.Age,
             PetTypeID: selectedPet.PetTypeID,
         });
+
+        // Cập nhật giá dựa trên trọng lượng pet
+        updateCurrentPrice(selectedPet.Weight);
     };
+
+    // Hàm để cập nhật giá dựa trên trọng lượng
+    const updateCurrentPrice = (weight) => {
+        if (serviceData?.PriceByWeight) {
+            const priceEntry = serviceData.PriceByWeight.find(
+                ({ minWeight, maxWeight }) => weight >= minWeight && weight <= maxWeight
+            );
+    
+            if (priceEntry) {
+                setCurrentPrice(priceEntry.price);
+            } else {
+                setCurrentPrice(0); // Nếu không có giá tương ứng
+            }
+        }
+    };
+
+    const handlePetWeightChange = (weight) => {
+        // Ensure the weight is valid
+        if (!weight) {
+            setCurrentPrice(0);
+            return;
+        }
+    
+        // Find the appropriate price based on weight
+        if (serviceData?.PriceByWeight) {
+            const priceEntry = serviceData.PriceByWeight.find(
+                ({ minWeight, maxWeight }) => weight >= minWeight && weight <= maxWeight
+            );
+    
+            if (priceEntry) {
+                setCurrentPrice(priceEntry.price);
+            } else {
+                setCurrentPrice(0); // Default to 0 if no price is found
+            }
+        }
+    };    
+
+    useEffect(() => {
+        if (bookingForm) {
+            bookingForm.setFieldsValue({ TotalPrice: currentPrice });
+        }
+    }, [currentPrice, bookingForm]);
 
     const fetchServiceDetail = async () => {
         try {
@@ -99,60 +142,6 @@ const SpaServiceDetail = () => {
     useEffect(() => {
         fetchServiceDetail();
     }, [id, accountID]);
-
-    const handleEditService = () => {
-        setEditMode(true);
-    };
-
-    const handleCancelEdit = async () => {
-        setEditMode(false);
-        setProductImg("");
-        await fetchServiceDetail(); // Reload service data from the database
-    };
-
-    const handleProductImageUpload = (e) => {
-        const file = e.target.files[0];
-        setProductImg(file);
-        form.setFieldsValue({ Image: file });
-    };
-
-    const handleSaveEdit = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                message.error(t('authorization_token_not_found'));
-                return;
-            }
-
-            const values = await form.validateFields(); // Validate form fields
-            const updatedService = {
-                ServiceName: values.ServiceName,
-                // Price: parseFloat(values.Price),
-                Description: values.Description,
-                ImageURL: values.ImageURL,
-                Status: values.Status
-            };
-            setSaving(true)
-            await axios.patch(`${API_URL}/api/services/${id}`, updatedService, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            message.success(t('update_success'))
-            setSaving(false)
-            setEditMode(false)
-            fetchServiceDetail();
-        } catch (error) {
-            console.error('Error updating service:', error);
-            if (error.response && error.response.status === 401) {
-                message.error('Unauthorized. Please log in.');
-            } else {
-                message.error(t('update_error'));
-            }
-            setSaving(false)
-        }
-    };
 
     const handleBookingNow = () => {
         if (!localStorage.getItem('user')) {
@@ -229,42 +218,60 @@ const SpaServiceDetail = () => {
                 message.error(t('authorization_token_not_found'));
                 return;
             }
-
+    
             // Validate PetTypeID
             if (values.PetTypeID !== serviceData.PetTypeID) {
                 message.error(t('pet_type_not_suitable_with_service'));
                 setOperationLoading(false);
                 return;
             }
-
+    
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
-
+    
             const bookingDateTime = moment(`${bookingDate.format('YYYY-MM-DD')} ${bookingTime}`, 'YYYY-MM-DD HH:mm');
             const currentDateTime = moment();
             const diffHours = bookingDateTime.diff(currentDateTime, 'hours');
-
+    
             if (diffHours < 3) {
                 message.error(t('3_hours_rule'));
                 setOperationLoading(false);
                 return;
             }
-
+    
+            // Check if booking can be made
+            const checkResponse = await axios.post(`${API_URL}/api/Spa-bookings/check`, {
+                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingTime: bookingTime,
+                PetID: values.PetID // Ensure PetID is included
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+    
+            if (!checkResponse.data.canBook) {
+                message.error(checkResponse.data.message);
+                setOperationLoading(false);
+                return;
+            }
+    
+            // Proceed to create booking
             const booking = {
                 Status: 'Pending',
                 CreateDate: new Date(),
                 BookingDate: bookingDate.format('YYYY-MM-DD'),
                 BookingTime: bookingTime,
-                // TotalPrice: serviceData.Price,
-                AccountID: accountID
-            }
-
+                AccountID: accountID,
+                CancelReason: ""
+            };
+    
             const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-
+    
             const bookingDetail = {
                 BookingID: responseBooking.data.BookingID,
                 ...values,
@@ -274,15 +281,15 @@ const SpaServiceDetail = () => {
                 Feedback: "",
                 isReview: false,
             };
-
+    
             const responseBookingDetail = await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-
-            console.log(responseBookingDetail.data)
-
+    
+            console.log(responseBookingDetail.data);
+    
             // Show success notification
             notification.success({
                 message: t('booking_success'),
@@ -290,16 +297,32 @@ const SpaServiceDetail = () => {
                 description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
                 onClick: () => navigate('/spa-booking'),
             });
-
+    
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
             setOperationLoading(false);
         } catch (error) {
             console.error('Error creating booking:', error);
-            message.error(t('error_create_booking'));
+            // Display specific error message from the server response
+            if (error.response) {
+                const serverMessage = error.response.data.message || t('error_create_booking');
+                message.error(serverMessage);
+            } else {
+                message.error(t('network_error')); // Generic network error message
+            }
             setOperationLoading(false);
         }
-        setOperationLoading(false);
+    };
+    
+    // Custom validation function
+    const validatePetWeight = (rule, value) => {
+        if (value < 0) {
+        return Promise.reject(t('weight_must_be_positive'));
+        }
+        if (value > 35) {
+        return Promise.reject(t('weight_must_be_less_than_35'));
+        }
+        return Promise.resolve();
     };
 
     const showAddPetModal = () => {
@@ -310,6 +333,34 @@ const SpaServiceDetail = () => {
     if (!serviceData) {
         return <Skeleton active />;
     }
+
+    const createOrder = (data, actions) => {(2);
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                value: currentPrice.toFixed(2),
+              },
+            },
+          ],
+        });
+      };
+
+      const onApprove = async (data, actions) => {
+        try {
+          const paypalOrder = await actions.order.capture();
+          
+        } catch (error) {
+          console.error("Error during PayPal checkout:", error);
+          // Handle error
+          message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
+        }
+      };
+    
+      const onError = (err) => {
+        message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
+        console.error("Error during PayPal checkout:", err);
+      };
 
     return (
         <div className="relative">
@@ -330,67 +381,32 @@ const SpaServiceDetail = () => {
                     <Image src={serviceData.ImageURL} alt={serviceData.ServiceName} />
                 </div>
                 <div className="w-full md:w-1/2 p-5 md:ml-10">
-                    {userRole === 'Store Manager' ? (
-                        <Form form={form} layout="vertical">
-                            <Form.Item
-                                name="ServiceName"
-                                label={t('service_name')}
-                                rules={[
-                                  { required: true, message: t('enter_service_name') },
-                                  { max: 100, message: t('service_name_too_long') }
-                                ]}
-                           >
-                                <Input disabled={!editMode} />
-                            </Form.Item>
-                            {/* <Form.Item
-                                name="Price"
-                                label="Giá"
-                                rules={[{ required: true, message: 'Hãy nhập giá dịch vụ!' }]}
-                            >
-                                <Input type="number" disabled={!editMode} />
-                            </Form.Item> */}
-                            <Form.Item
-                                name="Description"
-                                label={t('description')}
-                                rules={[
-                                  { required: true, message: t('enter_service_description') },
-                                  { max: 1000, message: t('description_too_long') }
-                                ]}
-                           >
-                                <TextArea disabled={!editMode} rows={10} placeholder={t('description')} style={{ whiteSpace: 'pre-wrap' }} />
-                            </Form.Item>
-                            <Form.Item
-                                name="Image"
-                                label={t('image')}
-                                rules={[{ required: !serviceData.ImageURL, message: t('please_upload_product_image') }]}
-                                className="mb-4"
-                            >
-                                <Input disabled={!editMode} type="file" onChange={handleProductImageUpload} className="w-full p-2 border border-gray-300 rounded" />
-                                {productImg && (
-                                    <Image src={URL.createObjectURL(productImg)} alt="Product Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
-                                    )}
-                                </Form.Item>
-                            <Form.Item
-                                name="Status"
-                                label={t('status')}
-                                rules={[{ required: true, message: t('please_select_status') }]}
-                            >
-                                <Select placeholder={t('select_status')} disabled={!editMode}>
-                                    <Option value="Available">{t('available')}</Option>
-                                    <Option value="Unavailable">{t('unavailable')}</Option>
-                                </Select>
-                            </Form.Item>
-                        </Form>
-                    ) : (
-                        <div>
-                            <Title level={3}>{serviceData.ServiceName}</Title>
-                            {/* <Paragraph className="text-green-600 text-4xl">${serviceData.Price}</Paragraph> */}
-                            <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 5, expandable: true, symbol: 'more' }}>
-                                {`Mô tả: ${serviceData.Description}`}
-                            </Paragraph>
+                <div>
+                    <Title level={3}>{serviceData.ServiceName}</Title>
+                    <Paragraph
+                        style={{ whiteSpace: 'pre-line' }}
+                        ellipsis={{ rows: 5, expandable: true, symbol: 'more' }}
+                    >
+                        {`Mô tả: ${serviceData.Description}`}
+                    </Paragraph>
+                    
+                        {/* Display Price Ranges */}
+                        <div className="mt-4">
+                            <Title level={4}>Giá theo cân nặng:</Title>
+                            {serviceData.PriceByWeight && serviceData.PriceByWeight.length > 0 ? (
+                            serviceData.PriceByWeight.map(({ minWeight, maxWeight, price }, index) => (
+                                <Paragraph key={index} className="mb-1">
+                                <span className="font-semibold">
+                                    {minWeight}kg - {maxWeight}kg:
+                                </span>{" "}
+                                {price.toLocaleString("en-US")}đ
+                                </Paragraph>
+                            ))
+                            ) : (
+                            <Paragraph>-</Paragraph>
+                            )}
                         </div>
-                    )}
-
+                    </div>
                     {userRole === 'Guest' || userRole === 'Customer' ? (
                         <>
                             <div className="flex space-x-4 justify-end">
@@ -408,17 +424,6 @@ const SpaServiceDetail = () => {
                                 <p className="text-red-500 text-right">{t('service_unavailable')}</p>
                             )}
                         </>
-                    ) : userRole === 'Store Manager' ? (
-                        editMode ? (
-                            <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleSaveEdit} disabled={saving}>{t('save')}</Button>
-                                <Button onClick={handleCancelEdit} disabled={saving}>{t('cancel')}</Button>
-                            </div>
-                        ) : (
-                            <div className="flex space-x-4 justify-end">
-                                <Button type="primary" onClick={handleEditService}>{t('edit')}</Button>
-                            </div>
-                        )
                     ) : null}
                 </div>
             </div>
@@ -562,14 +567,19 @@ const SpaServiceDetail = () => {
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                name="PetWeight"
-                                label={t('pet_weight')}
-                                rules={[
-                                  { required: true, message: t('plz_enter_pet_weight') },
-                                  { type: 'number', min: 0, message: t('weight_must_be_positive') }
-                                ]}
-                           >
-                                <InputNumber className='min-w-full' suffix="kg" placeholder={t('enter_pet_weight')} type="number" />
+                            name="PetWeight"
+                            label={t('pet_weight')}
+                            rules={[
+                                { required: true, message: t('plz_enter_pet_weight') },
+                                { validator: validatePetWeight }
+                            ]}
+                            >
+                            <InputNumber
+                                onChange={handlePetWeightChange}
+                                className='min-w-full'
+                                suffix="kg"
+                                placeholder={t('enter_pet_weight')}
+                            />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -603,7 +613,22 @@ const SpaServiceDetail = () => {
                         </Col>
                     </Row>
                 </Form>
+                <div className="flex justify-end mt-4">
+                    <Typography.Text className="text-4xl text-green-600">
+                        Tổng tiền: {currentPrice.toLocaleString("en-US")}đ
+                    </Typography.Text>
+                </div>
 
+                <div className="text-right">
+                  {/* PayPal Buttons */}
+                  { currentPrice > 0 && (
+                    <PayPalButtons
+                        createOrder={(data, actions) => createOrder(data, actions)}
+                        onApprove={(data, actions) => onApprove(data, actions)}
+                        onError={(err) => onError(err)}
+                    />
+                  )}
+                </div>
 
                 {/* <Button type="primary" onClick={showAddPetModal} loading={operationLoading}>
                     Thêm thú cưng

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select } from 'antd';
+import { Table, Typography, Button, Input, Modal, Form, Card, Skeleton, Image, message, Select, InputNumber } from 'antd';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
@@ -21,7 +22,7 @@ const SpaServiceList = () => {
   const [form] = Form.useForm();
   const [serviceImg, setServiceImg] = useState(""); // For image upload
   const navigate = useNavigate();
-  const [filteredServices, setFilteredServices] = useState([]); // State for filtered data
+  const [filteredServices, setfilteredServices] = useState([]); // State for filtered data
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const { t } = useTranslation();
 
@@ -45,7 +46,7 @@ const SpaServiceList = () => {
     const filteredData = serviceData.filter(service =>
       service.ServiceName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredServices(filteredData);
+    setfilteredServices(filteredData);
   }, [searchQuery, serviceData]);
 
 
@@ -65,39 +66,40 @@ const SpaServiceList = () => {
 
   const handleSaveAdd = async () => {
     try {
-      setSaving(true); // Start saving
+      setSaving(true);
       const token = localStorage.getItem('token');
       if (!token) {
         message.error(t('auth_error'));
         return;
       }
-
+  
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append('ServiceName', values.ServiceName);
-      // formData.append('Price', parseFloat(values.Price));
       formData.append('Description', values.Description);
       formData.append('PetTypeID', petTypeID);
       formData.append('Status', values.Status);
+      
+      // Append PriceByWeight as JSON
+      formData.append('PriceByWeight', JSON.stringify(values.PriceByWeight));
+  
       if (serviceImg) {
         formData.append('image', serviceImg);
       } else {
         message.error(t('image_error'));
         return;
       }
+  
       message.warning(t('processing'));
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
       const response = await axios.post(`${API_URL}/api/services`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       if (response.status === 201) {
-        message.success(t('add_success'))
+        message.success(t('add_success'));
         fetchServices();
         form.resetFields();
         setAddMode(false);
@@ -107,49 +109,33 @@ const SpaServiceList = () => {
     } catch (error) {
       console.error('Error adding service:', error);
       handleErrorResponse(error, t('add_error'));
-     } finally {
-      setSaving(false); // End saving
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleEditClick = (record) => {
-    setEditMode(record.ServiceID);
-    form.setFieldsValue({
-      ServiceName: record.ServiceName,
-      // Price: record.Price,
-      Description: record.Description,
-      Status: record.Status,
-    });
-    setServiceImg(""); // Reset image state
-  };
-
-  const handleCancelEdit = () => {
-    setEditMode(null);
-    form.resetFields();
-    setServiceImg(""); // Reset image state
-  };
-
-  const handleSaveEdit = async () => {
+const handleSaveEdit = async () => {
     try {
-      setSaving(true); // Start saving
+      setSaving(true);
       const token = localStorage.getItem('token');
       if (!token) {
         message.error(t('auth_error'));
         return;
       }
-
+  
       const values = await form.validateFields();
       const formData = new FormData();
       formData.append('ServiceName', values.ServiceName);
-      // formData.append('price', parseFloat(values.Price));
       formData.append('Description', values.Description);
       formData.append('Status', values.Status);
+      
+      // Append PriceByWeight as JSON
+      formData.append('PriceByWeight', JSON.stringify(values.PriceByWeight));
+  
       if (serviceImg) {
         formData.append('image', serviceImg);
       }
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
+  
       message.warning(t('processing'));
       const response = await axios.patch(`${API_URL}/api/services/${editMode}`, formData, {
         headers: {
@@ -157,9 +143,9 @@ const SpaServiceList = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       if (response.status === 200) {
-        message.success(t('update_success'))
+        message.success(t('update_success'));
         fetchServices();
         form.resetFields();
         setEditMode(null);
@@ -169,9 +155,36 @@ const SpaServiceList = () => {
     } catch (error) {
       console.error('Error updating service:', error);
       handleErrorResponse(error, t('update_error'));
-     } finally {
-      setSaving(false); // End saving
+    } finally {
+      setSaving(false);
     }
+  };
+
+  const handleEditClick = (record) => {
+    setEditMode(record.ServiceID);
+
+    // Format PriceByWeight data for the form
+    const formattedPriceByWeight = record.PriceByWeight.map(range => ({
+        minWeight: range.minWeight,
+        maxWeight: range.maxWeight,
+        price: range.price
+    }));
+
+    form.setFieldsValue({
+        ServiceName: record.ServiceName,
+        Description: record.Description,
+        Status: record.Status,
+        PriceByWeight: formattedPriceByWeight
+    });
+
+    setServiceImg(""); // Reset image state
+};
+
+
+  const handleCancelEdit = () => {
+    setEditMode(null);
+    form.resetFields();
+    setServiceImg(""); // Reset image state
   };
 
   const handleServiceImageUpload = (e) => {
@@ -227,14 +240,24 @@ const SpaServiceList = () => {
         </div>
       ),
     },
-    // {
-    //   title: 'Price',
-    //   dataIndex: 'Price',
-    //   key: 'Price',
-    //   render: (text) => (
-    //     <span>{typeof text === 'number' ? `$${text.toFixed(2)}` : '-'}</span>
-    //   ),
-    // },
+    {
+      title: t('Giá theo cân nặng'),
+      dataIndex: 'PriceByWeight',
+      key: 'PriceByWeight',
+      render: (priceByWeight) => (
+        <div>
+          {priceByWeight && priceByWeight.length > 0 ? (
+            priceByWeight.map(({ minWeight, maxWeight, price }, index) => (
+              <div key={index}>
+                {minWeight} - {maxWeight}kg: {price.toLocaleString("en-US")}đ
+              </div>
+            ))
+          ) : (
+            <div>-</div>
+          )}
+        </div>
+      ),
+    },
     {
       title: t('description'),
       dataIndex: 'Description',
@@ -270,6 +293,7 @@ const SpaServiceList = () => {
       ),
     },
   ];
+
 
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -314,23 +338,40 @@ const SpaServiceList = () => {
             ) : (
               filteredServices.map(service => (
                 <Card
-                  key={service.ServiceID}
-                  hoverable
-                  className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
-                  onClick={() => handleServiceClick(service.ServiceID)}
-                >
-                  <Image
-                    alt={service.ServiceName}
-                    src={service.ImageURL}
-                    preview={false}
-                    className="rounded-t-lg w-full h-44 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
-                    {/* <p className="text-green-600 mt-2 text-3xl">${service.Price.toFixed(2)}</p> */}
-                    {/* <p className="text-gray-500 mt-2">{service.Description}</p> */}
-                  </div>
-                </Card>
+                    key={service.ServiceID}
+                    hoverable
+                    className="bg-white rounded-lg shadow-md transition-transform transform-gpu hover:scale-105"
+                    onClick={() => handleServiceClick(service.ServiceID)}
+                  >
+                    <Image
+                      alt={service.ServiceName}
+                      src={service.ImageURL}
+                      preview={false}
+                      className="rounded-t-lg w-full h-44 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-2xl font-semibold">{service.ServiceName}</h3>
+                      <div className="text-lg mt-2">
+                        {service.PriceByWeight && service.PriceByWeight.length > 0 ? (
+                          <>
+                            <p className="text-green-600 mt-2 text-3xl">
+                              {service.PriceByWeight && service.PriceByWeight.length > 0 ? (
+                                service.PriceByWeight.length === 1 ? (
+                                  `${service.PriceByWeight[0].price.toLocaleString("en-US")}đ`
+                                ) : (
+                                  `${service.PriceByWeight[0].price.toLocaleString("en-US")} - ${service.PriceByWeight[service.PriceByWeight.length - 1].price.toLocaleString("en-US")}đ`
+                                )
+                              ) : (
+                                '-'
+                              )}
+                            </p>
+                          </>
+                        ) : (
+                          <div>-</div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
               ))
             )}
           </div>
@@ -338,13 +379,13 @@ const SpaServiceList = () => {
       </Form>
       {/* Add/ Update modal */}
       <Modal
-        title={editMode ? "Edit Service" : "Add New Service"}
+        title={editMode ? t('edit_service') : t('add_service')}
         visible={addMode || editMode !== null}
         onCancel={editMode ? handleCancelEdit : handleCancelAdd}
         footer={[
-          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>Cancel</Button>,
+          <Button key="cancel" onClick={editMode ? handleCancelEdit : handleCancelAdd} disabled={saving}>{t('cancel')}</Button>,
           <Button key="submit" type="primary" onClick={editMode ? handleSaveEdit : handleSaveAdd} disabled={saving}>
-            {editMode ? "Save" : "Add"}
+            {editMode ? t('save') : t('add')}
           </Button>,
         ]}
         style={{ textAlign: 'center' }}
@@ -377,6 +418,64 @@ const SpaServiceList = () => {
               <Image src={URL.createObjectURL(serviceImg)} alt="Service Preview" style={{ width: '100px', marginTop: '10px' }} className="block" />
             )}
           </Form.Item>
+          <Form.Item
+            name="PriceByWeight"
+            label={t('Giá theo cân nặng')}
+            className="mb-4"
+            rules={[{ required: true, message: t('enter_min_weight') }]}
+        >
+            <Form.List name="PriceByWeight">
+                {(fields, { add, remove }) => (
+                    <>
+                        {fields.map(({ key, name, fieldKey, ...restField }) => (
+                            <div key={key} className="flex mb-2">
+                                <Form.Item
+                                    {...restField}
+                                    name={[name, 'minWeight']}
+                                    fieldKey={[fieldKey, 'minWeight']}
+                                    rules={[
+                                        { required: true, message: t('enter_min_weight') },
+                                        { type: 'number', min: 0, message: t('min_weight_non_negative') }
+                                    ]}
+                                    className="mr-2 w-full"
+                                >
+                                    <InputNumber suffix='kg' placeholder={t('min_weight')} min={0} className="w-full" />
+                                </Form.Item>
+                                <Form.Item
+                                    {...restField}
+                                    name={[name, 'maxWeight']}
+                                    fieldKey={[fieldKey, 'maxWeight']}
+                                    rules={[
+                                        { required: true, message: t('enter_max_weight') },
+                                        { type: 'number', min: 0, message: t('max_weight_non_negative') }
+                                    ]}
+                                    className="mr-2 w-full"
+                                >
+                                    <InputNumber suffix='kg' placeholder={t('max_weight')} min={0} className="w-full" />
+                                </Form.Item>
+                                <Form.Item
+                                    {...restField}
+                                    name={[name, 'price']}
+                                    fieldKey={[fieldKey, 'price']}
+                                    rules={[
+                                        { required: true, message: t('enter_price') },
+                                        { type: 'number', min: 0, message: t('price_non_negative') }
+                                    ]}
+                                    className="w-full"
+                                >
+                                    <InputNumber placeholder={t('price')} min={0} className="w-full" />
+                                </Form.Item>
+                                <Button type="danger" onClick={() => remove(name)}>Remove</Button>
+                            </div>
+                        ))}
+                        <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                            {t('Thêm giá')}
+                        </Button>
+                    </>
+                )}
+            </Form.List>
+        </Form.Item>
+
           <Form.Item
             name="Status"
             label={t('status')}

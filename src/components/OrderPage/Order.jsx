@@ -480,9 +480,7 @@ const Order = () => {
                   {t("list_of_product")}
                 </Title>
                 {productDetails.map((item, index) => {
-                  const totalPrice = (item.Price * item.Quantity).toLocaleString(
-                    "en-US"
-                  );
+                  const totalPrice = (item.Price * item.Quantity).toLocaleString("en-US");
                   return (
                     <Row key={index} className="mb-4" gutter={[16, 16]}>
                       <Col span={4}>
