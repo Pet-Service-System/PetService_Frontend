@@ -507,5 +507,10 @@
     "enter_pattern": "Enter pattern",
     "account_locked": "Your account is locked. Please contact support.",
     "usage_limit_must_be_positive": "Usage limimt must be positive!",
-    "value_must_be_positive": "Value must be positivie!"
+    "value_must_be_positive": "Value must be positivie!",
+    "error_category_associated": "Cannot delete category. There are products associated with this category.",
+    "confirm_deletion_title": "Confirm Deletion",
+    "confirm_deletion_content": "Are you sure you want to delete this category?",
+    "category_deleted_successfully": "Category deleted successfully.",
+    "failed_to_delete_category": "Failed to delete category."
 }

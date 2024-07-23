@@ -513,6 +513,10 @@
     "enter_pattern": "Nhập mã",
     "account_locked": "Tài khoản đã bị khóa. Vui lòng liên hệ để được hỗ trợ.",
     "usage_limit_must_be_positive": "Số lần phải dương!",
-    "value_must_be_positive": "Giá trị phải dương!"
-    
+    "value_must_be_positive": "Giá trị phải dương!",
+    "error_category_associated": "Không thể xóa danh mục. Có sản phẩm đang liên kết với danh mục này.",
+    "confirm_deletion_title": "Xác nhận xóa",
+    "confirm_deletion_content": "Bạn có chắc chắn muốn xóa danh mục này không?",
+    "category_deleted_successfully": "Đã xóa danh mục thành công.",
+    "failed_to_delete_category": "Không thể xóa danh mục."
 }

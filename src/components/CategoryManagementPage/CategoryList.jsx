@@ -44,6 +44,16 @@ const CategoryList = () => {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/products`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
+  };
+
   const handleEditCategory = (category) => {
     setSelectedCategory(category);
     form.setFieldsValue({
@@ -115,6 +125,46 @@ const CategoryList = () => {
     setAddModalVisible(false);
   };
 
+  const handleDeleteCategory = async (category) => {
+    try {
+      const products = await fetchProducts();
+      const productsWithCategory = products.filter(
+        (product) => product.CategoryID === category.CategoryID
+      );
+  
+      if (productsWithCategory.length > 0) {
+        message.error(t('error_category_associated'));  // Updated with translation
+        return;
+      }
+  
+      Modal.confirm({
+        title: t('confirm_deletion_title'),  // Updated with translation
+        content: t('confirm_deletion_content'),  // Updated with translation
+        okText: t('delete'),  // Updated with translation
+        cancelText: t('cancel'),  // Updated with translation
+        onOk: async () => {
+          const token = localStorage.getItem('token');
+          try {
+            await axios.delete(`${API_URL}/api/categories/${category._id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            message.success(t('category_deleted_successfully'));  // Updated with translation
+            fetchCategories();
+          } catch (error) {
+            console.error('Error deleting category:', error);
+            message.error(t('failed_to_delete_category'));  // Updated with translation
+          }
+        },
+      });
+    } catch (error) {
+      console.error('Error checking products:', error);
+      message.error(t('failed_to_delete_category'));  // Updated with translation
+    }
+  };
+  
+
   const columns = [
     {
       title: 'Category ID',
@@ -136,25 +186,27 @@ const CategoryList = () => {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => handleEditCategory(record)}>Edit</Button>
+          <Button type="primary" onClick={() => handleEditCategory(record)}>
+            Edit
+          </Button>
+          <Button danger onClick={() => handleDeleteCategory(record)}>
+            Delete
+          </Button>
         </Space>
       ),
     },
   ];
 
   return (
-    <Layout className='site-layout' style={{ minHeight: '100vh' }}>
+    <Layout className="site-layout" style={{ minHeight: '100vh' }}>
       <div className="site-layout-background" style={{ padding: 24 }}>
         <Typography.Title className="text-center text-5xl">{t('category')}</Typography.Title>
         <Space className="mb-4 flex justify-end">
-          <Button type="primary" onClick={handleAddCategory}>{t('add_category')}</Button>
+          <Button type="primary" onClick={handleAddCategory}>
+            {t('add_category')}
+          </Button>
         </Space>
-        <Table
-          dataSource={categories}
-          columns={columns}
-          rowKey="_id"
-          loading={loading}
-        />
+        <Table dataSource={categories} columns={columns} rowKey="_id" loading={loading} />
         <Modal
           title="Edit Category"
           visible={editModalVisible}
@@ -189,10 +241,7 @@ const CategoryList = () => {
             >
               <Input />
             </Form.Item>
-            <Form.Item
-              name="Description"
-              label="Description"
-            >
+            <Form.Item name="Description" label="Description">
               <Input.TextArea />
             </Form.Item>
           </Form>
@@ -204,10 +253,7 @@ const CategoryList = () => {
           onCancel={cancelAddCategory}
           confirmLoading={modalLoading}
         >
-          <Form
-            form={addForm}
-            layout="vertical"
-          >
+          <Form form={addForm} layout="vertical">
             <Form.Item
               name="Name"
               label="Category Name"
@@ -217,10 +263,7 @@ const CategoryList = () => {
             >
               <Input />
             </Form.Item>
-            <Form.Item
-              name="Description"
-              label="Description"
-            >
+            <Form.Item name="Description" label="Description">
               <Input.TextArea />
             </Form.Item>
           </Form>
