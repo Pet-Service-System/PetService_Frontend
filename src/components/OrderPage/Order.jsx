@@ -524,20 +524,6 @@ const Order = () => {
                   <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
                 </Radio.Group>
               </div>
-              <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
-                <Title level={3} className="mb-6">
-                  {t("shipping_method")}
-                </Title>
-                <Radio.Group
-                  value={selectedShippingMethod}
-                  onChange={handleShippingChange}
-                >
-                  <Radio value="nationwide" className="font-medium block mb-2">
-                    {t("shipping_fee_nationwide")} (
-                    {shippingCost.toLocaleString("en-US")}đ)
-                  </Radio>
-                </Radio.Group>
-              </div>
 
               <div className="p-8 bg-white rounded-lg shadow-md mb-4 mt-4">
                 <Title level={3} className="mb-6">
