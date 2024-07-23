@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification, InputNumber } from 'antd';
@@ -10,6 +10,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 const API_URL = import.meta.env.REACT_APP_API_URL;
+const REACT_APP_EXCHANGE_RATE_API = import.meta.env.REACT_APP_EXCHANGE_RATE_API;
 
 const SpaServiceDetail = () => {
     const { id } = useParams();
@@ -24,10 +25,12 @@ const SpaServiceDetail = () => {
     const userRole = localStorage.getItem('role') || 'Guest';
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
+    const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
     const accountID = user?.id;
     const [selectedPet, setSelectedPet] = useState(null);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
+    const [isPayPalButtonVisible, setIsPayPalButtonVisible] = useState(false);
     const currentDateTime = moment();
     const availableTimes = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
@@ -36,6 +39,12 @@ const SpaServiceDetail = () => {
     ];
     const { t } = useTranslation();
     const [currentPrice, setCurrentPrice] = useState(0);
+    const currentPriceRef = useRef(currentPrice);
+
+    // Update the ref whenever currentPrice changes
+    useEffect(() => {
+        currentPriceRef.current = currentPrice;
+    }, [currentPrice]);
 
     const handlePetSelectChange = (value) => {
         const selectedPet = pets.find(pet => pet.PetID === value);
@@ -53,6 +62,20 @@ const SpaServiceDetail = () => {
         // Cập nhật giá dựa trên trọng lượng pet
         updateCurrentPrice(selectedPet.Weight);
     };
+
+    useEffect(() => {
+        const fetchExchangeRate = async () => {
+          try {
+            const response = await axios.get(`https://v6.exchangerate-api.com/v6/${REACT_APP_EXCHANGE_RATE_API}/latest/VND`);
+            setExchangeRateVNDtoUSD(response.data.conversion_rates.USD);
+          } catch (error) {
+            console.error("Error fetching exchange rate:", error);
+            message.error("Error fetching exchange rate.");
+          }
+        };
+    
+        fetchExchangeRate();
+      }, []);
 
     // Hàm để cập nhật giá dựa trên trọng lượng
     const updateCurrentPrice = (weight) => {
@@ -182,6 +205,9 @@ const SpaServiceDetail = () => {
 
     const handleBookingCancel = () => {
         setIsBookingModalVisible(false);
+        setOperationLoading(false);
+        setIsPayPalButtonVisible(false);
+        setCurrentPrice(0)
         bookingForm.resetFields();
     };
 
@@ -255,60 +281,15 @@ const SpaServiceDetail = () => {
                 setOperationLoading(false);
                 return;
             }
+            setIsPayPalButtonVisible(true); // Set this state to show the PayPal button
     
-            // Proceed to create booking
-            const booking = {
-                Status: 'Pending',
-                CreateDate: new Date(),
-                BookingDate: bookingDate.format('YYYY-MM-DD'),
-                BookingTime: bookingTime,
-                AccountID: accountID,
-                CancelReason: ""
-            };
-    
-            const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-    
-            const bookingDetail = {
-                BookingID: responseBooking.data.BookingID,
-                ...values,
-                BookingDate: bookingDate.format('YYYY-MM-DD'),
-                BookingTime: bookingTime,
-                ServiceID: id,
-                Feedback: "",
-                isReview: false,
-            };
-    
-            const responseBookingDetail = await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-    
-            console.log(responseBookingDetail.data);
-    
-            // Show success notification
-            notification.success({
-                message: t('booking_success'),
-                icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-                description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
-                onClick: () => navigate('/spa-booking'),
-            });
-    
-            setIsBookingModalVisible(false);
-            bookingForm.resetFields();
-            setOperationLoading(false);
         } catch (error) {
             console.error('Error creating booking:', error);
-            // Display specific error message from the server response
             if (error.response) {
                 const serverMessage = error.response.data.message || t('error_create_booking');
                 message.error(serverMessage);
             } else {
-                message.error(t('network_error')); // Generic network error message
+                message.error(t('network_error'));
             }
             setOperationLoading(false);
         }
@@ -334,22 +315,80 @@ const SpaServiceDetail = () => {
         return <Skeleton active />;
     }
 
-    const createOrder = (data, actions) => {(2);
+    const createOrder = (data, actions) => {
+        const latestPrice = currentPriceRef.current * exchangeRateVNDtoUSD; // Use ref to get latest value
         return actions.order.create({
-          purchase_units: [
-            {
-              amount: {
-                value: currentPrice.toFixed(2),
-              },
-            },
-          ],
+            purchase_units: [
+                {
+                    amount: {
+                        value: latestPrice.toFixed(2),
+                    },
+                },
+            ],
         });
-      };
+    };
 
       const onApprove = async (data, actions) => {
         try {
           const paypalOrder = await actions.order.capture();
-          
+          const values = await bookingForm.validateFields();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                message.error(t('authorization_token_not_found'));
+                return;
+            }
+
+            const bookingDate = values.BookingDate;
+            const bookingTime = values.BookingTime;
+            // Proceed to create booking
+            const booking = {
+                    Status: 'Pending',
+                    CreateDate: new Date(),
+                    BookingDate: bookingDate.format('YYYY-MM-DD'),
+                    BookingTime: bookingTime,
+                    TotalPrice: currentPriceRef.current,
+                    AccountID: accountID,
+                    PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
+                    CancelReason: ""
+                };
+
+                const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                const bookingDetail = {
+                    BookingID: responseBooking.data.BookingID,
+                    ...values,
+                    BookingDate: bookingDate.format('YYYY-MM-DD'),
+                    BookingTime: bookingTime,
+                    ServiceID: id,
+                    Feedback: "",
+                    isReview: false,
+                };
+
+                const responseBookingDetail = await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                console.log(responseBookingDetail.data);
+
+                // Show success notification
+                notification.success({
+                    message: t('booking_success'),
+                    icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+                    description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
+                    onClick: () => navigate('/spa-booking'),
+                });
+
+                setIsBookingModalVisible(false);
+                bookingForm.resetFields();
+                setOperationLoading(false);
+                setIsPayPalButtonVisible(false);
+                setCurrentPrice(0)
         } catch (error) {
           console.error("Error during PayPal checkout:", error);
           // Handle error
@@ -613,21 +652,23 @@ const SpaServiceDetail = () => {
                         </Col>
                     </Row>
                 </Form>
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end mt-4 mb-4">
                     <Typography.Text className="text-4xl text-green-600">
                         Tổng tiền: {currentPrice.toLocaleString("en-US")}đ
                     </Typography.Text>
                 </div>
-
+                {/* PayPal Buttons */}
                 <div className="text-right">
-                  {/* PayPal Buttons */}
-                  { currentPrice > 0 && (
-                    <PayPalButtons
-                        createOrder={(data, actions) => createOrder(data, actions)}
-                        onApprove={(data, actions) => onApprove(data, actions)}
-                        onError={(err) => onError(err)}
-                    />
-                  )}
+                    {isPayPalButtonVisible && currentPrice > 0 && (
+                        <>
+                            <p className='text-left text-3xl mb-2'>Vui lòng thanh toán để đặt lịch: </p>
+                            <PayPalButtons
+                                createOrder={(data, actions) => createOrder(data, actions)}
+                                onApprove={(data, actions) => onApprove(data, actions)}
+                                onError={(err) => onError(err)}
+                            />
+                        </>
+                    )}
                 </div>
 
                 {/* <Button type="primary" onClick={showAddPetModal} loading={operationLoading}>

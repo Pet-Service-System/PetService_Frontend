@@ -2,8 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
@@ -138,7 +140,7 @@ const SpaBookingDetail = () => {
           if (response.status !== 200) {
             throw new Error(`Failed to cancel booking ${spaBooking.OrderID}`);
           }
-
+          await processRefund(spaBooking.PaypalOrderID);
           fetchSpaBooking();
 
           // Show success message
@@ -149,6 +151,59 @@ const SpaBookingDetail = () => {
         }
       },
     });
+  };
+
+  const getPaypalAccessToken = async () => {
+    try {
+      const response = await axios.post(
+        'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+        'grant_type=client_credentials',
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)}`,
+          },
+        }
+      );
+      return response.data.access_token;
+    } catch (error) {
+      console.error('Error getting PayPal access token:', error);
+      throw new Error('Failed to get PayPal access token');
+    }
+  };
+
+  const processRefund = async (paypalOrderID) => {
+    try {
+      
+      const accessToken = await getPaypalAccessToken();
+      const response = await axios.post(
+        `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalOrderID}/refund`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+      if (response.status === 201) {
+        // Show success message with modal
+        Modal.success({
+          title: t('refund_success_title'),
+          content: t('refund_success_content'),
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} className="text-center" />,
+        });
+      } else {
+        throw new Error('Failed to process refund');
+      }
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      // Show error message with modal
+      Modal.error({
+        title: t('refund_error_title'),
+        content: t('refund_error_content'),
+      });
+    }
   };
 
   return ( spaBookingDetail &&
@@ -257,6 +312,12 @@ const SpaBookingDetail = () => {
             <Text>{spaBookingDetail.Feedback}</Text>
           </div>
         )}
+        <Card className="text-right w-1/2 ml-auto border-none">
+          <div className="mb-4 flex justify-end items-center">
+            <Text strong className="mr-2">{t('Tổng tiền')}:</Text>
+            <Text className="mb-4 text-green-600 text-4xl flex justify-between">{spaBooking.TotalPrice.toLocaleString('en-US')}đ</Text>
+          </div>
+        </Card>
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.Status === 'Pending' && (
           <Button danger className="float-end mt-4" onClick={handleCancelBooking}>

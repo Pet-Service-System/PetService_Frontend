@@ -129,9 +129,6 @@ const Banner = () => {
         onClick: () => navigate('/spa-booking'),
       },
     ] : []),
-    ...(role === 'Store Manager' ? [
-      { key: 'statistics', icon: <LineChartOutlined />, label: t('statistic_title'), onClick: () => navigate('/statistics') },
-    ] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: t('log_out'), onClick: handleLogout }
 ];
   
