@@ -187,13 +187,6 @@ const UserProfile = () => {
                   </Menu.Item>
                 </>
               )}
-              {role !== 'Customer' && (
-                <>
-                  <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
-                    {t('statistic_title')}
-                  </Menu.Item>
-                </>
-              )}
               <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
                 {t('log_out')}
               </Menu.Item>

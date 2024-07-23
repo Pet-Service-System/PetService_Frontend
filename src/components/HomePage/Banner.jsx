@@ -178,6 +178,7 @@ const Banner = () => {
     } else if (role === 'Administrator') {
       menuItems = [
         { key: 'manage-accounts', label: t('MANAGE_ACCOUNT'), path: '/manage-accounts' },
+        { key: 'statistics', label: t('statistic_title'), path: '/statistics' },
       ];
     } else if (role === 'Store Manager') {
       menuItems = [
@@ -261,7 +262,7 @@ const Banner = () => {
             <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item>
           </>
         )}
-        {['Sales Staff', 'Caretaker Staff'].includes(role) && isVertical && (
+        {['Sales Staff', 'Caretaker Staff', 'Store Manager'].includes(role) && isVertical && (
         <>
           <Menu.SubMenu title={t('account')}>
             <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>
@@ -269,7 +270,7 @@ const Banner = () => {
           <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item> 
         </>
         )}
-        {role === 'Store Manager' && isVertical && (
+        {role === 'Administrator' && isVertical && (
         <>
           <Menu.SubMenu title={t('account')}>
             <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_information')}</Menu.Item>

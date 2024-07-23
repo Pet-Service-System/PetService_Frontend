@@ -132,39 +132,6 @@ const Statistics = () => {
   return (
     <Layout style={{ minHeight: '80vh' }}>
       {/* Sider */}
-      {!screens.xs && (
-        <Sider width={220}>
-          <div className="logo" />
-          <Menu theme="dark" mode="inline">
-            <Menu.Item key="profile" icon={<UserOutlined />} onClick={() => navigate('/user-profile')}>
-              {t('user_information')}
-            </Menu.Item>
-            {role === 'Customer' && (
-              <>
-                <Menu.Item key="pet-list" icon={<UnorderedListOutlined />} onClick={() => navigate('/pet-list')}>
-                  {t('list_of_pets')}
-                </Menu.Item>
-                <Menu.Item key="order-history" icon={<HistoryOutlined />} onClick={() => navigate('/order-history')}>
-                  {t('order_history')}
-                </Menu.Item>
-                <Menu.Item key="spa-booking" icon={<HistoryOutlined />} onClick={() => navigate('/spa-booking')}>
-                  {t('service_history')}
-                </Menu.Item>
-              </>
-            )}
-            {role !== 'Customer' && (
-                <>
-                  <Menu.Item key="statistic" icon={<LineChartOutlined />} onClick={() => navigate('/statistics')}>
-                    {t('statistic_title')}
-                  </Menu.Item>
-                </>
-              )}
-            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-              {t('log_out')}
-            </Menu.Item>
-          </Menu>
-        </Sider>
-      )}
       {/* Statistics */}
       <div>
         <Title level={1} className="text-center text-black mt-10">
