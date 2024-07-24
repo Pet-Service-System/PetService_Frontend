@@ -1,18 +1,19 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs, Tag, Timeline, Select } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
 
 const { Text, Title } = Typography;
 const { Search } = Input;
+const { Option } = Select;
 const { TabPane } = Tabs;
+const { Item: TimelineItem } = Timeline;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
-
-const SpaBooking = () => {  
+const SpaBooking = () => {
   const navigate = useNavigate();
   const [role] = useState(localStorage.getItem("role") || "Guest");
   const [spaBookings, setSpaBookings] = useState([]);
@@ -26,7 +27,7 @@ const SpaBooking = () => {
     all: 0,
     completed: 0,
     pending: 0,
-    processing: 0,
+    checkedin: 0,
     canceled: 0,
   });
   const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false);
@@ -35,7 +36,13 @@ const SpaBooking = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBookingDate, setSelectedBookingDate] = useState(null);
   const [selectedDateCreated, setSelectedDateCreated] = useState(null);
+  const [caretakers, setCaretakers] = useState([]); 
+  const [selectedCaretaker, setSelectedCaretaker] = useState(null);
+  const [caretakerID, setCaretakerID] = useState(''); 
+  const [caretakerNote, setCaretakerNote] = useState('');
+  const [selectedBooking, setSelectedBooking] = useState(null); // State to hold selected booking details
 
+  // Function to get spa bookings
   const getSpaBookings = async (bookingDate, dateCreated) => {
     const token = localStorage.getItem('token');
     try {
@@ -54,7 +61,8 @@ const SpaBooking = () => {
       throw error;
     }
   };
-  
+
+  // Function to get spa booking details
   const getSpaBookingDetail = async (id) => {
     const token = localStorage.getItem('token');
     try {
@@ -70,26 +78,28 @@ const SpaBooking = () => {
     }
   };
 
+  // Fetch spa bookings on component mount and when activeTab or sortOrder changes
   useEffect(() => {
-    if(role === 'Customer' || role === 'Guest'){
+    if (role === 'Customer' || role === 'Guest') {
       navigate('/')
     } else {
       fetchSpaBookings();
     }
   }, [activeTab, sortOrder]);
 
+  // Filter spa bookings based on search query and date filters
   useEffect(() => {
     let filteredData = spaBookings.filter(booking =>
       booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       booking.phone.includes(searchQuery)
     );
-    // filter booking date
+    // Filter booking date
     if (selectedBookingDate) {
       filteredData = filteredData.filter(booking =>
         moment(booking.bookingDate).isSame(selectedBookingDate, 'day')
       );
     }
-    // filter date created
+    // Filter date created
     if (selectedDateCreated) {
       filteredData = filteredData.filter(booking =>
         moment(booking.date).isSame(selectedDateCreated, 'day')
@@ -99,6 +109,9 @@ const SpaBooking = () => {
     setFilteredSpaBookings(filteredData);
   }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated]);
 
+
+
+  // Fetch spa bookings and update booking counts
   const fetchSpaBookings = async () => {
     setLoading(true);
     try {
@@ -109,24 +122,25 @@ const SpaBooking = () => {
           id: booking.BookingID,
           date: new Date(booking.CreateDate),
           TotalPrice: booking.TotalPrice,
-          status: booking.Status,
+          status: booking.CurrentStatus,
           reviewed: booking.Reviewed,
           customerName: detail.CustomerName,
           phone: detail.Phone,
           bookingDate: detail.BookingDate ? new Date(detail.BookingDate) : null,
+          statusChanges: booking.StatusChanges
         };
       }));
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
 
-        setBookingCount({
-          all: sortedData.length,
-          completed: sortedData.filter(booking => booking.status === 'Completed').length,
-          pending: sortedData.filter(booking => booking.status === 'Pending').length,
-          processing: sortedData.filter(booking => booking.status === 'Processing').length,
-          canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
-        });
+      setBookingCount({
+        all: sortedData.length,
+        completed: sortedData.filter(booking => booking.status === 'Completed').length,
+        pending: sortedData.filter(booking => booking.status === 'Pending').length,
+        checkedin: sortedData.filter(booking => booking.status === 'Checked In').length,
+        canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
+      });
 
       const filteredData = activeTab === 'all'
         ? sortedData
@@ -139,43 +153,92 @@ const SpaBooking = () => {
       setLoading(false);
     }
   };
+
   const handleUpdateStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      setSaving(true)
+      setSaving(true); 
+      const updatedStatusChanges = [
+        ...selectedBooking.statusChanges, 
+        {
+          Status: pendingStatus, 
+          ChangeTime: new Date().toISOString(), 
+        },
+      ];
+
       await axios.put(
         `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
-        { Status: pendingStatus },
+        {
+          Status: pendingStatus, 
+          StatusChanges: updatedStatusChanges,
+          CaretakerID: caretakerID,
+          CaretakerNote: caretakerNote,
+        },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, 
           },
         }
       );
+  
+      // Show success message
       message.success(`${t('booking_success_update_to')} "${pendingStatus}"`);
-      setSaving(false)
-      setUpdateStatusModalVisible(false);
+      setSaving(false); // End saving process
+      setUpdateStatusModalVisible(false); // Close modal
       fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
+      // Handle error
       console.error('Error updating booking status:', error);
       message.error(t('fail_update_status'));
-      setSaving(false)
+      setSaving(false); // End saving process
     }
   };
+  
+   // Fetch Caretaker Staff accounts
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/api/accounts/all`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const caretakers = response.data.accounts
+          .filter(account => account.role === 'Caretaker Staff')
+          .map(account => ({
+            id: account.AccountID,
+            name: account.fullname
+          }));
+        setCaretakers(caretakers);
+      } catch (error) {
+        console.error('Error fetching accounts:', error);
+      }
+    };
+    fetchAccounts();
+  }, []);
+
+  const handleCaretakerChange = (value) => {
+      const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
+      setSelectedCaretaker(selectedCaretaker);
+      setCaretakerID(value);
+      setCaretakerNote(selectedCaretaker ? selectedCaretaker.name : '');
+  };
+
 
   const renderActions = (record) => {
     if (role === 'Sales Staff') {
       if (record.status === 'Pending') {
         return (
           <>
-            <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Processing')}>{t('processing')}</Button>
+            <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Checked In')}>{t('Check In')}</Button>
             <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center text-xl" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
-      };
+      }
     }
     if (role === 'Caretaker Staff') {
-      if (record.status === 'Processing') {
+      if (record.status === 'Checked In') {
         return (
           <>
             <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Completed')}>{t('completed')}</Button>
@@ -187,6 +250,7 @@ const SpaBooking = () => {
     return null;
   };
 
+  // Define table columns
   const columns = [
     {
       title: 'ID',
@@ -220,14 +284,12 @@ const SpaBooking = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Text className={
-          record.status === 'Completed' ? 'text-green-600' :
-            record.status === 'Pending' ? 'text-yellow-500' :
-            record.status === 'Processing' ? 'text-orange-600' :
-              'text-red-600'
-        }>
+        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Completed' ? 
+          'green' : record.status === 'Pending' ? 
+          'yellow' : record.status === 'Checked In' ? 
+          'blue' : 'red'}>
           {record.status}
-        </Text>
+        </Tag>
       )
     },
     {
@@ -247,16 +309,21 @@ const SpaBooking = () => {
     },
   ].filter(col => col.key !== 'actions' || role === 'Caretaker Staff' || role === 'Sales Staff');
 
+  // Show modal to update status and capture current booking details
   const showUpdateStatusModal = (id, status) => {
+    const booking = spaBookings.find(booking => booking.id === id);
+    setSelectedBooking(booking);
     setSelectedBookingId(id);
     setPendingStatus(status);
     setUpdateStatusModalVisible(true);
   };
 
+  // Handle search input
   const handleSearch = (value) => {
     setSearchQuery(value);
   };
 
+  // Handle booking date filter change
   const handleBookingDateChange = (date) => {
     if (date) {
       setSelectedBookingDate(date.toDate());
@@ -265,6 +332,7 @@ const SpaBooking = () => {
     }
   };
 
+  // Handle created date filter change
   const handleDateCreatedChange = (date) => {
     if (date) {
       setSelectedDateCreated(date.toDate());
@@ -308,7 +376,7 @@ const SpaBooking = () => {
             <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
             <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
             <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
-            <TabPane tab={<span>{t('processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.processing}</span></span>} key="processing" />
+            <TabPane tab={<span>{t('Check In')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedin}</span></span>} key="checkedin" />
             <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
           </Tabs>
           <Spin spinning={loading}>
@@ -326,15 +394,61 @@ const SpaBooking = () => {
             onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[
               <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)} disabled={saving}>{t('cancel')}</Button>,
-              <Button key="submit" type="primary" onClick={handleUpdateStatus} disabled={saving}>{t('confirm')}</Button>,
+              <Button
+                key="submit"
+                type="primary"
+                onClick={handleUpdateStatus}
+                disabled={saving} // Disable button during save operation
+              >
+                {t('confirm')}
+              </Button>
             ]}
           >
-            <p>{t('ask_update')} "{pendingStatus}"?</p>
+            <p className="mb-4">{t('ask_update')} "{pendingStatus}"?</p>
+            {pendingStatus === 'Checked In' && (
+              <div className="mb-4">
+                <Text className="mr-1">{t('Chọn nhân viên chăm sóc: ')}</Text>
+                <Select
+                  placeholder={t('select_caretaker')}
+                  onChange={handleCaretakerChange}
+                  style={{ width: 200 }}
+                >
+                  {caretakers.map(caretaker => (
+                    <Option key={caretaker.id} value={caretaker.id}>
+                      {caretaker.name}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            )}
+            <Timeline>
+              {selectedBooking?.statusChanges.map((change, index) => (
+                <TimelineItem key={index} color={getStatusColor(change.Status)}>
+                  <Text strong>{change.Status}</Text> - <Text>{moment(change.ChangeTime).format('DD/MM/YYYY HH:mm')}</Text>
+                </TimelineItem>
+              ))}
+            </Timeline>
           </Modal>
         </div>
       </Layout>
     </Layout>
   );
+};
+
+// Function to map status to color
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'Pending':
+      return 'orange';
+    case 'Checked In':
+      return 'blue';
+    case 'Completed':
+      return 'green';
+    case 'Canceled':
+      return 'red';
+    default:
+      return 'gray';
+  }
 };
 
 export default SpaBooking;

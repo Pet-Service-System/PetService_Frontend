@@ -1,26 +1,29 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+
 const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
+const { Step } = Steps;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const SpaBookingDetail = () => {
   const [spaBooking, setSpaBooking] = useState(null);
   const [spaBookingDetail, setSpaBookingDetail] = useState(null);
-  const [serviceData, setServiceData] = useState(null)
+  const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const role = localStorage.getItem('role')
+  const role = localStorage.getItem('role');
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation();
 
+  // Fetch spa booking by ID
   const getSpaBookingById = async (id) => {
     const token = localStorage.getItem('token');
     try {
@@ -34,8 +37,9 @@ const SpaBookingDetail = () => {
       console.error('Error fetching spa booking:', error);
       throw error;
     }
-  }
+  };
   
+  // Fetch spa booking detail by ID
   const getSpaBookingDetail = async (id) => {
     const token = localStorage.getItem('token');
     try {
@@ -49,8 +53,9 @@ const SpaBookingDetail = () => {
       console.error('Error fetching spa booking detail:', error);
       throw error;
     }
-  }
+  };
   
+  // Fetch spa service by ID
   const getSpaServiceByID = async (id) => {
     const token = localStorage.getItem('token');
     try {
@@ -64,18 +69,18 @@ const SpaBookingDetail = () => {
       console.error('Error fetching spa service detail:', error);
       throw error;
     }
-  }
+  };
 
-  
+  // Fetch spa booking data
   const fetchSpaBooking = async () => {
     setLoading(true);
     try {
       const booking = await getSpaBookingById(id);
       const bookingDetail = await getSpaBookingDetail(id);
-      const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID)
+      const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail);
-      setServiceData(serviceInfo)
+      setServiceData(serviceInfo);
     } catch (error) {
       console.error('Error fetching spa booking:', error);
     } finally {
@@ -98,6 +103,45 @@ const SpaBookingDetail = () => {
 
   const petTypeName = petTypeMapping[spaBookingDetail.PetTypeID] || 'Unknown';
 
+  // Define the standard status sequence
+  const statusSequence = ['Pending', 'Checked In', 'Completed'];
+
+  // Function to map status to color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Pending':
+        return 'orange';
+      case 'Checked In':
+        return 'blue';
+      case 'Completed':
+        return 'green';
+      case 'Canceled':
+        return 'red';
+      default:
+        return 'gray';
+    }
+  };
+
+  // Generate steps for status changes
+  const statusSteps = spaBooking.StatusChanges.map((change, index) => (
+    <Step
+      key={index}
+      title={change.Status}
+      description={new Date(change.ChangeTime).toLocaleString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })}
+      status={change.Status === 'Canceled' ? 'error' : 'process'}
+      icon={
+        <Tag color={getStatusColor(change.Status)}>{change.Status}</Tag>
+      }
+    />
+  ));
+
   // Columns configuration for the table
   const columns = [
     {
@@ -116,6 +160,7 @@ const SpaBookingDetail = () => {
     },
   ];
 
+  // Handle booking cancellation
   const handleCancelBooking = async () => {
     confirm({
       title: t('cofirm_cancel_booking'),
@@ -153,6 +198,7 @@ const SpaBookingDetail = () => {
     });
   };
 
+  // Get PayPal access token
   const getPaypalAccessToken = async () => {
     try {
       const response = await axios.post(
@@ -172,6 +218,7 @@ const SpaBookingDetail = () => {
     }
   };
 
+  // Process refund via PayPal
   const processRefund = async (paypalOrderID) => {
     try {
       
@@ -220,6 +267,12 @@ const SpaBookingDetail = () => {
       {/* Booking detail */}
       <Card className="p-4 max-w-screen-md mx-auto shadow-lg rounded-lg transform scale-90">
         <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
+        
+        {/* Status Tracking Bar */}
+        <Steps current={spaBooking.StatusChanges.length - 1} direction="horizontal" className="mb-8">
+          {statusSteps}
+        </Steps>
+
         <Row gutter={[16, 16]}>
           <Col span={12}>
             <div className="mb-4">
@@ -256,18 +309,8 @@ const SpaBookingDetail = () => {
               <Text>{spaBookingDetail.BookingTime}</Text>
             </div>
             <div className="mb-4">
-              <Text strong>{t('status')}: </Text>
-              <Text
-                className={
-                  spaBooking.Status === 'Completed'
-                    ? 'text-green-600'
-                    : spaBooking.Status === 'Pending' || spaBooking.Status === 'Processing'
-                    ? 'text-orange-400'
-                    : 'text-red-600'
-                }
-              >
-                {spaBooking.Status}
-              </Text>
+              <Text strong>{t('Nhân viên chăm sóc')}: </Text>
+              <Text>{spaBooking.CaretakerNote}</Text>
             </div>
           </Col>
         </Row>
@@ -307,11 +350,15 @@ const SpaBookingDetail = () => {
           pagination={false}
         />
         {spaBookingDetail.Feedback && (
-          <div className="mt-4">
-            <Text strong>{t('feedback')}: </Text>
-            <Text>{spaBookingDetail.Feedback}</Text>
-          </div>
+          <Card className="text-left w-full ml-auto">
+            <Title level={3} className="text-center">Đánh giá của khách hàng</Title>
+            <div className="mt-4">
+              <Text className="text-3xl" strong>{t('feedback')}: </Text>
+              <Text className="text-3xl">{spaBookingDetail.Feedback}</Text>
+            </div>
+          </Card>
         )}
+        
         <Card className="text-right w-1/2 ml-auto border-none">
           <div className="mb-4 flex justify-end items-center">
             <Text strong className="mr-2">{t('Tổng tiền')}:</Text>
@@ -319,7 +366,7 @@ const SpaBookingDetail = () => {
           </div>
         </Card>
         {/* Render the cancel button conditionally */}
-        {(role === 'Customer') && spaBooking.Status === 'Pending' && (
+        {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
           <Button danger className="float-end mt-4" onClick={handleCancelBooking}>
             {t('cancel_booking')}
           </Button>

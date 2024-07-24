@@ -85,7 +85,7 @@ const SpaBooking = () => {
         id: booking.BookingID,
         date: new Date(booking.CreateDate),
         TotalPrice: booking.TotalPrice,
-        status: booking.Status,
+        status: booking.CurrentStatus,
         isReviewed: booking.isReviewed,
       }));
 
@@ -216,7 +216,7 @@ const SpaBooking = () => {
       render: (text, record) => (
         <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Completed' ? 
                     'green' : record.status === 'Pending' ? 
-                    'yellow' : record.status === 'Processing' ? 
+                    'yellow' : record.status === 'Checked In' ? 
                     'blue' : 'red'}>
           {record.status}
         </Tag>
