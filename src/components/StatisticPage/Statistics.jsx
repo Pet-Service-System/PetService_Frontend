@@ -1,45 +1,34 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Statistic, Row, Col, Card, Typography, Spin, Image, Layout, Grid, Menu } from "antd";
+import { Statistic, Row, Col, Card, Typography, Spin, Image, Layout} from "antd";
 import "tailwindcss/tailwind.css";
 import CountUp from "react-countup";
-import { setShoppingCart } from '../../redux/shoppingCart';
 import {
   ShoppingCartOutlined,
   CarryOutOutlined,
   UserOutlined,
   ProductOutlined,
-  UnorderedListOutlined,
-  HistoryOutlined,
-  LogoutOutlined,
-  LineChartOutlined,
-  CreditCardOutlined
+  CreditCardOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
 import BarChart from "./BarChart";
+import EarningsLineChart from "./EarningLineChart";
 const API_URL = import.meta.env.REACT_APP_API_URL;
 
 const { Title } = Typography;
-const { Sider } = Layout;
-const { useBreakpoint } = Grid;
 
 const Statistics = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState(localStorage.getItem("role") || "Guest");
-  
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [totalBookings, setTotalBookings] = useState(0);
   const [mostOrderedProducts, setMostOrderedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const formatter = (value) => <CountUp end={value} separator="," />;
   const [totalEarnings, setTotalEarnings] = useState(0);
-  const dispatch = useDispatch();
   const { t } = useTranslation();
-  const screens = useBreakpoint();
 
   const fetchAvailableAccounts = async () => {
     try {
@@ -90,6 +79,7 @@ const Statistics = () => {
     }
   };
 
+
   useEffect(() => {
     if(role === 'Customer' || role === 'Guest'){
       navigate('/')
@@ -101,33 +91,6 @@ const Statistics = () => {
       fetchTotalEarnings()
     }
   }, []);
-
-  const handleLogout = async () => {
-    const accountID = user.id;
-    const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-  
-    if (cartItems.length > 0) {
-      try {
-        const response = await axios.post(`${API_URL}/api/cart`, {
-          AccountID: accountID,
-          Items: cartItems,
-        }, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        console.log('Cart saved successfully:', response.data);
-      } catch (error) {
-        console.error('Error saving cart:', error);
-      }
-    }
-  
-    localStorage.clear();
-    dispatch(setShoppingCart([]));
-    setRole('Guest');
-    setUser(null);
-    navigate('/', { replace: true });
-  };
 
   return (
     <Layout style={{ minHeight: '80vh' }}>
@@ -199,6 +162,9 @@ const Statistics = () => {
               <Card>
                 <BarChart />
               </Card>
+            </Col>
+            <Col xs={24}>
+              <EarningsLineChart />
             </Col>
             <Col xs={24}>
               <Card className="shadow-lg mb-4">
