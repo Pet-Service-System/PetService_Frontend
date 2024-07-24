@@ -155,6 +155,10 @@ const SpaBooking = () => {
   };
 
   const handleUpdateStatus = async () => {
+    if (pendingStatus === 'Checked In' && !selectedCaretaker) {
+      message.error(t('Please select a caretaker before confirming the check-in status.'));
+      return;
+    }
     try {
       const token = localStorage.getItem('token');
       setSaving(true); 
@@ -231,7 +235,7 @@ const SpaBooking = () => {
       if (record.status === 'Pending') {
         return (
           <>
-            <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Checked In')}>{t('Check In')}</Button>
+            <Button type="primary" className="min-w-[100px] w-auto px-2 py-1 text-center mr-2 text-xl" onClick={() => showUpdateStatusModal(record.id, 'Checked In')}>{t('Checked In')}</Button>
             <Button danger className="min-w-[100px] w-auto px-2 py-1 text-center text-xl" onClick={() => showUpdateStatusModal(record.id, 'Canceled')}>{t('cancel')}</Button>
           </>
         );
@@ -372,11 +376,11 @@ const SpaBooking = () => {
           </div>
         </Layout>
         {/* Table */}
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
+          <Tabs activeKey={activeTab} onChange={setActiveTab}>
             <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
             <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
             <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
-            <TabPane tab={<span>{t('Check In')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedin}</span></span>} key="checkedin" />
+            <TabPane tab={<span>{t('Checked In')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedin}</span></span>} key="checked in" />
             <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
           </Tabs>
           <Spin spinning={loading}>
@@ -398,7 +402,7 @@ const SpaBooking = () => {
                 key="submit"
                 type="primary"
                 onClick={handleUpdateStatus}
-                disabled={saving} // Disable button during save operation
+                disabled={saving || (pendingStatus === 'Checked In' && !selectedCaretaker)}
               >
                 {t('confirm')}
               </Button>
