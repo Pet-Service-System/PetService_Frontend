@@ -77,12 +77,6 @@ const SpaServiceDetail = () => {
             CaretakerID: selectedCaretaker ? selectedCaretaker.id : '',
             CaretakerNote: selectedCaretaker ? selectedCaretaker.name : ''
         });
-        if (selectedPet && selectedPet.Weight) {
-            updateCurrentPrice(selectedPet.Weight);
-        }
-        if (selectedPet && selectedPet.Weight) {
-            updateCurrentPrice(selectedPet.Weight);
-        }
     };
     
 
