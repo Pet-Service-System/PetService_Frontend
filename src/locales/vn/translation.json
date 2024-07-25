@@ -518,5 +518,9 @@
     "confirm_deletion_title": "Xác nhận xóa",
     "confirm_deletion_content": "Bạn có chắc chắn muốn xóa danh mục này không?",
     "category_deleted_successfully": "Đã xóa danh mục thành công.",
-    "failed_to_delete_category": "Không thể xóa danh mục."
+    "failed_to_delete_category": "Không thể xóa danh mục.",
+    "Nhân viên chăm sóc": "Nhân viên chăm sóc",
+    "select_caretaker": "Vui lòng chọn nhân viên chăm sóc",
+    "change_information_booking": "Thay đổi thông tin đặt lịch",
+    "annouce_before_change" : "Nếu chọn thời gian đặt chỗ này, bạn không thể thay đổi bất kỳ thông tin nào nữa. Bạn vẫn sẵn sàng thay đổi?"
 }
