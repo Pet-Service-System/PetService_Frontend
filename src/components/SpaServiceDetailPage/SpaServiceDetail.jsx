@@ -28,7 +28,6 @@ const SpaServiceDetail = () => {
     const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
     const accountID = user?.id;
     const [selectedPet, setSelectedPet] = useState(null);
-    const [selectedCaretaker, setSelectedCaretaker] = useState(null);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
     const [isPayPalButtonVisible, setIsPayPalButtonVisible] = useState(false);
@@ -60,7 +59,7 @@ const SpaServiceDetail = () => {
             const caretakers = response.data.accounts
                 .filter(account => account.role === 'Caretaker Staff')
                 .map(account => ({
-                    id: account._id,
+                    id: account.AccountID,
                     name: account.fullname
                 }));
             setCaretakers(caretakers);
@@ -74,10 +73,13 @@ const SpaServiceDetail = () => {
 
     const handleCaretakerChange = (value) => {
         const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
-        setSelectedCaretaker(selectedCaretaker);
         bookingForm.setFieldsValue({
+            CaretakerID: selectedCaretaker ? selectedCaretaker.id : '',
             CaretakerNote: selectedCaretaker ? selectedCaretaker.name : ''
         });
+        if (selectedPet && selectedPet.Weight) {
+            updateCurrentPrice(selectedPet.Weight);
+        }
         if (selectedPet && selectedPet.Weight) {
             updateCurrentPrice(selectedPet.Weight);
         }
@@ -375,28 +377,28 @@ const SpaServiceDetail = () => {
         
             // Validate form fields
             const values = await bookingForm.validateFields();
-        
             // Retrieve authorization token
             const token = localStorage.getItem('token');
             if (!token) {
             message.error(t('authorization_token_not_found'));
             return;
             }
-        
-            // Extract booking details
-            const bookingDate = values.BookingDate;
-            const bookingTime = values.BookingTime;
-            const booking = {
-            Status: 'Pending', // Initial status
-            CreateDate: new Date(),
-            BookingDate: bookingDate.format('YYYY-MM-DD'),
-            BookingTime: bookingTime,
-            TotalPrice: currentPriceRef.current,
-            AccountID: accountID,
-            PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
-            CaretakerNote: values.CaretakerNote,
-            CancelReason: "",
-            StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
+            
+                // Extract booking details
+                const bookingDate = values.BookingDate;
+                const bookingTime = values.BookingTime;
+                const booking = {
+                Status: 'Pending', // Initial status
+                CreateDate: new Date(),
+                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingTime: bookingTime,
+                TotalPrice: currentPriceRef.current,
+                AccountID: accountID,
+                PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
+                CaretakerNote: values.CaretakerNote,
+                CaretakerID: values.CaretakerID,
+                CancelReason: "",
+                StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
             };
         
             // Send booking data to backend
@@ -687,30 +689,37 @@ const SpaServiceDetail = () => {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                        <Form.Item
-                            name="CaretakerNote"
-                            label={t('Nhân viên chăm sóc')}
-                        >
-                            <Select
-                                placeholder={t('choose_caretaker')}
-                                onChange={(value) => handleCaretakerChange(value)}
-                            >
-                                {/* Empty option */}
-                                <Select.Option value='' key="empty-option">
-                                    {t('[Trống]')}
-                                </Select.Option>
-                                
-                                {/* Options for caretakers */}
-                                {caretakers.map(caretaker => (
-                                    <Select.Option key={caretaker.id} value={caretaker.id}>
-                                        {caretaker.name}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        </Col>
-                    </Row>
+        <Col xs={24} sm={12}>
+            <Form.Item
+                name="CaretakerID" 
+                label={t('Nhân viên chăm sóc')}
+                style={{ display: 'none' }} 
+            >
+                <Input />
+            </Form.Item>
+            <Form.Item
+                name="CaretakerNote"
+                label={t('Nhân viên chăm sóc')}
+            >
+                <Select
+                    placeholder={t('choose_caretaker')}
+                    onChange={(value) => handleCaretakerChange(value)}
+                >
+                    {/* Empty option */}
+                    <Select.Option value='' key="empty-option">
+                        {t('[Trống]')}
+                    </Select.Option>
+                    
+                    {/* Options for caretakers */}
+                    {caretakers.map(caretaker => (
+                        <Select.Option key={caretaker.id} value={caretaker.id}>
+                            {caretaker.name}
+                        </Select.Option>
+                    ))}
+                </Select>
+            </Form.Item>
+        </Col>
+    </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
                             <Form.Item name="ServiceID" label={t('service_id')} initialValue={id} style={{ display: 'none' }}>

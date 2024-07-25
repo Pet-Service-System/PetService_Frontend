@@ -126,8 +126,13 @@ const SpaBooking = () => {
           reviewed: booking.Reviewed,
           customerName: detail.CustomerName,
           phone: detail.Phone,
-          bookingDate: detail.BookingDate ? new Date(detail.BookingDate) : null,
-          statusChanges: booking.StatusChanges
+          bookingDate: detail.BookingDate,
+          bookingTime: detail.BookingTime,
+          statusChanges: booking.StatusChanges,
+          CaretakerNote: booking.CaretakerNote,
+          CaretakerID: booking.CaretakerID,
+          CancelReason: booking.CancelReason,
+          PaypalOrderID: booking.PaypalOrderID
         };
       }));
       const sortedData = sortOrder === 'desc'
@@ -198,37 +203,97 @@ const SpaBooking = () => {
     }
   };
   
-   // Fetch Caretaker Staff accounts
+  // Fetch Caretaker Staff accounts and check for availability
   useEffect(() => {
-    const fetchAccounts = async () => {
+    if(!selectedBooking){
+      return;
+    }
+    const fetchAccountsAndCheckAvailability = async () => {
       try {
         const token = localStorage.getItem('token');
+        // Fetch all caretakers
         const response = await axios.get(`${API_URL}/api/accounts/all`, {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            'Authorization': `Bearer ${token}`,
+          },
         });
+
         const caretakers = response.data.accounts
-          .filter(account => account.role === 'Caretaker Staff')
-          .map(account => ({
+          .filter((account) => account.role === 'Caretaker Staff')
+          .map((account) => ({
             id: account.AccountID,
-            name: account.fullname
+            name: account.fullname,
           }));
-        setCaretakers(caretakers);
+
+        // Fetch all spa bookings for availability check
+        const bookingsResponse = await axios.get(`${API_URL}/api/Spa-bookings/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        // Extract CaretakerID and BookingID from SpaBookings
+        const spaBookings = bookingsResponse.data.map((booking) => ({
+          caretakerID: booking.CaretakerID,
+          bookingID: booking.BookingID,
+          status: booking.CurrentStatus,
+        }));
+        // Fetch booking details for each booking to check availability
+        const bookingDetailsResponse = await Promise.all(
+          spaBookings.map((booking) =>
+            axios.get(`${API_URL}/api/spa-booking-details/booking/${booking.bookingID}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }).then((response) => ({
+              bookingID: booking.bookingID,
+              caretakerID: booking.caretakerID,
+              bookingDate: moment(response.data.BookingDate).format('YYYY-MM-DD'),
+              bookingTime: moment(response.data.BookingTime, 'HH:mm').format('HH:mm'),
+              status: booking.status,
+            }))
+          )
+        );
+        // Filter out the selectedBooking from the bookingDetailsResponse
+        const filteredBookingDetails = bookingDetailsResponse.filter(
+          (bookingDetail) =>
+            bookingDetail.bookingID !== selectedBooking?.id
+        );
+        // Map caretakers with availability status
+        const updatedCaretakers = caretakers.map((caretaker) => {
+          // Check if this caretaker is booked for the same date and time slot
+          const isBusy = filteredBookingDetails.some((bookingDetail) => {
+            return (
+              bookingDetail.caretakerID === caretaker.id &&
+              bookingDetail.bookingDate === selectedBooking?.bookingDate &&
+              bookingDetail.bookingTime === selectedBooking?.bookingTime &&
+              bookingDetail.status === 'Checked In' &&
+              bookingDetail.bookingID !== selectedBooking?.id // Ignore current booking
+            );
+          });
+
+          return {
+            ...caretaker,
+            isBusy,
+          };
+        });
+
+        setCaretakers(updatedCaretakers);
+
+        console.log('Updated Caretakers with Availability:', updatedCaretakers); // Debugging
       } catch (error) {
-        console.error('Error fetching accounts:', error);
+        console.error('Error fetching accounts or checking availability:', error);
       }
     };
-    fetchAccounts();
-  }, []);
+
+    fetchAccountsAndCheckAvailability();
+  }, [selectedBooking]);
 
   const handleCaretakerChange = (value) => {
-      const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
-      setSelectedCaretaker(selectedCaretaker);
-      setCaretakerID(value);
-      setCaretakerNote(selectedCaretaker ? selectedCaretaker.name : '');
+    const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
+    setSelectedCaretaker(selectedCaretaker);
+    setCaretakerID(value);
+    setCaretakerNote(selectedCaretaker ? selectedCaretaker.name : '');
   };
-
 
   const renderActions = (record) => {
     if (role === 'Sales Staff') {
@@ -344,7 +409,6 @@ const SpaBooking = () => {
       setSelectedDateCreated(null);
     }
   };
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -411,6 +475,7 @@ const SpaBooking = () => {
             <p className="mb-4">{t('ask_update')} "{pendingStatus}"?</p>
             {pendingStatus === 'Checked In' && (
               <div className="mb-4">
+                <Text className="mr-1">{t('Nhân viên được yêu cầu: ')} {selectedBooking?.CaretakerNote || '-'}</Text><br/>
                 <Text className="mr-1">{t('Chọn nhân viên chăm sóc: ')}</Text>
                 <Select
                   placeholder={t('select_caretaker')}
@@ -418,7 +483,9 @@ const SpaBooking = () => {
                   style={{ width: 200 }}
                 >
                   {caretakers.map(caretaker => (
-                    <Option key={caretaker.id} value={caretaker.id}>
+                    <Option key={caretaker.id} 
+                            value={caretaker.id} 
+                            disabled={caretaker.isBusy}>
                       {caretaker.name}
                     </Option>
                   ))}
