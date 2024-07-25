@@ -132,7 +132,8 @@ const SpaBooking = () => {
           CaretakerNote: booking.CaretakerNote,
           CaretakerID: booking.CaretakerID,
           CancelReason: booking.CancelReason,
-          PaypalOrderID: booking.PaypalOrderID
+          PaypalOrderID: booking.PaypalOrderID,
+          CustomerID: booking.AccountID
         };
       }));
       const sortedData = sortOrder === 'desc'
@@ -174,7 +175,7 @@ const SpaBooking = () => {
           ChangeTime: new Date().toISOString(), 
         },
       ];
-
+  
       await axios.put(
         `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
         {
@@ -189,6 +190,19 @@ const SpaBooking = () => {
           },
         }
       );
+      
+      // If the status is "Completed", call the update-spent API
+      if (pendingStatus === 'Completed') {
+        await axios.patch(
+          `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
   
       // Show success message
       message.success(`${t('booking_success_update_to')} "${pendingStatus}"`);
