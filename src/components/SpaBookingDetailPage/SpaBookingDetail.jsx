@@ -21,6 +21,7 @@ const SpaBookingDetail = () => {
   const [caretakers, setCaretakers] = useState([]); // List of available caretakers
   const [isChangeModalVisible, setIsChangeModalVisible] = useState(false); // Modal visibility state
   const [form] = Form.useForm(); // Antd form instance
+  const [caretakersName, setCaretakersName] = useState(null);
   const availableTimes = [
     "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
     "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -81,6 +82,21 @@ const SpaBookingDetail = () => {
     }
   };
 
+  const getFullName = async (CaretakerID) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/accounts/fullname/${CaretakerID}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching full name:', error);
+    }
+  };
+
+
   const fetchAccounts = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -119,10 +135,13 @@ const SpaBookingDetail = () => {
       const booking = await getSpaBookingById(id);
       const bookingDetail = await getSpaBookingDetail(id);
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
+      const caretakersName = await getFullName(booking.CaretakerID);
+
 
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail);
       setServiceData(serviceInfo);
+      setCaretakersName(caretakersName);
     } catch (error) {
       console.error('Error fetching spa booking:', error);
     } finally {
@@ -449,7 +468,7 @@ const SpaBookingDetail = () => {
             </div>
             <div className="mb-4">
               <Text strong>{t('Nhân viên chăm sóc')}: </Text>
-              <Text>{spaBooking.CaretakerNote}</Text>
+              <Text>{caretakersName.fullname}</Text>
             </div>
           </Col>
         </Row>
