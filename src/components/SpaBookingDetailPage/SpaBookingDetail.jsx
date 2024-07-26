@@ -526,7 +526,7 @@ const SpaBookingDetail = () => {
           <Button
             type="primary"
             onClick={handleOpenChangeModal}
-            disabled={isBefore24Hours() || role !== 'Customer' || spaBooking.CurrentStatus !== 'Pending'}
+            disabled={!isBefore24Hours() || role !== 'Customer' || spaBooking.CurrentStatus !== 'Pending'}
           >
             {t('change_information_booking')}
           </Button>
@@ -537,7 +537,7 @@ const SpaBookingDetail = () => {
             danger 
             className="float-end mt-4"
             onClick={handleCancelBooking}
-            disabled={isBefore24Hours()}>
+            disabled={!isBefore24Hours()}>
             {t('cancel_booking')}
           </Button>
         )}
