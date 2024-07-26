@@ -266,7 +266,7 @@ const BookingList = () => {
         {
           Status: pendingStatus, 
           StatusChanges: updatedStatusChanges,
-          CaretakerID: caretakerID,
+          CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
           CaretakerNote: caretakerNote,
           CancelReason: cancelReason,
         },
