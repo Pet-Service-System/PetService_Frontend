@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs, Tag, Timeline, Select, Radio } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs, Tag, Timeline, Select, Radio, InputNumber, Form } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,7 @@ const BookingList = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('all');
   const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
+  const [isConfirmButtonDisabled, setIsConfirmButtonDisabled] = useState(true);
   const [bookingCount, setBookingCount] = useState({
     all: 0,
     completed: 0,
@@ -50,7 +51,14 @@ const BookingList = () => {
   const [selectedCancelSource, setSelectedCancelSource] = useState('');
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [actualWeight, setActualWeight] = useState(null);
+  const [additionalCost, setAdditionalCost] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [showWeightInput, setShowWeightInput] = useState(false);
   const accountID = user?.id
+  const [radioValue, setRadioValue] = useState('Không');
+  const [form] = Form.useForm();
+  const [validate, setValidate] = useState(true);
 
   // Function to get spa bookings
   const getSpaBookings = async (bookingDate, dateCreated) => {
@@ -71,6 +79,33 @@ const BookingList = () => {
       throw error;
     }
   };
+
+  const handleWeightChange = (value) => {
+    setActualWeight(value);
+  
+    // Check weight validity
+    if (value < 0 || value > 35) {
+      setValidate(false)
+      form.setFields([
+        {
+          name: 'actualWeight',
+          errors: ['Cân nặng thực tế phải nằm trong khoảng từ 0 đến 35'],
+        },
+      ]);
+    } else {
+      form.setFields([{ name: 'actualWeight', errors: [] }]);
+      calculateAdditionalCost(value);
+      
+      // Check if weight is provided when "Có" is selected
+      if (radioValue === 'Có' && value === null) {
+        setIsConfirmButtonDisabled(true);
+      } else {
+        setIsConfirmButtonDisabled(false);
+      }
+      setValidate(true)
+    }
+  };
+  
 
   useEffect(() => {
     const fetchExchangeRate = async () => {
@@ -277,8 +312,10 @@ const BookingList = () => {
       let refundPercentage = 100; // Default refund percentage
       if (selectedCancelSource === 'Khach') {
         if (selectedReason === 'Khách không đến tiệm để làm dịch vụ') {
-          refundPercentage = 60;
-        } else {refundPercentage = 100}
+          refundPercentage = 30;
+        } else if (selectedReason === 'Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa') {
+          refundPercentage = 100;
+        } else {refundPercentage = 0}
       } else if (selectedCancelSource === 'Tiem') {
         refundPercentage = 100;
       }
@@ -304,7 +341,7 @@ const BookingList = () => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 201 && refundPercentage != 0 ) {
         // Show success message with modal
         Modal.success({
           title: t('refund_success_title'),
@@ -556,12 +593,68 @@ const BookingList = () => {
   };
 
   const handleCancelConfirm = () => {
+    setSelectedCaretaker(null);
     setUpdateStatusModalVisible(false)
     setSelectedCancelSource('')
     setSelectedReason('')
     setReasonDetail('')
+    setShowWeightInput(false)
+    setRadioValue('Không');
   };
 
+  const calculateAdditionalCost = async (weight) => {
+    if (!selectedBooking) return;
+
+    const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
+    const serviceID = bookingDetails?.ServiceID;
+  
+    // Fetch service details
+    const response = await axios.get(`${API_URL}/api/services/${serviceID}`);
+    const service = response.data;
+  
+    // Find the price range that includes the actual weight
+    const priceRange = service.PriceByWeight.find(range =>
+      weight >= range.minWeight && weight <= range.maxWeight
+    );
+  
+    if (priceRange) {
+      const newAdditionalCost = priceRange.price - selectedBooking.TotalPrice;
+      setAdditionalCost(newAdditionalCost);
+      setTotalPrice(priceRange.price);
+    } else {
+      // Handle case where weight does not match any price range
+      setAdditionalCost(0);
+      setTotalPrice(selectedBooking.TotalPrice);
+    }
+  };
+
+  const handleRadioChange = (e) => {
+    const value = e.target.value;
+    setRadioValue(value);
+    setShowWeightInput(value === 'Có');
+    if (value === 'Không') {
+      setActualWeight(0);
+      setAdditionalCost(0);
+      setTotalPrice(0);
+      form.setFieldsValue({
+        actualWeight: ''
+      });
+    }
+    if (value === 'Có' && actualWeight === null) {
+      setIsConfirmButtonDisabled(true);
+    } else {
+      setIsConfirmButtonDisabled(false);
+    }
+  };
+
+  useEffect(() => {
+    if (radioValue === 'Có' && actualWeight === null) {
+      setIsConfirmButtonDisabled(true);
+    } else {
+      setIsConfirmButtonDisabled(false);
+    }
+  }, [radioValue, actualWeight]);
+  
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -624,7 +717,7 @@ const BookingList = () => {
                 key="submit"
                 type="primary"
                 onClick={handleUpdateStatus}
-                disabled={saving || (pendingStatus === 'Checked In' && !selectedCaretaker) || (pendingStatus === 'Canceled' && (!selectedCancelSource ||!selectedReason))} // Disable the submit button during saving
+                disabled={saving || (pendingStatus === 'Checked In' && !selectedCaretaker) || (pendingStatus === 'Canceled' && (!selectedCancelSource ||!selectedReason)) || isConfirmButtonDisabled || !validate} // Disable the submit button during saving
               >
                 {t('confirm')}
               </Button>
@@ -648,6 +741,49 @@ const BookingList = () => {
                     </Option>
                   ))}
                 </Select>
+                <div>
+                  <Text className="mr-1">{t('Phát sinh chi phí do chênh lệch cân nặng thực tế:')}</Text>
+                  <Radio.Group
+                    onChange={handleRadioChange}
+                    value={radioValue}
+                  >
+                    <Radio value="Có">{t('Có')}</Radio>
+                    <Radio value="Không">{t('Không')}</Radio>
+                  </Radio.Group>
+                </div>
+                {showWeightInput && (
+                  <div>
+                    <div className="flex flex-row ">
+                      <Text className="mr-1">{t('Cân nặng thực tế:')}</Text>
+                      <Form form={form}>
+                        <Form.Item
+                          name="actualWeight"
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Cân nặng thực tế là bắt buộc',
+                            },
+                            { type: 'number', min: 0, max:35, message: t('Chỉ nhập từ 0 tới 35 ') }
+                          ]}
+                        >
+                          <InputNumber
+                            value={actualWeight}
+                            onChange={handleWeightChange}
+                            style={{ width: 60 }}
+                            className="h-10 w-10 items-center"
+                            suffix='kg'
+                          />
+                        </Form.Item>
+                      </Form>
+                    </div>
+                    <div>
+                      <Text className="mr-1">{t('Phí phát sinh:')} {additionalCost.toLocaleString('en-US')}</Text>
+                    </div>
+                    <div>
+                      <Text className="mr-1">{t('Tổng tiền:')} {totalPrice.toLocaleString('en-US')}</Text>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {pendingStatus === 'Canceled' && (
@@ -671,9 +807,13 @@ const BookingList = () => {
                         }
                       }}
                       className="w-full"
-                    >
-                      <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
-                      <Option value="Khách liên hệ hủy lịch do sự cố đặt nhầm hoặc không còn nhu cầu nữa">{t('Khách liên hệ hủy lịch do sự cố đặt nhầm hoặc không còn nhu cầu nữa')}</Option>
+                    > 
+                      {selectedBooking.status !== 'Checked In' && (
+                        <>
+                          <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
+                          <Option value="Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa">{t('Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa')}</Option>
+                        </>
+                      )}
                       <Option value="Khac">{t('Khác')}</Option>
                     </Select>
                   )}
