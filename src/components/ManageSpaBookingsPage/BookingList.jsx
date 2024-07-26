@@ -82,9 +82,8 @@ const BookingList = () => {
 
   const handleWeightChange = (value) => {
     setActualWeight(value);
-  
     // Check weight validity
-    if (value < 0 || value > 35) {
+    if (value < 0 || value > 35 || value == null) {
       setValidate(false)
       form.setFields([
         {
@@ -192,7 +191,9 @@ const BookingList = () => {
                 CaretakerID: booking.CaretakerID,
                 CancelReason: booking.CancelReason,
                 PaypalOrderID: booking.PaypalOrderID,
-                CustomerID: booking.AccountID
+                CustomerID: booking.AccountID,
+                ExtraCharge: booking.ExtraCharge,
+                FinalPrice: booking.FinalPrice
             };
         }));
     
@@ -224,7 +225,6 @@ const BookingList = () => {
             setLoading(false);
         }
     };
-  
 
   const handleUpdateStatus = async () => {
     setSaving(true)
@@ -248,9 +248,18 @@ const BookingList = () => {
           cancelReason = reasonDetail; 
         }
       }
-      await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
     }
+    // Log to verify the values
+    console.log('Selected Booking Total Price:', selectedBooking.TotalPrice);
+    console.log('Initial Final Price:', finalPrice);
 
+    if (finalPrice === 0) {
+      // Set finalPrice only if it is currently 0
+      setFinalPrice(selectedBooking.TotalPrice);
+    }
+    
+    console.log('Updated Final Price:', finalPrice);
+    
     try {
       const token = localStorage.getItem('token');
       const updatedStatusChanges = [
@@ -260,40 +269,119 @@ const BookingList = () => {
           ChangeTime: new Date().toISOString(), 
         },
       ];
-  
-      await axios.put(
-        `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
-        {
-          Status: pendingStatus, 
-          StatusChanges: updatedStatusChanges,
-          CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
-          CaretakerNote: caretakerNote,
-          CancelReason: cancelReason,
-          ExtraCharge: additionalCost,
-          FinalPrice: finalPrice,
-          isReplied: false,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, 
+      console.log(selectedBooking.status)
+      console.log(pendingStatus)
+      if(selectedBooking.status === 'Checked In' && pendingStatus === 'Completed'){
+        await axios.put(
+          `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
+          {
+            Status: pendingStatus, 
+            StatusChanges: updatedStatusChanges,
+            CancelReason: cancelReason,
+            ExtraCharge: selectedBooking.ExtraCharge,
+            FinalPrice: selectedBooking.FinalPrice,
+            isReplied: false,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        ); 
+      }
 
-      const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
-
-      await axios.put(
-        `${API_URL}/api/spa-booking-details/${bookingDetails.BookingDetailsID}`,
-        {
-          ActualWeight: actualWeight,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      if(selectedBooking.status === 'Pending' && pendingStatus === 'Checked In'){
+        await axios.put(
+          `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
+          {
+            Status: pendingStatus, 
+            StatusChanges: updatedStatusChanges,
+            CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
+            ExtraCharge: additionalCost,
+            FinalPrice: finalPrice,
+            isReplied: false,
           },
-        }
-      );
-      
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
+
+        const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
+
+        await axios.put(
+          `${API_URL}/api/spa-booking-details/${bookingDetails.BookingDetailsID}`,
+          {
+            ActualWeight: actualWeight,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+      // If the status is "Completed", call the update-spent API
+      if (pendingStatus === 'Completed') {
+        await axios.patch(
+          `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+
+      if(selectedBooking.status == 'Pending' && pendingStatus === 'Canceled'){
+        await axios.put(
+          `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
+          {
+            Status: pendingStatus, 
+            StatusChanges: updatedStatusChanges,
+            CancelReason: cancelReason,
+            isReplied: false,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
+        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
+      }
+      // If the status is "Completed", call the update-spent API
+      if (pendingStatus === 'Completed') {
+        await axios.patch(
+          `${API_URL}/api/accounts/${selectedBooking.CustomerID}/update-spent`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+
+      if(selectedBooking.status == 'Checked In' && pendingStatus === 'Canceled'){
+        await axios.put(
+          `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
+          {
+            Status: pendingStatus, 
+            StatusChanges: updatedStatusChanges,
+            CancelReason: cancelReason,
+            isReplied: false,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
+        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.FinalPrice);
+      }
       // If the status is "Completed", call the update-spent API
       if (pendingStatus === 'Completed') {
         await axios.patch(
@@ -336,6 +424,10 @@ const BookingList = () => {
           refundPercentage = 30;
         } else if (selectedReason === 'Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa') {
           refundPercentage = 100;
+        } else if (selectedReason === 'Khách hủy lịch sau khi phát sinh chi phí') {
+          refundPercentage = 80;
+        } else if (selectedReason === 'Thú cưng không hợp tác') {
+          refundPercentage = 90;
         } else {refundPercentage = 0}
       } else if (selectedCancelSource === 'Tiem') {
         refundPercentage = 100;
@@ -477,8 +569,6 @@ const BookingList = () => {
         });
 
         setCaretakers(updatedCaretakers);
-
-        console.log('Updated Caretakers with Availability:', updatedCaretakers); // Debugging
       } catch (error) {
         console.error('Error fetching accounts or checking availability:', error);
       }
@@ -487,11 +577,21 @@ const BookingList = () => {
     fetchAccountsAndCheckAvailability();
   }, [selectedBooking]);
 
-  const handleCaretakerChange = (value) => {
+  const handleCaretakerChange = async (value) => {
     const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
     setSelectedCaretaker(selectedCaretaker);
     setCaretakerID(value);
     setCaretakerNote(selectedCaretaker ? selectedCaretaker.name : '');
+    
+    const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
+    if(radioValue == 'Không'){
+      setActualWeight(bookingDetails.PetWeight);
+      setAdditionalCost(0);
+      setFinalPrice(selectedBooking.TotalPrice);
+      form.setFieldsValue({
+        actualWeight: ''
+      });
+    }
   };
 
   const renderActions = (record) => {
@@ -544,7 +644,7 @@ const BookingList = () => {
       dataIndex: 'bookingDate',
       key: 'bookingDate',
       render: (text, record) => (
-        <Text>{record.bookingDate ? moment(record.bookingDate).format('DD/MM/YYYY') : '-'}</Text>
+        <Text>{record.bookingDate}</Text>
       ),
     },
     {
@@ -584,6 +684,13 @@ const BookingList = () => {
     setSelectedBookingId(id);
     setPendingStatus(status);
     setUpdateStatusModalVisible(true);
+    setActualWeight(null)
+    setSelectedCaretaker(null)
+    form.setFieldsValue({
+      actualWeight: ''
+    });
+    setAdditionalCost(0)
+    setFinalPrice(0)
   };
 
   // Handle search input
@@ -625,14 +732,13 @@ const BookingList = () => {
 
   const calculateAdditionalCost = async (weight) => {
     if (!selectedBooking) return;
-
     const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
     const serviceID = bookingDetails?.ServiceID;
   
     // Fetch service details
     const response = await axios.get(`${API_URL}/api/services/${serviceID}`);
     const service = response.data;
-  
+
     // Find the price range that includes the actual weight
     const priceRange = service.PriceByWeight.find(range =>
       weight >= range.minWeight && weight <= range.maxWeight
@@ -648,15 +754,16 @@ const BookingList = () => {
       setFinalPrice(selectedBooking.TotalPrice);
     }
   };
-
-  const handleRadioChange = (e) => {
+  
+  const handleRadioChange = async (e) => {
+    const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
     const value = e.target.value;
     setRadioValue(value);
     setShowWeightInput(value === 'Có');
     if (value === 'Không') {
-      setActualWeight(0);
+      setActualWeight(bookingDetails.PetWeight);
       setAdditionalCost(0);
-      setFinalPrice(0);
+      setFinalPrice(selectedBooking.TotalPrice);
       form.setFieldsValue({
         actualWeight: ''
       });
@@ -675,7 +782,6 @@ const BookingList = () => {
       setIsConfirmButtonDisabled(false);
     }
   }, [radioValue, actualWeight]);
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -738,7 +844,13 @@ const BookingList = () => {
                 key="submit"
                 type="primary"
                 onClick={handleUpdateStatus}
-                disabled={saving || (pendingStatus === 'Checked In' && !selectedCaretaker) || (pendingStatus === 'Canceled' && (!selectedCancelSource ||!selectedReason)) || isConfirmButtonDisabled || !validate} // Disable the submit button during saving
+                disabled={saving || 
+                          (pendingStatus === 'Checked In' && !selectedCaretaker) || 
+                          (pendingStatus === 'Canceled' && 
+                          (!selectedCancelSource || !selectedReason)) || 
+                          isConfirmButtonDisabled || 
+                          !validate
+                        } // Disable the submit button during saving
               >
                 {t('confirm')}
               </Button>
@@ -752,7 +864,8 @@ const BookingList = () => {
                 <Select
                   placeholder={t('select_caretaker')}
                   onChange={handleCaretakerChange}
-                  style={{ width: 200 }}
+                  style={{ width: 300 }}
+                  value={selectedCaretaker ? selectedCaretaker.id : undefined}
                 >
                   {caretakers.map(caretaker => (
                     <Option key={caretaker.id} 
@@ -798,10 +911,10 @@ const BookingList = () => {
                       </Form>
                     </div>
                     <div>
-                      <Text className="mr-1">{t('Phí phát sinh:')} {additionalCost.toLocaleString('en-US')}</Text>
+                      <Text className="mr-1">{t('Phí phát sinh:')} {additionalCost.toLocaleString('vn')}</Text>
                     </div>
                     <div>
-                      <Text className="mr-1">{t('Tổng tiền:')} {finalPrice.toLocaleString('en-US')}</Text>
+                      <Text className="mr-1">{t('Tổng tiền:')} {finalPrice.toLocaleString('vn')}</Text>
                     </div>
                   </div>
                 )}
@@ -833,8 +946,10 @@ const BookingList = () => {
                         <>
                           <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
                           <Option value="Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa">{t('Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa')}</Option>
+                          <Option value="Khách hủy lịch sau khi phát sinh chi phí">{t('Khách hủy lịch sau khi phát sinh chi phí')}</Option>
                         </>
                       )}
+                      <Option value="Thú cưng không hợp tác">{t('Thú cưng không hợp tác')}</Option>
                       <Option value="Khac">{t('Khác')}</Option>
                     </Select>
                   )}

@@ -383,7 +383,7 @@ const SpaServiceDetail = () => {
                 const booking = {
                 Status: 'Pending', // Initial status
                 CreateDate: new Date(),
-                BookingDate: bookingDate.format('DD-MM-YYYY'),
+                BookingDate: bookingDate.format('DD/MM/YYYY'),
                 BookingTime: bookingTime,
                 TotalPrice: currentPriceRef.current,
                 AccountID: accountID,
@@ -407,21 +407,19 @@ const SpaServiceDetail = () => {
                 const bookingDetail = {
                 BookingID: responseBooking.data.BookingID,
                 ...values,
-                BookingDate: bookingDate.format('DD-MM-YYYY'),
+                BookingDate: bookingDate.format('DD/MM/YYYY'),
                 BookingTime: bookingTime,
                 ServiceID: id,
                 ActualWeight: ''
             };
         
             // Send booking detail data to backend
-            const responseBookingDetail = await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
+            await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
             });
-        
-            // Log response
-            console.log(responseBookingDetail.data);
+    
         
             // Display success notification
             notification.success({

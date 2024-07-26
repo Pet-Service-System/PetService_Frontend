@@ -497,7 +497,7 @@ const SpaBookingDetail = () => {
             <Text strong>{t('pet_weight')}: </Text>
             <Text>{spaBookingDetail.PetWeight} kg</Text>
           </div>
-          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && (
+          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && (
             <div className="mb-4 flex justify-between">
             <Text strong>{t('Cân nặng thực tế: ')} </Text>
             <Text>{spaBookingDetail.ActualWeight} kg</Text>
@@ -524,22 +524,27 @@ const SpaBookingDetail = () => {
         )}
 
         <Card className="text-right w-full ml-auto border-none">
-          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && (
+          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 ? (
             <>
-            <div className="mb-4 flex justify-end items-end">
-              <Text strong className="mr-2">{t('Thành tiền')}:</Text>
-              <Text className="flex justify-between">{spaBooking.TotalPrice}đ</Text>
-            </div>
-            <div className="mb-4 flex justify-end items-end">
-              <Text strong className="mr-2">{t('Chi phí phát sinh: ')}</Text>
-              <Text className="flex justify-between">{spaBooking.ExtraCharge}đ</Text>
-            </div>
+              <div className="mb-4 flex justify-end items-end">
+                <Text strong className="mr-2">{t('Thành tiền')}:</Text>
+                <Text className="flex justify-between">{spaBooking.TotalPrice.toLocaleString('vn')}đ</Text>
+              </div>
+              <div className="mb-4 flex justify-end items-end">
+                <Text strong className="mr-2">{t('Chi phí phát sinh: ')}</Text>
+                <Text className="flex justify-between">{spaBooking.ExtraCharge.toLocaleString('vn')}đ</Text>
+              </div>
+              <div className="flex justify-end items-end">
+                <Text strong className="mr-2">{t('Tổng tiền: ')}</Text>
+                <Text className="text-green-600 text-4xl flex justify-between">{spaBooking.FinalPrice.toLocaleString('vn')}đ</Text>
+              </div>
             </>
+          ) : (
+            <div className="flex justify-end items-end">
+              <Text strong className="mr-2">{t('Tổng tiền: ')}</Text>
+              <Text className="text-green-600 text-4xl flex justify-between">{spaBooking.TotalPrice.toLocaleString('vn')}đ</Text>
+            </div>
           )}
-          <div className="flex justify-end items-end">
-            <Text strong className="mr-2">{t('Tổng tiền: ')}</Text>
-            <Text className="text-green-600 text-4xl flex justify-between">{spaBooking.FinalPrice}đ</Text>
-          </div>
         </Card>
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
           <Button
