@@ -271,6 +271,7 @@ const BookingList = () => {
           CancelReason: cancelReason,
           ExtraCharge: additionalCost,
           FinalPrice: finalPrice,
+          isReplied: false,
         },
         {
           headers: {
@@ -674,7 +675,7 @@ const BookingList = () => {
       setIsConfirmButtonDisabled(false);
     }
   }, [radioValue, actualWeight]);
-  console.log(saving)
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
