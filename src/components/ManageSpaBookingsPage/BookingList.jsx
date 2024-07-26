@@ -139,55 +139,57 @@ const BookingList = () => {
   const fetchSpaBookings = async () => {
     setLoading(true);
     try {
-      const data = await getSpaBookings(selectedBookingDate, selectedDateCreated);
-      const formattedData = await Promise.all(data.map(async (booking) => {
-        const detail = await getSpaBookingDetail(booking.BookingID);
-        return {
-          id: booking.BookingID,
-          date: new Date(booking.CreateDate),
-          TotalPrice: booking.TotalPrice,
-          status: booking.CurrentStatus,
-          reviewed: booking.Reviewed,
-          customerName: detail.CustomerName,
-          phone: detail.Phone,
-          bookingDate: detail.BookingDate,
-          bookingTime: detail.BookingTime,
-          statusChanges: booking.StatusChanges,
-          CaretakerNote: booking.CaretakerNote,
-          CaretakerID: booking.CaretakerID,
-          CancelReason: booking.CancelReason,
-          PaypalOrderID: booking.PaypalOrderID,
-          CustomerID: booking.AccountID
-        };
-      }));
-      
-      const sortedData = sortOrder === 'desc'
-        ? formattedData.sort((a, b) => b.date - a.date)
-        : formattedData.sort((a, b) => a.date - b.date);
-
-      // If the role is Caretaker Staff, filter bookings by CaretakerID
-      const filteredData = role === 'Caretaker Staff'
-        ? sortedData.filter(booking => booking.CaretakerID === accountID)
-        : (activeTab === 'all'
+        const data = await getSpaBookings(selectedBookingDate, selectedDateCreated);
+        const formattedData = await Promise.all(data.map(async (booking) => {
+            const detail = await getSpaBookingDetail(booking.BookingID);
+            return {
+                id: booking.BookingID,
+                date: new Date(booking.CreateDate),
+                TotalPrice: booking.TotalPrice,
+                status: booking.CurrentStatus,
+                reviewed: booking.Reviewed,
+                customerName: detail.CustomerName,
+                phone: detail.Phone,
+                bookingDate: detail.BookingDate,
+                bookingTime: detail.BookingTime,
+                statusChanges: booking.StatusChanges,
+                CaretakerNote: booking.CaretakerNote,
+                CaretakerID: booking.CaretakerID,
+                CancelReason: booking.CancelReason,
+                PaypalOrderID: booking.PaypalOrderID,
+                CustomerID: booking.AccountID
+            };
+        }));
+    
+        // Filter based on user role
+        const filteredData = role === 'Caretaker Staff'
+            ? formattedData.filter(booking => booking.CaretakerID === accountID)
+            : formattedData;
+    
+        const sortedData = sortOrder === 'desc'
+            ? filteredData.sort((a, b) => b.date - a.date)
+            : filteredData.sort((a, b) => a.date - b.date);
+    
+        setBookingCount({
+            all: sortedData.length,
+            completed: sortedData.reduce((count, booking) => booking.status === 'Completed' ? count + 1 : count, 0),
+            pending: sortedData.reduce((count, booking) => booking.status === 'Pending' ? count + 1 : count, 0),
+            checkedin: sortedData.reduce((count, booking) => booking.status === 'Checked In' ? count + 1 : count, 0),
+            canceled: sortedData.reduce((count, booking) => booking.status === 'Canceled' ? count + 1 : count, 0),
+        });
+    
+        const displayedData = activeTab === 'all'
             ? sortedData
-            : sortedData.filter(booking => booking.status.toLowerCase() === activeTab)
-          );
-
-      setBookingCount({
-        all: filteredData.length,
-        completed: filteredData.filter(booking => booking.status === 'Completed').length,
-        pending: filteredData.filter(booking => booking.status === 'Pending').length,
-        checkedin: filteredData.filter(booking => booking.status === 'Checked In').length,
-        canceled: filteredData.filter(booking => booking.status === 'Canceled').length,
-      });
-
-      setSpaBookings(filteredData);
-    } catch (error) {
-      console.error('Error fetching spa bookings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+            : sortedData.filter(booking => booking.status.toLowerCase() === activeTab);
+    
+        setSpaBookings(displayedData);
+        } catch (error) {
+            console.error('Error fetching spa bookings:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+  
 
   const handleUpdateStatus = async () => {
     setSaving(true)
