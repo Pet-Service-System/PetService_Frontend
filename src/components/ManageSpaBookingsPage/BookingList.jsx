@@ -17,9 +17,8 @@ const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 const REACT_APP_EXCHANGE_RATE_API = import.meta.env.REACT_APP_EXCHANGE_RATE_API;
 
-const SpaBooking = () => {
+const BookingList = () => {
   const navigate = useNavigate();
-  const [role] = useState(localStorage.getItem("role") || "Guest");
   const [spaBookings, setSpaBookings] = useState([]);
   const [saving, setSaving] = useState(false);
   const [sortOrder] = useState('desc');
@@ -49,6 +48,9 @@ const SpaBooking = () => {
   const [selectedReason, setSelectedReason] = useState('');
   const [reasonDetail, setReasonDetail] = useState('');
   const [selectedCancelSource, setSelectedCancelSource] = useState('');
+  const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const accountID = user?.id
 
   // Function to get spa bookings
   const getSpaBookings = async (bookingDate, dateCreated) => {
@@ -158,21 +160,26 @@ const SpaBooking = () => {
           CustomerID: booking.AccountID
         };
       }));
+      
       const sortedData = sortOrder === 'desc'
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
 
-      setBookingCount({
-        all: sortedData.length,
-        completed: sortedData.filter(booking => booking.status === 'Completed').length,
-        pending: sortedData.filter(booking => booking.status === 'Pending').length,
-        checkedin: sortedData.filter(booking => booking.status === 'Checked In').length,
-        canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
-      });
+      // If the role is Caretaker Staff, filter bookings by CaretakerID
+      const filteredData = role === 'Caretaker Staff'
+        ? sortedData.filter(booking => booking.CaretakerID === accountID)
+        : (activeTab === 'all'
+            ? sortedData
+            : sortedData.filter(booking => booking.status.toLowerCase() === activeTab)
+          );
 
-      const filteredData = activeTab === 'all'
-        ? sortedData
-        : sortedData.filter(booking => booking.status.toLowerCase() === activeTab);
+      setBookingCount({
+        all: filteredData.length,
+        completed: filteredData.filter(booking => booking.status === 'Completed').length,
+        pending: filteredData.filter(booking => booking.status === 'Pending').length,
+        checkedin: filteredData.filter(booking => booking.status === 'Checked In').length,
+        canceled: filteredData.filter(booking => booking.status === 'Canceled').length,
+      });
 
       setSpaBookings(filteredData);
     } catch (error) {
@@ -721,4 +728,4 @@ const getStatusColor = (status) => {
   }
 };
 
-export default SpaBooking;
+export default BookingList;
