@@ -494,12 +494,12 @@ const SpaBookingDetail = () => {
           scroll={{ x: 'max-content' }}
           pagination={false}
         />
-        {spaBookingDetail.Feedback && (
+        {spaBooking.Feedback && (
           <Card className="text-left w-full ml-auto">
             <Title level={3} className="text-center">Đánh giá của khách hàng</Title>
             <div className="mt-4">
               <Text className="text-3xl" strong>{t('feedback')}: </Text>
-              <Text className="text-3xl">{spaBookingDetail.Feedback}</Text>
+              <Text className="text-3xl">{spaBooking.Feedback}</Text>
             </div>
           </Card>
         )}
