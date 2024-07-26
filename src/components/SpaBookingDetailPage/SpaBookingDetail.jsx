@@ -407,7 +407,12 @@ const SpaBookingDetail = () => {
         <Steps current={spaBooking.StatusChanges.length - 1} direction="horizontal" className="mb-8">
           {statusSteps}
         </Steps>
-
+        {spaBooking.CurrentStatus == 'Canceled' && (
+          <div className="mb-2">
+            <Text strong className="text-3xl text-red-600">Lí do hủy: </Text>
+            <Text className="text-3xl">{spaBooking.CancelReason}.</Text>
+          </div>
+        )}
         <Row gutter={[16, 16]}>
           <Col span={12}>
             <div className="mb-4">

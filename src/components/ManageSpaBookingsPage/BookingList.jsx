@@ -15,6 +15,7 @@ const { Item: TimelineItem } = Timeline;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
+const REACT_APP_EXCHANGE_RATE_API = import.meta.env.REACT_APP_EXCHANGE_RATE_API;
 
 const SpaBooking = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const SpaBooking = () => {
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('all');
+  const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
   const [bookingCount, setBookingCount] = useState({
     all: 0,
     completed: 0,
@@ -67,6 +69,20 @@ const SpaBooking = () => {
       throw error;
     }
   };
+
+  useEffect(() => {
+    const fetchExchangeRate = async () => {
+      try {
+        const response = await axios.get(`https://v6.exchangerate-api.com/v6/${REACT_APP_EXCHANGE_RATE_API}/latest/VND`);
+        setExchangeRateVNDtoUSD(response.data.conversion_rates.USD);
+      } catch (error) {
+        console.error("Error fetching exchange rate:", error);
+        message.error("Error fetching exchange rate.");
+      }
+    };
+
+    fetchExchangeRate();
+  }, []);
 
   // Function to get spa booking details
   const getSpaBookingDetail = async (id) => {
@@ -167,6 +183,7 @@ const SpaBooking = () => {
   };
 
   const handleUpdateStatus = async () => {
+    setSaving(true)
     if (pendingStatus === 'Checked In' && !selectedCaretaker) {
       message.error(t('Please select a caretaker before confirming the check-in status.'));
       return;
@@ -187,12 +204,11 @@ const SpaBooking = () => {
           cancelReason = reasonDetail; 
         }
       }
-      await processRefund(selectedBooking.PaypalOrderID);
+      await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
     }
 
     try {
       const token = localStorage.getItem('token');
-      setSaving(true); 
       const updatedStatusChanges = [
         ...selectedBooking.statusChanges, 
         {
@@ -233,6 +249,9 @@ const SpaBooking = () => {
       // Show success message
       message.success(`${t('booking_success_update_to')} "${pendingStatus}"`);
       setSaving(false); // End saving process
+      setReasonDetail('')
+      setSelectedCancelSource('')
+      setSelectedReason('')
       setUpdateStatusModalVisible(false); // Close modal
       fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
@@ -244,12 +263,30 @@ const SpaBooking = () => {
   };
 
   // Process refund via PayPal
-  const processRefund = async (paypalOrderID) => {
+  const processRefund = async (paypalOrderID, TotalPrice) => {
     try {
+      let refundPercentage = 100; // Default refund percentage
+      if (selectedCancelSource === 'Khach') {
+        if (selectedReason === 'Khách không đến tiệm để làm dịch vụ') {
+          refundPercentage = 60;
+        } else {refundPercentage = 100}
+      } else if (selectedCancelSource === 'Tiem') {
+        refundPercentage = 100;
+      }
+      
+      const refundAmount = (TotalPrice * refundPercentage) / 100 * exchangeRateVNDtoUSD;
+
       const accessToken = await getPaypalAccessToken();
+
+      // Process refund request
       const response = await axios.post(
         `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalOrderID}/refund`,
-        {},
+        {
+          amount: {
+            value: refundAmount.toFixed(2), 
+            currency_code: 'USD'
+          }
+        },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -257,6 +294,7 @@ const SpaBooking = () => {
           }
         }
       );
+
       if (response.status === 201) {
         // Show success message with modal
         Modal.success({
@@ -508,6 +546,13 @@ const SpaBooking = () => {
     setReasonDetail(e.target.value);
   };
 
+  const handleCancelConfirm = () => {
+    setUpdateStatusModalVisible(false)
+    setSelectedCancelSource('')
+    setSelectedReason('')
+    setReasonDetail('')
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -558,14 +603,19 @@ const SpaBooking = () => {
           <Modal
             title={`${t('update_status')} (${pendingStatus})`}
             visible={updateStatusModalVisible}
-            onCancel={() => setUpdateStatusModalVisible(false)}
             footer={[
-              <Button key="cancel" onClick={() => setUpdateStatusModalVisible(false)} disabled={saving}>{t('cancel')}</Button>,
+              <Button 
+                key="cancel" 
+                onClick={handleCancelConfirm} 
+                disabled={saving}
+              >
+                {t('cancel')}
+              </Button>,
               <Button
                 key="submit"
                 type="primary"
                 onClick={handleUpdateStatus}
-                disabled={saving || (pendingStatus === 'Checked In' && !selectedCaretaker)}
+                disabled={saving || (pendingStatus === 'Checked In' && !selectedCaretaker) || (pendingStatus === 'Canceled' && (!selectedCancelSource ||!selectedReason))} // Disable the submit button during saving
               >
                 {t('confirm')}
               </Button>
