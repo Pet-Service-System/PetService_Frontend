@@ -1,23 +1,35 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-
-const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
-const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
+import moment from 'moment';
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
 const { Step } = Steps;
+const { Option } = Select;
 const API_URL = import.meta.env.REACT_APP_API_URL;
+const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 
 const SpaBookingDetail = () => {
   const [spaBooking, setSpaBooking] = useState(null);
   const [spaBookingDetail, setSpaBookingDetail] = useState(null);
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [caretakers, setCaretakers] = useState([]); // List of available caretakers
+  const [isChangeModalVisible, setIsChangeModalVisible] = useState(false); // Modal visibility state
+  const [form] = Form.useForm(); // Antd form instance
+  const availableTimes = [
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+    "15:00", "15:30", "16:00", "16:30"
+  ];
+  const currentDateTime = moment();
+  const [operationLoading, setOperationLoading] = useState(false);
+
   const role = localStorage.getItem('role');
   const navigate = useNavigate();
   const { id } = useParams();
@@ -38,7 +50,7 @@ const SpaBookingDetail = () => {
       throw error;
     }
   };
-  
+
   // Fetch spa booking detail by ID
   const getSpaBookingDetail = async (id) => {
     const token = localStorage.getItem('token');
@@ -54,7 +66,7 @@ const SpaBookingDetail = () => {
       throw error;
     }
   };
-  
+
   // Fetch spa service by ID
   const getSpaServiceByID = async (id) => {
     const token = localStorage.getItem('token');
@@ -71,6 +83,37 @@ const SpaBookingDetail = () => {
     }
   };
 
+  const fetchAccounts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/accounts/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // Filter out Caretaker Staff accounts and map to include both id and name
+      const caretakers = response.data.accounts
+        .filter(account => account.role === 'Caretaker Staff')
+        .map(account => ({
+          id: account.AccountID,
+          name: account.fullname
+        }));
+      setCaretakers(caretakers);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCaretakerChange = (value) => {
+    const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
+    form.setFieldsValue({
+      CaretakerID: selectedCaretaker ? selectedCaretaker.id : '',
+      CaretakerNote: selectedCaretaker ? selectedCaretaker.name : ''
+    });
+  };
+
   // Fetch spa booking data
   const fetchSpaBooking = async () => {
     setLoading(true);
@@ -78,6 +121,7 @@ const SpaBookingDetail = () => {
       const booking = await getSpaBookingById(id);
       const bookingDetail = await getSpaBookingDetail(id);
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
+
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail);
       setServiceData(serviceInfo);
@@ -90,6 +134,7 @@ const SpaBookingDetail = () => {
 
   useEffect(() => {
     fetchSpaBooking();
+    fetchAccounts();
   }, []);
 
   if (loading || !spaBooking || !spaBookingDetail) {
@@ -218,7 +263,6 @@ const SpaBookingDetail = () => {
   // Process refund via PayPal
   const processRefund = async (paypalOrderID) => {
     try {
-      
       const accessToken = await getPaypalAccessToken();
       const response = await axios.post(
         `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalOrderID}/refund`,
@@ -250,7 +294,103 @@ const SpaBookingDetail = () => {
     }
   };
 
-  return ( spaBookingDetail &&
+  // Check if the "Change Information Booking" button should be enabled
+  const canChangeBooking = () => {
+    if (!spaBookingDetail) return false;
+
+    const bookingDateTime = moment(`${spaBookingDetail.BookingDate} ${spaBookingDetail.BookingTime}`, 'DD-MM-YYYY HH:mm');
+    const now = moment();
+
+    // Enable button if the current time is more than 24 hours before the booking time
+    return now.isBefore(bookingDateTime.subtract(24, 'hours'));
+  };
+
+  // Handle Change Information Booking
+  const handleOpenChangeModal = () => {
+    setIsChangeModalVisible(true);
+  };
+
+  // Handle OK for Change Information Modal
+  const handleOkChangeModal = async () => {
+    setOperationLoading(true);
+    try {
+      const values = await form.validateFields();
+      const newBookingDate = values.BookingDate;
+      const newBookingTime = values.BookingTime;
+      const newCaretakerId = values.caretaker;
+      const selectedCaretaker = caretakers.find(caretaker => caretaker.id === newCaretakerId);
+
+      const newBookingDateTime = moment(`${newBookingDate.format('DD-MM-YYYY')} ${newBookingTime}`, 'DD-MM-YYYY HH:mm');
+      const currentDateTime = moment();
+
+      // Ensure the new booking time is at least 3 hours from now
+      if (newBookingDateTime.diff(currentDateTime, 'hours') < 3) {
+        message.error(t('3_hours_rule'));
+        setOperationLoading(false);
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found.');
+      }
+
+      await axios.put(
+        `${API_URL}/api/spa-booking-details/${spaBookingDetail.BookingDetailsID}`,
+        {
+          BookingDate: newBookingDate.format('DD-MM-YYYY'),
+          BookingTime: newBookingTime,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      await axios.put(
+        `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
+        {
+          CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (newBookingDateTime.diff(currentDateTime, 'hours') < 24) {
+        confirm({
+          title: t('annouce_before_change'),
+          icon: <ExclamationCircleOutlined />,
+          onOk() {
+            message.success('Change information successfully.');
+            setIsChangeModalVisible(false);
+            fetchSpaBooking();
+          },
+          onCancel() {
+            message.info('Change cancelled.');
+          },
+        });
+      } else {
+        message.success('Change information successfully.');
+        setIsChangeModalVisible(false);
+        fetchSpaBooking();
+      }
+    } catch (error) {
+      console.error('Error changing booking information:', error);
+      message.error('Error changing booking information');
+    } finally {
+      setOperationLoading(false);
+    }
+  };
+
+  const handleCancelChangeModal = () => {
+    setIsChangeModalVisible(false);
+  };
+
+  return (spaBookingDetail &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
       <Button
@@ -264,7 +404,7 @@ const SpaBookingDetail = () => {
       {/* Booking detail */}
       <Card className="p-4 max-w-screen-md mx-auto shadow-lg rounded-lg transform scale-90">
         <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
-        
+
         {/* Status Tracking Bar */}
         <Steps current={spaBooking.StatusChanges.length - 1} direction="horizontal" className="mb-8">
           {statusSteps}
@@ -302,7 +442,7 @@ const SpaBookingDetail = () => {
               <Text>{spaBookingDetail.BookingDate}</Text>
             </div>
             <div className="mb-4">
-              <Text strong>{t('book_time')}: </Text>
+              <Text strong>{t('book_time')}: </ Text>
               <Text>{spaBookingDetail.BookingTime}</Text>
             </div>
             <div className="mb-4">
@@ -355,13 +495,19 @@ const SpaBookingDetail = () => {
             </div>
           </Card>
         )}
-        
+
         <Card className="text-right w-1/2 ml-auto border-none">
           <div className="mb-4 flex justify-end items-center">
             <Text strong className="mr-2">{t('Tổng tiền')}:</Text>
             <Text className="mb-4 text-green-600 text-4xl flex justify-between">{spaBooking.TotalPrice.toLocaleString('en-US')}đ</Text>
           </div>
         </Card>
+        {/* Render the change booking button conditionally */}
+        {canChangeBooking() && (role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
+          <Button type="primary" onClick={handleOpenChangeModal}>
+            {t('change_information_booking')}
+          </Button>
+        )}
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
           <Button danger className="float-end mt-4" onClick={handleCancelBooking}>
@@ -369,6 +515,72 @@ const SpaBookingDetail = () => {
           </Button>
         )}
       </Card>
+
+      {/* Change Information Modal */}
+      <Modal
+        title={t('change_information_booking')}
+        visible={isChangeModalVisible}
+        onOk={handleOkChangeModal}
+        onCancel={handleCancelChangeModal}
+        confirmLoading={operationLoading}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            name="BookingDate"
+            label={t('booking_date')}
+            rules={[{ required: true, message: t('plz_choose_booking_date') }]}
+          >
+            <DatePicker
+              style={{ width: '100%' }}
+              disabledDate={(current) => {
+                if (current && current < currentDateTime.startOf('day')) {
+                  return true;
+                }
+                if (current && current.isSame(currentDateTime, 'day')) {
+                  return current < currentDateTime;
+                }
+                return false;
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="BookingTime"
+            label={t('booking_time')}
+            rules={[{ required: true, message: t('plz_choose_booking_time') }]}
+          >
+            <Select
+              style={{ width: '100%' }}
+              placeholder={t('choose_booking_time')}
+            >
+              {availableTimes.map(time => (
+                <Select.Option key={time} value={time}>{time}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="caretaker"
+            label={t('Nhân viên chăm sóc')}
+            rules={[{ required: true, message: t('select_caretaker') }]}
+          >
+            <Select
+              placeholder={t('choose_caretaker')}
+              onChange={handleCaretakerChange}
+            >
+              {/* Empty option */}
+              <Select.Option value='' key="empty-option">
+                {t('[Trống]')}
+              </Select.Option>
+
+              {/* Options for caretakers */}
+              {caretakers.map(caretaker => (
+                <Select.Option key={caretaker.id} value={caretaker.id}>
+                  {caretaker.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
