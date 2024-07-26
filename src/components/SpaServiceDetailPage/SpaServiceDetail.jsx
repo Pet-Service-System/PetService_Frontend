@@ -392,6 +392,7 @@ const SpaServiceDetail = () => {
                 CaretakerID: values.CaretakerID,
                 CancelReason: "",
                 Feedback: "",
+                isReplied: false,
                 StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
             };
         
@@ -409,7 +410,6 @@ const SpaServiceDetail = () => {
                 BookingDate: bookingDate.format('YYYY-MM-DD'),
                 BookingTime: bookingTime,
                 ServiceID: id,
-            isReview: false,
             };
         
             // Send booking detail data to backend
