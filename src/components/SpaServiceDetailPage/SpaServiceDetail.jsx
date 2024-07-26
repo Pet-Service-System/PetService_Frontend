@@ -377,7 +377,6 @@ const SpaServiceDetail = () => {
             message.error(t('authorization_token_not_found'));
             return;
             }
-            
                 // Extract booking details
                 const bookingDate = values.BookingDate;
                 const bookingTime = values.BookingTime;

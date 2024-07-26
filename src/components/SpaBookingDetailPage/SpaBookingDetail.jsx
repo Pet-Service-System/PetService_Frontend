@@ -103,9 +103,6 @@ const SpaBookingDetail = () => {
 
   const petTypeName = petTypeMapping[spaBookingDetail.PetTypeID] || 'Unknown';
 
-  // Define the standard status sequence
-  const statusSequence = ['Pending', 'Checked In', 'Completed'];
-
   // Function to map status to color
   const getStatusColor = (status) => {
     switch (status) {

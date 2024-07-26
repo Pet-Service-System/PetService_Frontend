@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs, Tag, Timeline, Select } from "antd";
+import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs, Tag, Timeline, Select, Radio } from "antd";
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
@@ -41,6 +41,9 @@ const SpaBooking = () => {
   const [caretakerID, setCaretakerID] = useState(''); 
   const [caretakerNote, setCaretakerNote] = useState('');
   const [selectedBooking, setSelectedBooking] = useState(null); // State to hold selected booking details
+  const [selectedReason, setSelectedReason] = useState('');
+  const [reasonDetail, setReasonDetail] = useState('');
+  const [selectedCancelSource, setSelectedCancelSource] = useState('');
 
   // Function to get spa bookings
   const getSpaBookings = async (bookingDate, dateCreated) => {
@@ -165,6 +168,25 @@ const SpaBooking = () => {
       message.error(t('Please select a caretaker before confirming the check-in status.'));
       return;
     }
+
+    // Determine cancel reason
+    let cancelReason = '';
+    if (pendingStatus === 'Canceled') {
+      setCaretakerNote('')
+      setCaretakerID('')
+      if (selectedCancelSource === 'Khach') {
+        cancelReason = selectedReason;
+        if (selectedReason === 'Khac') {
+          cancelReason = reasonDetail;
+        }
+      } else if (selectedCancelSource === 'Tiem') {
+        if (selectedReason === 'Khac') {
+          cancelReason = reasonDetail; 
+        }
+      }
+
+    }
+
     try {
       const token = localStorage.getItem('token');
       setSaving(true); 
@@ -183,6 +205,7 @@ const SpaBooking = () => {
           StatusChanges: updatedStatusChanges,
           CaretakerID: caretakerID,
           CaretakerNote: caretakerNote,
+          CancelReason: cancelReason,
         },
         {
           headers: {
@@ -423,6 +446,11 @@ const SpaBooking = () => {
       setSelectedDateCreated(null);
     }
   };
+
+  const handleTextareaChange = e => {
+    setReasonDetail(e.target.value);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -486,7 +514,7 @@ const SpaBooking = () => {
               </Button>
             ]}
           >
-            <p className="mb-4">{t('ask_update')} "{pendingStatus}"?</p>
+            <p>{t('ask_update')} "{pendingStatus}"?</p>
             {pendingStatus === 'Checked In' && (
               <div className="mb-4">
                 <Text className="mr-1">{t('Nhân viên được yêu cầu: ')} {selectedBooking?.CaretakerNote || '-'}</Text><br/>
@@ -506,6 +534,54 @@ const SpaBooking = () => {
                 </Select>
               </div>
             )}
+            {pendingStatus === 'Canceled' && (
+              <div className="mb-4">
+                <p className="mb-2">{t('Lý do hủy từ:')}</p>
+                <Radio.Group onChange={e => {
+                  setSelectedCancelSource(e.target.value);
+                  setSelectedReason('');
+                }} value={selectedCancelSource}>
+                  <Radio value="Khach">{t('Khách')}</Radio>
+                  <Radio value="Tiem">{t('Tiệm')}</Radio>
+                </Radio.Group>
+                <div className="mt-2">
+                  {selectedCancelSource === 'Khach' && (
+                    <Select
+                      placeholder={t('Chọn lý do')}
+                      onChange={value => {
+                        setSelectedReason(value);
+                        if (value !== 'Khac') {
+                          setSelectedReason(value);
+                        }
+                      }}
+                      style={{ width: 300 }}
+                    >
+                      <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
+                      <Option value="Khac">{t('Khác')}</Option>
+                    </Select>
+                  )}
+                  {selectedCancelSource === 'Tiem' && (
+                    <Select
+                      placeholder={t('Chọn lý do')}
+                      onChange={value => {
+                        setSelectedReason(value);
+                      }}
+                      style={{ width: 300 }}
+                    >
+                      <Option value="Khac">{t('Khác')}</Option>
+                    </Select>
+                  )}
+                  {selectedReason === 'Khac' && (
+                    <textarea
+                      placeholder={t('Nhập lý do khác')}
+                      onChange={handleTextareaChange}
+                      required
+                      style={{ width: '100%', marginTop: '8px' }}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
             <Timeline>
               {selectedBooking?.statusChanges.map((change, index) => (
                 <TimelineItem key={index} color={getStatusColor(change.Status)}>
@@ -514,6 +590,7 @@ const SpaBooking = () => {
               ))}
             </Timeline>
           </Modal>
+
         </div>
       </Layout>
     </Layout>

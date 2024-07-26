@@ -235,21 +235,6 @@ const UserProfile = () => {
     },
   ];
 
-  // Current tier progress as percentage
-  const currentStepProgress = (tierIndex) => {
-    if (tierIndex === 0) {
-      return totalSpent < PREMIUM_THRESHOLD
-        ? (totalSpent / PREMIUM_THRESHOLD) * 100
-        : 100;
-    } else if (tierIndex === 1) {
-      return totalSpent < VIP_THRESHOLD
-        ? ((totalSpent - PREMIUM_THRESHOLD) / (VIP_THRESHOLD - PREMIUM_THRESHOLD)) * 100
-        : 100;
-    } else {
-      return totalSpent >= VIP_THRESHOLD ? 100 : 0;
-    }
-  };
-
   return (
     <Layout style={{ minHeight: '80vh' }}>
       {/* Sider */}
@@ -362,7 +347,7 @@ const UserProfile = () => {
             )}
           </div>
           {/* Render Account Information Card */}
-          {!isEditMode && (
+          {!isEditMode && role === 'Customer' && (
             <Card bordered={false} style={{ marginTop: '24px' }}>
               <Typography.Title level={2} className="text-center">
                  {t('Thông tin hội viên')}

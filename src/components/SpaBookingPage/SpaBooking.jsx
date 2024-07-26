@@ -53,7 +53,7 @@ const SpaBooking = () => {
     all: 0,
     completed: 0,
     pending: 0,
-    processing: 0,
+    checkedIn: 0,
     canceled: 0,
   });
 
@@ -97,7 +97,7 @@ const SpaBooking = () => {
           all: sortedData.length,
           completed: sortedData.filter(booking => booking.status === 'Completed').length,
           pending: sortedData.filter(booking => booking.status === 'Pending').length,
-          processing: sortedData.filter(booking => booking.status === 'Processing').length,
+          checkedIn: sortedData.filter(booking => booking.status === 'Checked In').length,
           canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
         });
 
@@ -333,7 +333,7 @@ const SpaBooking = () => {
             <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
             <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
             <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
-            <TabPane tab={<span>{t('processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.processing}</span></span>} key="processing" />
+            <TabPane tab={<span>{t('processing')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedIn}</span></span>} key="checked in" />
             <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
           </Tabs>
           <Spin spinning={loading}>
