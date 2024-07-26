@@ -391,24 +391,24 @@ const SpaServiceDetail = () => {
                 CaretakerNote: values.CaretakerNote,
                 CaretakerID: values.CaretakerID,
                 CancelReason: "",
+                Feedback: "",
                 StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
             };
         
             // Send booking data to backend
             const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            });
-        
-            // Prepare booking detail data
-            const bookingDetail = {
-            BookingID: responseBooking.data.BookingID,
-            ...values,
-            BookingDate: bookingDate.format('YYYY-MM-DD'),
-            BookingTime: bookingTime,
-            ServiceID: id,
-            Feedback: "",
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                });
+            
+                // Prepare booking detail data
+                const bookingDetail = {
+                BookingID: responseBooking.data.BookingID,
+                ...values,
+                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingTime: bookingTime,
+                ServiceID: id,
             isReview: false,
             };
         

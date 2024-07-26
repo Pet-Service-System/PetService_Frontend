@@ -9,7 +9,6 @@ import moment from 'moment';
 const { Title, Text } = Typography;
 const { confirm } = Modal;
 const { Step } = Steps;
-const { Option } = Select;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
@@ -295,16 +294,15 @@ const SpaBookingDetail = () => {
   };
 
   // Check if the "Change Information Booking" button should be enabled
-  const canChangeBooking = () => {
+  const isBefore24Hours = () => {
     if (!spaBookingDetail) return false;
 
     const bookingDateTime = moment(`${spaBookingDetail.BookingDate} ${spaBookingDetail.BookingTime}`, 'DD-MM-YYYY HH:mm');
     const now = moment();
-
     // Enable button if the current time is more than 24 hours before the booking time
     return now.isBefore(bookingDateTime.subtract(24, 'hours'));
   };
-
+  
   // Handle Change Information Booking
   const handleOpenChangeModal = () => {
     setIsChangeModalVisible(true);
@@ -502,15 +500,22 @@ const SpaBookingDetail = () => {
             <Text className="mb-4 text-green-600 text-4xl flex justify-between">{spaBooking.TotalPrice.toLocaleString('en-US')}đ</Text>
           </div>
         </Card>
-        {/* Render the change booking button conditionally */}
-        {canChangeBooking() && (role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
-          <Button type="primary" onClick={handleOpenChangeModal}>
+        {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
+          <Button
+            type="primary"
+            onClick={handleOpenChangeModal}
+            disabled={isBefore24Hours() || role !== 'Customer' || spaBooking.CurrentStatus !== 'Pending'}
+          >
             {t('change_information_booking')}
           </Button>
         )}
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
-          <Button danger className="float-end mt-4" onClick={handleCancelBooking}>
+          <Button 
+            danger 
+            className="float-end mt-4"
+            onClick={handleCancelBooking}
+            disabled={isBefore24Hours()}>
             {t('cancel_booking')}
           </Button>
         )}
@@ -560,7 +565,6 @@ const SpaBookingDetail = () => {
           <Form.Item
             name="caretaker"
             label={t('Nhân viên chăm sóc')}
-            rules={[{ required: true, message: t('select_caretaker') }]}
           >
             <Select
               placeholder={t('choose_caretaker')}

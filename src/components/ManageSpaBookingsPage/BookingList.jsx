@@ -5,6 +5,7 @@ import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePic
 import axios from 'axios';
 import moment from "moment";
 import { useTranslation } from 'react-i18next';
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
 const { Search } = Input;
@@ -12,6 +13,8 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 const { Item: TimelineItem } = Timeline;
 const API_URL = import.meta.env.REACT_APP_API_URL;
+const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 
 const SpaBooking = () => {
   const navigate = useNavigate();
@@ -184,7 +187,7 @@ const SpaBooking = () => {
           cancelReason = reasonDetail; 
         }
       }
-
+      await processRefund(selectedBooking.PaypalOrderID);
     }
 
     try {
@@ -237,6 +240,60 @@ const SpaBooking = () => {
       console.error('Error updating booking status:', error);
       message.error(t('fail_update_status'));
       setSaving(false); // End saving process
+    }
+  };
+
+  // Process refund via PayPal
+  const processRefund = async (paypalOrderID) => {
+    try {
+      const accessToken = await getPaypalAccessToken();
+      const response = await axios.post(
+        `https://api-m.sandbox.paypal.com/v2/payments/captures/${paypalOrderID}/refund`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+      if (response.status === 201) {
+        // Show success message with modal
+        Modal.success({
+          title: t('refund_success_title'),
+          content: t('refund_success_content'),
+          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} className="text-center" />,
+        });
+      } else {
+        throw new Error('Failed to process refund');
+      }
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      // Show error message with modal
+      Modal.error({
+        title: t('refund_error_title'),
+        content: t('refund_error_content'),
+      });
+    }
+  };
+
+  // Get PayPal access token
+  const getPaypalAccessToken = async () => {
+    try {
+      const response = await axios.post(
+        'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+        'grant_type=client_credentials',
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)}`,
+          },
+        }
+      );
+      return response.data.access_token;
+    } catch (error) {
+      console.error('Error getting PayPal access token:', error);
+      throw new Error('Failed to get PayPal access token');
     }
   };
   
@@ -554,9 +611,10 @@ const SpaBooking = () => {
                           setSelectedReason(value);
                         }
                       }}
-                      style={{ width: 300 }}
+                      className="w-full"
                     >
                       <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
+                      <Option value="Khách liên hệ hủy lịch do sự cố đặt nhầm hoặc không còn nhu cầu nữa">{t('Khách liên hệ hủy lịch do sự cố đặt nhầm hoặc không còn nhu cầu nữa')}</Option>
                       <Option value="Khac">{t('Khác')}</Option>
                     </Select>
                   )}
@@ -566,7 +624,7 @@ const SpaBooking = () => {
                       onChange={value => {
                         setSelectedReason(value);
                       }}
-                      style={{ width: 300 }}
+                      className="w-full"
                     >
                       <Option value="Khac">{t('Khác')}</Option>
                     </Select>

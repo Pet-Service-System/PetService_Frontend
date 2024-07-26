@@ -119,31 +119,30 @@ const SpaBooking = () => {
       message.info('Bạn đã đánh giá dịch vụ này rồi.');
       return;
     }
-
     setBookingID(id);
     setIsReviewing(true);
     setReviewText('');
     setReviewError('');
 
     // Load booking detail ID when reviewing
-    await getSpaBookingDetailID(id);
+    // await getSpaBookingDetailID(id);
   };
 
-  const getSpaBookingDetailID = async (id) => {
-    const token = localStorage.getItem('token');
-    try {
-      const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setBookingDetailID(response.data.BookingDetailsID);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching spa booking detail:', error);
-      throw error;
-    }
-  }
+  // const getSpaBookingDetailID = async (id) => {
+  //   const token = localStorage.getItem('token');
+  //   try {
+  //     const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     setBookingDetailID(response.data.BookingDetailsID);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('Error fetching spa booking detail:', error);
+  //     throw error;
+  //   }
+  // }
 
   const handleSubmitReview = async () => {
     if (reviewText.trim() === '') {
@@ -154,7 +153,7 @@ const SpaBooking = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `${API_URL}/api/spa-booking-details/${bookingDetailID}`,
+        `${API_URL}/api/Spa-bookings/${bookingID}`,
         { Feedback: reviewText},
         {
           headers: {
@@ -177,7 +176,7 @@ const SpaBooking = () => {
 
       setSpaBookings(prevBookings => prevBookings.map(booking => {
         if (booking.id === bookingID) {
-          return { ...booking, isReviewed: true }; // Cập nhật trạng thái isReviewed khi đã đánh giá
+          return { ...booking, isReviewed: true };
         }
         return booking;
       }));
