@@ -407,9 +407,10 @@ const SpaServiceDetail = () => {
                 const bookingDetail = {
                 BookingID: responseBooking.data.BookingID,
                 ...values,
-                BookingDate: bookingDate.format('YYYY-MM-DD'),
+                BookingDate: bookingDate.format('DD-MM-YYYY'),
                 BookingTime: bookingTime,
                 ServiceID: id,
+                ActualWeight: ''
             };
         
             // Send booking detail data to backend

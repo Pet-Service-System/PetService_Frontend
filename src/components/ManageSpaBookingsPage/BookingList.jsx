@@ -53,7 +53,7 @@ const BookingList = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [actualWeight, setActualWeight] = useState(null);
   const [additionalCost, setAdditionalCost] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [finalPrice, setFinalPrice] = useState(0);
   const [showWeightInput, setShowWeightInput] = useState(false);
   const accountID = user?.id
   const [radioValue, setRadioValue] = useState('Không');
@@ -269,10 +269,26 @@ const BookingList = () => {
           CaretakerID: caretakerID,
           CaretakerNote: caretakerNote,
           CancelReason: cancelReason,
+          ExtraCharge: additionalCost,
+          FinalPrice: finalPrice,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`, 
+          },
+        }
+      );
+
+      const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
+
+      await axios.put(
+        `${API_URL}/api/spa-booking-details/${bookingDetails.BookingDetailsID}`,
+        {
+          ActualWeight: actualWeight,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -296,6 +312,10 @@ const BookingList = () => {
       setReasonDetail('')
       setSelectedCancelSource('')
       setSelectedReason('')
+      setSelectedCaretaker(null);
+      setSelectedCancelSource('')
+      setShowWeightInput(false)
+      setRadioValue('Không');
       setUpdateStatusModalVisible(false); // Close modal
       fetchSpaBookings(); // Refresh bookings after update
     } catch (error) {
@@ -620,11 +640,11 @@ const BookingList = () => {
     if (priceRange) {
       const newAdditionalCost = priceRange.price - selectedBooking.TotalPrice;
       setAdditionalCost(newAdditionalCost);
-      setTotalPrice(priceRange.price);
+      setFinalPrice(priceRange.price);
     } else {
       // Handle case where weight does not match any price range
       setAdditionalCost(0);
-      setTotalPrice(selectedBooking.TotalPrice);
+      setFinalPrice(selectedBooking.TotalPrice);
     }
   };
 
@@ -635,7 +655,7 @@ const BookingList = () => {
     if (value === 'Không') {
       setActualWeight(0);
       setAdditionalCost(0);
-      setTotalPrice(0);
+      setFinalPrice(0);
       form.setFieldsValue({
         actualWeight: ''
       });
@@ -654,7 +674,7 @@ const BookingList = () => {
       setIsConfirmButtonDisabled(false);
     }
   }, [radioValue, actualWeight]);
-  
+  console.log(saving)
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -780,7 +800,7 @@ const BookingList = () => {
                       <Text className="mr-1">{t('Phí phát sinh:')} {additionalCost.toLocaleString('en-US')}</Text>
                     </div>
                     <div>
-                      <Text className="mr-1">{t('Tổng tiền:')} {totalPrice.toLocaleString('en-US')}</Text>
+                      <Text className="mr-1">{t('Tổng tiền:')} {finalPrice.toLocaleString('en-US')}</Text>
                     </div>
                   </div>
                 )}

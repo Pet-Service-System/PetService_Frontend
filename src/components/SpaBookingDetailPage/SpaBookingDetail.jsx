@@ -28,7 +28,6 @@ const SpaBookingDetail = () => {
   ];
   const currentDateTime = moment();
   const [operationLoading, setOperationLoading] = useState(false);
-
   const role = localStorage.getItem('role');
   const navigate = useNavigate();
   const { id } = useParams();
@@ -388,7 +387,7 @@ const SpaBookingDetail = () => {
     setIsChangeModalVisible(false);
   };
 
-  return (spaBookingDetail &&
+  return (spaBookingDetail && spaBooking &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
       <Button
@@ -472,13 +471,19 @@ const SpaBookingDetail = () => {
             <Text>{petTypeName}</Text>
           </div>
           <div className="mb-4 flex justify-between">
-            <Text strong>{t('pet_weight')}: </Text>
-            <Text>{spaBookingDetail.PetWeight} kg</Text>
-          </div>
-          <div className="mb-4 flex justify-between">
             <Text strong>{t('pet_age')}: </Text>
             <Text>{spaBookingDetail.PetAge} {t('years_old')}</Text>
           </div>
+          <div className="mb-4 flex justify-between">
+            <Text strong>{t('pet_weight')}: </Text>
+            <Text>{spaBookingDetail.PetWeight} kg</Text>
+          </div>
+          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && (
+            <div className="mb-4 flex justify-between">
+            <Text strong>{t('Cân nặng thực tế: ')} </Text>
+            <Text>{spaBookingDetail.ActualWeight} kg</Text>
+          </div>
+          )}
         </Card>
         <div className="mb-4">
           <Text strong>{t('booked_services')}:</Text>
@@ -499,10 +504,22 @@ const SpaBookingDetail = () => {
           </Card>
         )}
 
-        <Card className="text-right w-1/2 ml-auto border-none">
-          <div className="mb-4 flex justify-end items-center">
-            <Text strong className="mr-2">{t('Tổng tiền')}:</Text>
-            <Text className="mb-4 text-green-600 text-4xl flex justify-between">{spaBooking.TotalPrice.toLocaleString('en-US')}đ</Text>
+        <Card className="text-right w-full ml-auto border-none">
+          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && (
+            <>
+            <div className="mb-4 flex justify-end items-end">
+              <Text strong className="mr-2">{t('Thành tiền')}:</Text>
+              <Text className="flex justify-between">{spaBooking.TotalPrice}đ</Text>
+            </div>
+            <div className="mb-4 flex justify-end items-end">
+              <Text strong className="mr-2">{t('Chi phí phát sinh: ')}</Text>
+              <Text className="flex justify-between">{spaBooking.ExtraCharge}đ</Text>
+            </div>
+            </>
+          )}
+          <div className="flex justify-end items-end">
+            <Text strong className="mr-2">{t('Tổng tiền: ')}</Text>
+            <Text className="text-green-600 text-4xl flex justify-between">{spaBooking.FinalPrice}đ</Text>
           </div>
         </Card>
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
