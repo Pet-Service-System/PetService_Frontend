@@ -468,7 +468,7 @@ const SpaBookingDetail = () => {
             </div>
             <div className="mb-4">
               <Text strong>{t('Nhân viên chăm sóc')}: </Text>
-              <Text>{caretakersName.fullname}</Text>
+              <Text>{caretakersName?.fullname}</Text>
             </div>
           </Col>
         </Row>
