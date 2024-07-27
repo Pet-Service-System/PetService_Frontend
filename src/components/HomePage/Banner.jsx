@@ -163,6 +163,7 @@ const Banner = () => {
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'policy', label: t('policy'), path: '/policy'},
      ];
     } else if (role === 'Customer') {
       menuItems = [
@@ -171,6 +172,7 @@ const Banner = () => {
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
         { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
         { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'policy', label: t('policy'), path: '/policy'},
      ];
     } else if (role === 'Administrator') {
       menuItems = [

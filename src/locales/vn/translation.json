@@ -523,5 +523,6 @@
     "select_caretaker": "Vui lòng chọn nhân viên chăm sóc",
     "change_information_booking": "Thay đổi thông tin đặt lịch",
     "annouce_before_change" : "Nếu chọn thời gian đặt chỗ này, bạn không thể thay đổi bất kỳ thông tin nào nữa. Bạn vẫn sẵn sàng thay đổi?",
-    "choose_caretaker" : "Chọn người chăm sóc"
+    "choose_caretaker" : "Chọn người chăm sóc",
+    "policy": "CHÍNH SÁCH"
 }

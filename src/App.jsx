@@ -33,6 +33,7 @@ import StatisticPage from './pages/StatisticPage'
 // import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import VoucherPage from './pages/VoucherPage'
 import CategoryManagementPage from './pages/CategoryManagementPage'
+import PolicyPage from './pages/PolicyPage'
 function App() {
   return (
     <>
@@ -65,6 +66,7 @@ function App() {
       <Route path='/statistics' element={<StatisticPage/>}/>
       <Route path='/manage-voucher' element={<VoucherPage/>}/>
       <Route path='/manage-category' element={<CategoryManagementPage/>}/>
+      <Route path='/policy' element={<PolicyPage/>}/>
     </Routes>
     </>
   )

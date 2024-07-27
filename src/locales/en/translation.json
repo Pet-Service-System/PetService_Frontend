@@ -517,5 +517,6 @@
     "select_caretaker": "Please select a caretaker",
     "change_information_booking": "Change Booking Information",
     "annouce_before_change" : "If you choose this booking time, you can no longer change any information. Are you still willing to change?",
-    "choose_caretaker" : "Choose caretaker"
+    "choose_caretaker" : "Choose caretaker",
+    "policy": "POLICY"
 }

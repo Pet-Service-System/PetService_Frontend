@@ -425,7 +425,7 @@ const BookingList = () => {
         } else if (selectedReason === 'Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa') {
           refundPercentage = 100;
         } else if (selectedReason === 'Khách hủy lịch sau khi phát sinh chi phí') {
-          refundPercentage = 80;
+          refundPercentage = 70;
         } else if (selectedReason === 'Thú cưng không hợp tác') {
           refundPercentage = 90;
         } else {refundPercentage = 0}
