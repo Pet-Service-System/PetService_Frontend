@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification, InputNumber } from 'antd';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification, InputNumber, Card } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, ScheduleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 import { PayPalButtons } from "@paypal/react-paypal-js";
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 const REACT_APP_EXCHANGE_RATE_API = import.meta.env.REACT_APP_EXCHANGE_RATE_API;
@@ -24,6 +24,7 @@ const SpaServiceDetail = () => {
     const [operationLoading, setOperationLoading] = useState(false);
     const userRole = localStorage.getItem('role') || 'Guest';
     const navigate = useNavigate();
+    const [voucherCode, setVoucherCode] = useState("");
     const user = JSON.parse(localStorage.getItem('user'));
     const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
     const accountID = user?.id;
@@ -41,6 +42,43 @@ const SpaServiceDetail = () => {
     const { t } = useTranslation();
     const [currentPrice, setCurrentPrice] = useState(0);
     const currentPriceRef = useRef(currentPrice);
+    const [discountValue, setDiscountValue] = useState(0); // State for discount value
+    const discountValueRef = useRef(discountValue);
+    const [voucherID, setVoucherID] = useState(null);
+    const voucherIDref = useRef(voucherID);
+
+    useEffect(() => {
+        voucherIDref.current = voucherID;
+    }, [voucherID]);
+
+    useEffect(() => {
+        discountValueRef.current = discountValue;
+      }, [discountValue]);
+      const checkVoucher = async () => {
+        try {
+          if (voucherCode.trim() === '') {
+            return;
+          }
+          const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
+          const voucher = response.data;
+          if(voucher.MinimumOrderValue > currentPriceRef.current){
+            message.error("Giá trị đơn hàng không đủ để sử dụng voucher này");
+            return
+          }
+    
+          // Check if the voucher is valid and apply the discount
+          if (voucher) {
+            setDiscountValue(voucher.DiscountValue);
+            setVoucherID(voucher.VoucherID); 
+            message.success(t("voucher_applied"));
+          } else {
+            message.error(t("invalid_voucher"));
+          }
+        } catch (error) {
+          console.error(`Error:`, error);
+          message.error(t("invalid_voucher"));
+        }
+      };
 
     // Update the ref whenever currentPrice changes
     useEffect(() => {
@@ -247,6 +285,8 @@ const SpaServiceDetail = () => {
         setIsPayPalButtonVisible(false);
         setCurrentPrice(0)
         bookingForm.resetFields();
+        setDiscountValue(0)
+        setVoucherCode('')
     };
 
     const showLoginModal = () => {
@@ -352,7 +392,7 @@ const SpaServiceDetail = () => {
     }
 
     const createOrder = (data, actions) => {
-        const latestPrice = currentPriceRef.current * exchangeRateVNDtoUSD; // Use ref to get latest value
+        const latestPrice = (currentPriceRef.current - discountValueRef.current) * exchangeRateVNDtoUSD; // Use ref to get latest value
         return actions.order.create({
             purchase_units: [
                 {
@@ -393,6 +433,7 @@ const SpaServiceDetail = () => {
                 CancelReason: "",
                 Feedback: "",
                 isReplied: false,
+                VoucherID: voucherIDref.current,
                 StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
             };
         
@@ -652,19 +693,19 @@ const SpaServiceDetail = () => {
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                            name="PetWeight"
-                            label={t('pet_weight')}
-                            rules={[
-                                { required: true, message: t('plz_enter_pet_weight') },
-                                { validator: validatePetWeight }
-                            ]}
+                                name="PetWeight"
+                                label={t('pet_weight')}
+                                rules={[
+                                    { required: true, message: t('plz_enter_pet_weight') },
+                                    { validator: validatePetWeight }
+                                ]}
                             >
-                            <InputNumber
-                                onChange={handlePetWeightChange}
-                                className='min-w-full'
-                                suffix="kg"
-                                placeholder={t('enter_pet_weight')}
-                            />
+                                <InputNumber
+                                    onChange={handlePetWeightChange}
+                                    className='min-w-full'
+                                    suffix="kg"
+                                    placeholder={t('enter_pet_weight')}
+                                />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -672,8 +713,8 @@ const SpaServiceDetail = () => {
                                 name="PetAge"
                                 label={t('pet_age')}
                                 rules={[
-                                  { required: true, message: t('plz_enter_pet_age') },
-                                  { type: 'number', min: 0, message: t('age_must_be_positive') }
+                                { required: true, message: t('plz_enter_pet_age') },
+                                { type: 'number', min: 0, message: t('age_must_be_positive') }
                                 ]}
                             >
                                 <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('enter_pet_age')} />
@@ -681,40 +722,68 @@ const SpaServiceDetail = () => {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-        <Col xs={24} sm={12}>
-            <Form.Item
-                name="CaretakerID" 
-                label={t('Nhân viên chăm sóc')}
-                style={{ display: 'none' }} 
-            >
-                <Input />
-            </Form.Item>
-            <Form.Item
-                name="CaretakerNote"
-                label={t('Nhân viên chăm sóc')}
-            >
-                <Select
-                    placeholder={t('choose_caretaker')}
-                    onChange={(value) => handleCaretakerChange(value)}
-                >
-                    {/* Empty option */}
-                    <Select.Option value='' key="empty-option">
-                        {t('[Trống]')}
-                    </Select.Option>
-                    
-                    {/* Options for caretakers */}
-                    {caretakers.map(caretaker => (
-                        <Select.Option key={caretaker.id} value={caretaker.id}>
-                            {caretaker.name}
-                        </Select.Option>
-                    ))}
-                </Select>
-            </Form.Item>
-        </Col>
-    </Row>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                            name="CaretakerID" 
+                            label={t('Nhân viên chăm sóc')}
+                            style={{ display: 'none' }} 
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item
+                                name="CaretakerNote"
+                                label={t('Nhân viên chăm sóc')}
+                            >
+                                <Select
+                                    placeholder={t('choose_caretaker')}
+                                    onChange={(value) => handleCaretakerChange(value)}
+                                >
+                                    {/* Empty option */}
+                                    <Select.Option value='' key="empty-option">
+                                        {t('[Trống]')}
+                                    </Select.Option>
+                                    
+                                    {/* Options for caretakers */}
+                                    {caretakers.map(caretaker => (
+                                        <Select.Option key={caretaker.id} value={caretaker.id}>
+                                            {caretaker.name}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={12}>
+                            <Form.Item
+                                name="VoucherCode"
+                                label={t('voucher')}
+                            >
+                                <div className="relative">
+                                    <Input
+                                        placeholder={t('enter_voucher_code')}
+                                        value={voucherCode}
+                                        onChange={(e) => setVoucherCode(e.target.value)}
+                                        className="pr-16"
+                                    />
+                                    <Button
+                                        type="primary"
+                                        onClick={checkVoucher}
+                                        className="absolute right-0 top-0 bottom-0 rounded-l-none"
+                                        disabled={currentPrice == 0}
+                                    >
+                                        {t('apply_voucher')}
+                                    </Button>
+                                </div>
+                            </Form.Item>
+                        </Col>
+                    </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
-                            <Form.Item name="ServiceID" label={t('service_id')} initialValue={id} style={{ display: 'none' }}>
+                            <Form.Item
+                                name="ServiceID"
+                                label={t('service_id')}
+                                initialValue={id}
+                                style={{ display: 'none' }}
+                            >
                                 <Input />
                             </Form.Item>
                         </Col>
@@ -730,11 +799,30 @@ const SpaServiceDetail = () => {
                         </Col>
                     </Row>
                 </Form>
-                <div className="flex justify-end mt-4 mb-4">
-                    <Typography.Text className="text-4xl text-green-600">
-                        Tổng tiền: {currentPrice.toLocaleString("en-US")}đ
-                    </Typography.Text>
-                </div>
+                <Card className="flex flex-col md:ml-auto mt-4 mb-4 md:w-3/6 border-none">
+                    {discountValue > 0 && (
+                        <>
+                            <div className="flex flex-row mb-2 justify-between">
+                                <Text strong className='mr-1'>Thành tiền: </Text>
+                                <Text>
+                                    {currentPrice.toLocaleString("en-US")}đ
+                                </Text>
+                            </div>
+                            <div className="flex flex-row mb-2 justify-between">
+                                <Text strong className='mr-1'>Áp dụng mã giảm giá:</Text>
+                                <Text className="text-red-600">
+                                    -{(discountValue).toLocaleString("en-US")}đ
+                                </Text>
+                            </div>
+                        </>
+                    )}
+                    <div className="flex flex-row mb-2 justify-between">
+                        <Text strong className='mr-1 md:text-4xl text-3xl'>Tổng tiền:</Text>
+                        <Text className="md:text-4xl text-3xl text-green-600">
+                            {(currentPrice-discountValue).toLocaleString("en-US")}đ
+                        </Text>
+                    </div>
+                </Card>
                 {/* PayPal Buttons */}
                 <div className="text-right">
                     {isPayPalButtonVisible && currentPrice > 0 && (
@@ -748,11 +836,8 @@ const SpaServiceDetail = () => {
                         </>
                     )}
                 </div>
-
-                {/* <Button type="primary" onClick={showAddPetModal} loading={operationLoading}>
-                    Thêm thú cưng
-                </Button> */}
             </Modal>
+
 
             {/* Add Pet */}
             <Modal

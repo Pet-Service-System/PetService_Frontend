@@ -272,7 +272,7 @@ const BookingList = () => {
       console.log(selectedBooking.status)
       console.log(pendingStatus)
       if(selectedBooking.status === 'Checked In' && pendingStatus === 'Completed'){
-        await axios.put(
+        await axios.patch(
           `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
           {
             Status: pendingStatus, 
@@ -291,7 +291,7 @@ const BookingList = () => {
       }
 
       if(selectedBooking.status === 'Pending' && pendingStatus === 'Checked In'){
-        await axios.put(
+        await axios.patch(
           `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
           {
             Status: pendingStatus, 
@@ -310,7 +310,7 @@ const BookingList = () => {
 
         const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
 
-        await axios.put(
+        await axios.patch(
           `${API_URL}/api/spa-booking-details/${bookingDetails.BookingDetailsID}`,
           {
             ActualWeight: actualWeight,
@@ -336,7 +336,7 @@ const BookingList = () => {
       }
 
       if(selectedBooking.status == 'Pending' && pendingStatus === 'Canceled'){
-        await axios.put(
+        await axios.patch(
           `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
           {
             Status: pendingStatus, 
@@ -366,7 +366,7 @@ const BookingList = () => {
       }
 
       if(selectedBooking.status == 'Checked In' && pendingStatus === 'Canceled'){
-        await axios.put(
+        await axios.patch(
           `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
           {
             Status: pendingStatus, 

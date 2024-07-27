@@ -21,6 +21,7 @@ const SpaBookingDetail = () => {
   const [caretakers, setCaretakers] = useState([]); // List of available caretakers
   const [isChangeModalVisible, setIsChangeModalVisible] = useState(false); // Modal visibility state
   const [form] = Form.useForm(); // Antd form instance
+  const [voucherData, setVoucherData] = useState(null)
   const [caretakersName, setCaretakersName] = useState(null);
   const availableTimes = [
     "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
@@ -33,6 +34,34 @@ const SpaBookingDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { t } = useTranslation();
+  const [discountValue, setDiscountValue] = useState(0)
+
+  const getVoucherInformation = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}/api/voucher/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      throw error;
+    }
+  }
+
+  const fetchVoucher = async (voucherId) => {
+    try {
+      const voucherData = await getVoucherInformation(voucherId);
+      if(voucherData){
+        setVoucherData(voucherData);
+        setDiscountValue(voucherData.DiscountValue)
+      }
+    } catch (error) {
+      console.error('Error fetching voucher details:', error);
+    }
+  };
 
   // Fetch spa booking by ID
   const getSpaBookingById = async (id) => {
@@ -43,6 +72,10 @@ const SpaBookingDetail = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      const spaBooking = response.data
+      if (spaBooking.VoucherID) {
+        fetchVoucher(spaBooking.VoucherID);
+      }
       return response.data;
     } catch (error) {
       console.error('Error fetching spa booking:', error);
@@ -185,15 +218,25 @@ const SpaBookingDetail = () => {
   const statusSteps = spaBooking.StatusChanges.map((change, index) => (
     <Step
       key={index}
-      title={change.Status}
-      description={new Date(change.ChangeTime).toLocaleString('vi-VN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })}
+      title={
+        <div className="ml-14">
+          {change.Status}
+        </div>
+      }
+      description={
+        <div className="ml-14">
+          <span className="block mb-1">
+            {new Date(change.ChangeTime).toLocaleString('vi-VN', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            })}
+          </span>
+        </div>
+      }
       status={change.Status === 'Canceled' ? 'error' : 'process'}
       icon={
         <Tag color={getStatusColor(change.Status)}>{change.Status}</Tag>
@@ -406,6 +449,13 @@ const SpaBookingDetail = () => {
     setIsChangeModalVisible(false);
   };
 
+  function formatNumberWithCommas(number) {
+    if (typeof number !== 'number') {
+        return number;
+    }
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
   return (spaBookingDetail && spaBooking &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
@@ -497,7 +547,7 @@ const SpaBookingDetail = () => {
             <Text strong>{t('pet_weight')}: </Text>
             <Text>{spaBookingDetail.PetWeight} kg</Text>
           </div>
-          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && (
+          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && spaBookingDetail.ActualWeight !== null && (
             <div className="mb-4 flex justify-between">
             <Text strong>{t('Cân nặng thực tế: ')} </Text>
             <Text>{spaBookingDetail.ActualWeight} kg</Text>
@@ -523,26 +573,46 @@ const SpaBookingDetail = () => {
           </Card>
         )}
 
-        <Card className="text-right w-full ml-auto border-none">
-          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 ? (
-            <>
-              <div className="mb-4 flex justify-end items-end">
-                <Text strong className="mr-2">{t('Thành tiền')}:</Text>
-                <Text className="flex justify-between">{spaBooking.TotalPrice.toLocaleString('vn')}đ</Text>
+        <Card className="md:text-right md:w-3/5 md:ml-auto border-none">
+          {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && spaBookingDetail.ActualWeight !== null ? (
+            <div>
+              <div className="mb-2 flex justify-between items-end">
+                <Text strong className="mr-2 md:text-2xl">{t('Thành tiền')}:</Text>
+                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.TotalPrice)}đ</Text>
               </div>
-              <div className="mb-4 flex justify-end items-end">
-                <Text strong className="mr-2">{t('Chi phí phát sinh: ')}</Text>
-                <Text className="flex justify-between">{spaBooking.ExtraCharge.toLocaleString('vn')}đ</Text>
+              {voucherData && (
+                <div className="mb-4 flex flex-row justify-between">
+                  <Text className="md:text-2xl mr-2" strong>Áp dụng voucher({voucherData.Pattern}): </Text>
+                  <Text className="md:text-2xl text-red-600"> -{formatNumberWithCommas(discountValue)}đ</Text>
+                </div>
+              )}
+              <div className="mb-4 flex justify-between items-end">
+                <Text strong className="mr-2 md:text-2xl">{t('Chi phí phát sinh: ')}</Text>
+                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.ExtraCharge)}đ</Text>
               </div>
-              <div className="flex justify-end items-end">
-                <Text strong className="mr-2">{t('Tổng tiền: ')}</Text>
-                <Text className="text-green-600 text-4xl flex justify-between">{spaBooking.FinalPrice.toLocaleString('vn')}đ</Text>
+              <div className="flex justify-between items-end">
+                <Text strong className="mr-2 md:text-4xl">{t('Tổng tiền: ')}</Text>
+                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.FinalPrice-discountValue)}đ</Text>
               </div>
-            </>
+            </div>
           ) : (
-            <div className="flex justify-end items-end">
-              <Text strong className="mr-2">{t('Tổng tiền: ')}</Text>
-              <Text className="text-green-600 text-4xl flex justify-between">{spaBooking.TotalPrice.toLocaleString('vn')}đ</Text>
+            <div className="flex flex-col md:ml-auto mt-4 mb-4 border-none">
+              {voucherData && (
+                <div>
+                  <div className="mb-4 flex flex-row justify-between">
+                    <Text className="md:text-2xl mr-2 text-left" strong>Thành tiền</Text>
+                    <Text className="md:text-2xl">{spaBooking.TotalPrice}đ</Text>
+                  </div>
+                  <div className="mb-4 flex flex-row justify-between">
+                    <Text className="md:text-2xl mr-2 text-left" strong>Áp dụng voucher({voucherData.Pattern}): </Text>
+                    <Text className="md:text-2xl text-red-600"> -{formatNumberWithCommas(discountValue)}</Text>
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-row justify-between">
+                <Text strong className="mr-2 md:text-4xl">{t('Tổng tiền: ')}</Text>
+                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.TotalPrice - discountValue)}đ</Text>
+              </div>
             </div>
           )}
         </Card>
