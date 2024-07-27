@@ -768,7 +768,10 @@ const BookingList = () => {
         actualWeight: ''
       });
     }
-    if (value === 'Có' && actualWeight === null) {
+    console.log(caretakerID)
+    console.log(selectedCaretaker)
+    console.log(form.getFieldValue('actualWeight'))
+    if ((value === 'Có' && form.getFieldValue('actualWeight') === '')) {
       setIsConfirmButtonDisabled(true);
     } else {
       setIsConfirmButtonDisabled(false);
@@ -776,12 +779,12 @@ const BookingList = () => {
   };
 
   useEffect(() => {
-    if (radioValue === 'Có' && actualWeight === null) {
+    if (radioValue === 'Có' && form.getFieldValue('actualWeight') === '') {
       setIsConfirmButtonDisabled(true);
     } else {
       setIsConfirmButtonDisabled(false);
     }
-  }, [radioValue, actualWeight]);
+  }, [radioValue, actualWeight, form]);
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">

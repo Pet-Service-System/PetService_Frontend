@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker, List } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +58,26 @@ const SpaBookingDetail = () => {
     setFeedbackContent(e.target.value);
   };
 
+  const fetchReply = async (BookingID) => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const response = await axios.get(
+        `${API_URL}/api/replies/${BookingID}`,
+        config
+      );
+      if (response.data && response.data[0]) {
+        return response.data[0];
+      }
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+    }
+  };
+  
   const submitReply = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -101,7 +121,6 @@ const SpaBookingDetail = () => {
         );
         if (bookingResponse.status === 200) {
           setReplies((prevReplies) => [...prevReplies, createdReply]);
-          console.log(replies || null)
           setSpaBooking({ ...spaBooking, isReplied: true });
           message.success(t("reply_successfully"));
           setFeedbackingBookingDetailsId(null);
@@ -248,19 +267,17 @@ const SpaBookingDetail = () => {
       const bookingDetail = await getSpaBookingDetail(id);
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
       const caretakersName = await getFullName(booking.CaretakerID);
-
+      const reply = await fetchReply(booking.BookingID);
 
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail);
       setServiceData(serviceInfo);
       setCaretakersName(caretakersName);
-      console.log(role)
-      console.log(accountID)
-      console.log(booking.CaretakerID)
       if(role === 'Caretaker Staff' && accountID !== booking.CaretakerID){
         setAccess(false)
-        navigate(-1)
+        navigate('/manage-spa-bookings')
       }
+      setReplies(reply);
     } catch (error) {
       console.error('Error fetching spa booking:', error);
     } finally {
@@ -271,6 +288,7 @@ const SpaBookingDetail = () => {
   useEffect(() => {
     fetchSpaBooking();
     fetchAccounts();
+    fetchReply();
   }, []);
 
   if (loading || !spaBooking || !spaBookingDetail) {
@@ -530,7 +548,6 @@ const SpaBookingDetail = () => {
       setOperationLoading(false);
     }
   };
-
   const handleCancelChangeModal = () => {
     setIsChangeModalVisible(false);
   };
@@ -660,6 +677,7 @@ const SpaBookingDetail = () => {
                     <Button
                       className="ml-4"
                       onClick={() => startFeedback(spaBooking.BookingDetailsID)}
+                      disabled={spaBooking.isReplied}
                     >
                       {t("reply")}
                     </Button>
@@ -671,28 +689,21 @@ const SpaBookingDetail = () => {
                   </Text>
                   <Text className="text-3xl">{spaBooking.Feedback}</Text>
                 </div>
+                {replies && (
+                  <Card className="border-none">
+                    <div className="flex flex-col">
+                      <div className="flex flex-row">
+                        <Text strong className="text-2xl">{caretakersName.fullname}</Text>
+                        <Text className="text-gray-400">
+                          {" - "}
+                          {moment(replies.ReplyDate).format("DD/MM/YYYY")}
+                        </Text>
+                      </div>
+                      <Text>{replies.ReplyContent}</Text>
+                    </div>
+                  </Card>
+                )}
               </Card>
-              {replies.length !== 0 && (
-                <List
-                  dataSource={replies}
-                  renderItem={(reply) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        title={
-                          <span>
-                            {caretakersName.fullname}
-                            <Text className="text-gray-400">
-                              {" - "}
-                              {moment(reply.ReplyDate).format("DD/MM/YYYY")}
-                            </Text>
-                          </span>
-                        }
-                        description={reply.ReplyContent}
-                      />
-                    </List.Item>
-                  )}
-                />
-              )} 
             </>
           )}
 
