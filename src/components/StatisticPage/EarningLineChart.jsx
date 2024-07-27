@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Tabs, Card, Spin } from "antd";
+import { Tabs, Card, Spin, Typography } from "antd";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 import { useTranslation } from "react-i18next";
@@ -70,6 +70,7 @@ const EarningsLineChart = () => {
 
   return (
     <Card className="shadow-lg mb-4">
+      <Typography.Title className="text-center">Doanh thu dịch vụ</Typography.Title>
       <Tabs defaultActiveKey="weekly">
         <TabPane tab={t("Tuần")} key="weekly">
           {loading ? (
