@@ -423,7 +423,7 @@ const OrderHistoryDetail = () => {
       key: 'Price',
       render: (text) => {
         if (typeof text === 'number') {
-          return <span className="text-green-600">{text.toLocaleString('en-US')}</span>;
+          return <span className="text-green-600">{formatNumberWithCommas(text)}</span>;
         }
         return null;
       },
@@ -445,6 +445,13 @@ const OrderHistoryDetail = () => {
         </Button>
       ),
     });
+  }
+
+  function formatNumberWithCommas(number) {
+    if (typeof number !== 'number') {
+        return number;
+    }
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
   return ( orderDetail.Items &&
@@ -494,23 +501,23 @@ const OrderHistoryDetail = () => {
         <Card className="text-right w-1/2 ml-auto border-none">
           <div className="mb-4 flex justify-between">
             <Text strong>{t('subtotal')}:</Text>
-            <Text>{subTotal.toLocaleString('en-US')}</Text>
+            <Text>{formatNumberWithCommas(subTotal)}</Text>
           </div>
           <div className="mb-4 flex justify-between">
             <Text strong>{t('shipping_fee')}:</Text>
-            <Text>{shippingCost.toLocaleString('en-US')}</Text>
+            <Text>{formatNumberWithCommas(shippingCost)}</Text>
           </div>
           {voucherData && (
             <div className="mb-4 flex justify-between">
               <Text strong>{t('discount_applied')} ({voucherData.Pattern}): </Text>
               <div>
-                <Text className="text-red-600"> -{discountValue.toLocaleString('en-US')}</Text>
+                <Text className="text-red-600"> -{formatNumberWithCommas(discountValue)}</Text>
               </div>
             </div>
           )}
           <div className="flex justify-between">
             <Text strong>{t('total_amount')}:</Text>
-            <Text className="text-green-500">{(order.TotalPrice-discountValue).toLocaleString('en-US')}</Text>
+            <Text className="text-green-500">{formatNumberWithCommas(order.TotalPrice-discountValue)}</Text>
           </div>
         </Card>
 

@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker, List } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
+import TextArea from "antd/es/input/TextArea";
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
@@ -18,6 +19,7 @@ const SpaBookingDetail = () => {
   const [spaBookingDetail, setSpaBookingDetail] = useState(null);
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [feedbackingBookingDetailsId, setFeedbackingBookingDetailsId] = useState(null);
   const [caretakers, setCaretakers] = useState([]); // List of available caretakers
   const [isChangeModalVisible, setIsChangeModalVisible] = useState(false); // Modal visibility state
   const [form] = Form.useForm(); // Antd form instance
@@ -35,6 +37,83 @@ const SpaBookingDetail = () => {
   const { id } = useParams();
   const { t } = useTranslation();
   const [discountValue, setDiscountValue] = useState(0)
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const accountID = user?.id;
+  const [feedbackContent, setFeedbackContent] = useState("");
+  const [replies, setReplies] = useState([]);
+  const [access, setAccess] = useState(true);
+
+  const startFeedback = (id) => {
+    setFeedbackingBookingDetailsId(id);
+    setFeedbackContent("");
+  };
+
+  const cancelFeedback = () => {
+    setFeedbackingBookingDetailsId(null);
+    setFeedbackContent("");
+  };
+
+  const handleFeedbackContentChange = (e) => {
+    setFeedbackContent(e.target.value);
+  };
+
+  const submitReply = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      if (spaBooking.isReplied) {
+        message.error(t("you_can_only_reply_once"));
+        return;
+      }
+
+      if (!feedbackContent || feedbackContent.trim() === "") {
+        return;
+      }
+
+      const newReply = {
+        BookingID: spaBooking.BookingID,
+        AccountID: accountID,
+        ReplyContent: feedbackContent,
+        ReplyDate: new Date(),
+      };
+
+      const response = await axios.post(`${API_URL}/api/replies`, newReply, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Use backticks for template literals
+        },
+      });
+
+      if (response.status === 201) {
+        const createdReply = response.data;
+        const bookingResponse = await axios.patch(
+          `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
+          { isReplied: true },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Use backticks for template literals
+            },
+          }
+        );
+        if (bookingResponse.status === 200) {
+          setReplies((prevReplies) => [...prevReplies, createdReply]);
+          console.log(replies || null)
+          setSpaBooking({ ...spaBooking, isReplied: true });
+          message.success(t("reply_successfully"));
+          setFeedbackingBookingDetailsId(null);
+          setFeedbackContent("");
+        }
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
+      const errorMessage = error.response?.data?.message || t("error_reply");
+      message.error(errorMessage);
+    }
+  };
 
   const getVoucherInformation = async (id) => {
     const token = localStorage.getItem('token');
@@ -175,6 +254,13 @@ const SpaBookingDetail = () => {
       setSpaBookingDetail(bookingDetail);
       setServiceData(serviceInfo);
       setCaretakersName(caretakersName);
+      console.log(role)
+      console.log(accountID)
+      console.log(booking.CaretakerID)
+      if(role === 'Caretaker Staff' && accountID !== booking.CaretakerID){
+        setAccess(false)
+        navigate(-1)
+      }
     } catch (error) {
       console.error('Error fetching spa booking:', error);
     } finally {
@@ -454,9 +540,8 @@ const SpaBookingDetail = () => {
         return number;
     }
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-  return (spaBookingDetail && spaBooking &&
+  }
+  return (spaBookingDetail && spaBooking && access &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
       <Button
@@ -563,15 +648,75 @@ const SpaBookingDetail = () => {
           scroll={{ x: 'max-content' }}
           pagination={false}
         />
+
         {spaBooking.Feedback && (
-          <Card className="text-left w-full ml-auto">
-            <Title level={3} className="text-center">Đánh giá của khách hàng</Title>
-            <div className="mt-4">
-              <Text className="text-3xl" strong>{t('feedback')}: </Text>
-              <Text className="text-3xl">{spaBooking.Feedback}</Text>
-            </div>
-          </Card>
-        )}
+            <>
+              <Card className="text-left w-full ml-auto">
+                <div className="flex justify-between items-center">
+                  <Title level={3} className="m-0">
+                    Đánh giá của khách hàng
+                  </Title>
+                  {role == 'Caretaker Staff' && (
+                    <Button
+                      className="ml-4"
+                      onClick={() => startFeedback(spaBooking.BookingDetailsID)}
+                    >
+                      {t("reply")}
+                    </Button>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <Text className="text-3xl" strong>
+                    {t("feedback")}:{" "}
+                  </Text>
+                  <Text className="text-3xl">{spaBooking.Feedback}</Text>
+                </div>
+              </Card>
+              {replies.length !== 0 && (
+                <List
+                  dataSource={replies}
+                  renderItem={(reply) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        title={
+                          <span>
+                            {caretakersName.fullname}
+                            <Text className="text-gray-400">
+                              {" - "}
+                              {moment(reply.ReplyDate).format("DD/MM/YYYY")}
+                            </Text>
+                          </span>
+                        }
+                        description={reply.ReplyContent}
+                      />
+                    </List.Item>
+                  )}
+                />
+              )} 
+            </>
+          )}
+
+          {feedbackingBookingDetailsId === spaBooking.BookingDetailsID && (
+            <Card className="text-left w-full ml-auto mt-4">
+              <Title level={3} className="text-center">
+                {t("reply to feedback")}
+              </Title>
+              <div className="mt-4">
+                <TextArea
+                  rows={4}
+                  value={feedbackContent}
+                  onChange={handleFeedbackContentChange}
+                  placeholder={t("enter yourreply")}
+                />
+                <div className="mt-4 text-right">
+                  <Button onClick={cancelFeedback}>{t("cancel")}</Button>
+                  <Button type="primary" onClick={submitReply} className="ml-2">
+                    {t("submit")}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )} 
 
         <Card className="md:text-right md:w-3/5 md:ml-auto border-none">
           {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && spaBookingDetail.ActualWeight !== null ? (

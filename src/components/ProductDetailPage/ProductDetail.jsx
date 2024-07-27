@@ -365,7 +365,7 @@ const ProductDetail = () => {
                             <div>
                                 <Title level={3}>{productData.ProductName}</Title>
                                 <Paragraph>{`${t('quantity_in_stock')}: ${productData.Quantity}`}</Paragraph>
-                                <Paragraph className="text-green-600 text-4xl">{`${productData.Price.toLocaleString('en-US')}đ`}</Paragraph>
+                                <Paragraph className="text-green-600 text-4xl">{`${productData.Price}đ`}</Paragraph>
                                 <Paragraph style={{ whiteSpace: 'pre-line' }} ellipsis={{ rows: 5, expandable: true, symbol: 'more' }}>{`${t('description')}: ${productData.Description}`}</Paragraph>
                             </div>
                         )}

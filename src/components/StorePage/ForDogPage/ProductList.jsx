@@ -274,7 +274,7 @@ const ProductList = () => {
       dataIndex: 'Price',
       key: 'Price',
       render: (text) => (
-        <span>{typeof text === 'number' ? `${text.toLocaleString('en-US')}` : '-'}đ</span>
+        <span>{typeof text === 'number' ? `${text}` : '-'}đ</span>
       ),
     },
     {
@@ -395,7 +395,7 @@ const ProductList = () => {
                   />
                   <div className="p-4">
                     <h3 className="text-2xl font-semibold">{product.ProductName}</h3>
-                    <p className="text-green-600 mt-2 text-3xl">{product.Price.toLocaleString('en-US')}đ</p>
+                    <p className="text-green-600 mt-2 text-3xl">{product.Price}đ</p>
                     {/* <p className="text-gray-500 mt-2">{product.Description}</p> */}
                   </div>
                 </Card>

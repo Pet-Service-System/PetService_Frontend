@@ -519,7 +519,7 @@ const Order = () => {
                   value={selectedShippingMethod}
                   onChange={handleShippingChange}
                 >
-                  <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost.toLocaleString('en-US')}đ)</Radio>
+                  <Radio value="nationwide" className="font-medium block mb-2">{t('shipping_fee_nationwide')} ({shippingCost}đ)</Radio>
                 </Radio.Group>
               </div>
 

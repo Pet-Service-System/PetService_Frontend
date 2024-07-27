@@ -206,7 +206,7 @@ const Statistics = () => {
                                 {product.ProductName}
                               </h3>
                               <h2 className="text-green-600 mt-2 text-4xl">
-                                {product.Price.toLocaleString('en-US')}
+                                {product.Price}
                               </h2>
                               <p className="text-gray-500 mt-2">{product.Description}</p>
                             </div>

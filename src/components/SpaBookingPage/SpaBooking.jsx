@@ -41,7 +41,6 @@ const SpaBooking = () => {
   const [reviewText, setReviewText] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [bookingID, setBookingID] = useState(null);
-  const [bookingDetailID, setBookingDetailID] = useState(null); // Moved to useState
   const dispatch = useDispatch();
   const [role, setRole] = useState(localStorage.getItem('role') || 'Guest');
   const [loading, setLoading] = useState(false);
@@ -149,10 +148,9 @@ const SpaBooking = () => {
       setReviewError(t('review_error_empty'));
       return;
     }
-
     const token = localStorage.getItem('token');
     try {
-      await axios.put(
+      await axios.patch(
         `${API_URL}/api/Spa-bookings/${bookingID}`,
         { Feedback: reviewText},
         {
@@ -162,7 +160,7 @@ const SpaBooking = () => {
         }
       );
 
-      await axios.put(
+      await axios.patch(
         `${API_URL}/api/Spa-bookings/${bookingID}`,
         { isReviewed: true},
         {

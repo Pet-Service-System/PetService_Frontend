@@ -103,6 +103,10 @@ const RegisterForm = () => {
           address,
           status: 'active',
           role: 'Customer',
+          membershipType: 'Basic',
+          totalSpent: 0,
+          startDate: '',
+          endDate: '',
         });
 
         message.success(t('registration_successful'), 2).then(() => {
