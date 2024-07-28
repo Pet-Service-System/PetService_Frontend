@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification, InputNumber, Card } from 'antd';
+import { Button, Input, Image, Form, Typography, message, Skeleton, Select, Modal, DatePicker, Row, Col, notification, InputNumber, Card, Checkbox } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, ScheduleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
@@ -41,11 +41,16 @@ const SpaServiceDetail = () => {
     ];
     const { t } = useTranslation();
     const [currentPrice, setCurrentPrice] = useState(0);
+    const [isPolicyModalVisible, setIsPolicyModalVisible] = useState(false);
     const currentPriceRef = useRef(currentPrice);
     const [discountValue, setDiscountValue] = useState(0); // State for discount value
     const discountValueRef = useRef(discountValue);
     const [voucherID, setVoucherID] = useState(null);
+    const [isChecked, setIsChecked] = useState(false);
     const voucherIDref = useRef(voucherID);
+    // const [subscriptionPlan, setSubscriptionPlan] = useState('none');
+    // const [subscriptionDiscount, setSubscriptionDiscount] = useState(0); 
+    // const subscriptionDiscountRef = useRef(subscriptionDiscount);
 
     useEffect(() => {
         voucherIDref.current = voucherID;
@@ -54,6 +59,7 @@ const SpaServiceDetail = () => {
     useEffect(() => {
         discountValueRef.current = discountValue;
       }, [discountValue]);
+
       const checkVoucher = async () => {
         try {
           if (voucherCode.trim() === '') {
@@ -84,6 +90,7 @@ const SpaServiceDetail = () => {
     useEffect(() => {
         currentPriceRef.current = currentPrice;
     }, [currentPrice]);
+    
 
     const fetchAccounts = async () => {
         try {
@@ -283,11 +290,33 @@ const SpaServiceDetail = () => {
         setIsBookingModalVisible(false);
         setOperationLoading(false);
         setIsPayPalButtonVisible(false);
-        setCurrentPrice(0)
+        
+        // Reset states and refs
+        setCurrentPrice(0);
+        currentPriceRef.current = 0;
+    
+        setDiscountValue(0);
+        discountValueRef.current = 0;
+    
+        setVoucherCode('');
+        setVoucherID(null);
+        voucherIDref.current = null;
+    
+        setIsChecked(false);
+        // setSubscriptionPlan('none');
+        // setSubscriptionDiscount(0);
+        // subscriptionDiscountRef.current = 0;
+        // Reset forms
         bookingForm.resetFields();
-        setDiscountValue(0)
-        setVoucherCode('')
+        addPetForm.resetFields();
+    
+        // Clear selected pet
+        setSelectedPet(null);
+    
+        // Reset modal visibility
+        setIsAddModalVisible(false);
     };
+    
 
     const showLoginModal = () => {
         Modal.info({
@@ -391,8 +420,17 @@ const SpaServiceDetail = () => {
         return <Skeleton active />;
     }
 
+    const onCancelModal = () => {
+        setIsPolicyModalVisible(false)
+    };
+    
+    const handleChangeCheckBox = (e) => {
+        setIsChecked(e.target.checked);
+    };
+
     const createOrder = (data, actions) => {
-        const latestPrice = (currentPriceRef.current - discountValueRef.current) * exchangeRateVNDtoUSD; // Use ref to get latest value
+        // const latestPrice = ((currentPriceRef.current - discountValueRef.current) - (currentPriceRef.current * subscriptionDiscountRef.current)) * exchangeRateVNDtoUSD;
+        const latestPrice = (currentPriceRef.current - discountValueRef.current) * exchangeRateVNDtoUSD;
         return actions.order.create({
             purchase_units: [
                 {
@@ -402,7 +440,7 @@ const SpaServiceDetail = () => {
                 },
             ],
         });
-    };
+    };    
 
     const onApprove = async (data, actions) => {
         try {
@@ -488,6 +526,35 @@ const SpaServiceDetail = () => {
         console.error("Error during PayPal checkout:", err);
     };
 
+    // const handleSubscriptionPlanChange = (value) => {
+    //     let discount = 0;
+    //     switch (value) {
+    //         case '6months':
+    //             discount = 0.03;
+    //             break;
+    //         case '9months':
+    //             discount = 0.06;
+    //             break;
+    //         case '12months':
+    //             discount = 0.09;
+    //             break;
+    //         default:
+    //             discount = 0;
+    //             break;
+    //     }
+    //     setSubscriptionPlan(value); 
+    //     setSubscriptionDiscount(discount); 
+    //     subscriptionDiscountRef.current = discount;
+    //     console.log(subscriptionDiscountRef.current)
+    // };
+
+    function formatNumberWithCommas(number) {
+    if (typeof number !== 'number') {
+        return number;
+    }
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     return ( caretakers &&
         <div className="relative">
             {/* Go back button */}
@@ -525,7 +592,7 @@ const SpaServiceDetail = () => {
                                 <span className="font-semibold">
                                     {minWeight}kg - {maxWeight}kg:
                                 </span>{" "}
-                                {price.toLocaleString("en-US")}đ
+                                {formatNumberWithCommas(price)}đ
                                 </Paragraph>
                             ))
                             ) : (
@@ -564,6 +631,7 @@ const SpaServiceDetail = () => {
                 cancelText="Hủy"
                 width={800} // Set modal width
                 confirmLoading={operationLoading}
+                okButtonProps={{ disabled: !isChecked }}
             >
                 <Form form={bookingForm} layout="vertical">
                     <Row gutter={16}>
@@ -574,7 +642,7 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: t('plz_enter_customer_name') }]}
                                 initialValue={user?.fullname}
                             >
-                                <Input placeholder={t('enter_name')} />
+                                <Input disabled={operationLoading} placeholder={t('enter_name')} />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -584,7 +652,7 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: t('plz_enter_phone_number') }]}
                                 initialValue={user?.phone}
                             >
-                                <Input placeholder={t('enter_phone')} />
+                                <Input disabled={operationLoading} placeholder={t('enter_phone')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -597,6 +665,7 @@ const SpaServiceDetail = () => {
                             >
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    disabled={operationLoading}
                                     disabledDate={(current) => {
                                         if (current && current < currentDateTime.startOf('day')) {
                                             return true;
@@ -616,6 +685,7 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: t('plz_choose_booking_time') }]}
                             >
                                 <Select
+                                    disabled={operationLoading}
                                     style={{ width: '100%' }}
                                     placeholder={t('choose_booking_time')}
                                 >
@@ -634,6 +704,7 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: t('plz_choose_pet') }]}
                             >
                                 <Select
+                                    disabled={operationLoading}
                                     placeholder={t('choose_pet')}
                                     onChange={(value) => {
                                         if (value === "add_new_pet") {
@@ -660,7 +731,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_type')}
                                 rules={[{ required: true, message: t('plz_enter_pet_type') }]}
                             >
-                                <Select placeholder={t('choose_pet_type')}>
+                                <Select disabled={operationLoading} placeholder={t('choose_pet_type')}>
                                     <Option value="PT001">{t('dog')}</Option>
                                     <Option value="PT002">{t('cat')}</Option>
                                 </Select>
@@ -674,7 +745,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_gender')}
                                 rules={[{ required: true, message: t('plz_enter_pet_gender')}]}
                             >
-                                <Select placeholder={t('choose_gender')}>
+                                <Select disabled={operationLoading} placeholder={t('choose_gender')}>
                                     <Option value="Đực">{t('male')}</Option>
                                     <Option value="Cái">{t('female')}</Option>
                                 </Select>
@@ -686,7 +757,7 @@ const SpaServiceDetail = () => {
                                 label={t('pet_status')}
                                 rules={[{ required: true, message: t('plz_enter_pet_status') }]}
                             >
-                                <Input placeholder={t('enter_pet_status')} />
+                                <Input disabled={operationLoading} placeholder={t('enter_pet_status')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -701,6 +772,7 @@ const SpaServiceDetail = () => {
                                 ]}
                             >
                                 <InputNumber
+                                    disabled={operationLoading}
                                     onChange={handlePetWeightChange}
                                     className='min-w-full'
                                     suffix="kg"
@@ -717,7 +789,7 @@ const SpaServiceDetail = () => {
                                 { type: 'number', min: 0, message: t('age_must_be_positive') }
                                 ]}
                             >
-                                <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('enter_pet_age')} />
+                                <InputNumber disabled={operationLoading} className='min-w-full' suffix={t('age')} placeholder={t('enter_pet_age')} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -735,6 +807,7 @@ const SpaServiceDetail = () => {
                                 label={t('Nhân viên chăm sóc')}
                             >
                                 <Select
+                                    disabled={operationLoading}
                                     placeholder={t('choose_caretaker')}
                                     onChange={(value) => handleCaretakerChange(value)}
                                 >
@@ -759,6 +832,7 @@ const SpaServiceDetail = () => {
                             >
                                 <div className="relative">
                                     <Input
+                                        disabled={operationLoading}
                                         placeholder={t('enter_voucher_code')}
                                         value={voucherCode}
                                         onChange={(e) => setVoucherCode(e.target.value)}
@@ -768,7 +842,8 @@ const SpaServiceDetail = () => {
                                         type="primary"
                                         onClick={checkVoucher}
                                         className="absolute right-0 top-0 bottom-0 rounded-l-none"
-                                        disabled={currentPrice == 0}
+                                        disabled={currentPrice == 0 || operationLoading || !voucherCode}
+                                        
                                     >
                                         {t('apply_voucher')}
                                     </Button>
@@ -784,7 +859,7 @@ const SpaServiceDetail = () => {
                                 initialValue={id}
                                 style={{ display: 'none' }}
                             >
-                                <Input />
+                                <Input disabled={operationLoading}/>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
@@ -794,24 +869,87 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: t('plz_enter_pet_name') }]}
                                 style={{ display: 'none' }}
                             >
-                                <Input placeholder={t('enter_pet_name')} />
+                                <Input disabled={operationLoading} placeholder={t('enter_pet_name')} />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    {/* <Row gutter={16}>
+                        <Col xs={24} sm={12}>
+                        <Form.Item
+                            name="SubscriptionPlan"
+                            label='Đăng ký định kỳ dịch vụ'
+                        >
+                            <Select
+                                disabled={operationLoading}
+                                placeholder={t('choose_subscription_plan')}
+                                onChange={(value) => handleSubscriptionPlanChange(value)}
+                                defaultValue="none"
+                            >
+                                <Select.Option value="none">Không</Select.Option>
+                                <Select.Option value="6months">6 tháng</Select.Option>
+                                <Select.Option value="9months">9 tháng</Select.Option>
+                                <Select.Option value="12months">12 tháng</Select.Option>
+                            </Select>
+                        </Form.Item>
+                        </Col>
+                    </Row> */}
+                    <Row>
+                        <Col span={24}>
+                            <Form.Item
+                                name="TermsAndConditions"
+                                valuePropName="checked"
+                                rules={[{ required: true, message: "Vui lòng đồng ý với các điều khoản" }]}
+                            >
+                                <Checkbox disabled={operationLoading} className='font-normal' onChange={handleChangeCheckBox}>
+                                    Tôi đồng ý với <a className='text-blue-600 underline' onClick={() => setIsPolicyModalVisible(true)}>các điều khoản và điều kiện</a>
+                                </Checkbox>
                             </Form.Item>
                         </Col>
                     </Row>
                 </Form>
                 <Card className="flex flex-col md:ml-auto mt-4 mb-4 md:w-3/6 border-none">
-                    {discountValue > 0 && (
+                    {/* {(discountValue > 0 || subscriptionDiscount > 0) && currentPrice > 0 && (
                         <>
                             <div className="flex flex-row mb-2 justify-between">
                                 <Text strong className='mr-1'>Thành tiền: </Text>
                                 <Text>
-                                    {currentPrice.toLocaleString("en-US")}đ
+                                    {formatNumberWithCommas(currentPrice)}đ
+                                </Text>
+                            </div>
+                        </>
+                    )}
+                    {discountValue > 0 && currentPrice > 0 && (
+                        <>
+                            <div className="flex flex-row mb-2 justify-between">
+                                <Text strong className='mr-1'>Áp dụng mã giảm giá:</Text>
+                                <Text className="text-red-600">
+                                    -{formatNumberWithCommas(discountValue)}đ
+                                </Text>
+                            </div>
+                        </>
+                    )}
+                    {subscriptionDiscount > 0 && currentPrice > 0 && (
+                        <>
+                            <div className="flex flex-row mb-2 justify-between">
+                                <Text strong className='mr-1'>Giảm giá đăng ký định kỳ:</Text>
+                                <Text className="text-red-600">
+                                    -{formatNumberWithCommas(currentPrice * subscriptionDiscount)}đ
+                                </Text>
+                            </div>
+                        </>
+                    )} */}
+                    {discountValue > 0 && currentPrice > 0 && (
+                        <>
+                            <div className="flex flex-row mb-2 justify-between">
+                                <Text strong className='mr-1'>Thành tiền: </Text>
+                                <Text>
+                                    {formatNumberWithCommas(currentPrice)}đ
                                 </Text>
                             </div>
                             <div className="flex flex-row mb-2 justify-between">
                                 <Text strong className='mr-1'>Áp dụng mã giảm giá:</Text>
                                 <Text className="text-red-600">
-                                    -{(discountValue).toLocaleString("en-US")}đ
+                                    -{formatNumberWithCommas(discountValue)}đ
                                 </Text>
                             </div>
                         </>
@@ -819,7 +957,8 @@ const SpaServiceDetail = () => {
                     <div className="flex flex-row mb-2 justify-between">
                         <Text strong className='mr-1 md:text-4xl text-3xl'>Tổng tiền:</Text>
                         <Text className="md:text-4xl text-3xl text-green-600">
-                            {(currentPrice-discountValue).toLocaleString("en-US")}đ
+                            {/* {formatNumberWithCommas(currentPrice - discountValue - currentPrice * subscriptionDiscount)}đ */}
+                            {formatNumberWithCommas(currentPrice - discountValue)}đ
                         </Text>
                     </div>
                 </Card>
@@ -913,6 +1052,55 @@ const SpaServiceDetail = () => {
                         <InputNumber className='min-w-full' suffix={t('age')} placeholder={t('pet_age')} />
                     </Form.Item>
                 </Form>
+            </Modal>
+
+            {/* Policy Modal */}
+            <Modal
+                title="Chính Sách"
+                visible={isPolicyModalVisible}
+                onCancel={onCancelModal}
+                footer={null}
+                width={800}
+            >
+                <div className="p-8 bg-gray-100 min-h-screen">
+                    <Text>
+                        <strong>1. Chính Sách Phí Chênh Lệch Cân Nặng</strong>
+                        <br/>
+                        Trong quá trình khách check-in, nếu cân nặng của thú cưng khác với cân nặng đăng ký, chúng tôi sẽ thu thêm hoặc trả lại phí chênh lệch theo bảng giá.
+                        <br/>
+                        - Phí chênh lệch sẽ được tính dựa trên mức giá đã được niêm yết và sẽ được thông báo rõ ràng cho khách hàng.
+                        <br/>
+                        <strong>2. Chính Sách Hoàn Tiền</strong>
+                        <br/>
+                        Chúng tôi hiểu rằng có thể có những tình huống không mong muốn xảy ra, và chúng tôi cam kết hoàn tiền theo chính sách dưới đây:
+                        <br/>
+                        <strong>3. Chính Sách Hoàn Tiền Theo Nguồn Hủy</strong>
+                        <br/>
+                        <strong>3.1 Hủy từ Khách Hàng</strong>
+                        <br/>
+                        Nếu khách hàng hủy lịch với các lý do dưới đây, chính sách hoàn tiền sẽ được áp dụng như sau:
+                        <br/>
+                        - Khách không đến tiệm để làm dịch vụ: Hoàn tiền 30% tổng số tiền đã thanh toán.
+                        <br/>
+                        - Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa: Hoàn tiền 100% tổng số tiền đã thanh toán.
+                        <br/>
+                        - Khách hủy lịch sau khi phát sinh chi phí: Hoàn tiền 70% tổng số tiền đã thanh toán.
+                        <br/>
+                        - Thú cưng không hợp tác: Hoàn tiền 90% tổng số tiền đã thanh toán.
+                        <br/>
+                        - Các lý do khác: Hoàn tiền sẽ được giải quyết tùy theo từng tình huống cụ thể. Quý khách vui lòng liên hệ trực tiếp với chúng tôi để thảo luận và giải quyết.
+                        <br/>
+                        <strong>3.2 Hủy từ Tiệm</strong>
+                        <br/>
+                        Nếu hủy lịch từ phía tiệm, khách hàng sẽ được hoàn tiền 100% tổng số tiền đã thanh toán.
+                        <br/>
+                        <strong>4. Quy Định Chung</strong>
+                        <br/>
+                        - Chính sách hoàn tiền có thể thay đổi tùy theo từng trường hợp cụ thể và theo quy định của pháp luật hiện hành.
+                        <br/>
+                        - Mọi yêu cầu hoàn tiền cần được gửi qua email hoặc liên hệ trực tiếp với chúng tôi trong thời gian quy định.
+                    </Text>
+                </div>
             </Modal>
         </div>
     );

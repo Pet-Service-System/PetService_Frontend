@@ -1,4 +1,3 @@
-
 import { Typography, Card } from 'antd';
 
 const { Title, Paragraph } = Typography;
@@ -7,19 +6,27 @@ const Policy = () => {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <Title level={1} className="text-center mb-8">Chính Sách Hoàn Tiền</Title>
-      
+      <Title level={1} className="text-center mb-8">Chính Sách Của Tiệm</Title>
+
       <Card className="mb-4 p-4">
-        <Title level={3}>1. Chính Sách Hoàn Tiền</Title>
+        <Title level={3}>1. Chính Sách Phí Chênh Lệch Cân Nặng</Title>
+        <Paragraph>
+          Trong quá trình khách check-in, nếu cân nặng của thú cưng khác với cân nặng đăng ký, chúng tôi sẽ thu thêm hoặc trả lại phí chênh lệch theo bảng giá. 
+          - Phí chênh lệch sẽ được tính dựa trên mức giá đã được niêm yết và sẽ được thông báo rõ ràng cho khách hàng.
+        </Paragraph>
+      </Card>
+
+      <Card className="mb-4 p-4">
+        <Title level={3}>2. Chính Sách Hoàn Tiền</Title>
         <Paragraph>
           Chúng tôi hiểu rằng có thể có những tình huống không mong muốn xảy ra, và chúng tôi cam kết hoàn tiền theo chính sách dưới đây:
         </Paragraph>
       </Card>
 
       <Card className="mb-4 p-4">
-        <Title level={3}>2. Chính Sách Hoàn Tiền Theo Nguồn Hủy</Title>
+        <Title level={3}>3. Chính Sách Hoàn Tiền Theo Nguồn Hủy</Title>
         
-        <Title level={4}>2.1 Hủy từ Khách Hàng</Title>
+        <Title level={4}>3.1 Hủy từ Khách Hàng</Title>
         <Paragraph>
           Nếu khách hàng hủy lịch với các lý do dưới đây, chính sách hoàn tiền sẽ được áp dụng như sau:
         </Paragraph>
@@ -41,14 +48,14 @@ const Policy = () => {
           </li>
         </ul>
 
-        <Title level={4}>2.2 Hủy từ Tiệm</Title>
+        <Title level={4}>3.2 Hủy từ Tiệm</Title>
         <Paragraph>
           Nếu hủy lịch từ phía tiệm, khách hàng sẽ được hoàn tiền 100% tổng số tiền đã thanh toán.
         </Paragraph>
       </Card>
 
       <Card className="mb-4 p-4">
-        <Title level={3}>3. Quy Định Chung</Title>
+        <Title level={3}>4. Quy Định Chung</Title>
         <Paragraph>
           - Chính sách hoàn tiền có thể thay đổi tùy theo từng trường hợp cụ thể và theo quy định của pháp luật hiện hành.
         </Paragraph>

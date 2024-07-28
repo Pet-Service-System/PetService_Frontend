@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
-const { Search } = Input;
+const { Search, TextArea } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
 const { Item: TimelineItem } = Timeline;
@@ -167,8 +167,6 @@ const BookingList = () => {
     setFilteredSpaBookings(filteredData);
   }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated]);
 
-
-
   // Fetch spa bookings and update booking counts
   const fetchSpaBookings = async () => {
     setLoading(true);
@@ -249,16 +247,11 @@ const BookingList = () => {
         }
       }
     }
-    // Log to verify the values
-    console.log('Selected Booking Total Price:', selectedBooking.TotalPrice);
-    console.log('Initial Final Price:', finalPrice);
 
     if (finalPrice === 0) {
       // Set finalPrice only if it is currently 0
       setFinalPrice(selectedBooking.TotalPrice);
     }
-    
-    console.log('Updated Final Price:', finalPrice);
     
     try {
       const token = localStorage.getItem('token');
@@ -269,8 +262,7 @@ const BookingList = () => {
           ChangeTime: new Date().toISOString(), 
         },
       ];
-      console.log(selectedBooking.status)
-      console.log(pendingStatus)
+
       if(selectedBooking.status === 'Checked In' && pendingStatus === 'Completed'){
         await axios.patch(
           `${API_URL}/api/Spa-bookings/${selectedBookingId}`,
@@ -287,7 +279,7 @@ const BookingList = () => {
               Authorization: `Bearer ${token}`, 
             },
           }
-        ); 
+        );
       }
 
       if(selectedBooking.status === 'Pending' && pendingStatus === 'Checked In'){
@@ -307,7 +299,6 @@ const BookingList = () => {
             },
           }
         );
-
         const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
 
         await axios.patch(
@@ -785,6 +776,14 @@ const BookingList = () => {
       setIsConfirmButtonDisabled(false);
     }
   }, [radioValue, actualWeight, form]);
+
+  function formatNumberWithCommas(number) {
+    if (typeof number !== 'number') {
+        return number;
+    }
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout className="site-layout">
@@ -866,6 +865,7 @@ const BookingList = () => {
                 <Text className="mr-1">{t('Chọn nhân viên chăm sóc: ')}</Text>
                 <Select
                   placeholder={t('select_caretaker')}
+                  disabled={saving}
                   onChange={handleCaretakerChange}
                   style={{ width: 300 }}
                   value={selectedCaretaker ? selectedCaretaker.id : undefined}
@@ -884,8 +884,8 @@ const BookingList = () => {
                     onChange={handleRadioChange}
                     value={radioValue}
                   >
-                    <Radio value="Có">{t('Có')}</Radio>
-                    <Radio value="Không">{t('Không')}</Radio>
+                    <Radio disabled={saving} value="Có">{t('Có')}</Radio>
+                    <Radio disabled={saving} value="Không">{t('Không')}</Radio>
                   </Radio.Group>
                 </div>
                 {showWeightInput && (
@@ -909,15 +909,16 @@ const BookingList = () => {
                             style={{ width: 60 }}
                             className="h-10 w-10 items-center"
                             suffix='kg'
+                            disabled={saving}
                           />
                         </Form.Item>
                       </Form>
                     </div>
                     <div>
-                      <Text className="mr-1">{t('Phí phát sinh:')} {additionalCost.toLocaleString('vn')}</Text>
+                      <Text className="mr-1">{t('Phí phát sinh:')} {formatNumberWithCommas(additionalCost)}</Text>
                     </div>
                     <div>
-                      <Text className="mr-1">{t('Tổng tiền:')} {finalPrice.toLocaleString('vn')}</Text>
+                      <Text className="mr-1">{t('Tổng tiền:')} {formatNumberWithCommas(finalPrice)}</Text>
                     </div>
                   </div>
                 )}
@@ -930,12 +931,13 @@ const BookingList = () => {
                   setSelectedCancelSource(e.target.value);
                   setSelectedReason('');
                 }} value={selectedCancelSource}>
-                  <Radio value="Khach">{t('Khách')}</Radio>
-                  <Radio value="Tiem">{t('Tiệm')}</Radio>
+                  <Radio disabled={saving} value="Khach">{t('Khách')}</Radio>
+                  <Radio disabled={saving} value="Tiem">{t('Tiệm')}</Radio>
                 </Radio.Group>
                 <div className="mt-2">
                   {selectedCancelSource === 'Khach' && (
                     <Select
+                      disabled={saving}
                       placeholder={t('Chọn lý do')}
                       onChange={value => {
                         setSelectedReason(value);
@@ -958,6 +960,7 @@ const BookingList = () => {
                   )}
                   {selectedCancelSource === 'Tiem' && (
                     <Select
+                      disabled={saving}
                       placeholder={t('Chọn lý do')}
                       onChange={value => {
                         setSelectedReason(value);
@@ -968,7 +971,8 @@ const BookingList = () => {
                     </Select>
                   )}
                   {selectedReason === 'Khac' && (
-                    <textarea
+                    <TextArea
+                      disabled={saving}
                       placeholder={t('Nhập lý do khác')}
                       onChange={handleTextareaChange}
                       required

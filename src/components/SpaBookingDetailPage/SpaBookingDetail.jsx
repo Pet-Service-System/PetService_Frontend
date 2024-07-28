@@ -558,6 +558,7 @@ const SpaBookingDetail = () => {
     }
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
+  
   return (spaBookingDetail && spaBooking && access &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
