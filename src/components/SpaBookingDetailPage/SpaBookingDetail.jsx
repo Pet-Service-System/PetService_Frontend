@@ -378,7 +378,7 @@ const SpaBookingDetail = () => {
         try {
           const token = localStorage.getItem('token');
           // Make API call to update order status to 'Canceled'
-          const response = await axios.put(
+          const response = await axios.patch(
             `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
             { Status: 'Canceled' },
             {
@@ -498,7 +498,7 @@ const SpaBookingDetail = () => {
         throw new Error('Authentication token not found.');
       }
 
-      await axios.put(
+      await axios.patch(
         `${API_URL}/api/spa-booking-details/${spaBookingDetail.BookingDetailsID}`,
         {
           BookingDate: newBookingDate.format('DD-MM-YYYY'),
@@ -511,7 +511,7 @@ const SpaBookingDetail = () => {
         }
       );
 
-      await axios.put(
+      await axios.patch(
         `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
         {
           CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
@@ -550,6 +550,7 @@ const SpaBookingDetail = () => {
   };
   const handleCancelChangeModal = () => {
     setIsChangeModalVisible(false);
+    form.resetFields();
   };
 
   function formatNumberWithCommas(number) {
@@ -581,7 +582,7 @@ const SpaBookingDetail = () => {
         {spaBooking.CurrentStatus == 'Canceled' && (
           <div className="mb-2">
             <Text strong className="text-3xl text-red-600">Lí do hủy: </Text>
-            <Text className="text-3xl">{spaBooking.CancelReason}.</Text>
+            <Text className="text-3xl">{spaBooking.CancelReason}</Text>
           </div>
         )}
         <Row gutter={[16, 16]}>
