@@ -758,10 +758,8 @@ const BookingList = () => {
       form.setFieldsValue({
         actualWeight: ''
       });
+      setValidate(true)
     }
-    console.log(caretakerID)
-    console.log(selectedCaretaker)
-    console.log(form.getFieldValue('actualWeight'))
     if ((value === 'Có' && form.getFieldValue('actualWeight') === '')) {
       setIsConfirmButtonDisabled(true);
     } else {
