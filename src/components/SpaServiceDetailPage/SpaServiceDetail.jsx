@@ -845,7 +845,7 @@ const SpaServiceDetail = () => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        {/* <Col xs={24} sm={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
                                 name="VoucherCode"
                                 label={t('voucher')}
@@ -869,7 +869,7 @@ const SpaServiceDetail = () => {
                                     </Button>
                                 </div>
                             </Form.Item>
-                        </Col> */}
+                        </Col>
                     </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>

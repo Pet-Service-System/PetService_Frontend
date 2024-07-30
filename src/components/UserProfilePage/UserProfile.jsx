@@ -347,7 +347,7 @@ const UserProfile = () => {
             )}
           </div>
           {/* Render Account Information Card */}
-          {/* {!isEditMode && role === 'Customer' && (
+          {!isEditMode && role === 'Customer' && (
             <Card bordered={false} style={{ marginTop: '24px' }}>
               <Typography.Title level={2} className="text-center">
                  {t('Thông tin hội viên')}
@@ -405,7 +405,7 @@ const UserProfile = () => {
                 <p>{accountData.endDate ? new Date(accountData.endDate).toLocaleDateString() : t('-')}</p>
               </div>
             </Card>
-          )} */}
+          )}
         </Content>
       </Layout>
     </Layout>
