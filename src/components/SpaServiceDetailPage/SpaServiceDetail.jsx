@@ -509,6 +509,26 @@ const SpaServiceDetail = () => {
             });
         
             // Reset booking modal and form
+            setCurrentPrice(0);
+            currentPriceRef.current = 0;
+        
+            setDiscountValue(0);
+            discountValueRef.current = 0;
+        
+            setVoucherCode('');
+            setVoucherID(null);
+            voucherIDref.current = null;
+        
+            setIsChecked(false);
+            bookingForm.resetFields();
+            addPetForm.resetFields();
+        
+            // Clear selected pet
+            setSelectedPet(null);
+        
+            // Reset modal visibility
+            setIsAddModalVisible(false);
+            // Reset booking modal and form
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
             setOperationLoading(false);
@@ -825,7 +845,7 @@ const SpaServiceDetail = () => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col xs={24} sm={12}>
+                        {/* <Col xs={24} sm={12}>
                             <Form.Item
                                 name="VoucherCode"
                                 label={t('voucher')}
@@ -849,7 +869,7 @@ const SpaServiceDetail = () => {
                                     </Button>
                                 </div>
                             </Form.Item>
-                        </Col>
+                        </Col> */}
                     </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>

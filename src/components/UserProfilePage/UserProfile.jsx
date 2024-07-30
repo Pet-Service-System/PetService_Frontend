@@ -235,13 +235,6 @@ const UserProfile = () => {
     },
   ];
 
-  function formatNumberWithCommas(number) {
-    if (typeof number !== 'number') {
-        return number;
-    }
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
   return (
     <Layout style={{ minHeight: '80vh' }}>
       {/* Sider */}
@@ -354,7 +347,7 @@ const UserProfile = () => {
             )}
           </div>
           {/* Render Account Information Card */}
-          {!isEditMode && role === 'Customer' && (
+          {/* {!isEditMode && role === 'Customer' && (
             <Card bordered={false} style={{ marginTop: '24px' }}>
               <Typography.Title level={2} className="text-center">
                  {t('Thông tin hội viên')}
@@ -367,7 +360,7 @@ const UserProfile = () => {
               <div className="bg-gray-200 p-2 rounded-md mb-2">
                 <Title level={5}>{t('Tổng tiền tiêu')}</Title>
                 <p>
-                  <LineChartOutlined className="mr-2" />{formatNumberWithCommas(accountData.totalSpent) || 0}đ
+                  <LineChartOutlined className="mr-2" />{accountData.totalSpent || 0}đ
                 </p>
               </div>
 
@@ -412,7 +405,7 @@ const UserProfile = () => {
                 <p>{accountData.endDate ? new Date(accountData.endDate).toLocaleDateString() : t('-')}</p>
               </div>
             </Card>
-          )}
+          )} */}
         </Content>
       </Layout>
     </Layout>

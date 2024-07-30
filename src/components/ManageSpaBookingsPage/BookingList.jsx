@@ -290,7 +290,7 @@ const BookingList = () => {
             StatusChanges: updatedStatusChanges,
             CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
             ExtraCharge: additionalCost,
-            FinalPrice: finalPrice,
+            TotalPrice: finalPrice,
             isReplied: false,
           },
           {
@@ -371,7 +371,7 @@ const BookingList = () => {
             },
           }
         );
-        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.FinalPrice);
+        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
       }
       // If the status is "Completed", call the update-spent API
       if (pendingStatus === 'Completed') {
@@ -758,8 +758,10 @@ const BookingList = () => {
       form.setFieldsValue({
         actualWeight: ''
       });
-      setValidate(true)
     }
+    console.log(caretakerID)
+    console.log(selectedCaretaker)
+    console.log(form.getFieldValue('actualWeight'))
     if ((value === 'Có' && form.getFieldValue('actualWeight') === '')) {
       setIsConfirmButtonDisabled(true);
     } else {

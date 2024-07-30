@@ -378,7 +378,7 @@ const SpaBookingDetail = () => {
         try {
           const token = localStorage.getItem('token');
           // Make API call to update order status to 'Canceled'
-          const response = await axios.patch(
+          const response = await axios.put(
             `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
             { Status: 'Canceled' },
             {
@@ -498,7 +498,7 @@ const SpaBookingDetail = () => {
         throw new Error('Authentication token not found.');
       }
 
-      await axios.patch(
+      await axios.put(
         `${API_URL}/api/spa-booking-details/${spaBookingDetail.BookingDetailsID}`,
         {
           BookingDate: newBookingDate.format('DD-MM-YYYY'),
@@ -511,7 +511,7 @@ const SpaBookingDetail = () => {
         }
       );
 
-      await axios.patch(
+      await axios.put(
         `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
         {
           CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
@@ -550,7 +550,6 @@ const SpaBookingDetail = () => {
   };
   const handleCancelChangeModal = () => {
     setIsChangeModalVisible(false);
-    form.resetFields();
   };
 
   function formatNumberWithCommas(number) {
@@ -582,7 +581,7 @@ const SpaBookingDetail = () => {
         {spaBooking.CurrentStatus == 'Canceled' && (
           <div className="mb-2">
             <Text strong className="text-3xl text-red-600">Lí do hủy: </Text>
-            <Text className="text-3xl">{spaBooking.CancelReason}</Text>
+            <Text className="text-3xl">{spaBooking.CancelReason}.</Text>
           </div>
         )}
         <Row gutter={[16, 16]}>
@@ -750,7 +749,7 @@ const SpaBookingDetail = () => {
               </div>
               <div className="flex justify-between items-end">
                 <Text strong className="mr-2 md:text-4xl">{t('Tổng tiền: ')}</Text>
-                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.FinalPrice-discountValue)}đ</Text>
+                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.TotalPrice + spaBooking.ExtraCharge)}đ</Text>
               </div>
             </div>
           ) : (
