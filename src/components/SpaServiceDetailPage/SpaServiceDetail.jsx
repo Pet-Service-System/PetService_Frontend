@@ -457,6 +457,105 @@ const SpaServiceDetail = () => {
         });
     };    
 
+    // const onApprove = async (data, actions) => {
+    //     try {
+    //         // Capture PayPal order
+    //         const paypalOrder = await actions.order.capture();
+            
+    //         // Validate form fields
+    //         const values = await bookingForm.validateFields();
+    //         // Retrieve authorization token
+    //         const token = localStorage.getItem('token');
+    //         if (!token) {
+    //         message.error(t('authorization_token_not_found'));
+    //         return;
+    //         }
+    //             // Extract booking details
+    //             const bookingDate = values.BookingDate;
+    //             const bookingTime = values.BookingTime;
+    //             const booking = {
+    //             Status: 'Pending', // Initial status
+    //             CreateDate: new Date(),
+    //             BookingDate: bookingDate.format('DD/MM/YYYY'),
+    //             BookingTime: bookingTime,
+    //             TotalPrice: currentPriceRef.current,
+    //             AccountID: accountID,
+    //             PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
+    //             CaretakerNote: values.CaretakerNote || null,
+    //             CaretakerID: values.CaretakerID || null,
+    //             CancelReason: "",
+    //             Feedback: "",
+    //             isReplied: false,
+    //             VoucherID: voucherIDref.current,
+    //             StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
+    //         };
+        
+    //         // Send booking data to backend
+    //         const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //             });
+            
+    //             // Prepare booking detail data
+    //             const bookingDetail = {
+    //             BookingID: responseBooking.data.BookingID,
+    //             ...values,
+    //             BookingDate: bookingDate.format('DD/MM/YYYY'),
+    //             BookingTime: bookingTime,
+    //             ServiceID: id,
+    //             ActualWeight: ''
+    //         };
+        
+    //         // Send booking detail data to backend
+    //         await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //         });
+    
+        
+    //         // Display success notification
+    //         notification.success({
+    //         message: t('booking_success'),
+    //         icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+    //         description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
+    //         onClick: () => navigate('/spa-booking'),
+    //         });
+        
+    //         // Reset booking modal and form
+    //         setCurrentPrice(0);
+    //         currentPriceRef.current = 0;
+        
+    //         setDiscountValue(0);
+    //         discountValueRef.current = 0;
+    //         setIsVoucherApplied(false)
+    //         setVoucherCode('');
+    //         setVoucherID(null);
+    //         voucherIDref.current = null;
+        
+    //         setIsChecked(false);
+    //         bookingForm.resetFields();
+    //         addPetForm.resetFields();
+        
+    //         // Clear selected pet
+    //         setSelectedPet(null);
+        
+    //         // Reset modal visibility
+    //         setIsAddModalVisible(false);
+    //         // Reset booking modal and form
+    //         setIsBookingModalVisible(false);
+    //         bookingForm.resetFields();
+    //         setOperationLoading(false);
+    //         setIsPayPalButtonVisible(false);
+    //         setCurrentPrice(0);
+    //     } catch (error) {
+    //         console.error("Error during PayPal checkout:", error);
+    //         // Handle PayPal checkout error
+    //         message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
+    //     }
+    // };
+
     const onApprove = async (data, actions) => {
         try {
             // Capture PayPal order
@@ -464,97 +563,99 @@ const SpaServiceDetail = () => {
             
             // Validate form fields
             const values = await bookingForm.validateFields();
+            
             // Retrieve authorization token
             const token = localStorage.getItem('token');
             if (!token) {
-            message.error(t('authorization_token_not_found'));
-            return;
+                message.error(t('authorization_token_not_found'));
+                return;
             }
-                // Extract booking details
-                const bookingDate = values.BookingDate;
-                const bookingTime = values.BookingTime;
-                const booking = {
-                Status: 'Pending', // Initial status
+    
+            // Extract booking details
+            const bookingDate = values.BookingDate.format('DD/MM/YYYY');
+            const bookingTime = values.BookingTime;
+    
+            // Prepare all booking data
+            const bookingData = {
+                // Booking info
+                CurrentStatus: 'Pending',
                 CreateDate: new Date(),
-                BookingDate: bookingDate.format('DD/MM/YYYY'),
+                BookingDate: bookingDate,
                 BookingTime: bookingTime,
                 TotalPrice: currentPriceRef.current,
                 AccountID: accountID,
                 PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
+                VoucherID: voucherIDref.current || null,
+                isSpentUpdated: false,
+                StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }],
+                ExtraCharge: 0,
+            
+                // Booking detail info
+                CustomerName: values.CustomerName,
+                Phone: values.Phone,
+                PetID: values.PetID,
+                PetName: values.PetName,
+                PetGender: values.PetGender,
+                PetStatus: values.PetStatus,
+                PetTypeID: values.PetTypeID,
+                PetWeight: values.PetWeight,
+                ActualWeight: values.ActualWeight || '',
+                PetAge: values.PetAge,
+                ServiceID: id,
+            
+                // Additional info
+                CancelReason: values.CancelReason || "",
                 CaretakerNote: values.CaretakerNote || null,
                 CaretakerID: values.CaretakerID || null,
-                CancelReason: "",
-                Feedback: "",
+                Feedback: values.Feedback || "",
                 isReplied: false,
-                VoucherID: voucherIDref.current,
-                StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }] // Initialize status changes
-            };
-        
-            // Send booking data to backend
-            const responseBooking = await axios.post(`${API_URL}/api/Spa-bookings`, booking, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-                });
-            
-                // Prepare booking detail data
-                const bookingDetail = {
-                BookingID: responseBooking.data.BookingID,
-                ...values,
-                BookingDate: bookingDate.format('DD/MM/YYYY'),
-                BookingTime: bookingTime,
-                ServiceID: id,
-                ActualWeight: ''
-            };
-        
-            // Send booking detail data to backend
-            await axios.post(`${API_URL}/api/spa-booking-details`, bookingDetail, {
+            };            
+    
+            // Send all booking data to backend
+            await axios.post(`${API_URL}/api/spa-bookings`, bookingData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
     
-        
             // Display success notification
             notification.success({
-            message: t('booking_success'),
-            icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-            description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
-            onClick: () => navigate('/spa-booking'),
+                message: t('booking_success'),
+                icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+                description: 'Ấn vào đây để chuyển đến trang lịch sử dịch vụ',
+                onClick: () => navigate('/spa-booking'),
             });
-        
+    
             // Reset booking modal and form
             setCurrentPrice(0);
             currentPriceRef.current = 0;
-        
+    
             setDiscountValue(0);
             discountValueRef.current = 0;
-            setIsVoucherApplied(false)
+            setIsVoucherApplied(false);
             setVoucherCode('');
             setVoucherID(null);
             voucherIDref.current = null;
-        
+    
             setIsChecked(false);
             bookingForm.resetFields();
             addPetForm.resetFields();
-        
+    
             // Clear selected pet
             setSelectedPet(null);
-        
+    
             // Reset modal visibility
             setIsAddModalVisible(false);
-            // Reset booking modal and form
             setIsBookingModalVisible(false);
-            bookingForm.resetFields();
             setOperationLoading(false);
             setIsPayPalButtonVisible(false);
-            setCurrentPrice(0);
+    
         } catch (error) {
             console.error("Error during PayPal checkout:", error);
-            // Handle PayPal checkout error
             message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
         }
     };
+    
 
     const onError = (err) => {
         message.error("Đã xảy ra lỗi trong quá trình thanh toán với PayPal.");
