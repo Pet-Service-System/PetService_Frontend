@@ -92,13 +92,13 @@ const SpaBooking = () => {
         ? formattedData.sort((a, b) => b.date - a.date)
         : formattedData.sort((a, b) => a.date - b.date);
 
-        setBookingCount({
-          all: sortedData.length,
-          completed: sortedData.filter(booking => booking.status === 'Completed').length,
-          pending: sortedData.filter(booking => booking.status === 'Pending').length,
-          checkedIn: sortedData.filter(booking => booking.status === 'Checked In').length,
-          canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
-        });
+      setBookingCount({
+        all: sortedData.length,
+        completed: sortedData.filter(booking => booking.status === 'Completed').length,
+        pending: sortedData.filter(booking => booking.status === 'Pending').length,
+        checkedIn: sortedData.filter(booking => booking.status === 'Checked In').length,
+        canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
+      });
 
       const filteredData = activeTab === 'all'
         ? sortedData
@@ -152,17 +152,7 @@ const SpaBooking = () => {
     try {
       await axios.patch(
         `${API_URL}/api/Spa-bookings/${bookingID}`,
-        { Feedback: reviewText},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      await axios.patch(
-        `${API_URL}/api/Spa-bookings/${bookingID}`,
-        { isReviewed: true},
+        { Feedback: reviewText, isReviewed: true },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -211,10 +201,10 @@ const SpaBooking = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Completed' ? 
-                    'green' : record.status === 'Pending' ? 
-                    'yellow' : record.status === 'Checked In' ? 
-                    'blue' : 'red'}>
+        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Completed' ?
+          'green' : record.status === 'Pending' ?
+            'yellow' : record.status === 'Checked In' ?
+              'blue' : 'red'}>
           {record.status}
         </Tag>
       )
@@ -240,7 +230,7 @@ const SpaBooking = () => {
     const cartItems = JSON.parse(localStorage.getItem('shoppingCart')) || []; // Parse the cart items from localStorage
     console.log('User ID:', accountID);
     console.log('Cart Items:', cartItems);
-  
+
     if (cartItems.length > 0) {
       try {
         const response = await axios.post(`${API_URL}/api/cart`, {
@@ -257,14 +247,14 @@ const SpaBooking = () => {
         // Handle specific error scenarios if needed
       }
     }
-  
+
     localStorage.clear();
     dispatch(setShoppingCart([]));
     setRole('Guest');
     setUser(null);
     navigate('/', { replace: true });
   };
-  
+
   const handleDateCreatedChange = (date) => {
     setSelectedDateCreated(date ? date.toDate() : null);
   };
@@ -317,7 +307,7 @@ const SpaBooking = () => {
         <div className="site-layout-background" style={{ padding: 24 }}>
           <Typography.Title className="text-5xl text-center font-semibold mb-4">{t('spa_booking_history')}</Typography.Title>
           {/* Search and filter */}
-        <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
+          <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
             <div>
               <Text className="mr-1">{t('filter_created_date')}</Text>
               <DatePicker
