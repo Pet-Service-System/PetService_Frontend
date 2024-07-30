@@ -81,7 +81,8 @@ const SpaBooking = () => {
     try {
       const data = await getSpaBookings();
       const formattedData = data.map(booking => ({
-        id: booking.BookingID,
+        id: booking._id,
+        BookingID: booking.BookingID,
         date: new Date(booking.CreateDate),
         TotalPrice: booking.TotalPrice,
         status: booking.CurrentStatus,
@@ -194,7 +195,7 @@ const SpaBooking = () => {
       fixed: 'left',
       className: 'sticky left-0 bg-white',
       render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.id}</Button>
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.BookingID}</Button>
       ),
     },
     {

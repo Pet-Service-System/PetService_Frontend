@@ -599,15 +599,15 @@ const SpaServiceDetail = () => {
                 PetStatus: values.PetStatus,
                 PetTypeID: values.PetTypeID,
                 PetWeight: values.PetWeight,
-                ActualWeight: values.ActualWeight || '',
+                ActualWeight: values.ActualWeight || null,
                 PetAge: values.PetAge,
                 ServiceID: id,
             
                 // Additional info
-                CancelReason: values.CancelReason || "",
+                CancelReason: values.CancelReason || null,
                 CaretakerNote: values.CaretakerNote || null,
                 CaretakerID: values.CaretakerID || null,
-                Feedback: values.Feedback || "",
+                Feedback: values.Feedback || null,
                 isReplied: false,
             };            
     

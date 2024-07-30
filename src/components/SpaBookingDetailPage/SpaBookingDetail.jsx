@@ -165,7 +165,7 @@ const SpaBookingDetail = () => {
   const getSpaBookingById = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`${API_URL}/api/Spa-bookings/${id}`, {
+      const response = await axios.get(`${API_URL}/api/spa-bookings/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -174,6 +174,7 @@ const SpaBookingDetail = () => {
       if (spaBooking.VoucherID) {
         fetchVoucher(spaBooking.VoucherID);
       }
+      console.log(response.data)
       return response.data;
     } catch (error) {
       console.error('Error fetching spa booking:', error);
@@ -227,7 +228,6 @@ const SpaBookingDetail = () => {
     }
   };
 
-
   const fetchAccounts = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -268,7 +268,7 @@ const SpaBookingDetail = () => {
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
       const caretakersName = await getFullName(booking.CaretakerID);
       const reply = await fetchReply(booking.BookingID);
-
+      
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail);
       setServiceData(serviceInfo);
