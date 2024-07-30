@@ -509,6 +509,24 @@ const SpaServiceDetail = () => {
             });
         
             // Reset booking modal and form
+            // Reset states and refs
+            setCurrentPrice(0);
+            currentPriceRef.current = 0;
+        
+            setDiscountValue(0);
+            discountValueRef.current = 0;
+        
+            setVoucherCode('');
+            setVoucherID(null);
+            voucherIDref.current = null;
+        
+            setIsChecked(false);
+            // Reset forms
+            bookingForm.resetFields();
+            addPetForm.resetFields();
+
+            setSelectedPet(null);
+
             setIsBookingModalVisible(false);
             bookingForm.resetFields();
             setOperationLoading(false);
