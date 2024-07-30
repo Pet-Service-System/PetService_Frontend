@@ -191,7 +191,6 @@ const BookingList = () => {
                 PaypalOrderID: booking.PaypalOrderID,
                 CustomerID: booking.AccountID,
                 ExtraCharge: booking.ExtraCharge,
-                FinalPrice: booking.FinalPrice
             };
         }));
     
@@ -271,7 +270,6 @@ const BookingList = () => {
             StatusChanges: updatedStatusChanges,
             CancelReason: cancelReason,
             ExtraCharge: selectedBooking.ExtraCharge,
-            FinalPrice: selectedBooking.FinalPrice,
             isReplied: false,
           },
           {
@@ -290,7 +288,6 @@ const BookingList = () => {
             StatusChanges: updatedStatusChanges,
             CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
             ExtraCharge: additionalCost,
-            FinalPrice: finalPrice,
             isReplied: false,
           },
           {
@@ -371,7 +368,6 @@ const BookingList = () => {
             },
           }
         );
-        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.FinalPrice);
       }
       // If the status is "Completed", call the update-spent API
       if (pendingStatus === 'Completed') {
