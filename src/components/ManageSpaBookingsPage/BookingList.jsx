@@ -742,8 +742,12 @@ const BookingList = () => {
     if (!selectedBooking) return;
     const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
     const serviceID = bookingDetails?.ServiceID;
-    const voucherData = await getVoucherInformation(selectedBooking.VoucherID)
-    const voucherValue = voucherData.DiscountValue
+    let voucherValue = 0;
+
+    if (selectedBooking.VoucherID) {
+        const voucherData = await getVoucherInformation(selectedBooking.VoucherID);
+        voucherValue = voucherData.DiscountValue;
+    }
     // Fetch service details
     const response = await axios.get(`${API_URL}/api/services/${serviceID}`);
     const service = response.data;
