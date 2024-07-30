@@ -735,7 +735,7 @@ const SpaBookingDetail = () => {
             <div>
               <div className="mb-2 flex justify-between items-end">
                 <Text strong className="mr-2 md:text-2xl">{t('Thành tiền')}:</Text>
-                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.TotalPrice - spaBooking.ExtraCharge)}đ</Text>
+                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.TotalPrice - spaBooking.ExtraCharge + discountValue)}đ</Text>
               </div>
               {voucherData && (
                 <div className="mb-4 flex flex-row justify-between">
@@ -758,7 +758,7 @@ const SpaBookingDetail = () => {
                 <div>
                   <div className="mb-4 flex flex-row justify-between">
                     <Text className="md:text-2xl mr-2 text-left" strong>Thành tiền</Text>
-                    <Text className="md:text-2xl">{spaBooking.TotalPrice}đ</Text>
+                    <Text className="md:text-2xl">{spaBooking.TotalPrice + discountValue}đ</Text>
                   </div>
                   <div className="mb-4 flex flex-row justify-between">
                     <Text className="md:text-2xl mr-2 text-left" strong>Áp dụng voucher({voucherData.Pattern}): </Text>
@@ -768,7 +768,7 @@ const SpaBookingDetail = () => {
               )}
               <div className="flex flex-row justify-between">
                 <Text strong className="mr-2 md:text-4xl">{t('Tổng tiền: ')}</Text>
-                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.TotalPrice - discountValue)}đ</Text>
+                <Text className="text-green-600 text-3xl md:text-4xl flex justify-between">{formatNumberWithCommas(spaBooking.TotalPrice)}đ</Text>
               </div>
             </div>
           )}

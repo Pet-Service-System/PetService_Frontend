@@ -358,7 +358,10 @@ const SpaServiceDetail = () => {
                 setOperationLoading(false);
                 return;
             }
-    
+
+            const totalPrice = currentPrice - discountValue
+            setCurrentPrice(totalPrice)
+            
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
     
@@ -446,7 +449,7 @@ const SpaServiceDetail = () => {
         try {
             // Capture PayPal order
             const paypalOrder = await actions.order.capture();
-        
+            
             // Validate form fields
             const values = await bookingForm.validateFields();
             // Retrieve authorization token
@@ -963,7 +966,7 @@ const SpaServiceDetail = () => {
                             <div className="flex flex-row mb-2 justify-between">
                                 <Text strong className='mr-1'>Thành tiền: </Text>
                                 <Text>
-                                    {formatNumberWithCommas(currentPrice)}đ
+                                    {formatNumberWithCommas(currentPrice + discountValue)}đ
                                 </Text>
                             </div>
                             <div className="flex flex-row mb-2 justify-between">
@@ -978,7 +981,7 @@ const SpaServiceDetail = () => {
                         <Text strong className='mr-1 md:text-4xl text-3xl'>Tổng tiền:</Text>
                         <Text className="md:text-4xl text-3xl text-green-600">
                             {/* {formatNumberWithCommas(currentPrice - discountValue - currentPrice * subscriptionDiscount)}đ */}
-                            {formatNumberWithCommas(currentPrice - discountValue)}đ
+                            {formatNumberWithCommas(currentPrice)}đ
                         </Text>
                     </div>
                 </Card>
