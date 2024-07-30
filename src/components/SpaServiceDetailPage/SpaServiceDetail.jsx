@@ -33,6 +33,7 @@ const SpaServiceDetail = () => {
     const genders = ['Đực', 'Cái'];
     const [isPayPalButtonVisible, setIsPayPalButtonVisible] = useState(false);
     const currentDateTime = moment();
+    const [isVoucherApplied, setIsVoucherApplied] = useState(false);
     const [caretakers, setCaretakers] = useState('');
     const availableTimes = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
@@ -62,29 +63,41 @@ const SpaServiceDetail = () => {
 
       const checkVoucher = async () => {
         try {
-          if (voucherCode.trim() === '') {
-            return;
-          }
-          const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
-          const voucher = response.data;
-          if(voucher.MinimumOrderValue > currentPriceRef.current){
-            message.error("Giá trị đơn hàng không đủ để sử dụng voucher này");
-            return
-          }
+            if (voucherCode.trim() === '') {
+                return;
+            }
     
-          // Check if the voucher is valid and apply the discount
-          if (voucher) {
-            setDiscountValue(voucher.DiscountValue);
-            setVoucherID(voucher.VoucherID); 
-            message.success(t("voucher_applied"));
-          } else {
-            message.error(t("invalid_voucher"));
-          }
+            if (isVoucherApplied) { 
+                message.error(t("Đã áp dụng voucher"));
+                return;
+            }
+    
+            const response = await axios.get(`${API_URL}/api/voucher/pattern/${voucherCode}`);
+            const voucher = response.data;
+    
+            if (voucher.MinimumOrderValue > currentPriceRef.current) {
+                message.error("Giá trị đơn hàng không đủ để sử dụng voucher này");
+                return;
+            }
+    
+            // Apply the voucher discount
+            if (voucher) {
+                setDiscountValue(voucher.DiscountValue);
+                setVoucherID(voucher.VoucherID);
+                setIsVoucherApplied(true);
+                // Calculate the total price considering the discount
+                const totalPrice = currentPriceRef.current - voucher.DiscountValue;
+                console.log(totalPrice)
+                setCurrentPrice(totalPrice);
+                message.success(t("voucher_applied"));
+            } else {
+                message.error(t("invalid_voucher"));
+            }
         } catch (error) {
-          console.error(`Error:`, error);
-          message.error(t("invalid_voucher"));
+            console.error(`Error:`, error);
+            message.error(t("invalid_voucher"));
         }
-      };
+    };
 
     // Update the ref whenever currentPrice changes
     useEffect(() => {
@@ -290,7 +303,7 @@ const SpaServiceDetail = () => {
         setIsBookingModalVisible(false);
         setOperationLoading(false);
         setIsPayPalButtonVisible(false);
-        
+        setIsVoucherApplied(false)
         // Reset states and refs
         setCurrentPrice(0);
         currentPriceRef.current = 0;
@@ -358,10 +371,7 @@ const SpaServiceDetail = () => {
                 setOperationLoading(false);
                 return;
             }
-
-            const totalPrice = currentPrice - discountValue
-            setCurrentPrice(totalPrice)
-            
+    
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
     
@@ -391,6 +401,7 @@ const SpaServiceDetail = () => {
                 setOperationLoading(false);
                 return;
             }
+    
             setIsPayPalButtonVisible(true); // Set this state to show the PayPal button
     
         } catch (error) {
@@ -402,6 +413,7 @@ const SpaServiceDetail = () => {
             setOperationLoading(false);
         }
     };
+    
     
     // Custom validation function
     const validatePetWeight = (rule, value) => {
@@ -433,7 +445,7 @@ const SpaServiceDetail = () => {
 
     const createOrder = (data, actions) => {
         // const latestPrice = ((currentPriceRef.current - discountValueRef.current) - (currentPriceRef.current * subscriptionDiscountRef.current)) * exchangeRateVNDtoUSD;
-        const latestPrice = (currentPriceRef.current - discountValueRef.current) * exchangeRateVNDtoUSD;
+        const latestPrice = (currentPriceRef.current) * exchangeRateVNDtoUSD;
         return actions.order.create({
             purchase_units: [
                 {
@@ -517,7 +529,7 @@ const SpaServiceDetail = () => {
         
             setDiscountValue(0);
             discountValueRef.current = 0;
-        
+            setIsVoucherApplied(false)
             setVoucherCode('');
             setVoucherID(null);
             voucherIDref.current = null;

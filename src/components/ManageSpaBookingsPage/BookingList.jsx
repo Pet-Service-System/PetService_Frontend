@@ -80,7 +80,22 @@ const BookingList = () => {
     }
   };
 
-  const handleWeightChange = (value) => {
+  const getVoucherInformation = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(`${API_URL}/api/voucher/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      throw error;
+    }
+  }
+
+  const handleWeightChange = async (value) => {
     setActualWeight(value);
     // Check weight validity
     if (value < 0 || value > 35 || value == null) {
@@ -93,7 +108,7 @@ const BookingList = () => {
       ]);
     } else {
       form.setFields([{ name: 'actualWeight', errors: [] }]);
-      calculateAdditionalCost(value);
+      await calculateAdditionalCost(value);
       
       // Check if weight is provided when "Có" is selected
       if (radioValue === 'Có' && value === null) {
@@ -191,7 +206,7 @@ const BookingList = () => {
                 PaypalOrderID: booking.PaypalOrderID,
                 CustomerID: booking.AccountID,
                 ExtraCharge: booking.ExtraCharge,
-                FinalPrice: booking.FinalPrice
+                VoucherID: booking.VoucherID
             };
         }));
     
@@ -668,22 +683,7 @@ const BookingList = () => {
     },
   ].filter(col => col.key !== 'actions' || role === 'Caretaker Staff' || role === 'Sales Staff');
 
-  // Show modal to update status and capture current booking details
-  const showUpdateStatusModal = (id, status) => {
-    const booking = spaBookings.find(booking => booking.id === id);
-    setSelectedBooking(booking);
-    setSelectedBookingId(id);
-    setPendingStatus(status);
-    setUpdateStatusModalVisible(true);
-    setActualWeight(null)
-    setSelectedCaretaker(null)
-    form.setFieldsValue({
-      actualWeight: ''
-    });
-    setAdditionalCost(0)
-    setFinalPrice(0)
-  };
-
+  
   // Handle search input
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -721,11 +721,29 @@ const BookingList = () => {
     setRadioValue('Không');
   };
 
+  // Show modal to update status and capture current booking details
+  const showUpdateStatusModal = (id, status) => {
+    const booking = spaBookings.find(booking => booking.id === id);
+    setSelectedBooking(booking);
+    setSelectedBookingId(id);
+    setPendingStatus(status);
+    setUpdateStatusModalVisible(true);
+    setActualWeight(null)
+    setSelectedCaretaker(null)
+    form.setFieldsValue({
+      actualWeight: ''
+    });
+    setAdditionalCost(0)
+    setFinalPrice(selectedBooking.TotalPrice)
+  };
+
+
   const calculateAdditionalCost = async (weight) => {
     if (!selectedBooking) return;
     const bookingDetails = await getSpaBookingDetail(selectedBooking.id);
     const serviceID = bookingDetails?.ServiceID;
-  
+    const voucherData = await getVoucherInformation(selectedBooking.VoucherID)
+    const voucherValue = voucherData.DiscountValue
     // Fetch service details
     const response = await axios.get(`${API_URL}/api/services/${serviceID}`);
     const service = response.data;
@@ -736,9 +754,9 @@ const BookingList = () => {
     );
   
     if (priceRange) {
-      const newAdditionalCost = priceRange.price - selectedBooking.TotalPrice;
+      const newAdditionalCost = priceRange.price - selectedBooking.TotalPrice - voucherValue;
       setAdditionalCost(newAdditionalCost);
-      setFinalPrice(priceRange.price);
+      setFinalPrice(priceRange.price - voucherValue);
     } else {
       // Handle case where weight does not match any price range
       setAdditionalCost(0);
