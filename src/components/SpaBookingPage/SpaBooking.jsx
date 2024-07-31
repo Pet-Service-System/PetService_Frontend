@@ -125,9 +125,6 @@ const SpaBooking = () => {
     setIsReviewing(true);
     setReviewText('');
     setReviewError('');
-
-    // Load booking detail ID when reviewing
-    // await getSpaBookingDetailID(id);
   };
 
   // const getSpaBookingDetailID = async (id) => {
@@ -219,7 +216,7 @@ const SpaBooking = () => {
       render: (text, record) => (
         <Button
           type="primary"
-          onClick={() => handleReviewTransaction(record.id, record.isReviewed)} // Truyền trạng thái isReviewed vào hàm
+          onClick={() => handleReviewTransaction(record.id, record.isReviewed)}
           disabled={record.status !== 'Completed' || record.isReviewed}
           className='min-w-[100px] w-auto px-2 py-1 text-center text-xl'
         >

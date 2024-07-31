@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Table, Button, Typography, Layout, message, Spin, Modal, Input, DatePicker, Tabs, Tag, Timeline, Select, Radio, InputNumber, Form } from "antd";
@@ -10,7 +11,6 @@ const { Text, Title } = Typography;
 const { Search, TextArea } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
-const { Item: TimelineItem } = Timeline;
 const API_URL = import.meta.env.REACT_APP_API_URL;
 const PAYPAL_CLIENT_ID = import.meta.env.REACT_APP_PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
@@ -58,6 +58,7 @@ const BookingList = () => {
   const [radioValue, setRadioValue] = useState('Không');
   const [form] = Form.useForm();
   const [validate, setValidate] = useState(true);
+  const [total, setTotal] = useState(0);
 
   // Function to get spa bookings
   const getSpaBookings = async (bookingDate, dateCreated) => {
@@ -72,13 +73,14 @@ const BookingList = () => {
           dateCreated: dateCreated ? moment(dateCreated).format('DD/MM/YYYY') : undefined,
         }
       });
+      setTotal(response.data.length);
       return response.data;
     } catch (error) {
       console.error('Error fetching spa bookings:', error);
       throw error;
     }
   };
-
+  
   const getVoucherInformation = async (id) => {
     const token = localStorage.getItem('token');
     try {
@@ -162,22 +164,24 @@ const BookingList = () => {
   // Filter spa bookings based on search query and date filters
   useEffect(() => {
     let filteredData = spaBookings.filter(booking =>
-      booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.phone.includes(searchQuery)
+      (booking.CustomerName && booking.CustomerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (booking.Phone && booking.Phone.includes(searchQuery))
     );
+  
     // Filter booking date
     if (selectedBookingDate) {
       filteredData = filteredData.filter(booking =>
-        moment(booking.bookingDate).isSame(selectedBookingDate, 'day')
+        moment(booking.BookingDate, 'DD/MM/YYYY').isSame(selectedBookingDate, 'day')
       );
     }
+  
     // Filter date created
     if (selectedDateCreated) {
       filteredData = filteredData.filter(booking =>
         moment(booking.date).isSame(selectedDateCreated, 'day')
       );
     }
-
+  
     setFilteredSpaBookings(filteredData);
   }, [searchQuery, spaBookings, selectedBookingDate, selectedDateCreated]);
 
@@ -188,23 +192,34 @@ const BookingList = () => {
       const data = await getSpaBookings(selectedBookingDate, selectedDateCreated);
       const formattedData = await Promise.all(data.map(async (booking) => {
         return {
-          id: booking.BookingID,
+          id: booking._id.toString(),  // Use _id for unique identifier
           date: new Date(booking.CreateDate),
           TotalPrice: booking.TotalPrice,
+          CustomerID: booking.AccountID,
           status: booking.CurrentStatus,
-          isReviewed: booking.isReviewed,
+          isSpentUpdated: booking.isSpentUpdated,
+          VoucherID: booking.VoucherID,
           CustomerName: booking.BookingDetailsID.CustomerName,
           Phone: booking.BookingDetailsID.Phone,
+          PetID: booking.BookingDetailsID.PetID,
+          PetName: booking.BookingDetailsID.PetName,
+          PetGender: booking.BookingDetailsID.PetGender,
+          PetStatus: booking.BookingDetailsID.PetStatus,
+          PetTypeID: booking.BookingDetailsID.PetTypeID,
+          PetWeight: booking.BookingDetailsID.PetWeight,
+          ActualWeight: booking.BookingDetailsID.ActualWeight,
+          PetAge: booking.BookingDetailsID.PetAge,
           BookingDate: booking.BookingDetailsID.BookingDate,
           BookingTime: booking.BookingDetailsID.BookingTime,
+          ServiceID: booking.BookingDetailsID.ServiceID,
           StatusChanges: booking.StatusChanges,
           CaretakerNote: booking.AdditionalInfoID.CaretakerNote,
           CaretakerID: booking.AdditionalInfoID.CaretakerID,
           CancelReason: booking.AdditionalInfoID.CancelReason,
+          Feedback: booking.AdditionalInfoID.Feedback,
+          isReplied: booking.AdditionalInfoID.isReplied,
           PaypalOrderID: booking.PaymentDetailsID.PaypalOrderID,
-          CustomerID: booking.AccountID,
-          ExtraCharge: booking.PaymentDetailsID.ExtraCharge,
-          VoucherID: booking.VoucherID
+          ExtraCharge: booking.PaymentDetailsID.ExtraCharge
         };
       }));
 
@@ -212,6 +227,7 @@ const BookingList = () => {
       const filteredData = role === 'Caretaker Staff'
         ? formattedData.filter(booking => booking.CaretakerID === accountID)
         : formattedData;
+
       const sortedData = sortOrder === 'desc'
         ? filteredData.sort((a, b) => b.date - a.date)
         : filteredData.sort((a, b) => a.date - b.date);
@@ -224,7 +240,6 @@ const BookingList = () => {
         canceled: sortedData.filter(booking => booking.status === 'Canceled').length,
       });
 
-
       const displayedData = activeTab === 'all'
         ? sortedData
         : sortedData.filter(booking => booking.status.toLowerCase() === activeTab);
@@ -236,7 +251,7 @@ const BookingList = () => {
       setLoading(false);
     }
   };
-
+  
   const handleUpdateStatus = async () => {
     setSaving(true)
     if (pendingStatus === 'Checked In' && !selectedCaretaker) {
@@ -268,20 +283,12 @@ const BookingList = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const updatedStatusChanges = [
-        ...selectedBooking.StatusChanges,
-        {
-          Status: pendingStatus,
-          ChangeTime: new Date().toISOString(),
-        },
-      ];
 
       if (selectedBooking.status === 'Checked In' && pendingStatus === 'Completed') {
         await axios.patch(
           `${API_URL}/api/spa-bookings/${selectedBookingId}`,
           {
             CurrentStatus: pendingStatus,
-            StatusChanges: updatedStatusChanges,
             CancelReason: cancelReason,
             ExtraCharge: selectedBooking.ExtraCharge,
             FinalPrice: selectedBooking.FinalPrice,
@@ -300,23 +307,11 @@ const BookingList = () => {
           `${API_URL}/api/spa-bookings/${selectedBookingId}`,
           {
             CurrentStatus: pendingStatus,
-            StatusChanges: updatedStatusChanges,
             CaretakerID: selectedCaretaker ? selectedCaretaker.id : selectedBooking.CaretakerID,
+            CaretakerNote: selectedCaretaker ? selectedCaretaker.name : selectedBooking.CaretakerNote,
             ExtraCharge: additionalCost,
             TotalPrice: finalPrice,
             isReplied: false,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const bookingDetails = selectedBooking.BookingDetailsID;
-
-        await axios.patch(
-          `${API_URL}/api/spa-booking-details/${bookingDetails.BookingDetailsID}`,
-          {
             ActualWeight: actualWeight,
           },
           {
@@ -344,7 +339,6 @@ const BookingList = () => {
           `${API_URL}/api/spa-bookings/${selectedBookingId}`,
           {
             CurrentStatus: pendingStatus,
-            StatusChanges: updatedStatusChanges,
             CancelReason: cancelReason,
             isReplied: false,
           },
@@ -354,7 +348,7 @@ const BookingList = () => {
             },
           }
         );
-        await processRefund(selectedBooking.PaymentDetailsID, selectedBooking.TotalPrice);
+        await processRefund(selectedBooking.PaypalOrderID, selectedBooking.TotalPrice);
       }
       // If the status is "Completed", call the update-spent API
       if (pendingStatus === 'Completed') {
@@ -374,7 +368,6 @@ const BookingList = () => {
           `${API_URL}/api/spa-bookings/${selectedBookingId}`,
           {
             CurrentStatus: pendingStatus,
-            StatusChanges: updatedStatusChanges,
             CancelReason: cancelReason,
             isReplied: false,
           },
@@ -384,7 +377,6 @@ const BookingList = () => {
             },
           }
         );
-        await processRefund(selectedBooking.PaymentDetailsID.PaypalOrderID, selectedBooking.TotalPrice);
       }
 
       // Show success message
@@ -491,83 +483,74 @@ const BookingList = () => {
     if (!selectedBooking) {
       return;
     }
+  
     const fetchAccountsAndCheckAvailability = async () => {
       try {
         const token = localStorage.getItem('token');
+        
         // Fetch all caretakers
-        const response = await axios.get(`${API_URL}/api/accounts/all`, {
+        const accountsResponse = await axios.get(`${API_URL}/api/accounts/all`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
-
-        const caretakers = response.data.accounts
+  
+        const caretakers = accountsResponse.data.accounts
           .filter((account) => account.role === 'Caretaker Staff')
           .map((account) => ({
             id: account.AccountID,
             name: account.fullname,
           }));
-
-        // Fetch all spa bookings for availability check
+  
+        // Fetch all spa bookings
         const bookingsResponse = await axios.get(`${API_URL}/api/spa-bookings/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        // Extract CaretakerID and BookingID from SpaBookings
+  
+        // Extract relevant data for availability check
         const spaBookings = bookingsResponse.data.map((booking) => ({
           caretakerID: booking.AdditionalInfoID.CaretakerID,
-          bookingID: booking.BookingID,
+          bookingID: booking._id, // Use _id for BookingID
           status: booking.CurrentStatus,
+          bookingDate: booking.BookingDetailsID.BookingDate,
+          bookingTime: booking.BookingDetailsID.BookingTime,
         }));
-        // Fetch booking details for each booking to check availability
-        const bookingDetailsResponse = await Promise.all(
-          spaBookings.map((booking) =>
-            axios.get(`${API_URL}/api/spa-booking-details/booking/${booking.bookingID}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }).then((response) => ({
-              bookingID: booking.bookingID,
-              caretakerID: booking.caretakerID,
-              bookingDate: moment(response.data.BookingDate).format('DD/MM/YYYY'),
-              bookingTime: moment(response.data.BookingTime, 'HH:mm').format('HH:mm'),
-              status: booking.status,
-            }))
-          )
+  
+        // Filter out the selectedBooking for the current check
+        const filteredSpaBookings = spaBookings.filter(
+          (booking) =>
+            booking.bookingID !== selectedBooking._id // Use _id for BookingID
         );
-        // Filter out the selectedBooking from the bookingDetailsResponse
-        const filteredBookingDetails = bookingDetailsResponse.filter(
-          (bookingDetail) =>
-            bookingDetail.bookingID !== selectedBooking?.id
-        );
+        
         // Map caretakers with availability status
         const updatedCaretakers = caretakers.map((caretaker) => {
           // Check if this caretaker is booked for the same date and time slot
-          const isBusy = filteredBookingDetails.some((bookingDetail) => {
+          const isBusy = filteredSpaBookings.some((bookingDetail) => {
             return (
               bookingDetail.caretakerID === caretaker.id &&
-              bookingDetail.bookingDate === selectedBooking?.BookingDate &&
-              bookingDetail.bookingTime === selectedBooking?.BookingTime &&
-              bookingDetail.status === 'Checked In' &&
-              bookingDetail.bookingID !== selectedBooking?.id // Ignore current booking
+              bookingDetail.bookingDate === selectedBooking.BookingDate &&
+              bookingDetail.bookingTime === selectedBooking.BookingTime &&
+              bookingDetail.status === 'Checked In'
             );
           });
-
+  
           return {
             ...caretaker,
             isBusy,
           };
         });
-
+  
         setCaretakers(updatedCaretakers);
       } catch (error) {
         console.error('Error fetching accounts or checking availability:', error);
       }
     };
-
+  
     fetchAccountsAndCheckAvailability();
   }, [selectedBooking]);
+  
 
   const handleCaretakerChange = async (value) => {
     const selectedCaretaker = caretakers.find(caretaker => caretaker.id === value);
@@ -575,9 +558,8 @@ const BookingList = () => {
     setCaretakerID(value);
     setCaretakerNote(selectedCaretaker ? selectedCaretaker.name : '');
 
-    const bookingDetails = selectedBooking.BookingDetailsID;
     if (radioValue == 'Không') {
-      setActualWeight(bookingDetails.PetWeight);
+      setActualWeight(selectedBooking.PetWeight);
       setAdditionalCost(0);
       setFinalPrice(selectedBooking.TotalPrice);
       form.setFieldsValue({
@@ -613,13 +595,14 @@ const BookingList = () => {
   // Define table columns
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: 'No.',
+      key: 'index',
       fixed: 'left',
       className: 'sticky left-0 bg-white',
-      render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.id}</Button>
+      render: (text, record, index) => (
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>
+          {total - index}
+        </Button>
       ),
     },
     {
@@ -635,19 +618,24 @@ const BookingList = () => {
       title: t('booking_date'),
       dataIndex: 'BookingDate',
       key: 'bookingDate',
+      sorter: (a, b) => {
+        const dateA = moment(a.BookingDate, 'DD/MM/YYYY');
+        const dateB = moment(b.BookingDate, 'DD/MM/YYYY');
+        return dateA - dateB;
+      },
       render: (text, record) => (
         <Text>{record.BookingDate}</Text>
       ),
-    },
+    },    
     {
       title: t('status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => (
-        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={record.status === 'Completed' ?
-          'green' : record.status === 'Pending' ?
-            'yellow' : record.status === 'Checked In' ?
-              'blue' : 'red'}>
+        <Tag className='min-w-[70px] w-auto px-2 py-1 text-center' color={
+          record.status === 'Completed' ? 'green' :
+          record.status === 'Pending' ? 'yellow' :
+          record.status === 'Checked In' ? 'blue' : 'red'}>
           {record.status}
         </Tag>
       )
@@ -712,6 +700,7 @@ const BookingList = () => {
     const booking = spaBookings.find(booking => booking.id === id);
     setSelectedBooking(booking);
     setSelectedBookingId(id);
+    console.log(selectedBooking)
     setPendingStatus(status);
     setUpdateStatusModalVisible(true);
     setActualWeight(null)
@@ -726,8 +715,7 @@ const BookingList = () => {
 
   const calculateAdditionalCost = async (weight) => {
     if (!selectedBooking) return;
-    const bookingDetails = selectedBooking.BookingDetailsID;
-    const serviceID = bookingDetails?.ServiceID;
+    const serviceID = selectedBooking?.ServiceID;
     let voucherValue = 0;
 
     if (selectedBooking.VoucherID) {
@@ -755,12 +743,11 @@ const BookingList = () => {
   };
 
   const handleRadioChange = async (e) => {
-    const bookingDetails = selectedBooking.BookingDetailsID;
     const value = e.target.value;
     setRadioValue(value);
     setShowWeightInput(value === 'Có');
     if (value === 'Không') {
-      setActualWeight(bookingDetails.PetWeight);
+      setActualWeight(selectedBooking.PetWeight);
       setAdditionalCost(0);
       setFinalPrice(selectedBooking.TotalPrice);
       form.setFieldsValue({
@@ -794,216 +781,216 @@ const BookingList = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Layout className="site-layout">
-        <div className="site-layout-background" style={{ padding: 24 }}>
-          <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
-          {/* Search and filter */}
-          <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
-            <div>
-              <Text className="mr-1">{t('filter_booking_date')}</Text>
-              <DatePicker
-                format={'DD/MM/YYYY'}
-                onChange={handleBookingDateChange}
-                style={{ width: 150, marginRight: 12 }}
-              />
-            </div>
-            <div>
-              <Text className="mr-1">{t('filter_created_date')}</Text>
-              <DatePicker
-                format={'DD/MM/YYYY'}
-                onChange={handleDateCreatedChange}
-                style={{ width: 150, marginRight: 12 }}
-              />
-            </div>
-            <div className="flex md:justify-end items-center">
-              <Text className="mr-1">{t('search_customer')}:</Text>
-              <Search
-                placeholder={t('search')}
-                onChange={(e) => handleSearch(e.target.value)}
-                style={{ width: 340 }}
-              />
-            </div>
-          </Layout>
-          {/* Table */}
-          <Tabs activeKey={activeTab} onChange={setActiveTab}>
-            <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
-            <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
-            <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
-            <TabPane tab={<span>{t('Checked In')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedin}</span></span>} key="checked in" />
-            <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
-          </Tabs>
-          <Spin spinning={loading}>
-            <Table
-              columns={columns}
-              dataSource={filteredSpaBookings}
-              rowKey="id"
-              scroll={{ x: 'max-content' }}
-            />
-          </Spin>
-          {/* Update status modal */}
-          <Modal
-            title={`${t('update_status')} (${pendingStatus})`}
-            visible={updateStatusModalVisible}
-            footer={[
-              <Button
-                key="cancel"
-                onClick={handleCancelConfirm}
-                disabled={saving}
-              >
-                {t('cancel')}
-              </Button>,
-              <Button
-                key="submit"
-                type="primary"
-                onClick={handleUpdateStatus}
-                disabled={saving ||
-                  (pendingStatus === 'Checked In' && !selectedCaretaker) ||
-                  (pendingStatus === 'Canceled' &&
-                    (!selectedCancelSource || !selectedReason)) ||
-                  isConfirmButtonDisabled ||
-                  !validate
-                } // Disable the submit button during saving
-              >
-                {t('confirm')}
-              </Button>
-            ]}
-          >
-            <p>{t('ask_update')} "{pendingStatus}"?</p>
-            {pendingStatus === 'Checked In' && (
-              <div className="mb-4">
-                <Text className="mr-1">{t('Nhân viên được yêu cầu: ')} {selectedBooking?.CaretakerNote || '-'}</Text><br />
-                <Text className="mr-1">{t('Chọn nhân viên chăm sóc: ')}</Text>
-                <Select
-                  placeholder={t('select_caretaker')}
-                  disabled={saving}
-                  onChange={handleCaretakerChange}
-                  style={{ width: 300 }}
-                  value={selectedCaretaker ? selectedCaretaker.id : undefined}
-                >
-                  {caretakers.map(caretaker => (
-                    <Option key={caretaker.id}
-                      value={caretaker.id}
-                      disabled={caretaker.isBusy}>
-                      {caretaker.name}
-                    </Option>
-                  ))}
-                </Select>
-                <div>
-                  <Text className="mr-1">{t('Phát sinh chi phí do chênh lệch cân nặng thực tế:')}</Text>
-                  <Radio.Group
-                    onChange={handleRadioChange}
-                    value={radioValue}
-                  >
-                    <Radio disabled={saving} value="Có">{t('Có')}</Radio>
-                    <Radio disabled={saving} value="Không">{t('Không')}</Radio>
-                  </Radio.Group>
-                </div>
-                {showWeightInput && (
-                  <div>
-                    <div className="flex flex-row ">
-                      <Text className="mr-1">{t('Cân nặng thực tế:')}</Text>
-                      <Form form={form}>
-                        <Form.Item
-                          name="actualWeight"
-                          rules={[
-                            {
-                              required: true,
-                              message: 'Cân nặng thực tế là bắt buộc',
-                            },
-                            { type: 'number', min: 0, max: 35, message: t('Chỉ nhập từ 0 tới 35 ') }
-                          ]}
-                        >
-                          <InputNumber
-                            value={actualWeight}
-                            onChange={handleWeightChange}
-                            style={{ width: 60 }}
-                            className="h-10 w-10 items-center"
-                            suffix='kg'
-                            disabled={saving}
-                          />
-                        </Form.Item>
-                      </Form>
-                    </div>
-                    <div>
-                      <Text className="mr-1">{t('Phí phát sinh:')} {formatNumberWithCommas(additionalCost)}</Text>
-                    </div>
-                    <div>
-                      <Text className="mr-1">{t('Tổng tiền:')} {formatNumberWithCommas(finalPrice)}</Text>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {pendingStatus === 'Canceled' && (
-              <div className="mb-4">
-                <p className="mb-2">{t('Lý do hủy từ:')}</p>
-                <Radio.Group onChange={e => {
-                  setSelectedCancelSource(e.target.value);
-                  setSelectedReason('');
-                }} value={selectedCancelSource}>
-                  <Radio disabled={saving} value="Khach">{t('Khách')}</Radio>
-                  <Radio disabled={saving} value="Tiem">{t('Tiệm')}</Radio>
-                </Radio.Group>
-                <div className="mt-2">
-                  {selectedCancelSource === 'Khach' && (
-                    <Select
-                      disabled={saving}
-                      placeholder={t('Chọn lý do')}
-                      onChange={value => {
-                        setSelectedReason(value);
-                        if (value !== 'Khac') {
-                          setSelectedReason(value);
-                        }
-                      }}
-                      className="w-full"
-                    >
-                      {selectedBooking.status !== 'Checked In' && (
-                        <>
-                          <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
-                          <Option value="Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa">{t('Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa')}</Option>
-                          <Option value="Khách hủy lịch sau khi phát sinh chi phí">{t('Khách hủy lịch sau khi phát sinh chi phí')}</Option>
-                        </>
-                      )}
-                      <Option value="Thú cưng không hợp tác">{t('Thú cưng không hợp tác')}</Option>
-                      <Option value="Khac">{t('Khác')}</Option>
-                    </Select>
-                  )}
-                  {selectedCancelSource === 'Tiem' && (
-                    <Select
-                      disabled={saving}
-                      placeholder={t('Chọn lý do')}
-                      onChange={value => {
-                        setSelectedReason(value);
-                      }}
-                      className="w-full"
-                    >
-                      <Option value="Khac">{t('Khác')}</Option>
-                    </Select>
-                  )}
-                  {selectedReason === 'Khac' && (
-                    <TextArea
-                      disabled={saving}
-                      placeholder={t('Nhập lý do khác')}
-                      onChange={handleTextareaChange}
-                      required
-                      style={{ width: '100%', marginTop: '8px' }}
-                    />
-                  )}
-                </div>
-              </div>
-            )}
-            <Timeline>
-              {selectedBooking?.StatusChanges.map((change, index) => (
-                <TimelineItem key={index} color={getStatusColor(change.Status)}>
-                  <Text strong>{change.Status}</Text> - <Text>{moment(change.ChangeTime).format('DD/MM/YYYY HH:mm')}</Text>
-                </TimelineItem>
-              ))}
-            </Timeline>
-          </Modal>
-
+  <Layout className="site-layout">
+    <div className="site-layout-background" style={{ padding: 24 }}>
+      <Title className="text-5xl text-center font-semibold">{t('service_list')}</Title>
+      {/* Search and filter */}
+      <Layout className="flex lg:flex-row sm:flex-col justify-between mt-10 mb-4 lg:items-end">
+        <div>
+          <Text className="mr-1">{t('filter_booking_date')}</Text>
+          <DatePicker
+            format={'DD/MM/YYYY'}
+            onChange={handleBookingDateChange}
+            style={{ width: 150, marginRight: 12 }}
+          />
+        </div>
+        <div>
+          <Text className="mr-1">{t('filter_created_date')}</Text>
+          <DatePicker
+            format={'DD/MM/YYYY'}
+            onChange={handleDateCreatedChange}
+            style={{ width: 150, marginRight: 12 }}
+          />
+        </div>
+        <div className="flex md:justify-end items-center">
+          <Text className="mr-1">{t('search_customer')}:</Text>
+          <Search
+            placeholder={t('search')}
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: 340 }}
+          />
         </div>
       </Layout>
-    </Layout>
+      {/* Table */}
+      <Tabs activeKey={activeTab} onChange={setActiveTab}>
+        <TabPane tab={<span>{t('all')} <span className="inline-block bg-gray-200 text-gray-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.all}</span></span>} key="all" />
+        <TabPane tab={<span>{t('completed')} <span className="inline-block bg-green-200 text-green-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.completed}</span></span>} key="completed" />
+        <TabPane tab={<span>{t('pending')} <span className="inline-block bg-yellow-200 text-yellow-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.pending}</span></span>} key="pending" />
+        <TabPane tab={<span>{t('Checked In')} <span className="inline-block bg-blue-200 text-blue-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.checkedin}</span></span>} key="checked in" />
+        <TabPane tab={<span>{t('canceled')} <span className="inline-block bg-red-200 text-red-800 text-md font-semibold px-3 py-1 w-11 h-11 text-center">{bookingCount.canceled}</span></span>} key="canceled" />
+      </Tabs>
+      <Spin spinning={loading}>
+        <Table
+          columns={columns}
+          dataSource={filteredSpaBookings}
+          rowKey="id"
+          scroll={{ x: 'max-content' }}
+        />
+      </Spin>
+      {/* Update status modal */}
+      <Modal
+        title={`${t('update_status')} (${pendingStatus})`}
+        visible={updateStatusModalVisible}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={handleCancelConfirm}
+            disabled={saving}
+          >
+            {t('cancel')}
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleUpdateStatus}
+            disabled={saving ||
+              (pendingStatus === 'Checked In' && !selectedCaretaker) ||
+              (pendingStatus === 'Canceled' &&
+                (!selectedCancelSource || !selectedReason)) ||
+              isConfirmButtonDisabled ||
+              !validate
+            } // Disable the submit button during saving
+          >
+            {t('confirm')}
+          </Button>
+        ]}
+      >
+        <p>{t('ask_update')} "{pendingStatus}"?</p>
+        {pendingStatus === 'Checked In' && (
+          <div className="mb-4">
+            <Text className="mr-1">{t('Nhân viên được yêu cầu: ')} {selectedBooking?.CaretakerNote || '-'}</Text><br />
+            <Text className="mr-1">{t('Chọn nhân viên chăm sóc: ')}</Text>
+            <Select
+              placeholder={t('select_caretaker')}
+              disabled={saving}
+              onChange={handleCaretakerChange}
+              style={{ width: 300 }}
+              value={selectedCaretaker ? selectedCaretaker.id : undefined}
+            >
+              {caretakers.map(caretaker => (
+                <Option key={caretaker.id}
+                  value={caretaker.id}
+                  disabled={caretaker.isBusy}>
+                  {caretaker.name}
+                </Option>
+              ))}
+            </Select>
+            <div>
+              <Text className="mr-1">{t('Phát sinh chi phí do chênh lệch cân nặng thực tế:')}</Text>
+              <Radio.Group
+                onChange={handleRadioChange}
+                value={radioValue}
+              >
+                <Radio disabled={saving} value="Có">{t('Có')}</Radio>
+                <Radio disabled={saving} value="Không">{t('Không')}</Radio>
+              </Radio.Group>
+            </div>
+            {showWeightInput && (
+              <div>
+                <div className="flex flex-row ">
+                  <Text className="mr-1">{t('Cân nặng thực tế:')}</Text>
+                  <Form form={form}>
+                    <Form.Item
+                      name="actualWeight"
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Cân nặng thực tế là bắt buộc',
+                        },
+                        { type: 'number', min: 0, max: 35, message: t('Chỉ nhập từ 0 tới 35 ') }
+                      ]}
+                    >
+                      <InputNumber
+                        value={actualWeight}
+                        onChange={handleWeightChange}
+                        style={{ width: 60 }}
+                        className="h-10 w-10 items-center"
+                        suffix='kg'
+                        disabled={saving}
+                      />
+                    </Form.Item>
+                  </Form>
+                </div>
+                <div>
+                  <Text className="mr-1">{t('Phí phát sinh:')} {formatNumberWithCommas(additionalCost)}</Text>
+                </div>
+                <div>
+                  <Text className="mr-1">{t('Tổng tiền:')} {formatNumberWithCommas(finalPrice)}</Text>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {pendingStatus === 'Canceled' && (
+          <div className="mb-4">
+            <p className="mb-2">{t('Lý do hủy từ:')}</p>
+            <Radio.Group onChange={e => {
+              setSelectedCancelSource(e.target.value);
+              setSelectedReason('');
+            }} value={selectedCancelSource}>
+              <Radio disabled={saving} value="Khach">{t('Khách')}</Radio>
+              <Radio disabled={saving} value="Tiem">{t('Tiệm')}</Radio>
+            </Radio.Group>
+            <div className="mt-2">
+              {selectedCancelSource === 'Khach' && (
+                <Select
+                  disabled={saving}
+                  placeholder={t('Chọn lý do')}
+                  onChange={value => {
+                    setSelectedReason(value);
+                    if (value !== 'Khac') {
+                      setSelectedReason(value);
+                    }
+                  }}
+                  className="w-full"
+                >
+                  {selectedBooking.status !== 'Checked In' && (
+                    <>
+                      <Option value="Khách không đến tiệm để làm dịch vụ">{t('Khách không đến tiệm để làm dịch vụ')}</Option>
+                      <Option value="Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa">{t('Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa')}</Option>
+                      <Option value="Khách hủy lịch sau khi phát sinh chi phí">{t('Khách hủy lịch sau khi phát sinh chi phí')}</Option>
+                    </>
+                  )}
+                  <Option value="Thú cưng không hợp tác">{t('Thú cưng không hợp tác')}</Option>
+                  <Option value="Khac">{t('Khác')}</Option>
+                </Select>
+              )}
+              {selectedCancelSource === 'Tiem' && (
+                <Select
+                  disabled={saving}
+                  placeholder={t('Chọn lý do')}
+                  onChange={value => {
+                    setSelectedReason(value);
+                  }}
+                  className="w-full"
+                >
+                  <Option value="Khac">{t('Khác')}</Option>
+                </Select>
+              )}
+              {selectedReason === 'Khac' && (
+                <TextArea
+                  disabled={saving}
+                  placeholder={t('Nhập lý do khác')}
+                  onChange={handleTextareaChange}
+                  required
+                  style={{ width: '100%', marginTop: '8px' }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+        <Timeline>
+          {selectedBooking?.StatusChanges.map((change, index) => (
+            <Timeline.Item key={index} color={getStatusColor(change.Status)}>
+              <Text strong>{change.Status}</Text> - <Text>{moment(change.ChangeTime).format('DD/MM/YYYY HH:mm')}</Text>
+            </Timeline.Item>
+          ))}
+        </Timeline>
+      </Modal>
+    </div>
+  </Layout>
+</Layout>
+
   );
 };
 

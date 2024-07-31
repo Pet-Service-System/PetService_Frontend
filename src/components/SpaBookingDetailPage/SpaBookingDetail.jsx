@@ -77,7 +77,7 @@ const SpaBookingDetail = () => {
       console.error("Error fetching replies:", error);
     }
   };
-  
+
   const submitReply = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -94,9 +94,9 @@ const SpaBookingDetail = () => {
       if (!feedbackContent || feedbackContent.trim() === "") {
         return;
       }
-
+      
       const newReply = {
-        BookingID: spaBooking.BookingID,
+        BookingID: spaBooking._id,
         AccountID: accountID,
         ReplyContent: feedbackContent,
         ReplyDate: new Date(),
@@ -111,7 +111,7 @@ const SpaBookingDetail = () => {
       if (response.status === 201) {
         const createdReply = response.data;
         const bookingResponse = await axios.patch(
-          `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
+          `${API_URL}/api/Spa-bookings/${spaBooking._id}`,
           { isReplied: true },
           {
             headers: {
@@ -265,14 +265,15 @@ const SpaBookingDetail = () => {
       const booking = await getSpaBookingById(id);
       const bookingDetail = booking.BookingDetailsID
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
-      const caretakersName = await getFullName(booking.AdditionalInfoID.CaretakerNote);
+      const caretakersName = await getFullName(booking.AdditionalInfoID.CaretakerID);
       const reply = await fetchReply(booking._id);
       
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail)
       setServiceData(serviceInfo);
       setCaretakersName(caretakersName);
-      if(role === 'Caretaker Staff' && accountID !== booking.CaretakerID){
+
+      if(role === 'Caretaker Staff' && accountID !== booking.AdditionalInfoID.CaretakerID){
         setAccess(false)
         navigate('/manage-spa-bookings')
       }
@@ -684,7 +685,7 @@ const SpaBookingDetail = () => {
           pagination={false}
         />
 
-        {spaBooking.Feedback && (
+        {spaBooking.AdditionalInfoID.Feedback && (
             <>
               <Card className="text-left w-full ml-auto">
                 <div className="flex justify-between items-center">
@@ -695,7 +696,7 @@ const SpaBookingDetail = () => {
                     <Button
                       className="ml-4"
                       onClick={() => startFeedback(spaBooking.BookingDetailsID)}
-                      disabled={spaBooking.isReplied}
+                      disabled={spaBooking.AdditionalInfoID.isReplied}
                     >
                       {t("reply")}
                     </Button>
@@ -705,7 +706,7 @@ const SpaBookingDetail = () => {
                   <Text className="text-3xl" strong>
                     {t("feedback")}:{" "}
                   </Text>
-                  <Text className="text-3xl">{spaBooking.Feedback}</Text>
+                  <Text className="text-3xl">{spaBooking.AdditionalInfoID.Feedback}</Text>
                 </div>
                 {replies && (
                   <Card className="border-none">
@@ -728,7 +729,7 @@ const SpaBookingDetail = () => {
           {feedbackingBookingDetailsId === spaBooking.BookingDetailsID && (
             <Card className="text-left w-full ml-auto mt-4">
               <Title level={3} className="text-center">
-                {t("reply to feedback")}
+                {t("Phản hồi feedback")}
               </Title>
               <div className="mt-4">
                 <TextArea
@@ -752,7 +753,7 @@ const SpaBookingDetail = () => {
             <div>
               <div className="mb-2 flex justify-between items-end">
                 <Text strong className="mr-2 md:text-2xl">{t('Thành tiền')}:</Text>
-                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.TotalPrice - spaBooking.ExtraCharge + discountValue)}đ</Text>
+                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.PaymentDetailsID.TotalPrice - spaBooking.PaymentDetailsID.ExtraCharge + discountValue)}đ</Text>
               </div>
               {voucherData && (
                 <div className="mb-4 flex flex-row justify-between">
@@ -762,7 +763,7 @@ const SpaBookingDetail = () => {
               )}
               <div className="mb-4 flex justify-between items-end">
                 <Text strong className="mr-2 md:text-2xl">{t('Chi phí phát sinh: ')}</Text>
-                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.ExtraCharge)}đ</Text>
+                <Text className="flex justify-between md:text-2xl">{formatNumberWithCommas(spaBooking.PaymentDetailsID.ExtraCharge)}đ</Text>
               </div>
               <div className="flex justify-between items-end">
                 <Text strong className="mr-2 md:text-4xl">{t('Tổng tiền: ')}</Text>
