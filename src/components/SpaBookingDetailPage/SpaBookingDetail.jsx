@@ -265,14 +265,13 @@ const SpaBookingDetail = () => {
       const booking = await getSpaBookingById(id);
       const bookingDetail = booking.BookingDetailsID
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
-      const caretakersName = await getFullName(booking.AdditionalInfoID.CaretakerID);
+      const caretakersName = await getFullName(booking.AdditionalInfoID.CaretakerNote);
       const reply = await fetchReply(booking._id);
       
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail)
       setServiceData(serviceInfo);
       setCaretakersName(caretakersName);
-
       if(role === 'Caretaker Staff' && accountID !== booking.CaretakerID){
         setAccess(false)
         navigate('/manage-spa-bookings')
@@ -378,9 +377,12 @@ const SpaBookingDetail = () => {
         try {
           const token = localStorage.getItem('token');
           // Make API call to update order status to 'Canceled'
-          const response = await axios.put(
-            `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
-            { Status: 'Canceled' },
+          const response = await axios.patch(
+            `${API_URL}/api/spa-bookings/${spaBooking._id}`,
+            { 
+              CurrentStatus: 'Canceled',
+              CancelReason: 'Khách hủy lịch',
+            },
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -389,9 +391,9 @@ const SpaBookingDetail = () => {
           );
 
           if (response.status !== 200) {
-            throw new Error(`Failed to cancel booking ${spaBooking.OrderID}`);
+            throw new Error(`Failed to cancel booking ${spaBooking._id}`);
           }
-          await processRefund(spaBooking.PaypalOrderID);
+          await processRefund(spaBooking.PaymentDetailsID.PaypalOrderID);
           fetchSpaBooking();
 
           // Show success message
@@ -550,7 +552,7 @@ const SpaBookingDetail = () => {
                 }
             );
 
-            message.success(t('change_information_successfully'));
+            message.success('Đổi thời gian đặt lịch thành công');
             setIsChangeModalVisible(false);
             fetchSpaBooking();
             setOperationLoading(false);
@@ -562,7 +564,6 @@ const SpaBookingDetail = () => {
         setOperationLoading(false);
     }
 };
-
 
   const handleCancelChangeModal = () => {
     setIsChangeModalVisible(false);
@@ -597,7 +598,7 @@ const SpaBookingDetail = () => {
         {spaBooking.CurrentStatus == 'Canceled' && (
           <div className="mb-2">
             <Text strong className="text-3xl text-red-600">Lí do hủy: </Text>
-            <Text className="text-3xl">{spaBooking.CancelReason}.</Text>
+            <Text className="text-3xl">{spaBooking.AdditionalInfoID.CancelReason ? spaBooking.AdditionalInfoID.CancelReason : '-'}</Text>
           </div>
         )}
         <Row gutter={[16, 16]}>
@@ -637,7 +638,7 @@ const SpaBookingDetail = () => {
             </div>
             <div className="mb-4">
               <Text strong>{t('Nhân viên chăm sóc')}: </Text>
-              <Text>{caretakersName?.fullname}</Text>
+              <Text>{spaBooking.AdditionalInfoID.CaretakerNote}</Text>
             </div>
           </Col>
         </Row>
@@ -826,6 +827,7 @@ const SpaBookingDetail = () => {
           >
             <DatePicker
               style={{ width: '100%' }}
+              format={'DD/MM/YYYY'}
               disabledDate={(current) => {
                 if (current && current < currentDateTime.startOf('day')) {
                   return true;
