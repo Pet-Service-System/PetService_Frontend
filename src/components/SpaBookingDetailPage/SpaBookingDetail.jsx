@@ -174,7 +174,6 @@ const SpaBookingDetail = () => {
       if (spaBooking.VoucherID) {
         fetchVoucher(spaBooking.VoucherID);
       }
-      console.log(response.data)
       return response.data;
     } catch (error) {
       console.error('Error fetching spa booking:', error);
@@ -183,20 +182,20 @@ const SpaBookingDetail = () => {
   };
 
   // Fetch spa booking detail by ID
-  const getSpaBookingDetail = async (id) => {
-    const token = localStorage.getItem('token');
-    try {
-      const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching spa booking detail:', error);
-      throw error;
-    }
-  };
+  // const getSpaBookingDetail = async (id) => {
+  //   const token = localStorage.getItem('token');
+  //   try {
+  //     const response = await axios.get(`${API_URL}/api/spa-booking-details/booking/${id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('Error fetching spa booking detail:', error);
+  //     throw error;
+  //   }
+  // };
 
   // Fetch spa service by ID
   const getSpaServiceByID = async (id) => {
@@ -264,15 +263,16 @@ const SpaBookingDetail = () => {
     setLoading(true);
     try {
       const booking = await getSpaBookingById(id);
-      const bookingDetail = await getSpaBookingDetail(id);
+      const bookingDetail = booking.BookingDetailsID
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
-      const caretakersName = await getFullName(booking.CaretakerID);
-      const reply = await fetchReply(booking.BookingID);
+      const caretakersName = await getFullName(booking.AdditionalInfoID.CaretakerID);
+      const reply = await fetchReply(booking._id);
       
       setSpaBooking(booking);
-      setSpaBookingDetail(bookingDetail);
+      setSpaBookingDetail(bookingDetail)
       setServiceData(serviceInfo);
       setCaretakersName(caretakersName);
+
       if(role === 'Caretaker Staff' && accountID !== booking.CaretakerID){
         setAccess(false)
         navigate('/manage-spa-bookings')
@@ -477,77 +477,93 @@ const SpaBookingDetail = () => {
   const handleOkChangeModal = async () => {
     setOperationLoading(true);
     try {
-      const values = await form.validateFields();
-      const newBookingDate = values.BookingDate;
-      const newBookingTime = values.BookingTime;
-      const newCaretakerId = values.caretaker;
-      const selectedCaretaker = caretakers.find(caretaker => caretaker.id === newCaretakerId);
+        const values = await form.validateFields();
+        const newBookingDate = values.BookingDate;
+        const newBookingTime = values.BookingTime;
+        const newCaretakerId = values.caretaker;
+        const selectedCaretaker = caretakers.find(caretaker => caretaker.id === newCaretakerId);
 
-      const newBookingDateTime = moment(`${newBookingDate.format('DD-MM-YYYY')} ${newBookingTime}`, 'DD-MM-YYYY HH:mm');
-      const currentDateTime = moment();
+        const newBookingDateTime = moment(`${newBookingDate.format('DD-MM-YYYY')} ${newBookingTime}`, 'DD-MM-YYYY HH:mm');
+        const currentDateTime = moment();
 
-      // Ensure the new booking time is at least 3 hours from now
-      if (newBookingDateTime.diff(currentDateTime, 'hours') < 3) {
-        message.error(t('3_hours_rule'));
-        setOperationLoading(false);
-        return;
-      }
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication token not found.');
-      }
-
-      await axios.put(
-        `${API_URL}/api/spa-booking-details/${spaBookingDetail.BookingDetailsID}`,
-        {
-          BookingDate: newBookingDate.format('DD-MM-YYYY'),
-          BookingTime: newBookingTime,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // Ensure the new booking time is at least 3 hours from now
+        if (newBookingDateTime.diff(currentDateTime, 'hours') < 3) {
+            message.error(t('3_hours_rule'));
+            setOperationLoading(false);
+            return;
         }
-      );
 
-      await axios.put(
-        `${API_URL}/api/Spa-bookings/${spaBooking.BookingID}`,
-        {
-          CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Authentication token not found.');
         }
-      );
 
-      if (newBookingDateTime.diff(currentDateTime, 'hours') < 24) {
-        confirm({
-          title: t('annouce_before_change'),
-          icon: <ExclamationCircleOutlined />,
-          onOk() {
-            message.success('Change information successfully.');
+        // Check if the change is within 24 hours
+        if (newBookingDateTime.diff(currentDateTime, 'hours') < 24) {
+            confirm({
+                title: t('annouce_before_change'),
+                icon: <ExclamationCircleOutlined />,
+                onOk: async () => {
+                    try {
+                        await axios.patch(
+                            `${API_URL}/api/spa-bookings/${spaBooking._id}`,
+                            {
+                                CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
+                                BookingDate: newBookingDate.format('DD-MM-YYYY'),
+                                BookingTime: newBookingTime,
+                            },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${token}`,
+                                },
+                            }
+                        );
+                        message.success('Đổi thời gian đặt lịch thành công');
+                        setIsChangeModalVisible(false);
+                        fetchSpaBooking();
+                    } catch (error) {
+                        console.error('Error changing booking information:', error);
+                        message.error(t('error_changing_booking_information'));
+                    } finally {
+                        setOperationLoading(false);
+                        form.resetFields();
+                    }
+                },
+                onCancel() {
+                    setOperationLoading(false);
+                    form.resetFields();
+                },
+            });
+        } else {
+            // If the change is not within 24 hours, directly call the API
+            await axios.patch(
+                `${API_URL}/api/spa-bookings/${spaBooking._id}`,
+                {
+                    CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
+                    BookingDate: newBookingDate.format('DD/MM/YYYY'),
+                    BookingTime: newBookingTime,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            message.success(t('change_information_successfully'));
             setIsChangeModalVisible(false);
             fetchSpaBooking();
-          },
-          onCancel() {
-            message.info('Change cancelled.');
-          },
-        });
-      } else {
-        message.success('Change information successfully.');
-        setIsChangeModalVisible(false);
-        fetchSpaBooking();
-      }
+            setOperationLoading(false);
+            form.resetFields();
+        }
     } catch (error) {
-      console.error('Error changing booking information:', error);
-      message.error('Error changing booking information');
-    } finally {
-      setOperationLoading(false);
+        console.error('Error changing booking information:', error);
+        message.error(t('error_changing_booking_information'));
+        setOperationLoading(false);
     }
-  };
+};
+
+
   const handleCancelChangeModal = () => {
     setIsChangeModalVisible(false);
   };
@@ -572,7 +588,7 @@ const SpaBookingDetail = () => {
       </Button>
       {/* Booking detail */}
       <Card className="p-4 max-w-screen-md mx-auto shadow-lg rounded-lg transform scale-90">
-        <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} #{spaBooking.BookingID}</Title>
+        <Title level={2} className="mb-4 text-center">{t('spa_booking_detail_title')} {spaBookingDetail.BookingDate} {spaBookingDetail.BookingTime}</Title>
 
         {/* Status Tracking Bar */}
         <Steps current={spaBooking.StatusChanges.length - 1} direction="horizontal" className="mb-8">

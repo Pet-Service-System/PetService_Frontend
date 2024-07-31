@@ -386,8 +386,8 @@ const SpaServiceDetail = () => {
             }
     
             // Check if booking can be made
-            const checkResponse = await axios.post(`${API_URL}/api/Spa-bookings/check`, {
-                BookingDate: bookingDate.format('YYYY-MM-DD'),
+            const checkResponse = await axios.post(`${API_URL}/api/spa-bookings/check`, {
+                BookingDate: bookingDate.format('DD/MM/YYYY'),
                 BookingTime: bookingTime,
                 PetID: values.PetID
             }, {
@@ -1235,6 +1235,12 @@ const SpaServiceDetail = () => {
                         - Chính sách hoàn tiền có thể thay đổi tùy theo từng trường hợp cụ thể và theo quy định của pháp luật hiện hành.
                         <br/>
                         - Mọi yêu cầu hoàn tiền cần được gửi qua email hoặc liên hệ trực tiếp với chúng tôi trong thời gian quy định.
+                        <br/>
+                        <strong>5. Chính Sách Đặt Lịch Trong Vòng 24 Giờ</strong>
+                        <br/>
+                        - Đặt lịch trong vòng 24 tiếng so với thời điểm hiện tại thì không thể thay đổi thông tin đặt lịch và hủy đặt lịch. 
+                        <br/>
+                        - Mọi vấn đề liên quan vui lòng liên hệ qua hotline để được hỗ trợ.
                     </Text>
                 </div>
             </Modal>

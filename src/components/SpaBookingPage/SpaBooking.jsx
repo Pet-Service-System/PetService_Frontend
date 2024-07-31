@@ -179,13 +179,14 @@ const SpaBooking = () => {
 
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: 'No.',
+      key: 'index',
       fixed: 'left',
       className: 'sticky left-0 bg-white',
-      render: (text, record) => (
-        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>{record.BookingID}</Button>
+      render: (text, record, index) => (
+        <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>
+          {index + 1}
+        </Button>
       ),
     },
     {
