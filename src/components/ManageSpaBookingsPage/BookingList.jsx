@@ -68,8 +68,8 @@ const BookingList = () => {
           Authorization: `Bearer ${token}`,
         },
         params: {
-          bookingDate: bookingDate ? moment(bookingDate).format('YYYY-MM-DD') : undefined,
-          dateCreated: dateCreated ? moment(dateCreated).format('YYYY-MM-DD') : undefined,
+          bookingDate: bookingDate ? moment(bookingDate).format('DD/MM/YYYY') : undefined,
+          dateCreated: dateCreated ? moment(dateCreated).format('DD/MM/YYYY') : undefined,
         }
       });
       return response.data;
@@ -530,7 +530,7 @@ const BookingList = () => {
             }).then((response) => ({
               bookingID: booking.bookingID,
               caretakerID: booking.caretakerID,
-              bookingDate: moment(response.data.BookingDate).format('YYYY-MM-DD'),
+              bookingDate: moment(response.data.BookingDate).format('DD/MM/YYYY'),
               bookingTime: moment(response.data.BookingTime, 'HH:mm').format('HH:mm'),
               status: booking.status,
             }))
@@ -802,6 +802,7 @@ const BookingList = () => {
             <div>
               <Text className="mr-1">{t('filter_booking_date')}</Text>
               <DatePicker
+                format={'DD/MM/YYYY'}
                 onChange={handleBookingDateChange}
                 style={{ width: 150, marginRight: 12 }}
               />
@@ -809,6 +810,7 @@ const BookingList = () => {
             <div>
               <Text className="mr-1">{t('filter_created_date')}</Text>
               <DatePicker
+                format={'DD/MM/YYYY'}
                 onChange={handleDateCreatedChange}
                 style={{ width: 150, marginRight: 12 }}
               />

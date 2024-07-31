@@ -55,6 +55,7 @@ const SpaBooking = () => {
     checkedIn: 0,
     canceled: 0,
   });
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchSpaBookings();
@@ -106,6 +107,7 @@ const SpaBooking = () => {
         : sortedData.filter(booking => booking.status.toLowerCase() === activeTab);
 
       setSpaBookings(filteredData);
+      setTotal(data.length);
     } catch (error) {
       console.error('Error fetching spa bookings:', error);
     } finally {
@@ -185,7 +187,7 @@ const SpaBooking = () => {
       className: 'sticky left-0 bg-white',
       render: (text, record, index) => (
         <Button type="link" onClick={() => navigate(`/spa-booking-detail/${record.id}`)}>
-          {index + 1}
+          {total - index}
         </Button>
       ),
     },
@@ -313,6 +315,7 @@ const SpaBooking = () => {
             <div>
               <Text className="mr-1">{t('filter_created_date')}</Text>
               <DatePicker
+                format={'DD/MM/YYYY'}
                 onChange={handleDateCreatedChange}
                 style={{ width: 150, marginRight: 12 }}
               />

@@ -375,7 +375,7 @@ const SpaServiceDetail = () => {
             const bookingDate = values.BookingDate;
             const bookingTime = values.BookingTime;
     
-            const bookingDateTime = moment(`${bookingDate.format('YYYY-MM-DD')} ${bookingTime}`, 'YYYY-MM-DD HH:mm');
+            const bookingDateTime = moment(`${bookingDate.format('DD/MM/YYYY')} ${bookingTime}`, 'DD/MM/YYYY HH:mm');
             const currentDateTime = moment();
             const diffHours = bookingDateTime.diff(currentDateTime, 'hours');
     
@@ -560,7 +560,7 @@ const SpaServiceDetail = () => {
         try {
             // Capture PayPal order
             const paypalOrder = await actions.order.capture();
-            
+
             // Validate form fields
             const values = await bookingForm.validateFields();
             
@@ -801,6 +801,7 @@ const SpaServiceDetail = () => {
                             >
                                 <DatePicker
                                     style={{ width: '100%' }}
+                                    format={'DD/MM/YYYY'}
                                     disabled={operationLoading}
                                     disabledDate={(current) => {
                                         if (current && current < currentDateTime.startOf('day')) {
