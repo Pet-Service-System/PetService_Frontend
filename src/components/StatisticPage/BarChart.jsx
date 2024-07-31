@@ -8,7 +8,7 @@ const API_URL = import.meta.env.REACT_APP_API_URL;
 export default function BarChart() {
   const { t } = useTranslation();
   const [data, setData] = useState([
-    [t("day_of_week"), t("total_services_booked"), t("total_ordered")],
+    [t("day_of_week"), t("total_services_booked")],
   ]);
 
   const options = {
@@ -26,7 +26,7 @@ export default function BarChart() {
         const apiData = response.data;
         // Directly use the API data
         const translatedData = [
-          [t("day_of_week"), t("total_services_booked"), t("total_ordered")],
+          [t("day_of_week"), t("total_services_booked")],
           ...apiData.slice(1),
         ];
         setData(translatedData);

@@ -161,8 +161,8 @@ const Banner = () => {
         { key: 'home', label: t('HOME'), path: '/' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
-        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
-        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        // { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        // { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'policy', label: t('policy'), path: '/policy'},
      ];
     } else if (role === 'Customer') {
@@ -170,8 +170,8 @@ const Banner = () => {
         { key: 'home', label: t('HOME'), path: '/' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
-        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
-        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        // { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        // { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'policy', label: t('policy'), path: '/policy'},
      ];
     } else if (role === 'Administrator') {
@@ -184,27 +184,27 @@ const Banner = () => {
         // { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
-        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
-        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        // { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        // { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
         { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
-        { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+        // { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
         { key: 'manage-voucher', label: t('voucher'), path: '/manage-voucher', parent: t('MANAGEMENT') },
-        { key: 'manage-category', label: t('category'), path: '/manage-category', parent: t('MANAGEMENT') },
+        // { key: 'manage-category', label: t('category'), path: '/manage-category', parent: t('MANAGEMENT') },
       ];
     } else if (role === 'Sales Staff') {
       menuItems = [
         // { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
         { key: 'dog-service', label: t('for_dog'), path: '/services-for-dog', parent: t('pet_service') },
         { key: 'cat-service', label: t('for_cat'), path: '/services-for-cat', parent: t('pet_service') },
-        { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
-        { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
-        { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
-        { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
+        // { key: 'dog-product', label: t('for_dog'), path: '/products-for-dog', parent: t('STORE') },
+        // { key: 'cat-product', label: t('for_cat'), path: '/products-for-cat', parent: t('STORE') },
+        { key: 'manage-spa-booking', label: t('QUẢN LÝ ĐẶT LỊCH'), path: '/manage-spa-bookings'},
+        // { key: 'manage-order', label: t('order'), path: '/manage-orders', parent: t('MANAGEMENT') },
       ];
     } else if (role === 'Caretaker Staff') {
       menuItems = [
         // { key: 'schedule', label: t('SCHEDULE'), path: '/staff-schedule' },
-        { key: 'manage-spa-booking', label: t('spa_booking'), path: '/manage-spa-bookings', parent: t('MANAGEMENT') },
+        { key: 'manage-spa-booking', label: t('Quản lý đặt lịch'), path: '/manage-spa-bookings'},
       ];
     } 
 
@@ -255,7 +255,6 @@ const Banner = () => {
             <Menu.SubMenu key="user-profile" title={t('ACCOUNT')}>
               <Menu.Item onClick={() => { navigate('/user-profile') }}>{t('user_profile')}</Menu.Item>
               <Menu.Item onClick={() => { navigate('/pet-list') }}>{t('list_of_pets')}</Menu.Item>
-              <Menu.Item onClick={() => { navigate('/order-history') }}>{t('orders_history')}</Menu.Item>
               <Menu.Item onClick={() => { navigate('/spa-booking') }}>{t('service_history')}</Menu.Item>
             </Menu.SubMenu>
             <Menu.Item onClick={handleLogout}>{t('LOG_OUT')}</Menu.Item>
@@ -328,13 +327,13 @@ const Banner = () => {
               <Button type="primary" onClick={handleLoginClick} className="ml-4 relative">{t('LOG_IN')}</Button>
             ) : (
               <div className="flex items-center ml-4">
-                {role === 'Customer' && (
+                {/* {role === 'Customer' && (
                   <>
                     <Badge count={productCount}>
                       <Button shape="circle" icon={<ShoppingCartOutlined />} onClick={() => navigate('/cart')} />
                     </Badge>
                   </>
-                )}
+                )} */}
                 {role !== 'Guest' && (
                   <>
                     <Popover content={renderUserMenu()} trigger="click" visible={visible} onVisibleChange={handleVisibleChange}>

@@ -1,7 +1,6 @@
 
 import { FloatButton } from 'antd';
 import About from '../components/HomePage/About';
-import Statistics from '../components/HomePage/Statistics';
 import Welcome from '../components/HomePage/Welcome';
 import { FacebookOutlined } from '@ant-design/icons';
 
@@ -10,7 +9,7 @@ const HomePage = () => {
     <div >
         <Welcome />
         <About/>
-        <Statistics/>
+        {/* <Statistics/> */}
         <div className="fixed bottom-5 right-5 z-50">
           <FloatButton
             type="primary"

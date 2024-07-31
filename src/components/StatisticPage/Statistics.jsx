@@ -105,18 +105,6 @@ const Statistics = () => {
             <Col xs={24} md={12}>
               <Card className="shadow-lg mb-4">
                 <div className="flex items-center">
-                  <ShoppingCartOutlined className="text-7xl mr-4" />
-                  <Statistic
-                    title={t('shippedOrders')}
-                    value={totalOrders}
-                    formatter={formatter}
-                  />
-                </div>
-              </Card>
-            </Col>
-            <Col xs={24} md={12}>
-              <Card className="shadow-lg mb-4">
-                <div className="flex items-center">
                   <CarryOutOutlined className="text-7xl mr-4" />
                   <Statistic
                     title={t('completedSpaBookings')}
@@ -126,21 +114,7 @@ const Statistics = () => {
                 </div>
               </Card>
             </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-              <Col xs={24} md={12}>
-                <Card className="shadow-lg mb-4">
-                  <div className="flex items-center">
-                    <UserOutlined className="text-7xl mr-4" />
-                    <Statistic
-                      title={t('totalActiveUsers')}
-                      value={totalUsers}
-                      formatter={formatter}
-                    />
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} md={12}>
+            <Col xs={24} md={12}>
               <Card>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <CreditCardOutlined
@@ -158,6 +132,32 @@ const Statistics = () => {
                 </Card>
               </Col>
             </Row>
+            {/* <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Card className="shadow-lg mb-4">
+                  <div className="flex items-center">
+                    <UserOutlined className="text-7xl mr-4" />
+                    <Statistic
+                      title={t('totalActiveUsers')}
+                      value={totalUsers}
+                      formatter={formatter}
+                    />
+                  </div>
+                </Card>
+              </Col>
+              <Col xs={24} md={12}>
+              <Card className="shadow-lg mb-4">
+                <div className="flex items-center">
+                  <ShoppingCartOutlined className="text-7xl mr-4" />
+                  <Statistic
+                    title={t('shippedOrders')}
+                    value={totalOrders}
+                    formatter={formatter}
+                  />
+                </div>
+              </Card>
+            </Col>
+            </Row> */}
             <Col xs={24} className="mb-4 shadow-lg">
               <Card>
                 <BarChart />
@@ -166,7 +166,7 @@ const Statistics = () => {
             <Col xs={24}>
               <EarningsLineChart />
             </Col>
-            <Col xs={24}>
+            {/* <Col xs={24}>
               <Card className="shadow-lg mb-4">
                 <div className="flex flex-col items-center">
                   <div className="flex items-center mb-4">
@@ -217,7 +217,7 @@ const Statistics = () => {
                   )}
                 </div>
               </Card>
-            </Col>
+            </Col> */}
         </div>
       </div>
     </Layout>
