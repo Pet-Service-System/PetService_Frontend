@@ -20,7 +20,7 @@ const getSpaBookings = async () => {
   const AccountID = user.id
   const token = localStorage.getItem('token');
   try {
-    const response = await axios.get(`${API_URL}/api/Spa-bookings/account/${AccountID}`, {
+    const response = await axios.get(`${API_URL}/api/spa-bookings/account/${AccountID}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -152,7 +152,7 @@ const SpaBooking = () => {
     const token = localStorage.getItem('token');
     try {
       await axios.patch(
-        `${API_URL}/api/Spa-bookings/${bookingID}`,
+        `${API_URL}/api/spa-bookings/${bookingID}`,
         { Feedback: reviewText, isReviewed: true },
         {
           headers: {
