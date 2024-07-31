@@ -542,5 +542,8 @@
     "cancel_detail_6": "If the appointment is canceled by the salon, the customer will be refunded 100% of the total amount paid.",
     "policy_header_3": "General rules",
     "policy_detail_3": "- Refund policy may vary depending on each specific case and according to current law.",
-    "policy_detail_3.1": "- All refund requests must be sent via email or contact us directly within the specified time."
+    "policy_detail_3.1": "- All refund requests must be sent via email or contact us directly within the specified time.",
+    "24_hour_booking_policy": "24-Hour Booking Policy",
+    "booking_policy_detail_1": "- Bookings made within 24 hours of the current time cannot be modified or canceled.",
+    "booking_policy_detail_2": "- For any issues, please contact our hotline for support."
 }

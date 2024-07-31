@@ -548,5 +548,8 @@
     "cancel_detail_6": "Nếu hủy lịch từ phía tiệm, khách hàng sẽ được hoàn tiền 100% tổng số tiền đã thanh toán.",
     "policy_header_3": "Quy Định Chung",
     "policy_detail_3": "- Chính sách hoàn tiền có thể thay đổi tùy theo từng trường hợp cụ thể và theo quy định của pháp luật hiện hành.",
-    "policy_detail_3.1": "- Mọi yêu cầu hoàn tiền cần được gửi qua email hoặc liên hệ trực tiếp với chúng tôi trong thời gian quy định."
+    "policy_detail_3.1": "- Mọi yêu cầu hoàn tiền cần được gửi qua email hoặc liên hệ trực tiếp với chúng tôi trong thời gian quy định.",
+    "24_hour_booking_policy": "Chính Sách Đặt Lịch Trong Vòng 24 Giờ",
+    "booking_policy_detail_1": "- Đặt lịch trong vòng 24 tiếng so với thời điểm hiện tại thì không thể thay đổi thông tin đặt lịch và hủy đặt lịch.",
+    "booking_policy_detail_2": "- Mọi vấn đề liên quan vui lòng liên hệ qua hotline để được hỗ trợ."
 }

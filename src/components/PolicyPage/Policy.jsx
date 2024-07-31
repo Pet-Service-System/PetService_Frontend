@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 const { Title, Paragraph } = Typography;
 
 const Policy = () => {
-
   const { t } = useTranslation();
 
   return (
@@ -14,8 +13,8 @@ const Policy = () => {
       <Card className="mb-4 p-4">
         <Title level={3}>1. {t('policy_header_1')}</Title>
         <Paragraph>
-        {t('policy_detail_1')} <br />
-        {t('policy_detail_1.1')}
+          {t('policy_detail_1')} <br />
+          {t('policy_detail_1.1')}
         </Paragraph>
       </Card>
 
@@ -60,10 +59,19 @@ const Policy = () => {
       <Card className="mb-4 p-4">
         <Title level={3}>4. {t('policy_header_3')}</Title>
         <Paragraph>
-        {t('policy_detail_3')}
+          {t('policy_detail_3')}
         </Paragraph>
         <Paragraph>
-        {t('policy_detail_3.1')}
+          {t('policy_detail_3.1')}
+        </Paragraph>
+      </Card>
+
+      {/* Add new policy for 24-hour booking */}
+      <Card className="mb-4 p-4">
+        <Title level={3}>5. {t('24_hour_booking_policy')}</Title>
+        <Paragraph>
+          {t('booking_policy_detail_1')} <br />
+          {t('booking_policy_detail_2')}
         </Paragraph>
       </Card>
     </div>
