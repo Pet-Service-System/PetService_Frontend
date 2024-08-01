@@ -765,8 +765,8 @@ const SpaServiceDetail = () => {
                 visible={isBookingModalVisible}
                 onCancel={handleBookingCancel}
                 onOk={handleBookingSubmit}
-                okText="Đặt lịch ngay"
-                cancelText="Hủy"
+                okText={t('booking_now')}
+                cancelText={t('cancel')}
                 width={800} // Set modal width
                 confirmLoading={operationLoading}
                 okButtonProps={{ disabled: !isChecked }}
@@ -1040,7 +1040,7 @@ const SpaServiceDetail = () => {
                                 rules={[{ required: true, message: "Vui lòng đồng ý với các điều khoản" }]}
                             >
                                 <Checkbox disabled={operationLoading} className='font-normal' onChange={handleChangeCheckBox}>
-                                    Tôi đồng ý với <a className='text-blue-600 underline' onClick={() => setIsPolicyModalVisible(true)}>các điều khoản và điều kiện</a>
+                                    {t('confirmation')} <a className='text-blue-600 underline' onClick={() => setIsPolicyModalVisible(true)}>{t('Terms_and_conditions')}</a>
                                 </Checkbox>
                             </Form.Item>
                         </Col>
@@ -1080,7 +1080,7 @@ const SpaServiceDetail = () => {
                     {discountValue > 0 && currentPrice > 0 && (
                         <>
                             <div className="flex flex-row mb-2 justify-between">
-                                <Text strong className='mr-1'>Thành tiền: </Text>
+                                <Text strong className='mr-1'>{t('totalMoney')}</Text>
                                 <Text>
                                     {formatNumberWithCommas(currentPrice + discountValue)}đ
                                 </Text>
@@ -1094,7 +1094,7 @@ const SpaServiceDetail = () => {
                         </>
                     )}
                     <div className="flex flex-row mb-2 justify-between">
-                        <Text strong className='mr-1 md:text-4xl text-3xl'>Tổng tiền:</Text>
+                        <Text strong className='mr-1 md:text-4xl text-3xl'>{t('totalMoney')}</Text>
                         <Text className="md:text-4xl text-3xl text-green-600">
                             {/* {formatNumberWithCommas(currentPrice - discountValue - currentPrice * subscriptionDiscount)}đ */}
                             {formatNumberWithCommas(currentPrice)}đ
@@ -1105,7 +1105,7 @@ const SpaServiceDetail = () => {
                 <div className="text-right">
                     {isPayPalButtonVisible && currentPrice > 0 && (
                         <>
-                            <p className='text-left text-3xl mb-2'>Vui lòng thanh toán để đặt lịch: </p>
+                            <p className='text-left text-3xl mb-2'>{t('please_pay_to_book')}</p>
                             <PayPalButtons
                                 createOrder={(data, actions) => createOrder(data, actions)}
                                 onApprove={(data, actions) => onApprove(data, actions)}
@@ -1203,47 +1203,47 @@ const SpaServiceDetail = () => {
             >
                 <div className="p-8 bg-gray-100 min-h-screen">
                     <Text>
-                        <strong>1. Chính Sách Phí Chênh Lệch Cân Nặng</strong>
+                        <strong>1. {t('policy_header_1')}</strong>
                         <br/>
-                        Trong quá trình khách check-in, nếu cân nặng của thú cưng khác với cân nặng đăng ký, chúng tôi sẽ thu thêm hoặc trả lại phí chênh lệch theo bảng giá.
+                        {t('policy_detail_1')}
                         <br/>
-                        - Phí chênh lệch sẽ được tính dựa trên mức giá đã được niêm yết và sẽ được thông báo rõ ràng cho khách hàng.
+                        {t('policy_detail_1.1')}
                         <br/>
-                        <strong>2. Chính Sách Hoàn Tiền</strong>
+                        <strong>2. {t('refund_policy')}</strong>
                         <br/>
-                        Chúng tôi hiểu rằng có thể có những tình huống không mong muốn xảy ra, và chúng tôi cam kết hoàn tiền theo chính sách dưới đây:
+                        {t('refund_detail')}
                         <br/>
-                        <strong>3. Chính Sách Hoàn Tiền Theo Nguồn Hủy</strong>
+                        <strong>3. {t('policy_header_2')}</strong>
                         <br/>
-                        <strong>3.1 Hủy từ Khách Hàng</strong>
+                        <strong>3.1 {t('cancel_header')}</strong>
                         <br/>
-                        Nếu khách hàng hủy lịch với các lý do dưới đây, chính sách hoàn tiền sẽ được áp dụng như sau:
+                        {t('cancel_detail')}
                         <br/>
-                        - Khách không đến tiệm để làm dịch vụ: Hoàn tiền 30% tổng số tiền đã thanh toán.
+                        {t('cancel_detail_1')} {t('cancel_detail_1.1')}
                         <br/>
-                        - Khách liên hệ hủy lịch do sự cố hoặc không còn nhu cầu nữa: Hoàn tiền 100% tổng số tiền đã thanh toán.
+                        {t('cancel_detail_2')} {t('cancel_detail_2.1')}
                         <br/>
-                        - Khách hủy lịch sau khi phát sinh chi phí: Hoàn tiền 70% tổng số tiền đã thanh toán.
+                        {t('cancel_detail_3')} {t('cancel_detail_3.1')}
                         <br/>
-                        - Thú cưng không hợp tác: Hoàn tiền 90% tổng số tiền đã thanh toán.
+                        {t('cancel_detail_4')} {t('cancel_detail_4.1')}
                         <br/>
-                        - Các lý do khác: Hoàn tiền sẽ được giải quyết tùy theo từng tình huống cụ thể. Quý khách vui lòng liên hệ trực tiếp với chúng tôi để thảo luận và giải quyết.
+                        {t('cancel_detail_5')} {t('cancel_detail_5.1')}
                         <br/>
-                        <strong>3.2 Hủy từ Tiệm</strong>
+                        <strong>3.2 {t('cancel_header_1')}</strong>
                         <br/>
-                        Nếu hủy lịch từ phía tiệm, khách hàng sẽ được hoàn tiền 100% tổng số tiền đã thanh toán.
+                        {t('cancel_detail_6')}
                         <br/>
-                        <strong>4. Quy Định Chung</strong>
+                        <strong>4. {t('policy_header_3')}</strong>
                         <br/>
-                        - Chính sách hoàn tiền có thể thay đổi tùy theo từng trường hợp cụ thể và theo quy định của pháp luật hiện hành.
+                        {t('policy_detail_3')}
                         <br/>
-                        - Mọi yêu cầu hoàn tiền cần được gửi qua email hoặc liên hệ trực tiếp với chúng tôi trong thời gian quy định.
+                        {t('policy_detail_3.1')}
                         <br/>
-                        <strong>5. Chính Sách Đặt Lịch Trong Vòng 24 Giờ</strong>
+                        <strong>5. {t('24_hour_booking_policy')}</strong>
                         <br/>
-                        - Đặt lịch trong vòng 24 tiếng so với thời điểm hiện tại thì không thể thay đổi thông tin đặt lịch và hủy đặt lịch. 
+                        {t('booking_policy_detail_1')}
                         <br/>
-                        - Mọi vấn đề liên quan vui lòng liên hệ qua hotline để được hỗ trợ.
+                        {t('booking_policy_detail_2')}
                     </Text>
                 </div>
             </Modal>

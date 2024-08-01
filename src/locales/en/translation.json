@@ -551,5 +551,16 @@
     "the_change_information_time_is_x_left": "The change information time is {{x}} left.",
     "error_changing_booking_information": "Error changing booking information.",
     "error_reply": "An error occurred while replying.",
-    "confirm_cancel_booking": "Confirm Cancel Booking"
+    "confirm_cancel_booking": "Confirm Cancel Booking",
+    "confirmation": "I agree with",
+    "Terms_and_conditions": "All Terms and conditions",
+    "totalMoney": "Total amount: ",
+    "please_pay_to_book": "Please pay to book an appointment: ",
+    "cancel_reason": "Reason for cancellation: ",
+    "membership": "Membership information",
+    "membership_type": "Membership type",
+    "totalmoneyspent": "Total money spent",
+    "to": "to",
+    "membership_startday": "Membership start date",
+    "membership_endday": "Membership end date"
 }

@@ -357,15 +357,15 @@ const UserProfile = () => {
           {!isEditMode && role === 'Customer' && (
             <Card bordered={false} style={{ marginTop: '24px' }}>
               <Typography.Title level={2} className="text-center">
-                 {t('Thông tin hội viên')}
+                 {t('membership')}
               </Typography.Title>
               <div className="bg-gray-200 p-2 rounded-md mb-2">
-                <Title level={5}>{t('Loại hội viên')}</Title>
+                <Title level={5}>{t('membership_type')}</Title>
                 <p>{tierIcon}{accountData.membershipType || t('no_data')}</p>
               </div>
 
               <div className="bg-gray-200 p-2 rounded-md mb-2">
-                <Title level={5}>{t('Tổng tiền tiêu')}</Title>
+                <Title level={5}>{t('totalmoneyspent')}</Title>
                 <p>
                   <LineChartOutlined className="mr-2" />{formatNumberWithCommas(accountData.totalSpent) || 0}đ
                 </p>
@@ -398,17 +398,17 @@ const UserProfile = () => {
                     '0%': '#108ee9',
                     '100%': '#87d068',
                   }}
-                  format={(percent) => `${Number(percent).toFixed(1)}% ${t('tới')} ${currentTier === 'Basic' ? 'Premium' : currentTier === 'Premium' ? 'VIP' : 'VIP'}`}
+                  format={(percent) => `${Number(percent).toFixed(1)}% ${t('to')} ${currentTier === 'Basic' ? 'Premium' : currentTier === 'Premium' ? 'VIP' : 'VIP'}`}
                 />
               </div>
 
               <div className="bg-gray-200 p-2 rounded-md mb-2">
-                <Title level={5}>{t('Ngày bắt đầu hội viên')}</Title>
+                <Title level={5}>{t('membership_startday')}</Title>
                 <p>{accountData.startDate ? new Date(accountData.startDate).toLocaleDateString() : t('-')}</p>
               </div>
 
               <div className="bg-gray-200 p-2 rounded-md mb-2">
-                <Title level={5}>{t('Ngày kết thúc hội viên')}</Title>
+                <Title level={5}>{t('membership_endday')}</Title>
                 <p>{accountData.endDate ? new Date(accountData.endDate).toLocaleDateString() : t('-')}</p>
               </div>
             </Card>

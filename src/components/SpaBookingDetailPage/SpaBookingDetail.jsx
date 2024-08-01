@@ -613,7 +613,7 @@ const SpaBookingDetail = () => {
         </Steps>
         {spaBooking.CurrentStatus == 'Canceled' && (
           <div className="mb-2">
-            <Text strong className="text-3xl text-red-600">Lí do hủy: </Text>
+            <Text strong className="text-3xl text-red-600">{t('cancel_reason')}</Text>
             <Text className="text-3xl">{spaBooking.AdditionalInfoID.CancelReason ? spaBooking.AdditionalInfoID.CancelReason : '-'}</Text>
           </div>
         )}
