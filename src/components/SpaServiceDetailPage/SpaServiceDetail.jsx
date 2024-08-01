@@ -580,16 +580,15 @@ const SpaServiceDetail = () => {
                 // Booking info
                 CurrentStatus: 'Pending',
                 CreateDate: new Date(),
-                BookingDate: bookingDate,
-                BookingTime: bookingTime,
                 TotalPrice: currentPriceRef.current,
                 AccountID: accountID,
-                PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
                 VoucherID: voucherIDref.current || null,
                 isSpentUpdated: false,
                 StatusChanges: [{ Status: 'Pending', ChangeTime: new Date() }],
+                
+                //PaymentDetail info
+                PaypalOrderID: paypalOrder.purchase_units[0].payments.captures[0].id,
                 ExtraCharge: 0,
-            
                 // Booking detail info
                 CustomerName: values.CustomerName,
                 Phone: values.Phone,
@@ -601,6 +600,8 @@ const SpaServiceDetail = () => {
                 PetWeight: values.PetWeight,
                 ActualWeight: values.ActualWeight || null,
                 PetAge: values.PetAge,
+                BookingDate: bookingDate,
+                BookingTime: bookingTime,
                 ServiceID: id,
             
                 // Additional info
@@ -609,6 +610,7 @@ const SpaServiceDetail = () => {
                 CaretakerID: values.CaretakerID || null,
                 Feedback: values.Feedback || null,
                 isReplied: false,
+                isReviewed: false,
             };            
     
             // Send all booking data to backend

@@ -76,18 +76,17 @@ const SpaBooking = () => {
       fetchSpaBookings();
     }
   }, [selectedDateCreated]);
-
+  console.log(spaBookings)
   const fetchSpaBookings = async () => {
     setLoading(true);
     try {
       const data = await getSpaBookings();
       const formattedData = data.map(booking => ({
         id: booking._id,
-        BookingID: booking.BookingID,
         date: new Date(booking.CreateDate),
         TotalPrice: booking.TotalPrice,
         status: booking.CurrentStatus,
-        isReviewed: booking.isReviewed,
+        isReviewed: booking.AdditionalInfoID.isReviewed,
       }));
 
       const sortedData = sortOrder === 'desc'
