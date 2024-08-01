@@ -856,14 +856,16 @@ const SpaBookingDetail = () => {
             {t('change_information_booking')}
           </Button>
         )}
-        <Button
-          type="primary"
-          onClick={() => handleReviewTransaction(spaBooking.AdditionalInfoID.isReviewed)}
-          disabled={spaBooking.CurrentStatus !== 'Completed' || spaBooking.AdditionalInfoID.isReviewed}
-          className='min-w-[100px] w-auto px-2 py-1 text-center text-xl ml-2'
-        >
-          {spaBooking.AdditionalInfoID.isReviewed ? t('reviewed') : t('review')}
-        </Button>
+        {(role === 'Customer') && spaBooking.CurrentStatus == 'Completed' && (
+          <Button
+            type="primary"
+            onClick={() => handleReviewTransaction(spaBooking.AdditionalInfoID.isReviewed)}
+            disabled={spaBooking.CurrentStatus !== 'Completed' || spaBooking.AdditionalInfoID.isReviewed}
+            className='min-w-[100px] w-auto px-2 py-1 text-center text-xl ml-2'
+          >
+            {spaBooking.AdditionalInfoID.isReviewed ? t('reviewed') : t('review')}
+          </Button>
+        )}
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
           <Button
