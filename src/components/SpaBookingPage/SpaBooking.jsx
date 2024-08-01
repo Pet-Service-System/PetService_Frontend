@@ -282,13 +282,13 @@ const SpaBooking = () => {
                 >
                   {t('pet_list')}
                 </Menu.Item>
-                <Menu.Item
+                {/* <Menu.Item
                   key="order-history"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate('/order-history')}
                 >
                   {t('orders_history')}
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item key="spa-booking"
                   onClick={() => navigate('/spa-booking')}
                   icon={<HistoryOutlined />}>

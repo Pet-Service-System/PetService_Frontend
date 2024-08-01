@@ -244,13 +244,13 @@ const PetList = () => {
                 >
                   {t('list_of_pets')}
                 </Menu.Item>
-                <Menu.Item
+                {/* <Menu.Item
                   key="order-history"
                   icon={<HistoryOutlined />}
                   onClick={() => navigate('/order-history')}
                 >
                   {t('order_history')}
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item key="spa-booking"
                   onClick={() => navigate('/spa-booking')}
                   icon={<HistoryOutlined />}>

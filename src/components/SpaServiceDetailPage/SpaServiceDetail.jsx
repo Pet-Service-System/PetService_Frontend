@@ -28,7 +28,7 @@ const SpaServiceDetail = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const [exchangeRateVNDtoUSD, setExchangeRateVNDtoUSD] = useState(null)
     const accountID = user?.id;
-    const [selectedPet, setSelectedPet] = useState(null);
+    const [selectedPet, setSelectedPet] = useState(undefined);
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const genders = ['Đực', 'Cái'];
     const [isPayPalButtonVisible, setIsPayPalButtonVisible] = useState(false);
@@ -293,6 +293,17 @@ const SpaServiceDetail = () => {
             addPetForm.resetFields();
             message.success(t('pet_added_successfully'));
             fetchPets();
+            // Reset the Select value
+            bookingForm.setFieldsValue({
+                PetID: null,
+                PetName: null,
+                PetGender: null,
+                PetStatus: null,
+                PetWeight: null,
+                PetAge: null,
+                PetTypeID: null,
+            });
+            setSelectedPet(undefined);
         } catch (info) {
             console.log('Validate Failed:', info);
         }
@@ -324,7 +335,7 @@ const SpaServiceDetail = () => {
         addPetForm.resetFields();
     
         // Clear selected pet
-        setSelectedPet(null);
+        setSelectedPet(undefined);
     
         // Reset modal visibility
         setIsAddModalVisible(false);
@@ -644,7 +655,7 @@ const SpaServiceDetail = () => {
             addPetForm.resetFields();
     
             // Clear selected pet
-            setSelectedPet(null);
+            setSelectedPet(undefined);
     
             // Reset modal visibility
             setIsAddModalVisible(false);
@@ -685,6 +696,20 @@ const SpaServiceDetail = () => {
     //     subscriptionDiscountRef.current = discount;
     //     console.log(subscriptionDiscountRef.current)
     // };
+
+    const handleModalCancel = () => {
+        setSelectedPet(undefined);
+        bookingForm.setFieldsValue({
+            PetID: null,
+            PetName: null,
+            PetGender: null,
+            PetStatus: null,
+            PetWeight: null,
+            PetAge: null,
+            PetTypeID: null,
+        });
+        setIsAddModalVisible(false);
+    };
 
     function formatNumberWithCommas(number) {
     if (typeof number !== 'number') {
@@ -837,18 +862,20 @@ const SpaServiceDetail = () => {
                     </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
-                            <Form.Item
+                        <Form.Item
                                 name="PetID"
                                 label={t('my_pet')}
                                 rules={[{ required: true, message: t('plz_choose_pet') }]}
                             >
                                 <Select
+                                    value={selectedPet}
                                     disabled={operationLoading}
                                     placeholder={t('choose_pet')}
                                     onChange={(value) => {
                                         if (value === "add_new_pet") {
                                             showAddPetModal();
                                         } else {
+                                            setSelectedPet(value); 
                                             handlePetSelectChange(value);
                                         }
                                     }}
@@ -1121,10 +1148,10 @@ const SpaServiceDetail = () => {
             <Modal
                 title="Thêm thú cưng"
                 visible={isAddModalVisible}
-                onCancel={() => setIsAddModalVisible(false)}
+                onCancel={handleModalCancel}
                 confirmLoading={operationLoading}
                 footer={[
-                    <Button key="back" onClick={() => setIsAddModalVisible(false)}>
+                    <Button key="back" onClick={handleModalCancel}>
                         {t('cancel')}
                     </Button>,
                     <Button key="submit" type="primary" onClick={handleAddPet} loading={operationLoading}>
