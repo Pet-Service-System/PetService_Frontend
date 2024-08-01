@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker } from 'antd';
+import { Spin, Card, Typography, Table, Button, Image, message, Modal, Row, Col, Steps, Tag, Form, Select, DatePicker, Input } from 'antd';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeftOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,9 @@ const PAYPAL_CLIENT_SECRET = import.meta.env.REACT_APP_PAYPAL_CLIENT_SECRET;
 
 const SpaBookingDetail = () => {
   const [spaBooking, setSpaBooking] = useState(null);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewError, setReviewError] = useState('');
   const [spaBookingDetail, setSpaBookingDetail] = useState(null);
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -151,6 +154,33 @@ const SpaBookingDetail = () => {
       throw error;
     }
   }
+
+  const handleSubmitReview = async () => {
+    if (reviewText.trim() === '') {
+      setReviewError(t('review_error_empty'));
+      return;
+    }
+    const token = localStorage.getItem('token');
+    try {
+      await axios.patch(
+        `${API_URL}/api/spa-bookings/${spaBooking._id}`,
+        { Feedback: reviewText, isReviewed: true },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      message.success(t('review_success'));
+
+      setIsReviewing(false);
+      fetchSpaBooking()
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      message.error(t('review_fail'));
+    }
+  };
 
   const fetchVoucher = async (voucherId) => {
     try {
@@ -592,6 +622,17 @@ const SpaBookingDetail = () => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  const handleReviewTransaction = async (isReviewed) => {
+    // Kiểm tra xem đã được đánh giá hay chưa
+    if (isReviewed) {
+      message.info('Bạn đã đánh giá dịch vụ này rồi.');
+      return;
+    }
+    setIsReviewing(true);
+    setReviewText('');
+    setReviewError('');
+  };
+
   return (spaBookingDetail && spaBooking && access &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
@@ -815,6 +856,14 @@ const SpaBookingDetail = () => {
             {t('change_information_booking')}
           </Button>
         )}
+        <Button
+          type="primary"
+          onClick={() => handleReviewTransaction(spaBooking.AdditionalInfoID.isReviewed)}
+          disabled={spaBooking.CurrentStatus !== 'Completed' || spaBooking.AdditionalInfoID.isReviewed}
+          className='min-w-[100px] w-auto px-2 py-1 text-center text-xl'
+        >
+          {spaBooking.AdditionalInfoID.isReviewed ? t('reviewed') : t('review')}
+        </Button>
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
           <Button
@@ -892,6 +941,26 @@ const SpaBookingDetail = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      <Modal
+            title={t('submit_review')}
+            visible={isReviewing}
+            onCancel={() => setIsReviewing(false)}
+            footer={[
+              <Button key="cancel" onClick={() => setIsReviewing(false)}>{t('cancel')}</Button>,
+              <Button key="submit" type="primary" onClick={handleSubmitReview}>{t('submit')}</Button>,
+            ]}
+          >
+            <Form>
+              <Form.Item
+                label={t('review')}
+                validateStatus={reviewError ? 'error' : ''}
+                help={reviewError}
+              >
+                <Input.TextArea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+              </Form.Item>
+            </Form>
+          </Modal>
     </div>
   );
 };
