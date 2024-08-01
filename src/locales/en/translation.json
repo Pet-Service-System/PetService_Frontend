@@ -545,5 +545,6 @@
     "policy_detail_3.1": "- All refund requests must be sent via email or contact us directly within the specified time.",
     "24_hour_booking_policy": "24-Hour Booking Policy",
     "booking_policy_detail_1": "- Bookings made within 24 hours of the current time cannot be modified or canceled.",
-    "booking_policy_detail_2": "- For any issues, please contact our hotline for support."
+    "booking_policy_detail_2": "- For any issues, please contact our hotline for support.",
+    "error_changing_booking_information" : "An error occurred while changing booking information"
 }
