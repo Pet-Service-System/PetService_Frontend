@@ -125,6 +125,7 @@ const SpaBookingDetail = () => {
           message.success(t("reply_successfully"));
           setFeedbackingBookingDetailsId(null);
           setFeedbackContent("");
+         window.location.reload();
         }
       }
     } catch (error) {
