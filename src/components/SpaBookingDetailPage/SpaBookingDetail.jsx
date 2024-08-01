@@ -860,7 +860,7 @@ const SpaBookingDetail = () => {
           type="primary"
           onClick={() => handleReviewTransaction(spaBooking.AdditionalInfoID.isReviewed)}
           disabled={spaBooking.CurrentStatus !== 'Completed' || spaBooking.AdditionalInfoID.isReviewed}
-          className='min-w-[100px] w-auto px-2 py-1 text-center text-xl'
+          className='min-w-[100px] w-auto px-2 py-1 text-center text-xl ml-2'
         >
           {spaBooking.AdditionalInfoID.isReviewed ? t('reviewed') : t('review')}
         </Button>
