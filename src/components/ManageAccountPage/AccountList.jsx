@@ -123,6 +123,11 @@ const AccountList = () => {
 
   const columns = [
     {
+      title: t('User ID'),
+      dataIndex: 'AccountID',
+      key: 'AccountID',
+    },
+    {
       title: t('fullname'),
       dataIndex: 'fullname',
       key: 'fullname',
