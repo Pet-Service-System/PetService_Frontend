@@ -438,16 +438,16 @@ const BookingList = () => {
         }
       );
 
-      if (response.status === 201 && refundPercentage != 0) {
-        // Show success message with modal
-        Modal.success({
-          title: t('refund_success_title'),
-          content: t('refund_success_content'),
-          icon: <CheckCircleOutlined style={{ color: '#52c41a' }} className="text-center" />,
-        });
-      } else {
-        throw new Error('Failed to process refund');
-      }
+      // if (response.status === 201 && refundPercentage != 0) {
+      //   // Show success message with modal
+      //   Modal.success({
+      //     title: t('refund_success_title'),
+      //     content: t('refund_success_content'),
+      //     icon: <CheckCircleOutlined style={{ color: '#52c41a' }} className="text-center" />,
+      //   });
+      // } else {
+      //   throw new Error('Failed to process refund');
+      // }
     } catch (error) {
       console.error('Error processing refund:', error);
       // Show error message with modal
