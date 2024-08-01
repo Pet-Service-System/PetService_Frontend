@@ -32,6 +32,8 @@ const SpaBookingDetail = () => {
   ];
   const currentDateTime = moment();
   const [operationLoading, setOperationLoading] = useState(false);
+  const [changeCount, setChangeCount] = useState(0);
+  const maxChanges = 3;
   const role = localStorage.getItem('role');
   const navigate = useNavigate();
   const { id } = useParams();
@@ -94,7 +96,7 @@ const SpaBookingDetail = () => {
       if (!feedbackContent || feedbackContent.trim() === "") {
         return;
       }
-      
+
       const newReply = {
         BookingID: spaBooking._id,
         AccountID: accountID,
@@ -125,7 +127,7 @@ const SpaBookingDetail = () => {
           message.success(t("reply_successfully"));
           setFeedbackingBookingDetailsId(null);
           setFeedbackContent("");
-         window.location.reload();
+          window.location.reload();
         }
       }
     } catch (error) {
@@ -153,7 +155,7 @@ const SpaBookingDetail = () => {
   const fetchVoucher = async (voucherId) => {
     try {
       const voucherData = await getVoucherInformation(voucherId);
-      if(voucherData){
+      if (voucherData) {
         setVoucherData(voucherData);
         setDiscountValue(voucherData.DiscountValue)
       }
@@ -268,13 +270,13 @@ const SpaBookingDetail = () => {
       const serviceInfo = await getSpaServiceByID(bookingDetail.ServiceID);
       const caretakersName = await getFullName(booking.AdditionalInfoID.CaretakerID);
       const reply = await fetchReply(booking._id);
-      
+
       setSpaBooking(booking);
       setSpaBookingDetail(bookingDetail)
       setServiceData(serviceInfo);
       setCaretakersName(caretakersName);
 
-      if(role === 'Caretaker Staff' && accountID !== booking.AdditionalInfoID.CaretakerID){
+      if (role === 'Caretaker Staff' && accountID !== booking.AdditionalInfoID.CaretakerID) {
         setAccess(false)
         navigate('/manage-spa-bookings')
       }
@@ -381,7 +383,7 @@ const SpaBookingDetail = () => {
           // Make API call to update order status to 'Canceled'
           const response = await axios.patch(
             `${API_URL}/api/spa-bookings/${spaBooking._id}`,
-            { 
+            {
               CurrentStatus: 'Canceled',
               CancelReason: 'Khách hủy lịch',
             },
@@ -471,101 +473,113 @@ const SpaBookingDetail = () => {
     // Enable button if the current time is more than 24 hours before the booking time
     return now.isBefore(bookingDateTime.subtract(24, 'hours'));
   };
-  
+
   // Handle Change Information Booking
   const handleOpenChangeModal = () => {
-    setIsChangeModalVisible(true);
+    if (changeCount >= maxChanges) {
+      message.error(t("you_can_not_change_this_information_booking_any_more"));
+    } else {
+      confirm({
+        title: t("are_you_sure_to_change_the_information"),
+        icon: <ExclamationCircleOutlined />,
+        content: t("the_change_information_time_is_x_left", { x: maxChanges - changeCount }),
+        onOk: () => {
+          setIsChangeModalVisible(true);
+        }
+      });
+    }
   };
 
   // Handle OK for Change Information Modal
   const handleOkChangeModal = async () => {
     setOperationLoading(true);
     try {
-        const values = await form.validateFields();
-        const newBookingDate = values.BookingDate;
-        const newBookingTime = values.BookingTime;
-        const newCaretakerId = values.caretaker;
-        const selectedCaretaker = caretakers.find(caretaker => caretaker.id === newCaretakerId);
+      const values = await form.validateFields();
+      const newBookingDate = values.BookingDate;
+      const newBookingTime = values.BookingTime;
+      const newCaretakerId = values.caretaker;
+      const selectedCaretaker = caretakers.find(caretaker => caretaker.id === newCaretakerId);
 
-        const newBookingDateTime = moment(`${newBookingDate.format('DD-MM-YYYY')} ${newBookingTime}`, 'DD-MM-YYYY HH:mm');
-        const currentDateTime = moment();
+      const newBookingDateTime = moment(`${newBookingDate.format('DD-MM-YYYY')} ${newBookingTime}`, 'DD-MM-YYYY HH:mm');
+      const currentDateTime = moment();
 
-        // Ensure the new booking time is at least 3 hours from now
-        if (newBookingDateTime.diff(currentDateTime, 'hours') < 3) {
-            message.error(t('3_hours_rule'));
-            setOperationLoading(false);
-            return;
-        }
+      // Ensure the new booking time is at least 3 hours from now
+      if (newBookingDateTime.diff(currentDateTime, 'hours') < 3) {
+        message.error(t('3_hours_rule'));
+        setOperationLoading(false);
+        return;
+      }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('Authentication token not found.');
-        }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found.');
+      }
 
-        // Check if the change is within 24 hours
-        if (newBookingDateTime.diff(currentDateTime, 'hours') < 24) {
-            confirm({
-                title: t('annouce_before_change'),
-                icon: <ExclamationCircleOutlined />,
-                onOk: async () => {
-                    try {
-                        await axios.patch(
-                            `${API_URL}/api/spa-bookings/${spaBooking._id}`,
-                            {
-                                CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
-                                BookingDate: newBookingDate.format('DD-MM-YYYY'),
-                                BookingTime: newBookingTime,
-                            },
-                            {
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            }
-                        );
-                        message.success('Đổi thời gian đặt lịch thành công');
-                        setIsChangeModalVisible(false);
-                        fetchSpaBooking();
-                    } catch (error) {
-                        console.error('Error changing booking information:', error);
-                        message.error(t('error_changing_booking_information'));
-                    } finally {
-                        setOperationLoading(false);
-                        form.resetFields();
-                    }
-                },
-                onCancel() {
-                    setOperationLoading(false);
-                    form.resetFields();
-                },
-            });
-        } else {
-            // If the change is not within 24 hours, directly call the API
-            await axios.patch(
+      // Check if the change is within 24 hours
+      if (newBookingDateTime.diff(currentDateTime, 'hours') < 24) {
+        confirm({
+          title: t('annouce_before_change'),
+          icon: <ExclamationCircleOutlined />,
+          onOk: async () => {
+            try {
+              await axios.patch(
                 `${API_URL}/api/spa-bookings/${spaBooking._id}`,
                 {
-                    CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
-                    BookingDate: newBookingDate.format('DD/MM/YYYY'),
-                    BookingTime: newBookingTime,
+                  CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
+                  BookingDate: newBookingDate.format('DD-MM-YYYY'),
+                  BookingTime: newBookingTime,
                 },
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
                 }
-            );
-
-            message.success('Đổi thời gian đặt lịch thành công');
-            setIsChangeModalVisible(false);
-            fetchSpaBooking();
+              );
+              message.success('Đổi thời gian đặt lịch thành công');
+              setIsChangeModalVisible(false);
+              fetchSpaBooking();
+            } catch (error) {
+              console.error('Error changing booking information:', error);
+              message.error(t('error_changing_booking_information'));
+            } finally {
+              setOperationLoading(false);
+              form.resetFields();
+            }
+          },
+          onCancel() {
             setOperationLoading(false);
             form.resetFields();
-        }
-    } catch (error) {
-        console.error('Error changing booking information:', error);
-        message.error(t('error_changing_booking_information'));
+          },
+        });
+      } else {
+        // If the change is not within 24 hours, directly call the API
+        await axios.patch(
+          `${API_URL}/api/spa-bookings/${spaBooking._id}`,
+          {
+            CaretakerNote: selectedCaretaker ? selectedCaretaker.name : '',
+            BookingDate: newBookingDate.format('DD/MM/YYYY'),
+            BookingTime: newBookingTime,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        message.success('Đổi thời gian đặt lịch thành công');
+        setIsChangeModalVisible(false);
+        setChangeCount(changeCount + 1);
+        fetchSpaBooking();
         setOperationLoading(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      console.error('Error changing booking information:', error);
+      message.error(t('error_changing_booking_information'));
+      setOperationLoading(false);
     }
-};
+  };
 
   const handleCancelChangeModal = () => {
     setIsChangeModalVisible(false);
@@ -573,11 +587,11 @@ const SpaBookingDetail = () => {
 
   function formatNumberWithCommas(number) {
     if (typeof number !== 'number') {
-        return number;
+      return number;
     }
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
-  
+
   return (spaBookingDetail && spaBooking && access &&
     <div className="p-4 md:p-8 lg:p-12">
       {/* Go back */}
@@ -671,9 +685,9 @@ const SpaBookingDetail = () => {
           </div>
           {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && spaBookingDetail.ActualWeight !== null && (
             <div className="mb-4 flex justify-between">
-            <Text strong>{t('Cân nặng thực tế: ')} </Text>
-            <Text>{spaBookingDetail.ActualWeight} kg</Text>
-          </div>
+              <Text strong>{t('Cân nặng thực tế: ')} </Text>
+              <Text>{spaBookingDetail.ActualWeight} kg</Text>
+            </div>
           )}
         </Card>
         <div className="mb-4">
@@ -687,67 +701,67 @@ const SpaBookingDetail = () => {
         />
 
         {spaBooking.AdditionalInfoID.Feedback && (
-            <>
-              <Card className="text-left w-full ml-auto">
-                <div className="flex justify-between items-center">
-                  <Title level={3} className="m-0">
-                    Đánh giá của khách hàng
-                  </Title>
-                  {role == 'Caretaker Staff' && (
-                    <Button
-                      className="ml-4"
-                      onClick={() => startFeedback(spaBooking.BookingDetailsID)}
-                      disabled={spaBooking.AdditionalInfoID.isReplied}
-                    >
-                      {t("reply")}
-                    </Button>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <Text className="text-3xl" strong>
-                    {t("feedback")}:{" "}
-                  </Text>
-                  <Text className="text-3xl">{spaBooking.AdditionalInfoID.Feedback}</Text>
-                </div>
-                {replies && (
-                  <Card className="border-none">
-                    <div className="flex flex-col">
-                      <div className="flex flex-row">
-                        <Text strong className="text-2xl">{caretakersName.fullname}</Text>
-                        <Text className="text-gray-400">
-                          {" - "}
-                          {moment(replies.ReplyDate).format("DD/MM/YYYY")}
-                        </Text>
-                      </div>
-                      <Text>{replies.ReplyContent}</Text>
-                    </div>
-                  </Card>
-                )}
-              </Card>
-            </>
-          )}
-
-          {feedbackingBookingDetailsId === spaBooking.BookingDetailsID && (
-            <Card className="text-left w-full ml-auto mt-4">
-              <Title level={3} className="text-center">
-                {t("Phản hồi feedback")}
-              </Title>
-              <div className="mt-4">
-                <TextArea
-                  rows={4}
-                  value={feedbackContent}
-                  onChange={handleFeedbackContentChange}
-                  placeholder={t("enter yourreply")}
-                />
-                <div className="mt-4 text-right">
-                  <Button onClick={cancelFeedback}>{t("cancel")}</Button>
-                  <Button type="primary" onClick={submitReply} className="ml-2">
-                    {t("submit")}
+          <>
+            <Card className="text-left w-full ml-auto">
+              <div className="flex justify-between items-center">
+                <Title level={3} className="m-0">
+                  Đánh giá của khách hàng
+                </Title>
+                {role == 'Caretaker Staff' && (
+                  <Button
+                    className="ml-4"
+                    onClick={() => startFeedback(spaBooking.BookingDetailsID)}
+                    disabled={spaBooking.AdditionalInfoID.isReplied}
+                  >
+                    {t("reply")}
                   </Button>
-                </div>
+                )}
               </div>
+              <div className="mt-4">
+                <Text className="text-3xl" strong>
+                  {t("feedback")}:{" "}
+                </Text>
+                <Text className="text-3xl">{spaBooking.AdditionalInfoID.Feedback}</Text>
+              </div>
+              {replies && (
+                <Card className="border-none">
+                  <div className="flex flex-col">
+                    <div className="flex flex-row">
+                      <Text strong className="text-2xl">{caretakersName.fullname}</Text>
+                      <Text className="text-gray-400">
+                        {" - "}
+                        {moment(replies.ReplyDate).format("DD/MM/YYYY")}
+                      </Text>
+                    </div>
+                    <Text>{replies.ReplyContent}</Text>
+                  </div>
+                </Card>
+              )}
             </Card>
-          )} 
+          </>
+        )}
+
+        {feedbackingBookingDetailsId === spaBooking.BookingDetailsID && (
+          <Card className="text-left w-full ml-auto mt-4">
+            <Title level={3} className="text-center">
+              {t("Phản hồi feedback")}
+            </Title>
+            <div className="mt-4">
+              <TextArea
+                rows={4}
+                value={feedbackContent}
+                onChange={handleFeedbackContentChange}
+                placeholder={t("enter yourreply")}
+              />
+              <div className="mt-4 text-right">
+                <Button onClick={cancelFeedback}>{t("cancel")}</Button>
+                <Button type="primary" onClick={submitReply} className="ml-2">
+                  {t("submit")}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card className="md:text-right md:w-3/5 md:ml-auto border-none">
           {spaBookingDetail.ActualWeight !== spaBookingDetail.PetWeight && spaBooking.ExtraCharge != 0 && spaBookingDetail.ActualWeight !== null ? (
@@ -803,8 +817,8 @@ const SpaBookingDetail = () => {
         )}
         {/* Render the cancel button conditionally */}
         {(role === 'Customer') && spaBooking.CurrentStatus !== 'Completed' && spaBooking.CurrentStatus !== 'Canceled' && (
-          <Button 
-            danger 
+          <Button
+            danger
             className="float-end mt-4"
             onClick={handleCancelBooking}
             disabled={!isBefore24Hours()}>

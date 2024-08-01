@@ -522,8 +522,8 @@
     "Nhân viên chăm sóc": "Nhân viên chăm sóc",
     "select_caretaker": "Vui lòng chọn nhân viên chăm sóc",
     "change_information_booking": "Thay đổi thông tin đặt lịch",
-    "annouce_before_change" : "Nếu chọn thời gian đặt chỗ này, bạn không thể thay đổi bất kỳ thông tin nào nữa. Bạn vẫn sẵn sàng thay đổi?",
-    "choose_caretaker" : "Chọn người chăm sóc",
+    "annouce_before_change": "Nếu chọn thời gian đặt chỗ này, bạn không thể thay đổi bất kỳ thông tin nào nữa. Bạn vẫn sẵn sàng thay đổi?",
+    "choose_caretaker": "Chọn người chăm sóc",
     "policy": "CHÍNH SÁCH",
     "policy_store": "Chính Sách Của Tiệm",
     "policy_header_1": "Chính Sách Phí Chênh Lệch Cân Nặng",
@@ -551,5 +551,11 @@
     "policy_detail_3.1": "- Mọi yêu cầu hoàn tiền cần được gửi qua email hoặc liên hệ trực tiếp với chúng tôi trong thời gian quy định.",
     "24_hour_booking_policy": "Chính Sách Đặt Lịch Trong Vòng 24 Giờ",
     "booking_policy_detail_1": "- Đặt lịch trong vòng 24 tiếng so với thời điểm hiện tại thì không thể thay đổi thông tin đặt lịch và hủy đặt lịch.",
-    "booking_policy_detail_2": "- Mọi vấn đề liên quan vui lòng liên hệ qua hotline để được hỗ trợ."
+    "booking_policy_detail_2": "- Mọi vấn đề liên quan vui lòng liên hệ qua hotline để được hỗ trợ.",
+    "error_changing_booking_information": "Có lỗi xảy ra khi thay đổi thông tin đặt chỗ",
+    "you_can_not_change_this_information_booking_any_more": "Bạn không thể thay đổi thông tin đặt chỗ này nữa.",
+    "are_you_sure_to_change_the_information": "Bạn có chắc chắn muốn thay đổi thông tin không?",
+    "the_change_information_time_is_x_left": "Thời gian thay đổi thông tin còn lại là {{x}} lần.",
+    "error_reply": "Đã xảy ra lỗi khi trả lời.",
+    "confirm_cancel_booking": "Xác nhận hủy đặt chỗ"
 }

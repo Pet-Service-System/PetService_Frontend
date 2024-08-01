@@ -516,8 +516,8 @@
     "Nhân viên chăm sóc": "Caretaker",
     "select_caretaker": "Please select a caretaker",
     "change_information_booking": "Change Booking Information",
-    "annouce_before_change" : "If you choose this booking time, you can no longer change any information. Are you still willing to change?",
-    "choose_caretaker" : "Choose caretaker",
+    "annouce_before_change": "If you choose this booking time, you can no longer change any information. Are you still willing to change?",
+    "choose_caretaker": "Choose caretaker",
     "policy": "POLICY",
     "policy_store": "Store Policy",
     "policy_header_1": "Weight Difference Fee Policy",
@@ -546,5 +546,10 @@
     "24_hour_booking_policy": "24-Hour Booking Policy",
     "booking_policy_detail_1": "- Bookings made within 24 hours of the current time cannot be modified or canceled.",
     "booking_policy_detail_2": "- For any issues, please contact our hotline for support.",
-    "error_changing_booking_information" : "An error occurred while changing booking information"
+    "you_can_not_change_this_information_booking_any_more": "You cannot change this information booking anymore.",
+    "are_you_sure_to_change_the_information": "Are you sure to change the information?",
+    "the_change_information_time_is_x_left": "The change information time is {{x}} left.",
+    "error_changing_booking_information": "Error changing booking information.",
+    "error_reply": "An error occurred while replying.",
+    "confirm_cancel_booking": "Confirm Cancel Booking"
 }
