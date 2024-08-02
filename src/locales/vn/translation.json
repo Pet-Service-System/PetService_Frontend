@@ -555,7 +555,7 @@
     "error_changing_booking_information": "Có lỗi xảy ra khi thay đổi thông tin đặt chỗ",
     "you_can_not_change_this_information_booking_any_more": "Bạn không thể thay đổi thông tin đặt chỗ này nữa.",
     "are_you_sure_to_change_the_information": "Bạn có chắc chắn muốn thay đổi thông tin không?",
-    "the_change_information_time_is_x_left": "Thời gian thay đổi thông tin còn lại là {{x}} lần.",
+    "the_change_information_time_is_x_left": "Số lần thay đổi thông tin còn lại là {{x}} lần.",
     "error_reply": "Đã xảy ra lỗi khi trả lời.",
     "confirm_cancel_booking": "Xác nhận hủy đặt chỗ",
     "confirmation": "Tôi đồng ý với",
